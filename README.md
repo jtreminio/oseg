@@ -6,7 +6,7 @@ Create (almost) ready to use SDK snippets for SDKs generated using [openapi-gene
 
 ## Examples
 
-Using the [OpenAPITools/openapi-generator petstore.yaml](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml) definition as an example, we can generate SDK examples from the [addPet endpoint](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml#L22-L47).
+Using the [OpenAPITools/openapi-generator petstore.yaml](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml) definition, we can generate SDK examples from the [addPet endpoint](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml#L22-L47).
 
 OpenAPI spec:
 
@@ -369,6 +369,18 @@ apiCaller.addPet(
 });
 ```
 
+### Where does the example data come from?
+
+Example data embedded into the snippets above is read from a number of places, almost all embedded within the OpenAPI definition itself:
+
+1) `example` or `examples` definition among operation or parameter definitions
+2) Externally referenced JSON files
+3) You can also create custom JSON payloads for any given endpoint. Right now the directory for this is hard-coded as `custom_examples` within your OpenAPI SDK config file's directory. See [custom_examples](./data/petstore/custom_examples)
+
+OSEG currently generates one example file per `requestBody` definition, but only a single example per `parameters` definition.
+
+In other words, you can generate multiple examples of the same operation/endpoint by having multiple `requestBody` definitions (`application/json` and `application/x-www-form-urlencoded`). Each generate example will have different data embedded within it. However, since [parameters](https://github.com/jtreminio/oseg/blob/main/data/petstore/openapi.yaml#L84-L100) is tied to a single operation, the same data will apply to any and all `requestBody` definitions.
+
 ## Adding more SDKs
 
 Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/). Adding a new SDK requires a few steps:
@@ -396,3 +408,5 @@ Things like discriminators and `allOf` will be supported.
 Things like `oneOf` will not be supported (this does not translate very well to generated SDKs).
 
 Currently only languages I know are supported. I will continue adding more language as the project matures and test coverage increases.
+
+OSEG does not currently embed authentication/security examples or anything unrelated to data not available from `example`/`examples`. More feature support is coming.
