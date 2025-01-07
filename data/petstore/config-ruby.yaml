@@ -1,0 +1,9 @@
+generatorName: ruby
+additionalProperties:
+  gemName: openapi_client
+  moduleName: OpenapiClient
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

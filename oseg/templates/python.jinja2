@@ -1,0 +1,124 @@
+{%- macro print_scalar_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_scalar_array_value(parsed) -%}
+    {% if parsed.values == None %}None{% else %}
+[
+        {% for i in parsed.values %}
+    {{ i }},
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_value(parsed) -%}
+    {% if parsed.values == None %}None{% else %}
+open("{{ parsed.value }}", "rb").read()
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array_value(parsed) -%}
+    {% if parsed.values == None %}None{% else %}
+[
+        {% for i in parsed.values %}
+    open("{{ i }}", "rb").read(),
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_value(parsed) -%}
+    {% if parsed.value == None %}None{% else %}
+{
+        {% for k, v in parsed.value.items() %}
+    "{{ k }}": {{ v }},
+        {% endfor %}
+}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array_value(parsed) -%}
+    {% if parsed.values == None %}None{% else %}
+[
+        {% for obj in parsed.values %}
+    {
+            {% for k, v in obj.items() %}
+        "{{ k }}": {{ v }},
+            {% endfor %}
+    },
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_ref_array_value(parsed) -%}
+[
+    {% for i in parsed.values %}
+    {{ i }},
+    {% endfor %}
+]
+{%- endmacro -%}
+
+{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
+    {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
+{%- endmacro -%}
+
+from pprint import pprint
+
+from {{ sdk_options.additionalProperties.packageName }} import ApiClient, ApiException, Configuration, api, models
+
+configuration = Configuration()
+
+with ApiClient(configuration) as api_client:
+{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
+    {% if not ref.is_array %}
+    {{ ref_name|setter_property_name }} = models.{{ ref.type }}()
+        {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
+            {% for name, value in properties.items() %}
+    {{ ref_name|setter_property_name }}.{{ name }} = {{ value }}
+            {% endfor %}
+        {% endcall %}
+    {% else %}
+    {{ ref_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(ref, parent_name, 4) %}
+            {{- value }}
+        {% endcall %}
+    {% endif %}
+
+{% endfor %}
+    try:
+        api_caller = api.{{ api_name|pascal_case }}Api(api_client)
+
+        {{ "" -}}
+        {% if has_response  %}response = {% endif -%}
+        api_caller.{{ operation_id|snake_case }}(
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 12) %}
+    {% for name, value in properties.items() %}
+            {{ name|setter_property_name }}={{ value }},
+    {% endfor %}
+{% endcall %}
+        )
+    {% if has_response and not is_binary_response %}
+
+        pprint(response)
+    {% elif is_binary_response %}
+
+        open("file_response.zip", "wb").write(response.read())
+    {% endif %}
+    except ApiException as e:
+        print("Exception when calling {{ api_name|pascal_case }}#{{ operation_id|snake_case }}: %s\n" % e)
+{{ "" }}

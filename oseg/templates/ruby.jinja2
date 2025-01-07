@@ -1,0 +1,132 @@
+{%- macro print_scalar_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_scalar_array_value(parsed) -%}
+    {% if parsed.values == None %}nil{% else %}
+[
+        {% for i in parsed.values %}
+    {{ i }},
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_value(parsed) -%}
+    {% if parsed.values == None %}nil{% else %}
+File.new("{{ parsed.value }}", "r")
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array_value(parsed) -%}
+    {% if parsed.values == None %}nil{% else %}
+[
+        {% for i in parsed.values %}
+    File.new("{{ i }}", "r"),
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_value(parsed) -%}
+    {% if parsed.value == None %}nil{% else %}
+{
+        {% for k, v in parsed.value.items() %}
+    "{{ k }}": {{ v }},
+        {% endfor %}
+}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array_value(parsed) -%}
+    {% if parsed.values == None %}nil{% else %}
+[
+        {% for obj in parsed.values %}
+    {
+            {% for k, v in obj.items() %}
+        "{{ k }}": {{ v }},
+            {% endfor %}
+    },
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_ref_array_value(parsed) -%}
+[
+    {% for i in parsed.values %}
+    {{ i }},
+    {% endfor %}
+]
+{%- endmacro -%}
+
+{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count, required_flag) -%}
+    {{- caller(parse_request_data(example_data, single_body_value, indent_count, required_flag)) }}
+{%- endmacro -%}
+
+require "{{ sdk_options.additionalProperties.gemName }}"
+
+{{ sdk_options.additionalProperties.moduleName }}.configure do |config|
+end
+
+{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
+    {% if not ref.is_array %}
+{{ ref_name|setter_property_name }} = {{ sdk_options.additionalProperties.moduleName }}::{{ ref.type|pascal_case }}.new
+        {% call(properties) parse_body_properties_macro(ref, parent_name, 0) %}
+            {% for name, value in properties.items() %}
+{{ ref_name|setter_property_name }}.{{ name|setter_property_name }} = {{ value }}
+            {% endfor %}
+        {% endcall %}
+    {% else %}
+{{ ref_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(ref, parent_name, 0) %}
+    {{- value }}
+        {% endcall %}
+    {% endif %}
+
+{% endfor %}
+begin
+    api_caller = {{ sdk_options.additionalProperties.moduleName }}::{{ api_name|pascal_case }}Api.new
+
+    {{ "" -}}
+    {% if has_response  %}response = {% endif -%}
+    api_caller.{{ operation_id|snake_case }}(
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 4, True) %}
+    {% for name, value in properties.items() %}
+        {{ value }},
+    {% endfor %}
+{% endcall %}
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 4, False) %}
+    {% if properties %}
+        {
+        {% for name, value in properties.items() %}
+            {{ name|setter_property_name }}: {{ value }},
+        {% endfor %}
+        },
+    {% endif %}
+{% endcall %}
+    )
+{% if has_response and not is_binary_response %}
+
+    p response
+{% elif is_binary_response %}
+
+    FileUtils.cp(response.path, "path/to/file.zip")
+{% endif %}
+rescue {{ sdk_options.additionalProperties.moduleName }}::ApiError => e
+    puts "Exception when calling {{ api_name|pascal_case }}#{{ operation_id|snake_case }}: #{e}"
+end
+{{ "" }}

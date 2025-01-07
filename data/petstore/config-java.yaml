@@ -1,0 +1,13 @@
+generatorName: java
+additionalProperties:
+  invokerPackage: org.openapitools.client
+  apiPackage: org.openapitools.client.api
+  modelPackage: org.openapitools.client.model
+  # Useful for example namespace
+  finalPackageName: org.openapitools.client.examples
+  hideGenerationTimestamp: true
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

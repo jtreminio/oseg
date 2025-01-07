@@ -1,0 +1,131 @@
+{%- macro print_scalar_value(parsed) -%}
+{% if parsed.value == "null" %}undefined{% else %}
+{{ parsed.value }}
+{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_scalar_array_value(parsed) -%}
+    {% if parsed.values == None %}undefined{% else %}
+[
+        {% for i in parsed.values %}
+    {{ i }},
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_value(parsed) -%}
+    {% if parsed.values == None %}undefined{% else %}
+fs.createReadStream("{{ parsed.value }}")
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array_value(parsed) -%}
+    {% if parsed.values == None %}undefined{% else %}
+[
+        {% for i in parsed.values %}
+    fs.createReadStream("{{ i }}"),
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_value(parsed) -%}
+    {% if parsed.value == None %}undefined{% else %}
+{
+        {% for k, v in parsed.value.items() %}
+    "{{ k }}": {{ v }},
+        {% endfor %}
+}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array_value(parsed) -%}
+    {% if parsed.values == None %}undefined{% else %}
+[
+        {% for obj in parsed.values %}
+    {
+            {% for k, v in obj.items() %}
+        "{{ k }}": {{ v }},
+            {% endfor %}
+    },
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_value(parsed) -%}
+    {% if parsed.value == None %}undefined{% else %}
+{{ parsed.value }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_array_value(parsed) -%}
+    {% if parsed.value == None %}undefined{% else %}
+[
+    {% for i in parsed.values %}
+    {{ i }},
+    {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
+    {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
+{%- endmacro -%}
+
+import * as fs from 'fs';
+import * as {{ sdk_options.additionalProperties.npmName|snake_case }} from "{{ sdk_options.additionalProperties.npmName }}";
+
+const apiCaller = new {{ sdk_options.additionalProperties.npmName|snake_case }}.{{ api_name|pascal_case }}Api();
+
+{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
+    {% if not ref.is_array %}
+const {{ ref_name|setter_property_name }}: {{ sdk_options.additionalProperties.npmName|snake_case }}.{{ ref.type }} = {
+    {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
+        {% for name, value in properties.items() %}
+    {{ name|setter_method_name }}: {{ value }},
+        {% endfor %}
+    {% endcall %}
+};
+    {% else %}
+const {{ ref_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(ref, parent_name, 0) %}
+    {{- value }};
+        {% endcall %}
+    {% endif %}
+
+{% endfor %}
+{% if not single_body_value or not example_data.body %}
+    {% call(properties) parse_request_properties_macro(example_data, single_body_value, 4) %}
+        {% for name, value in properties.items() %}
+const {{ name }} = {{ value }};
+        {% endfor %}
+    {% endcall %}
+{% endif %}
+apiCaller.{{ operation_id|camel_case }}(
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 4) %}
+    {% for name, value in properties.items() %}
+    {{ name|camel_case }},
+    {% endfor %}
+{% endcall %}
+){% if has_response  %}.then(response => {
+{% if not is_binary_response %}
+  console.log(response.body);
+{% elif is_binary_response %}
+  fs.createWriteStream('file_response.zip').write(response.body);
+{% endif -%}
+}){% endif %}.catch(error => {
+  console.log("Exception when calling {{ api_name|pascal_case }}#{{ operation_id|camel_case }}:");
+  console.log(error.body);
+});
+{{ "" }}

@@ -1,0 +1,8 @@
+generatorName: php
+additionalProperties:
+  invokerPackage: "OpenAPI\\Client"
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

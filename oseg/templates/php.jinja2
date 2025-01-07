@@ -1,0 +1,130 @@
+{%- macro print_scalar_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_scalar_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+[
+        {% for i in parsed.values %}
+    {{ i }},
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+new SplFileObject("{{ parsed.value }}")
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+[
+        {% for i in parsed.values %}
+    new SplFileObject("{{ i }}"),
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_value(parsed) -%}
+    {% if parsed.value == None %}null{% else %}
+{
+        {% for k, v in parsed.value.items() %}
+    "{{ k }}": {{ v }},
+        {% endfor %}
+}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+[
+        {% for obj in parsed.values %}
+    {
+            {% for k, v in obj.items() %}
+        "{{ k }}": {{ v }},
+            {% endfor %}
+    },
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_value(parsed) -%}
+    {% if parsed.value == None %}null{% else %}
+${{ parsed.value }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_array_value(parsed) -%}
+    {% if parsed.value == None %}null{% else %}
+[
+    {% for i in parsed.values %}
+    ${{ i }},
+    {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
+    {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
+{%- endmacro -%}
+
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$config = {{ sdk_options.additionalProperties.invokerPackage }}\Configuration::getDefaultConfiguration();
+
+{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
+    {% if not ref.is_array %}
+{{ ref_name|setter_property_name }} = (new {{ sdk_options.additionalProperties.invokerPackage }}\Model\{{ ref.type }}())
+        {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
+            {% for name, value in properties.items() %}
+    ->set{{ name|setter_method_name }}({{ value }}){% if loop.last %};{% endif %}
+
+            {% endfor %}
+        {% endcall %}
+    {% else %}
+{{ ref_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(ref, parent_name, 0) %}
+{{- value }};
+        {% endcall %}
+    {% endif %}
+
+{% endfor %}
+try {
+    $api_caller = new {{ sdk_options.additionalProperties.invokerPackage }}\Api\{{ api_name|pascal_case }}Api(config: $config);
+
+    {{ "" -}}
+    {% if has_response  %}$response = {% endif -%}
+    $api_caller->{{ operation_id|camel_case }}(
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 8) %}
+    {% for name, value in properties.items() %}
+        {{ name|snake_case }}: {% if value != "null" %}{% endif %}{{ value }},
+    {% endfor %}
+{% endcall %}
+    );
+{% if has_response and not is_binary_response %}
+
+    print_r($response);
+{% elif is_binary_response %}
+
+    copy($response->getRealPath(), __DIR__ . '/file_response.zip');
+{% endif %}
+} catch ({{ sdk_options.additionalProperties.invokerPackage }}\ApiException $e) {
+    echo 'Exception when calling {{ api_name|pascal_case }}#{{ operation_id|camel_case }}: '
+        . print_r($e->getResponseObject());
+}
+{{ "" }}

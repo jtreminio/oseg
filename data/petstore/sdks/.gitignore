@@ -1,0 +1,14 @@
+**/.github
+**/.openapi-generator
+**/examples
+
+csharp/api
+csharp/global.json
+
+java/api
+java/gradle
+
+ruby/spec
+
+typescript-node/dist
+typescript-node/package-lock.json

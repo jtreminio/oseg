@@ -1,0 +1,160 @@
+{%- macro print_scalar_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_scalar_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+List.of {% if not parsed.values %}(){% else %}
+(
+        {% for i in parsed.values %}
+    {{ i }}{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+)
+    {%- endif %}{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+new File("{{ parsed.value }}")
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+List.of {% if not parsed.values %}(){% else %}
+(
+    {% for i in parsed.values %}
+    new File("{{ i }}"){% if not loop.last %},{% endif %}
+
+    {% endfor %}
+)
+    {%- endif %}{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_value(parsed) -%}
+    {% if parsed.value == None %}null{% else %}
+Map.of {% if not parsed.value %}(){% else %}
+(
+        {% for k, v in parsed.value.items() %}
+    "{{ k }}", {{ v }}{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+)
+    {%- endif %}{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+List.of {% if not parsed.values %}(){% else %}
+(
+        {% for obj in parsed.values %}
+    Map.of {% if not parsed.value %}(){% else %}
+    (
+            {% for k, v in obj.items() %}
+        "{{ k }}": {{ v }},
+            {% endfor %}
+    ){% if not loop.last %},{% endif %}{% endif %}
+
+        {% endfor %}
+)
+    {%- endif %}{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_ref_value(parsed) -%}
+{{ parsed.value }}
+{%- endmacro -%}
+
+{%- macro print_ref_array_value(parsed) -%}
+    {% if parsed.values == None %}null{% else %}
+List.of {% if not parsed.values %}(){% else %}
+(
+        {% for i in parsed.values %}
+    {{ i|camel_case }}{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+)
+    {%- endif %}{%- endif %}
+{%- endmacro -%}
+
+{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- endmacro -%}
+
+{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
+    {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
+{%- endmacro -%}
+
+package {{ sdk_options.additionalProperties.finalPackageName }};
+
+import {{ sdk_options.additionalProperties.invokerPackage }}.ApiException;
+import {{ sdk_options.additionalProperties.invokerPackage }}.Configuration;
+import {{ sdk_options.additionalProperties.apiPackage }}.*;
+import {{ sdk_options.additionalProperties.invokerPackage }}.auth.*;
+import {{ sdk_options.additionalProperties.modelPackage }}.*;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+public class {{ operation_id|pascal_case }}_{{ example_data.name|snake_case }}
+{
+    public static void main(String[] args)
+    {
+        var config = Configuration.getDefaultApiClient();
+
+{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
+    {% if not ref.is_array %}
+        var {{ ref_name|setter_property_name }} = new {{ ref.type }}()
+        {% call(properties) parse_body_properties_macro(ref, parent_name, 12) %}
+            {% for name, value in properties.items() %}
+            .{{ name|setter_property_name }}({{ value }}){% if loop.last %};{% endif %}
+
+            {% endfor %}
+        {% endcall %}
+    {% else %}
+        var {{ ref_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(ref, parent_name, 8) %}
+            {{- value }};
+        {% endcall %}
+    {% endif %}
+
+{% endfor %}
+        try
+        {
+            var apiCaller = new {{ api_name|pascal_case }}Api(config);
+
+            {{ "" -}}
+            {% if has_response  %}var response = {% endif -%}
+            apiCaller.{{ operation_id|camel_case }}(
+{% call(properties) parse_request_properties_macro(example_data, single_body_value, 16) %}
+    {% for name, value in properties.items() %}
+                {{ value }}{% if not loop.last %},{% endif %}
+
+    {% endfor %}
+{% endcall %}
+            );
+    {% if has_response and not is_binary_response %}
+
+            System.out.println(response);
+    {% elif is_binary_response %}
+            var fileStream = File.Create("file_response.zip");
+            response.Seek(0, SeekOrigin.Begin);
+            response.CopyTo(fileStream);
+            fileStream.Close();
+    {% endif %}
+        } catch (ApiException e) {
+            System.err.println("Exception when calling {{ api_name|pascal_case }}#{{ operation_id|camel_case }}");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+{{ "" }}

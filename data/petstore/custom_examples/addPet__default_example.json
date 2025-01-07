@@ -1,0 +1,23 @@
+{
+  "id": 12345,
+  "name": "My pet name",
+  "status": "available",
+  "photoUrls": [
+    "https://example.com/picture_1.jpg",
+    "https://example.com/picture_2.jpg"
+  ],
+  "category": {
+    "id": 12345,
+    "name": "Category_Name"
+  },
+  "tags": [
+    {
+      "id": 12345,
+      "name": "tag_1"
+    },
+    {
+      "id": 98765,
+      "name": "tag_2"
+    }
+  ]
+}

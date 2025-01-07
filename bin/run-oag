@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+SOURCE_DIR=$1
+SDK=$2
+
+BASE_DIR="${DIR}/../data/${SOURCE_DIR}"
+
+OAS="${BASE_DIR}/openapi.yaml"
+CONFIG_FILE="${BASE_DIR}/config-${SDK}.yaml"
+OUTPUT_DIR="${BASE_DIR}/sdks"
+
+if [[ -z "${SOURCE_DIR-}" ]] || [[ ! -d "${BASE_DIR}" ]]; then
+  echo "Must provide source directory"
+  exit 1
+fi
+
+if [[ ! -f "${OAS}" ]]; then
+  echo "Openapi file does not exist: ${OAS}"
+  exit 1
+fi
+
+if [[ -z "${SDK-}" ]]; then
+  echo "SDK not set"
+  exit 1
+fi
+
+CONFIG_PARAM="-g ${SDK}"
+if [[ -f "${CONFIG_FILE}" ]]; then
+  CONFIG_PARAM="-c /local/config-${SDK}.yaml"
+fi
+
+if [[ -d "${OUTPUT_DIR}/${SDK}" ]]; then
+  mkdir -p "${OUTPUT_DIR}/${SDK}"
+fi
+
+docker run --rm \
+  -v "${BASE_DIR}/:/local" \
+  openapitools/openapi-generator-cli:v7.8.0 generate \
+    ${CONFIG_PARAM} \
+    -i "/local/openapi.yaml" \
+    -o "/local/sdks/${SDK}"
+
+if [[ "${SOURCE_DIR}" == "petstore" ]] && [[ -d "${BASE_DIR}/oseg_generated/${SDK}" ]]; then
+  if [[ "${SDK}" == "csharp" ]]; then
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/Org.OpenAPITools/examples"
+  elif [[ "${SDK}" == "java" ]]; then
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/main/java/org/openapitools/client/examples"
+  else
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/examples"
+  fi
+
+  if [[ ! -L "${SYMLINK_TARGET}" ]]; then
+    ln -s "${BASE_DIR}/oseg_generated/${SDK}" "${SYMLINK_TARGET}"
+  fi
+fi

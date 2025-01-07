@@ -1,0 +1,6 @@
+{
+  "__http__": {
+    "petId": 12345
+  },
+  "file": "/path/to/file"
+}
