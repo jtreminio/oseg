@@ -369,7 +369,7 @@ apiCaller.addPet(
 });
 ```
 
-### Where does the example data come from?
+## Where does the example data come from?
 
 Example data embedded into the snippets above is read from a number of places, almost all embedded within the OpenAPI definition itself:
 
