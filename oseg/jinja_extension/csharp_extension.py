@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from oseg import model
 from oseg.jinja_extension import BaseExtension
 
@@ -195,7 +193,7 @@ class CSharpExtension(BaseExtension):
                 return parsed
 
             for obj in item.value:
-                result = OrderedDict()
+                result = {}
 
                 for k, v in obj.items():
                     result[k] = self._to_json(v)

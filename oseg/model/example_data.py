@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Optional, Union
 
 from oseg import model
@@ -8,7 +7,7 @@ class ExampleData:
     def __init__(
         self,
         name: str,
-        http: OrderedDict[str, "model.PropertyScalar"],
+        http: dict[str, "model.PropertyScalar"],
         body: Optional["model.PropertyRef"],
     ):
         self.name = name
@@ -18,8 +17,8 @@ class ExampleData:
     def get_non_refs(
         self,
         required: bool,
-    ) -> OrderedDict[str, Union["model.PropertyObject", "model.PropertyScalar"]]:
-        ordered = OrderedDict()
+    ) -> dict[str, Union["model.PropertyObject", "model.PropertyScalar"]]:
+        ordered = {}
 
         for name, prop in self.http.items():
             if prop.is_required == required:

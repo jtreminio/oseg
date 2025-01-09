@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import openapi_pydantic as oa
 
 from oseg import parser, model
@@ -283,7 +281,7 @@ class PropertyParser:
     def __sort_property_names(
         self,
         data: dict[str, any],
-        properties: OrderedDict[str, oa.Reference | oa.Schema],
+        properties: dict[str, oa.Reference | oa.Schema],
     ) -> list[str]:
         if self.__order_by_example_data:
             # properties with example data are listed first

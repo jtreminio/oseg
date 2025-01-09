@@ -1,6 +1,5 @@
 import json
 import os
-from collections import OrderedDict
 from pathlib import Path
 
 import openapi_pydantic as oa
@@ -28,7 +27,7 @@ class RequestBodyParser:
     def get_body_params_by_example(
         self,
         operation: oa.Operation,
-    ) -> tuple[dict[str, any], OrderedDict[str, model.PropertyRef]]:
+    ) -> tuple[dict[str, any], dict[str, model.PropertyRef]]:
         """Grab example data from requestBody schema
 
         Will read data directly from requestBody.content.example[s], or $ref:
@@ -44,7 +43,7 @@ class RequestBodyParser:
         """
 
         http_data = {}
-        examples = OrderedDict()
+        examples = {}
 
         request_body_content = self.__get_request_body_content(operation)
 
@@ -118,7 +117,7 @@ class RequestBodyParser:
                         **component_examples,
                     }
 
-        result = OrderedDict()
+        result = {}
 
         for example_name, example in examples.items():
             self.property_parser.order_by_example_data(
@@ -264,7 +263,7 @@ class RequestBodyParser:
     def __get_data_from_custom_examples(
         self,
         operation_id: str,
-    ) -> tuple[dict[str, any], OrderedDict[str, dict[str, any]]] | None:
+    ) -> tuple[dict[str, any], dict[str, dict[str, any]]] | None:
         """Read example data from external file"""
 
         directory = f"{self.oa_parser.get_oas_dirname()}/custom_examples/"
@@ -274,7 +273,7 @@ class RequestBodyParser:
         if not os.path.isdir(directory):
             return None
 
-        results = OrderedDict()
+        results = {}
         http_data: dict[str, any] = {}
 
         for filepath in glob.glob(os.path.join(directory, f"{base_filename}*")):

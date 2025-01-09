@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from collections import OrderedDict
 
 import openapi_pydantic as oa
 
@@ -9,7 +8,7 @@ from oseg import parser, model
 @dataclass
 class JoinedValues:
     schemas: list[oa.Schema]
-    properties: OrderedDict[str, oa.Reference | oa.Schema]
+    properties: dict[str, oa.Reference | oa.Schema]
     discriminator_target_name: str | None
 
 
@@ -105,8 +104,8 @@ class SchemaJoiner:
     def __get_properties(
         self,
         schemas: list[oa.Schema],
-    ) -> OrderedDict[str, oa.Reference | oa.Schema]:
-        result = OrderedDict()
+    ) -> dict[str, oa.Reference | oa.Schema]:
+        result = {}
 
         for schema in schemas:
             # property could actually be an array of refs

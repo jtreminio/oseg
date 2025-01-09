@@ -1,6 +1,5 @@
 import json
 from abc import abstractmethod
-from collections import OrderedDict
 from typing import Protocol, Union
 
 import jinja2
@@ -60,14 +59,14 @@ class BaseExtension(Protocol):
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
-    ) -> OrderedDict[str, model.PropertyRef]:
+    ) -> dict[str, model.PropertyRef]:
         """Parses body data that is sent as instantiated Model objects
 
         Drills down into dependent Model objects
         """
 
         if not example_data.body:
-            return OrderedDict()
+            return {}
 
         refs = self.__flatten_refs(example_data.body, "")
 
@@ -82,7 +81,7 @@ class BaseExtension(Protocol):
         parent: model.PropertyRef,
         parent_name: str,
         indent_count: int,
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
         result = self.__parse_non_ref_properties(
@@ -135,7 +134,7 @@ class BaseExtension(Protocol):
         single_body_value: bool,
         indent_count: int,
         required_flag: bool | None = None,
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         """Parse data passed directly to an API object
 
         Can include HTTP path/query params as well as body data.
@@ -153,8 +152,8 @@ class BaseExtension(Protocol):
         4) Optional body params
         """
 
-        http_required = OrderedDict()
-        http_optional = OrderedDict()
+        http_required = {}
+        http_optional = {}
 
         for name, parameter in example_data.http.items():
             if parameter.is_required:
@@ -202,9 +201,9 @@ class BaseExtension(Protocol):
                     params_optional[k] = v
 
         if required_flag:
-            params_optional = OrderedDict()
+            params_optional = {}
         elif required_flag is not None and not required_flag:
-            params_required = OrderedDict()
+            params_required = {}
 
         for k, v in params_optional.items():
             params_required[k] = v
@@ -227,8 +226,8 @@ class BaseExtension(Protocol):
         self,
         ref: model.PropertyRef,
         parent_name: str,
-    ) -> OrderedDict[str, model.PropertyRef]:
-        result = OrderedDict()
+    ) -> dict[str, model.PropertyRef]:
+        result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
         for name, sub_ref in ref.value.refs.items():
@@ -253,11 +252,11 @@ class BaseExtension(Protocol):
         self,
         context: Context,
         parent_type: str,
-        properties: OrderedDict[
+        properties: dict[
             str,
             Union["model.PropertyFile", "model.PropertyObject", "model.PropertyScalar"],
         ],
-    ) -> OrderedDict[str, any]:
+    ) -> dict[str, any]:
         print_scalar_value: Macro = context.vars["print_scalar_value"]
         print_scalar_array_value: Macro = context.vars["print_scalar_array_value"]
         print_file_value: Macro = context.vars["print_file_value"]
@@ -265,7 +264,7 @@ class BaseExtension(Protocol):
         print_object_value: Macro = context.vars["print_object_value"]
         print_object_array_value: Macro = context.vars["print_object_array_value"]
 
-        result: OrderedDict[str, any] = OrderedDict()
+        result: dict[str, any] = {}
 
         for name, prop in properties.items():
             if isinstance(prop, model.PropertyScalar):
@@ -294,9 +293,9 @@ class BaseExtension(Protocol):
 
     def __indent(
         self,
-        property_values: OrderedDict[str, str | None],
+        property_values: dict[str, str | None],
         indent_count: int,
-    ) -> OrderedDict[str, str | None]:
+    ) -> dict[str, str | None]:
         indent = " " * indent_count
 
         for name, value in property_values.items():

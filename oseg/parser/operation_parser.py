@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import openapi_pydantic as oa
 
 from oseg import parser, model
@@ -144,14 +142,14 @@ class OperationParser:
         self,
         operation: oa.Operation,
         http_custom_example_data: dict[str, any] | None,
-    ) -> OrderedDict[str, model.PropertyScalar]:
+    ) -> dict[str, model.PropertyScalar]:
         """Add path and query parameter examples to request operation
 
         Only parameters that have example or default data will be included.
         Will only ever read the first example of any parameter.
         """
 
-        http_params = OrderedDict()
+        http_params = {}
 
         if not operation.parameters:
             return http_params

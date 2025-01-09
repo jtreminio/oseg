@@ -1,11 +1,11 @@
-from typing import Union, OrderedDict
+from typing import Union
 import openapi_pydantic as oa
 
 from oseg import model
 
 
 class PropertyObject(model.PropertyProto):
-    T = Union[OrderedDict[str, any] | list[OrderedDict[str, any]] | None]
+    T = Union[dict[str, any] | list[dict[str, any]] | None]
 
     def __init__(
         self,

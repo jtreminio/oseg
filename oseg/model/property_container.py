@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Union
 
 import openapi_pydantic as oa
@@ -11,17 +10,17 @@ class PropertyContainer:
         self.schema = schema
         self.discriminator_target_type: str | None = None
 
-        self._refs: OrderedDict[str, "model.PropertyRef"] = OrderedDict()
-        self._array_refs: OrderedDict[str, list["model.PropertyRef"]] = OrderedDict()
-        self._scalars: OrderedDict[str, "model.PropertyScalar"] = OrderedDict()
-        self._files: OrderedDict[str, "model.PropertyFile"] = OrderedDict()
-        self._objects: OrderedDict[str, "model.PropertyObject"] = OrderedDict()
+        self._refs: dict[str, "model.PropertyRef"] = {}
+        self._array_refs: dict[str, list["model.PropertyRef"]] = {}
+        self._scalars: dict[str, "model.PropertyScalar"] = {}
+        self._files: dict[str, "model.PropertyFile"] = {}
+        self._objects: dict[str, "model.PropertyObject"] = {}
 
         self._properties_required: list[str] = []
         self._properties_optional: list[str] = []
 
     @property
-    def refs(self) -> OrderedDict[str, "model.PropertyRef"]:
+    def refs(self) -> dict[str, "model.PropertyRef"]:
         return self._refs
 
     def add_ref(self, name: str, ref: "model.PropertyRef") -> None:
@@ -29,7 +28,7 @@ class PropertyContainer:
         self.__add_property_to_full_list(name)
 
     @property
-    def array_refs(self) -> OrderedDict[str, list["model.PropertyRef"]]:
+    def array_refs(self) -> dict[str, list["model.PropertyRef"]]:
         return self._array_refs
 
     def add_array_refs(self, name: str, refs: list["model.PropertyRef"]) -> None:
@@ -37,8 +36,8 @@ class PropertyContainer:
         self.__add_property_to_full_list(name)
 
     @property
-    def scalars(self) -> OrderedDict[str, "model.PropertyScalar"]:
-        result = OrderedDict()
+    def scalars(self) -> dict[str, "model.PropertyScalar"]:
+        result = {}
 
         for name, prop in self._scalars.items():
             if not prop.is_array:
@@ -47,8 +46,8 @@ class PropertyContainer:
         return result
 
     @property
-    def array_scalars(self) -> OrderedDict[str, "model.PropertyScalar"]:
-        result = OrderedDict()
+    def array_scalars(self) -> dict[str, "model.PropertyScalar"]:
+        result = {}
 
         for name, prop in self._scalars.items():
             if prop.is_array:
@@ -61,8 +60,8 @@ class PropertyContainer:
         self.__add_property_to_full_list(name)
 
     @property
-    def files(self) -> OrderedDict[str, "model.PropertyFile"]:
-        result = OrderedDict()
+    def files(self) -> dict[str, "model.PropertyFile"]:
+        result = {}
 
         for name, prop in self._files.items():
             if not prop.is_array:
@@ -71,8 +70,8 @@ class PropertyContainer:
         return result
 
     @property
-    def array_files(self) -> OrderedDict[str, "model.PropertyFile"]:
-        result = OrderedDict()
+    def array_files(self) -> dict[str, "model.PropertyFile"]:
+        result = {}
 
         for name, prop in self._files.items():
             if prop.is_array:
@@ -85,8 +84,8 @@ class PropertyContainer:
         self.__add_property_to_full_list(name)
 
     @property
-    def objects(self) -> OrderedDict[str, "model.PropertyObject"]:
-        result = OrderedDict()
+    def objects(self) -> dict[str, "model.PropertyObject"]:
+        result = {}
 
         for name, prop in self._objects.items():
             if not prop.is_array:
@@ -95,8 +94,8 @@ class PropertyContainer:
         return result
 
     @property
-    def array_objects(self) -> OrderedDict[str, "model.PropertyObject"]:
-        result = OrderedDict()
+    def array_objects(self) -> dict[str, "model.PropertyObject"]:
+        result = {}
 
         for name, prop in self._objects.items():
             if prop.is_array:
@@ -111,13 +110,11 @@ class PropertyContainer:
     def get_non_refs(
         self,
         required_flag: bool | None = None,
-    ) -> OrderedDict[
+    ) -> dict[
         str, Union["model.PropertyFile", "model.PropertyObject", "model.PropertyScalar"]
     ]:
         all_props = self._scalars | self._files | self._objects
-        ordered: OrderedDict[
-            str, Union["model.PropertyObject", "model.PropertyScalar"]
-        ] = OrderedDict()
+        ordered: dict[str, Union["model.PropertyObject", "model.PropertyScalar"]] = {}
 
         if required_flag is None or required_flag is True:
             for prop_name in self._properties_required:

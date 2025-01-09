@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Callable
 
 import jinja2
@@ -82,7 +81,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
-    ) -> OrderedDict[str, model.PropertyRef]:
+    ) -> dict[str, model.PropertyRef]:
         return self.__sdk_generator.parse_body_data(
             example_data,
             single_body_value,
@@ -95,7 +94,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         parent: model.PropertyRef,
         parent_name: str,
         indent_count: int,
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         return self.__sdk_generator.parse_body_properties(
             context,
             parent,
@@ -126,7 +125,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         single_body_value: bool,
         indent_count: int,
         required_flag: bool | None = None,
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         return self.__sdk_generator.parse_request_data(
             context,
             example_data,
