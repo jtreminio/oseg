@@ -1,14 +1,17 @@
 import unittest
-from test_utils import get_request_operations
+from test_utils import TestUtils
 
 
 class TestOperationParser(unittest.TestCase):
+    def setUp(self):
+        self.test_utils = TestUtils()
+
     def test_param_with_example(self):
         """Always use example value if set"""
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_with_example"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = "value_1"
@@ -29,7 +32,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_with_example_with_default"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = "value_1"
@@ -50,7 +53,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_without_example_with_default_is_required"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = "value_2"
@@ -71,7 +74,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_without_example_without_default_is_required"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = None
@@ -92,7 +95,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_without_example_without_default_not_required"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = None
@@ -113,7 +116,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_as_array"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = [
@@ -137,7 +140,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "mixed_params"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_keys = [
             "param_with_example",
@@ -203,7 +206,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "path-query-parameters.yaml"
         operation_id = "param_not_in_query_or_path"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_name = "param_name_1"
         expected_value = "value_1"
@@ -224,7 +227,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "single-requestBody.yaml"
         operation_id = "single_request_body"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_example_name = "default_example"
         expected_example_body_type = "Pet"
@@ -244,7 +247,7 @@ class TestOperationParser(unittest.TestCase):
 
         oas_file = "single-requestBody.yaml"
         operation_id = "multiple_request_body"
-        request_operation = get_request_operations(oas_file)[operation_id]
+        request_operation = self.test_utils.request_operations(oas_file)[operation_id]
 
         expected_example_name = "default_example"
         expected_example_body_type = "Customer"
