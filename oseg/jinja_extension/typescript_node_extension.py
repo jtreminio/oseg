@@ -28,7 +28,7 @@ class TypescriptNodeExtension(BaseExtension):
                 return parsed
 
             is_enum = item.type == "string" and item.is_enum
-            namespace = self.sdk_options["additionalProperties"].get("npmName")
+            namespace = self.sdk_options.additionalProperties.get("npmName")
 
             for i in item.value:
                 if is_enum:
@@ -43,7 +43,7 @@ class TypescriptNodeExtension(BaseExtension):
 
         if item.type == "string" and item.is_enum:
             parsed.is_enum = True
-            namespace = self.sdk_options["additionalProperties"].get("npmName")
+            namespace = self.sdk_options.additionalProperties.get("npmName")
             enum_name = self.__get_enum_name(item, item.value)
 
             if enum_name is None:

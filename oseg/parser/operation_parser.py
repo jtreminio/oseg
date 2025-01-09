@@ -1,5 +1,4 @@
 import openapi_pydantic as oa
-
 from oseg import parser, model
 
 

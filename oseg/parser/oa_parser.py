@@ -1,9 +1,8 @@
 import json
 import os
-
+from pathlib import Path
 import openapi_pydantic as oa
 import yaml
-from pathlib import Path
 
 
 class OaParser:

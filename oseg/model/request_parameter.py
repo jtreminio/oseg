@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import openapi_pydantic as oa
+from dataclasses import dataclass
 
 
 @dataclass

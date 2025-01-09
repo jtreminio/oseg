@@ -1,6 +1,5 @@
-from typing import Union
 import openapi_pydantic as oa
-
+from typing import Union
 from oseg import model
 
 T = Union["model.PropertyContainer", list[model.PropertyContainer]]

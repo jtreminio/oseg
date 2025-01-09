@@ -1,8 +1,6 @@
-from dataclasses import dataclass
-
 import openapi_pydantic as oa
-
-from oseg import parser, model
+from dataclasses import dataclass
+from oseg import model, parser
 
 
 @dataclass

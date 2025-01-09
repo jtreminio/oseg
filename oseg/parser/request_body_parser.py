@@ -1,10 +1,8 @@
+import glob
 import json
 import os
-from pathlib import Path
-
 import openapi_pydantic as oa
-import glob
-
+from pathlib import Path
 from oseg import parser, model
 
 

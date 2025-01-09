@@ -1,10 +1,7 @@
-from typing import Callable
-
 import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context
-
-import oseg
+from typing import Callable
 from oseg import jinja_extension, model
 
 
@@ -67,14 +64,14 @@ class GeneratorExtension(jinja2.ext.Extension):
         return self.__sdk_generator
 
     @sdk_generator.setter
-    def sdk_generator(self, sdk_options: "oseg.SdkOptions") -> None:
+    def sdk_generator(self, sdk_options: "model.SdkOptions") -> None:
         if (
-            sdk_options["generatorName"] is None
-            or sdk_options["generatorName"] not in self.__generators
+            sdk_options.generatorName is None
+            or sdk_options.generatorName not in self.__generators
         ):
             raise NotImplementedError
 
-        self.__sdk_generator = self.__generators[sdk_options["generatorName"]]
+        self.__sdk_generator = self.__generators[sdk_options.generatorName]
         self.__sdk_generator.sdk_options = sdk_options
 
     def __parse_body_data(

@@ -1,6 +1,5 @@
-from typing import Union
 import openapi_pydantic as oa
-
+from typing import Union
 from oseg import model
 
 T_SINGLE = Union[str, int, bool]

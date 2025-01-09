@@ -1,5 +1,4 @@
 import unittest
-
 from test_utils import get_request_operations
 
 

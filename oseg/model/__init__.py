@@ -15,3 +15,4 @@ from .property_scalar import PropertyScalar
 from .request_body_content import RequestBodyContent
 from .request_operation import RequestOperation
 from .request_parameter import RequestParameter
+from .sdk_options import SdkOptions

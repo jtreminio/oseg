@@ -1,13 +1,10 @@
-import json
-from abc import abstractmethod
-from typing import Protocol, Union
-
-import jinja2
-import openapi_pydantic as oa
-from jinja2.runtime import Macro, Context
 import convert_case
-
-import oseg
+import jinja2
+import json
+import openapi_pydantic as oa
+from abc import abstractmethod
+from jinja2.runtime import Macro, Context
+from typing import Protocol, Union
 from oseg import model
 
 
@@ -19,7 +16,7 @@ class BaseExtension(Protocol):
     def __init__(self, environment: jinja2.Environment):
         self.__environment = environment
         self.sdk_options = None
-        self.sdk_options: "oseg.SdkOptions"
+        self.sdk_options: "model.SdkOptions"
 
     @abstractmethod
     def setter_method_name(self, name: str) -> str:

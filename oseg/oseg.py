@@ -1,14 +1,6 @@
 import os
 import yaml
-from typing import TypedDict
-
-from . import parser, jinja_extension, model
-
-
-class SdkOptions(TypedDict):
-    generatorName: str
-    additionalProperties: dict[str, str]
-    globalProperties: dict[str, str]
+from . import jinja_extension, model, parser
 
 
 class Generator:
@@ -64,7 +56,7 @@ class Generator:
         self,
         request_operation: model.RequestOperation,
         example_data: model.ExampleData,
-        sdk_options: SdkOptions,
+        sdk_options: model.SdkOptions,
         output_dir: str,
         file_extension: str,
     ):
@@ -86,17 +78,15 @@ class Generator:
         f.write(rendered)
         f.close()
 
-    def __get_sdk_options(self, config_file: str) -> SdkOptions:
-        __DIR = os.path.dirname(os.path.abspath(__file__))
-
+    def __get_sdk_options(self, config_file: str) -> model.SdkOptions:
         if not os.path.isfile(config_file):
-            raise NotImplementedError
+            raise NotImplementedError(f"{config_file} does not exist or is unreadable")
 
         file = open(config_file, "r")
-        data: SdkOptions = yaml.safe_load(file)
+        data = yaml.safe_load(file)
         file.close()
 
         if not data or not len(data):
-            raise NotImplementedError
+            raise NotImplementedError(f"{config_file} contains invalid data")
 
-        return data
+        return model.SdkOptions(config_file, data)

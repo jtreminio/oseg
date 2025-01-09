@@ -28,7 +28,7 @@ class PhpExtension(BaseExtension):
                 return parsed
 
             is_enum = item.type == "string" and item.is_enum
-            namespace = self.sdk_options["additionalProperties"].get("invokerPackage")
+            namespace = self.sdk_options.additionalProperties.get("invokerPackage")
 
             for i in item.value:
                 if is_enum:
@@ -45,7 +45,7 @@ class PhpExtension(BaseExtension):
         parsed = model.ParsedScalar()
 
         if item.type == "string" and item.is_enum:
-            namespace = self.sdk_options["additionalProperties"].get("invokerPackage")
+            namespace = self.sdk_options.additionalProperties.get("invokerPackage")
             enum_name = self.__get_enum_name(item, name, item.value)
             parsed.value = f"{namespace}\\Model\\{parent_type}::{enum_name}"
             parsed.is_enum = True

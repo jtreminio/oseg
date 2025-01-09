@@ -1,6 +1,6 @@
-from typing import Protocol
-from abc import abstractmethod
 import openapi_pydantic as oa
+from abc import abstractmethod
+from typing import Protocol
 
 
 class PropertyProto(Protocol):
