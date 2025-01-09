@@ -83,14 +83,14 @@ fs.createReadStream("{{ parsed.value }}")
 {%- endmacro -%}
 
 import * as fs from 'fs';
-import * as {{ sdk_options.additionalProperties.npmName|snake_case }} from "{{ sdk_options.additionalProperties.npmName }}";
+import * as {{ sdk_options.additional_properties.npmName|snake_case }} from "{{ sdk_options.additional_properties.npmName }}";
 
-const apiCaller = new {{ sdk_options.additionalProperties.npmName|snake_case }}.{{ api_name|pascal_case }}Api();
+const apiCaller = new {{ sdk_options.additional_properties.npmName|snake_case }}.{{ api_name|pascal_case }}Api();
 
 {% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
     {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
     {% if not ref.is_array %}
-const {{ ref_name|setter_property_name }}: {{ sdk_options.additionalProperties.npmName|snake_case }}.{{ ref.type }} = {
+const {{ ref_name|setter_property_name }}: {{ sdk_options.additional_properties.npmName|snake_case }}.{{ ref.type }} = {
     {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
         {% for name, value in properties.items() %}
     {{ name|setter_method_name }}: {{ value }},

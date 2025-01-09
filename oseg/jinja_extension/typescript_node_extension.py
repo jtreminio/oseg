@@ -28,11 +28,11 @@ class TypescriptNodeExtension(BaseExtension):
                 return parsed
 
             is_enum = item.type == "string" and item.is_enum
-            namespace = self.sdk_options.additionalProperties.get("npmName")
+            namespace = self._sdk_options.additional_properties.get("npmName")
 
             for i in item.value:
                 if is_enum:
-                    enum_name = self.__get_enum_name(item, i)
+                    enum_name = self._get_enum_name(item, i)
                     parsed.values.append(f"{namespace}.{parent_type}.{enum_name}")
                 else:
                     parsed.values.append(self._to_json(i))
@@ -43,8 +43,8 @@ class TypescriptNodeExtension(BaseExtension):
 
         if item.type == "string" and item.is_enum:
             parsed.is_enum = True
-            namespace = self.sdk_options.additionalProperties.get("npmName")
-            enum_name = self.__get_enum_name(item, item.value)
+            namespace = self._sdk_options.additional_properties.get("npmName")
+            enum_name = self._get_enum_name(item, item.value)
 
             if enum_name is None:
                 parsed.value = "undefined"
@@ -115,7 +115,7 @@ class TypescriptNodeExtension(BaseExtension):
 
         return parsed
 
-    def __get_enum_name(
+    def _get_enum_name(
         self,
         item: model.PropertyScalar,
         value: any,

@@ -9,7 +9,6 @@ class Generator:
         oas_file: str,
         operation_id: str | None = None,
     ):
-        self.generator_extension = jinja_extension.GeneratorExtension.factory()
         oa_parser = parser.OaParser(oas_file)
         property_parser = parser.PropertyParser(oa_parser)
 
@@ -18,7 +17,8 @@ class Generator:
             property_parser=property_parser,
         )
 
-        self.operation_parser = parser.OperationParser(
+        self._generator_extension = jinja_extension.GeneratorExtension.factory()
+        self._operation_parser = parser.OperationParser(
             oa_parser=oa_parser,
             request_body_parser=request_body_parser,
             operation_id=operation_id,
@@ -29,17 +29,17 @@ class Generator:
         config_file: str,
         output_dir: str,
     ) -> int:
-        sdk_options = self.__get_sdk_options(config_file)
+        sdk_options = self._get_sdk_options(config_file)
 
-        self.generator_extension.sdk_generator = sdk_options
-        file_extension = self.generator_extension.sdk_generator.FILE_EXTENSION
+        self._generator_extension.sdk_generator = sdk_options
+        file_extension = self._generator_extension.sdk_generator.FILE_EXTENSION
 
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
 
-        for _, request_operation in self.get_request_operations().items():
+        for _, request_operation in self.request_operations.items():
             for example_data in request_operation.request_data:
-                self.__parse_request_operation(
+                self._parse_request_operation(
                     request_operation=request_operation,
                     example_data=example_data,
                     sdk_options=sdk_options,
@@ -49,10 +49,11 @@ class Generator:
 
         return 0
 
-    def get_request_operations(self) -> dict[str, model.RequestOperation]:
-        return self.operation_parser.get_request_operations()
+    @property
+    def request_operations(self) -> dict[str, model.RequestOperation]:
+        return self._operation_parser.get_request_operations()
 
-    def __parse_request_operation(
+    def _parse_request_operation(
         self,
         request_operation: model.RequestOperation,
         example_data: model.ExampleData,
@@ -64,7 +65,7 @@ class Generator:
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_data.name}"
         print(f"Begin parsing for {filename}")
 
-        rendered = self.generator_extension.template.render(
+        rendered = self._generator_extension.template.render(
             sdk_options=sdk_options,
             operation_id=operation_id,
             has_response=request_operation.has_response,
@@ -78,7 +79,7 @@ class Generator:
         f.write(rendered)
         f.close()
 
-    def __get_sdk_options(self, config_file: str) -> model.SdkOptions:
+    def _get_sdk_options(self, config_file: str) -> model.SdkOptions:
         if not os.path.isfile(config_file):
             raise NotImplementedError(f"{config_file} does not exist or is unreadable")
 

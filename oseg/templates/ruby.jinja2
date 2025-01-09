@@ -76,15 +76,15 @@ File.new("{{ parsed.value }}", "r")
     {{- caller(parse_request_data(example_data, single_body_value, indent_count, required_flag)) }}
 {%- endmacro -%}
 
-require "{{ sdk_options.additionalProperties.gemName }}"
+require "{{ sdk_options.additional_properties.gemName }}"
 
-{{ sdk_options.additionalProperties.moduleName }}.configure do |config|
+{{ sdk_options.additional_properties.moduleName }}.configure do |config|
 end
 
 {% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
     {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
     {% if not ref.is_array %}
-{{ ref_name|setter_property_name }} = {{ sdk_options.additionalProperties.moduleName }}::{{ ref.type|pascal_case }}.new
+{{ ref_name|setter_property_name }} = {{ sdk_options.additional_properties.moduleName }}::{{ ref.type|pascal_case }}.new
         {% call(properties) parse_body_properties_macro(ref, parent_name, 0) %}
             {% for name, value in properties.items() %}
 {{ ref_name|setter_property_name }}.{{ name|setter_property_name }} = {{ value }}
@@ -99,7 +99,7 @@ end
 
 {% endfor %}
 begin
-    api_caller = {{ sdk_options.additionalProperties.moduleName }}::{{ api_name|pascal_case }}Api.new
+    api_caller = {{ sdk_options.additional_properties.moduleName }}::{{ api_name|pascal_case }}Api.new
 
     {{ "" -}}
     {% if has_response  %}response = {% endif -%}
@@ -126,7 +126,7 @@ begin
 
     FileUtils.cp(response.path, "path/to/file.zip")
 {% endif %}
-rescue {{ sdk_options.additionalProperties.moduleName }}::ApiError => e
+rescue {{ sdk_options.additional_properties.moduleName }}::ApiError => e
     puts "Exception when calling {{ api_name|pascal_case }}#{{ operation_id|snake_case }}: #{e}"
 end
 {{ "" }}

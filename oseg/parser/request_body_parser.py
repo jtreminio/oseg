@@ -4,23 +4,24 @@ import os
 import openapi_pydantic as oa
 from pathlib import Path
 from oseg import parser, model
+from oseg.parser.file_loader import FileLoader
 
 
 class RequestBodyParser:
-    FORM_DATA_CONTENT_TYPES = [
+    _FORM_DATA_CONTENT_TYPES = [
         "application/x-www-form-urlencoded",
         "multipart/form-data",
     ]
 
-    INLINE_REQUEST_BODY_NAME = "__INLINE_REQUEST_BODY_NAME__"
+    _INLINE_REQUEST_BODY_NAME = "__INLINE_REQUEST_BODY_NAME__"
 
     def __init__(
         self,
         oa_parser: "parser.OaParser",
         property_parser: "parser.PropertyParser",
     ):
-        self.oa_parser: "parser.OaParser" = oa_parser
-        self.property_parser = property_parser
+        self._oa_parser = oa_parser
+        self._property_parser = property_parser
 
     def get_body_params_by_example(
         self,
@@ -43,7 +44,7 @@ class RequestBodyParser:
         http_data = {}
         examples = {}
 
-        request_body_content = self.__get_request_body_content(operation)
+        request_body_content = self._get_request_body_content(operation)
 
         if not request_body_content:
             return http_data, examples
@@ -55,7 +56,7 @@ class RequestBodyParser:
 
         default_example_name = "default_example"
 
-        custom_examples = self.__get_data_from_custom_examples(
+        custom_examples = self._get_data_from_custom_examples(
             operation.operationId,
         )
 
@@ -81,28 +82,28 @@ class RequestBodyParser:
 
                 # switch to $ref schema if necessary
                 if hasattr(example_schema, "ref"):
-                    basename, ref_schema = self.oa_parser.example_schema_from_ref(
+                    basename, ref_schema = self._oa_parser.example_schema_from_ref(
                         example_schema.ref
                     )
 
                     if ref_schema:
                         target_schema = ref_schema
 
-                file_data = self.__get_data_from_file(target_schema)
+                file_data = self._get_data_from_file(target_schema)
 
                 if file_data is not None:
                     examples[example_name] = file_data
 
                     continue
 
-                inline_data = self.__get_data_from_inline_value(target_schema)
+                inline_data = self._get_data_from_inline_value(target_schema)
 
                 if inline_data is not None:
                     examples[example_name] = inline_data
 
         # merge data from components
         if content.media_type_schema:
-            component_examples = self.__parse_components(content.media_type_schema)
+            component_examples = self._parse_components(content.media_type_schema)
 
             # no results so far, use whatever came from component examples
             if component_examples and not len(examples):
@@ -118,11 +119,11 @@ class RequestBodyParser:
         result = {}
 
         for example_name, example in examples.items():
-            self.property_parser.order_by_example_data(
-                request_body_content.name != self.INLINE_REQUEST_BODY_NAME,
+            self._property_parser.order_by_example_data(
+                request_body_content.name != self._INLINE_REQUEST_BODY_NAME,
             )
 
-            container = self.property_parser.parse(
+            container = self._property_parser.parse(
                 schema=request_body_content.schema,
                 data=example,
             )
@@ -154,9 +155,9 @@ class RequestBodyParser:
 
         # we only want the first result
         for content_type, body in operation.requestBody.content.items():
-            return content_type in self.FORM_DATA_CONTENT_TYPES
+            return content_type in self._FORM_DATA_CONTENT_TYPES
 
-    def __get_request_body_content(
+    def _get_request_body_content(
         self,
         operation: oa.Operation,
     ) -> model.RequestBodyContent | None:
@@ -164,7 +165,7 @@ class RequestBodyParser:
             return
 
         if hasattr(operation.requestBody, "ref"):
-            _, schema = self.oa_parser.request_body_schema_from_ref(
+            _, schema = self._oa_parser.request_body_schema_from_ref(
                 operation.requestBody.ref,
             )
 
@@ -192,7 +193,7 @@ class RequestBodyParser:
             return
 
         if hasattr(content.media_type_schema, "ref"):
-            body_name, schema = self.oa_parser.component_schema_from_ref(
+            body_name, schema = self._oa_parser.component_schema_from_ref(
                 content.media_type_schema.ref,
             )
         elif (
@@ -202,12 +203,12 @@ class RequestBodyParser:
             and content.media_type_schema.items.ref
         ):
             schema = content.media_type_schema
-            body_name, _ = self.oa_parser.component_schema_from_ref(
+            body_name, _ = self._oa_parser.component_schema_from_ref(
                 content.media_type_schema.items.ref,
             )
         # inline schema definition
         elif hasattr(content.media_type_schema, "type"):
-            body_name = self.INLINE_REQUEST_BODY_NAME
+            body_name = self._INLINE_REQUEST_BODY_NAME
             schema = content.media_type_schema
         else:
             return
@@ -222,7 +223,7 @@ class RequestBodyParser:
             required=required,
         )
 
-    def __get_data_from_file(
+    def _get_data_from_file(
         self,
         example_schema: oa.Example,
     ) -> dict[str, any] | None:
@@ -231,8 +232,7 @@ class RequestBodyParser:
         if "$ref" not in example_schema.value:
             return None
 
-        oas_dirname = self.oa_parser.get_oas_dirname()
-        filename = f"{oas_dirname}/{example_schema.value.get("$ref")}"
+        filename = f"{self._oa_parser.oas_dirname}/{example_schema.value.get("$ref")}"
 
         if not os.path.isfile(filename):
             return None
@@ -247,7 +247,7 @@ class RequestBodyParser:
             print(f"Error reading example file {filename}")
             print(e)
 
-    def __get_data_from_inline_value(
+    def _get_data_from_inline_value(
         self,
         example_schema: oa.Example,
     ) -> dict[str, any] | None:
@@ -258,13 +258,13 @@ class RequestBodyParser:
 
         return example_schema.value
 
-    def __get_data_from_custom_examples(
+    def _get_data_from_custom_examples(
         self,
         operation_id: str,
     ) -> tuple[dict[str, any], dict[str, dict[str, any]]] | None:
         """Read example data from external file"""
 
-        directory = f"{self.oa_parser.get_oas_dirname()}/custom_examples/"
+        directory = f"{self._oa_parser.oas_dirname}/custom_examples/"
         base_filename = f"{operation_id}__"
         http_key_name = "__http__"
 
@@ -275,7 +275,7 @@ class RequestBodyParser:
         http_data: dict[str, any] = {}
 
         for filepath in glob.glob(os.path.join(directory, f"{base_filename}*")):
-            data = self.oa_parser.get_file_contents(filepath)
+            data = FileLoader.get_file_contents(filepath)
 
             if not data or not isinstance(data, dict):
                 continue
@@ -297,16 +297,16 @@ class RequestBodyParser:
 
         return http_data, results
 
-    def __parse_components(self, schema: oa.Schema | oa.Reference) -> dict[str, any]:
+    def _parse_components(self, schema: oa.Schema | oa.Reference) -> dict[str, any]:
         example_data: dict[str, any] = {}
 
-        example_data = {**example_data, **self.__handle_ref_type(schema)}
-        example_data = {**example_data, **self.__handle_array_ref_type(schema)}
-        example_data = {**example_data, **self.__handle_non_ref_types(schema)}
+        example_data = {**example_data, **self._handle_ref_type(schema)}
+        example_data = {**example_data, **self._handle_array_ref_type(schema)}
+        example_data = {**example_data, **self._handle_non_ref_types(schema)}
 
         return example_data
 
-    def __handle_ref_type(
+    def _handle_ref_type(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
@@ -315,17 +315,17 @@ class RequestBodyParser:
         if not hasattr(schema, "ref") or not schema.ref:
             return {}
 
-        target_schema_name, target_schema = self.oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
             schema.ref
         )
 
-        parsed = self.__parse_components(
+        parsed = self._parse_components(
             schema=target_schema,
         )
 
         return parsed
 
-    def __handle_array_ref_type(
+    def _handle_array_ref_type(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
@@ -345,7 +345,7 @@ class RequestBodyParser:
             ):
                 continue
 
-            parsed = self.__parse_components(
+            parsed = self._parse_components(
                 schema=property_schema.items,
             )
 
@@ -357,7 +357,7 @@ class RequestBodyParser:
 
         return result
 
-    def __handle_non_ref_types(
+    def _handle_non_ref_types(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
@@ -365,7 +365,7 @@ class RequestBodyParser:
 
         result: dict[str, any] = {}
 
-        is_set, value = self.__get_property_schema_example(schema)
+        is_set, value = self._get_property_schema_example(schema)
 
         if is_set and isinstance(value, dict):
             result = value
@@ -374,14 +374,14 @@ class RequestBodyParser:
             return result
 
         for property_name, property_schema in schema.properties.items():
-            is_set, value = self.__get_property_schema_example(property_schema)
+            is_set, value = self._get_property_schema_example(property_schema)
 
             if is_set:
                 result[property_name] = value
 
         return result
 
-    def __get_property_schema_example(
+    def _get_property_schema_example(
         self,
         schema: oa.Schema,
     ) -> tuple[bool, any]:

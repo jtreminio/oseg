@@ -1,23 +1,20 @@
-import json
 import os
-from pathlib import Path
 import openapi_pydantic as oa
-import yaml
+from oseg.parser.file_loader import FileLoader
 
 
 class OaParser:
-    def __init__(
-        self,
-        oas_file: str,
-    ):
-        self.openapi: oa.OpenAPI = oa.parse_obj(self.get_file_contents(oas_file))
-        self.oas_dirname = os.path.dirname(oas_file)
+    def __init__(self, oas_file: str):
+        self._openapi: oa.OpenAPI = oa.parse_obj(FileLoader.get_file_contents(oas_file))
+        self._oas_dirname = os.path.dirname(oas_file)
 
-    def get_oas_dirname(self) -> str:
-        return self.oas_dirname
+    @property
+    def oas_dirname(self) -> str:
+        return self._oas_dirname
 
-    def get_paths(self) -> dict[str, oa.PathItem]:
-        return self.openapi.paths
+    @property
+    def paths(self) -> dict[str, oa.PathItem]:
+        return self._openapi.paths
 
     def get_property_schema(
         self,
@@ -41,13 +38,13 @@ class OaParser:
 
     def component_schema_from_ref(self, ref: str) -> tuple[str, oa.Schema | None]:
         name = ref.split("/").pop()
-        schema = self.openapi.components.schemas.get(name)
+        schema = self._openapi.components.schemas.get(name)
 
         return name, schema
 
     def example_schema_from_ref(self, ref: str) -> tuple[str, oa.Example | None]:
         name = ref.split("/").pop()
-        schema: oa.Example | None = self.openapi.components.examples.get(name)
+        schema: oa.Example | None = self._openapi.components.examples.get(name)
 
         if schema is None:
             return name, None
@@ -67,19 +64,6 @@ class OaParser:
         ref: str,
     ) -> tuple[str, oa.RequestBody | None]:
         name = ref.split("/").pop()
-        schema = self.openapi.components.requestBodies.get(name)
+        schema = self._openapi.components.requestBodies.get(name)
 
         return name, schema
-
-    @staticmethod
-    def get_file_contents(filename: str) -> any:
-        file = open(filename, "r")
-
-        if Path(filename).suffix == ".json":
-            data = json.load(file)
-        else:
-            data = yaml.safe_load(file)
-
-        file.close()
-
-        return data

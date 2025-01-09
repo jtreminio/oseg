@@ -13,10 +13,18 @@ class BaseExtension(Protocol):
     GENERATOR: str
     TEMPLATE: str
 
+    _sdk_options: "model.SdkOptions"
+
     def __init__(self, environment: jinja2.Environment):
-        self.__environment = environment
-        self.sdk_options = None
-        self.sdk_options: "model.SdkOptions"
+        self._environment = environment
+
+    @property
+    def sdk_options(self) -> "model.SdkOptions":
+        return self._sdk_options
+
+    @sdk_options.setter
+    def sdk_options(self, options: "model.SdkOptions"):
+        self._sdk_options = options
 
     @abstractmethod
     def setter_method_name(self, name: str) -> str:
@@ -65,7 +73,7 @@ class BaseExtension(Protocol):
         if not example_data.body:
             return {}
 
-        refs = self.__flatten_refs(example_data.body, "")
+        refs = self._flatten_refs(example_data.body, "")
 
         if single_body_value:
             refs[example_data.body.type] = example_data.body
@@ -81,7 +89,7 @@ class BaseExtension(Protocol):
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
-        result = self.__parse_non_ref_properties(
+        result = self._parse_non_ref_properties(
             context=context,
             parent_type=parent.type,
             properties=parent.value.get_non_refs(),
@@ -90,13 +98,13 @@ class BaseExtension(Protocol):
         print_ref_value: Macro = context.vars["print_ref_value"]
         print_ref_array_value: Macro = context.vars["print_ref_array_value"]
 
-        for name, parsed in self.__parse_ref(parent, parent_name).items():
+        for name, parsed in self._parse_ref(parent, parent_name).items():
             if isinstance(parsed, model.ParsedRef):
                 result[name] = print_ref_value(parsed)
             else:
                 result[name] = print_ref_array_value(parsed)
 
-        return self.__indent(result, indent_count)
+        return self._indent(result, indent_count)
 
     def parse_body_property_list(
         self,
@@ -107,7 +115,7 @@ class BaseExtension(Protocol):
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
 
-        result = self.__parse_non_ref_properties(
+        result = self._parse_non_ref_properties(
             context=context,
             parent_type=parent.type,
             properties=parent.value.get_non_refs(),
@@ -116,13 +124,13 @@ class BaseExtension(Protocol):
         print_ref_value: Macro = context.vars["print_ref_value"]
         print_ref_array_value: Macro = context.vars["print_ref_array_value"]
 
-        for name, parsed in self.__parse_ref(parent, parent_name).items():
+        for name, parsed in self._parse_ref(parent, parent_name).items():
             if isinstance(parsed, model.ParsedRef):
                 result[name] = print_ref_value(parsed)
             else:
                 result[name] = print_ref_array_value(parsed)
 
-            return self.__indent(result, indent_count)[name]
+            return self._indent(result, indent_count)[name]
 
     def parse_request_data(
         self,
@@ -158,13 +166,13 @@ class BaseExtension(Protocol):
             else:
                 http_optional[name] = parameter
 
-        params_required = self.__parse_non_ref_properties(
+        params_required = self._parse_non_ref_properties(
             context=context,
             parent_type="",
             properties=http_required,
         )
 
-        params_optional = self.__parse_non_ref_properties(
+        params_optional = self._parse_non_ref_properties(
             context=context,
             parent_type="",
             properties=http_optional,
@@ -179,13 +187,13 @@ class BaseExtension(Protocol):
                 else:
                     params_optional[example_data.body.type] = value
             else:
-                body_params_required = self.__parse_non_ref_properties(
+                body_params_required = self._parse_non_ref_properties(
                     context=context,
                     parent_type="",
                     properties=example_data.body.value.get_non_refs(True),
                 )
 
-                body_params_optional = self.__parse_non_ref_properties(
+                body_params_optional = self._parse_non_ref_properties(
                     context=context,
                     parent_type="",
                     properties=example_data.body.value.get_non_refs(False),
@@ -205,7 +213,7 @@ class BaseExtension(Protocol):
         for k, v in params_optional.items():
             params_required[k] = v
 
-        return self.__indent(params_required, indent_count)
+        return self._indent(params_required, indent_count)
 
     def camel_case(self, value: str) -> str:
         return convert_case.camel_case(value)
@@ -219,7 +227,7 @@ class BaseExtension(Protocol):
     def upper_case(self, value: str) -> str:
         return convert_case.upper_case(value)
 
-    def __flatten_refs(
+    def _flatten_refs(
         self,
         ref: model.PropertyRef,
         parent_name: str,
@@ -230,7 +238,7 @@ class BaseExtension(Protocol):
         for name, sub_ref in ref.value.refs.items():
             sub_name = f"{parent_name}{name}"
 
-            sub_results = self.__flatten_refs(sub_ref, sub_name)
+            sub_results = self._flatten_refs(sub_ref, sub_name)
             result |= sub_results
             result[sub_name] = sub_ref
 
@@ -238,14 +246,14 @@ class BaseExtension(Protocol):
             i = 1
             for sub_ref in refs:
                 sub_name = f"{parent_name}{name}_{i}"
-                sub_results = self.__flatten_refs(sub_ref, sub_name)
+                sub_results = self._flatten_refs(sub_ref, sub_name)
                 result |= sub_results
                 result[sub_name] = sub_ref
                 i += 1
 
         return result
 
-    def __parse_non_ref_properties(
+    def _parse_non_ref_properties(
         self,
         context: Context,
         parent_type: str,
@@ -288,7 +296,7 @@ class BaseExtension(Protocol):
 
         return result
 
-    def __indent(
+    def _indent(
         self,
         property_values: dict[str, str | None],
         indent_count: int,
@@ -303,7 +311,7 @@ class BaseExtension(Protocol):
 
         return property_values
 
-    def __parse_ref(
+    def _parse_ref(
         self,
         ref: model.PropertyRef,
         parent_name: str,
@@ -354,7 +362,7 @@ class BaseExtension(Protocol):
 
         return result
 
-    def __remove_empty_items(self, items: list) -> list:
+    def _remove_empty_items(self, items: list) -> list:
         result = []
         for item in items:
             if item is not None and item != "":

@@ -8,7 +8,7 @@ T = Union[T_SINGLE, T_LIST, None]
 
 
 class PropertyScalar(model.PropertyProto):
-    __PRIMITIVE_TYPES = [
+    _PRIMITIVE_TYPES = [
         "boolean",
         "integer",
         "number",
@@ -24,14 +24,14 @@ class PropertyScalar(model.PropertyProto):
     ):
         super().__init__(name, value, schema, parent)
 
-        self.__normalize_value()
-        self._type = self.__set_type()
-        self._format = self.__set_string_format()
-        self._is_enum = self.__set_is_enum()
+        self._normalize_value()
+        self._type = self._set_type()
+        self._format = self._set_string_format()
+        self._is_enum = self._set_is_enum()
 
     @staticmethod
-    def is_primitive_type(propery_type: str):
-        return propery_type in PropertyScalar.__PRIMITIVE_TYPES
+    def is_primitive_type(propery_type: str) -> bool:
+        return propery_type in PropertyScalar._PRIMITIVE_TYPES
 
     @staticmethod
     def is_schema_valid_single(schema: oa.Schema) -> bool:
@@ -57,18 +57,18 @@ class PropertyScalar(model.PropertyProto):
         return self._value
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._type
 
     @property
-    def format(self):
+    def format(self) -> str | None:
         return self._format
 
     @property
-    def is_enum(self):
+    def is_enum(self) -> bool:
         return self._is_enum
 
-    def __normalize_value(self):
+    def _normalize_value(self):
         if self._value is None and self._schema.default is not None:
             self._value = self._schema.default
 
@@ -98,7 +98,7 @@ class PropertyScalar(model.PropertyProto):
             self._value = bool(self._value)
 
     # todo currently only support single type, not list of types
-    def __set_type(self) -> str:
+    def _set_type(self) -> str:
         if self._is_array:
             type_value = self._schema.items.type.value
 
@@ -107,7 +107,7 @@ class PropertyScalar(model.PropertyProto):
             ), f"'{self._schema}' has invalid array items type"
 
             assert (
-                type_value in PropertyScalar.__PRIMITIVE_TYPES
+                type_value in PropertyScalar._PRIMITIVE_TYPES
             ), f"'{type_value}' not a valid scalar type"
 
             return type_value
@@ -117,12 +117,12 @@ class PropertyScalar(model.PropertyProto):
         assert isinstance(type_value, str), f"'{self._schema}' has invalid item type"
 
         assert (
-            type_value in PropertyScalar.__PRIMITIVE_TYPES
+            type_value in PropertyScalar._PRIMITIVE_TYPES
         ), f"'{type_value}' not a valid scalar type"
 
         return type_value
 
-    def __set_string_format(self) -> str | None:
+    def _set_string_format(self) -> str | None:
         if self._is_array:
             return (
                 self._schema.items.schema_format
@@ -136,7 +136,7 @@ class PropertyScalar(model.PropertyProto):
             else None
         )
 
-    def __set_is_enum(self) -> bool:
+    def _set_is_enum(self) -> bool:
         if self._is_array:
             return (
                 hasattr(self._schema.items, "enum")

@@ -6,6 +6,8 @@ from oseg import jinja_extension, model
 
 
 class GeneratorExtension(jinja2.ext.Extension):
+    _sdk_generator: "jinja_extension.BaseExtension"
+
     @staticmethod
     def factory() -> "GeneratorExtension":
         env = jinja2.Environment(
@@ -21,32 +23,30 @@ class GeneratorExtension(jinja2.ext.Extension):
 
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)
-        self.__sdk_generator: "jinja_extension.BaseExtension"
-        self.__sdk_generator = None
 
         environment.filters["camel_case"]: Callable[[str], str] = (
-            lambda value: self.__sdk_generator.camel_case(value)
+            lambda value: self._sdk_generator.camel_case(value)
         )
         environment.filters["pascal_case"]: Callable[[str], str] = (
-            lambda value: self.__sdk_generator.pascal_case(value)
+            lambda value: self._sdk_generator.pascal_case(value)
         )
         environment.filters["snake_case"]: Callable[[str], str] = (
-            lambda value: self.__sdk_generator.snake_case(value)
+            lambda value: self._sdk_generator.snake_case(value)
         )
         environment.filters["setter_method_name"]: Callable[[str], str] = (
-            lambda name: self.__sdk_generator.setter_method_name(name)
+            lambda name: self._sdk_generator.setter_method_name(name)
         )
         environment.filters["setter_property_name"]: Callable[[str], str] = (
-            lambda name: self.__sdk_generator.setter_property_name(name)
+            lambda name: self._sdk_generator.setter_property_name(name)
         )
-        environment.globals.update(parse_body_data=self.__parse_body_data)
-        environment.globals.update(parse_body_properties=self.__parse_body_properties)
+        environment.globals.update(parse_body_data=self._parse_body_data)
+        environment.globals.update(parse_body_properties=self._parse_body_properties)
         environment.globals.update(
-            parse_body_property_list=self.__parse_body_property_list
+            parse_body_property_list=self._parse_body_property_list
         )
-        environment.globals.update(parse_request_data=self.__parse_request_data)
+        environment.globals.update(parse_request_data=self._parse_request_data)
 
-        self.__generators: dict[str, jinja_extension.BaseExtension] = {
+        self._generators: dict[str, jinja_extension.BaseExtension] = {
             "csharp": jinja_extension.CSharpExtension(environment),
             "java": jinja_extension.JavaExtension(environment),
             "php": jinja_extension.PhpExtension(environment),
@@ -57,42 +57,42 @@ class GeneratorExtension(jinja2.ext.Extension):
 
     @property
     def template(self) -> jinja2.Template:
-        return self.environment.get_template(self.__sdk_generator.TEMPLATE)
+        return self.environment.get_template(self._sdk_generator.TEMPLATE)
 
     @property
     def sdk_generator(self) -> "jinja_extension.BaseExtension":
-        return self.__sdk_generator
+        return self._sdk_generator
 
     @sdk_generator.setter
-    def sdk_generator(self, sdk_options: "model.SdkOptions") -> None:
+    def sdk_generator(self, sdk_options: "model.SdkOptions"):
         if (
-            sdk_options.generatorName is None
-            or sdk_options.generatorName not in self.__generators
+            sdk_options.generator_name is None
+            or sdk_options.generator_name not in self._generators
         ):
             raise NotImplementedError
 
-        self.__sdk_generator = self.__generators[sdk_options.generatorName]
-        self.__sdk_generator.sdk_options = sdk_options
+        self._sdk_generator = self._generators[sdk_options.generator_name]
+        self._sdk_generator.sdk_options = sdk_options
 
-    def __parse_body_data(
+    def _parse_body_data(
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
     ) -> dict[str, model.PropertyRef]:
-        return self.__sdk_generator.parse_body_data(
+        return self._sdk_generator.parse_body_data(
             example_data,
             single_body_value,
         )
 
     @pass_context
-    def __parse_body_properties(
+    def _parse_body_properties(
         self,
         context: Context,
         parent: model.PropertyRef,
         parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
-        return self.__sdk_generator.parse_body_properties(
+        return self._sdk_generator.parse_body_properties(
             context,
             parent,
             parent_name,
@@ -100,14 +100,14 @@ class GeneratorExtension(jinja2.ext.Extension):
         )
 
     @pass_context
-    def __parse_body_property_list(
+    def _parse_body_property_list(
         self,
         context: Context,
         parent: model.PropertyRef,
         parent_name: str,
         indent_count: int,
     ) -> str:
-        return self.__sdk_generator.parse_body_property_list(
+        return self._sdk_generator.parse_body_property_list(
             context,
             parent,
             parent_name,
@@ -115,7 +115,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         )
 
     @pass_context
-    def __parse_request_data(
+    def _parse_request_data(
         self,
         context: Context,
         example_data: model.ExampleData,
@@ -123,7 +123,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
-        return self.__sdk_generator.parse_request_data(
+        return self._sdk_generator.parse_request_data(
             context,
             example_data,
             single_body_value,

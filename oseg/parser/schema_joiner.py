@@ -15,7 +15,7 @@ class SchemaJoiner:
         self,
         oa_parser: parser.OaParser,
     ):
-        self.__oa_parser = oa_parser
+        self._oa_parser = oa_parser
 
     def merge_schemas_and_properties(
         self,
@@ -29,18 +29,18 @@ class SchemaJoiner:
         join any Schema with allOf
         """
 
-        discriminated = self.__resolve_discriminator(schema, data)
+        discriminated = self._resolve_discriminator(schema, data)
 
         if discriminated:
             return discriminated
 
         return JoinedValues(
             schemas=[schema],
-            properties=self.__get_properties([schema]),
+            properties=self._get_properties([schema]),
             discriminator_target_name=None,
         )
 
-    def __resolve_discriminator(
+    def _resolve_discriminator(
         self,
         schema: oa.Schema,
         data: dict[str, any] | None,
@@ -72,7 +72,7 @@ class SchemaJoiner:
             return None
 
         discriminator_target_name, discriminator_target_schema = (
-            self.__oa_parser.component_schema_from_ref(
+            self._oa_parser.component_schema_from_ref(
                 discriminator_target_ref,
             )
         )
@@ -89,17 +89,17 @@ class SchemaJoiner:
             property_schema = i
 
             if hasattr(i, "ref") and i.ref:
-                _, property_schema = self.__oa_parser.component_schema_from_ref(i.ref)
+                _, property_schema = self._oa_parser.component_schema_from_ref(i.ref)
 
             schemas.append(property_schema)
 
         return JoinedValues(
             schemas=schemas,
-            properties=self.__get_properties(schemas),
+            properties=self._get_properties(schemas),
             discriminator_target_name=discriminator_target_name,
         )
 
-    def __get_properties(
+    def _get_properties(
         self,
         schemas: list[oa.Schema],
     ) -> dict[str, oa.Reference | oa.Schema]:
@@ -108,7 +108,7 @@ class SchemaJoiner:
         for schema in schemas:
             # property could actually be an array of refs
             if model.PropertyRef.is_schema_valid_array(schema):
-                body_name, _ = self.__oa_parser.component_schema_from_ref(
+                body_name, _ = self._oa_parser.component_schema_from_ref(
                     schema.items.ref,
                 )
 

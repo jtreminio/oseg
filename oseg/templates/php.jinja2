@@ -84,12 +84,12 @@ ${{ parsed.value }}
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$config = {{ sdk_options.additionalProperties.invokerPackage }}\Configuration::getDefaultConfiguration();
+$config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
 
 {% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
     {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
     {% if not ref.is_array %}
-{{ ref_name|setter_property_name }} = (new {{ sdk_options.additionalProperties.invokerPackage }}\Model\{{ ref.type }}())
+{{ ref_name|setter_property_name }} = (new {{ sdk_options.additional_properties.invokerPackage }}\Model\{{ ref.type }}())
         {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
             {% for name, value in properties.items() %}
     ->set{{ name|setter_method_name }}({{ value }}){% if loop.last %};{% endif %}
@@ -105,7 +105,7 @@ $config = {{ sdk_options.additionalProperties.invokerPackage }}\Configuration::g
 
 {% endfor %}
 try {
-    $api_caller = new {{ sdk_options.additionalProperties.invokerPackage }}\Api\{{ api_name|pascal_case }}Api(config: $config);
+    $api_caller = new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ api_name|pascal_case }}Api(config: $config);
 
     {{ "" -}}
     {% if has_response  %}$response = {% endif -%}
@@ -123,7 +123,7 @@ try {
 
     copy($response->getRealPath(), __DIR__ . '/file_response.zip');
 {% endif %}
-} catch ({{ sdk_options.additionalProperties.invokerPackage }}\ApiException $e) {
+} catch ({{ sdk_options.additional_properties.invokerPackage }}\ApiException $e) {
     echo 'Exception when calling {{ api_name|pascal_case }}#{{ operation_id|camel_case }}: '
         . print_r($e->getResponseObject());
 }

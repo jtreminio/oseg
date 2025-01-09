@@ -7,12 +7,12 @@ class PropertyParser:
         self,
         oa_parser: parser.OaParser,
     ):
-        self.__oa_parser = oa_parser
-        self.__schema_joiner = parser.SchemaJoiner(oa_parser)
-        self.__order_by_example_data = True
+        self._oa_parser = oa_parser
+        self._schema_joiner = parser.SchemaJoiner(oa_parser)
+        self._order_by_example_data = True
 
-    def order_by_example_data(self, flag: bool) -> None:
-        self.__order_by_example_data = flag
+    def order_by_example_data(self, flag: bool):
+        self._order_by_example_data = flag
 
     def parse(
         self,
@@ -21,7 +21,7 @@ class PropertyParser:
     ) -> model.PropertyContainer:
         property_container = model.PropertyContainer(schema)
 
-        merged_values = self.__schema_joiner.merge_schemas_and_properties(schema, data)
+        merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
 
         schemas = merged_values.schemas
         properties = merged_values.properties
@@ -30,13 +30,13 @@ class PropertyParser:
         )
 
         # properties with example data are listed first
-        sorted_properties = self.__sort_property_names(data, properties)
+        sorted_properties = self._sort_property_names(data, properties)
 
         for property_name in sorted_properties:
             property_schema = properties.get(property_name)
             property_value = data.get(property_name) if data is not None else None
 
-            if self.__handle_ref_type(
+            if self._handle_ref_type(
                 property_container=property_container,
                 schema=property_schema,
                 name=property_name,
@@ -44,7 +44,7 @@ class PropertyParser:
             ):
                 continue
 
-            if self.__handle_array_ref_type(
+            if self._handle_array_ref_type(
                 property_container=property_container,
                 schema=property_schema,
                 name=property_name,
@@ -54,7 +54,7 @@ class PropertyParser:
 
         for property_name in sorted_properties:
             for current_schema in schemas:
-                resolved_schema = self.__oa_parser.get_property_schema(
+                resolved_schema = self._oa_parser.get_property_schema(
                     current_schema,
                     property_name,
                 )
@@ -65,7 +65,7 @@ class PropertyParser:
                 property_value = data.get(property_name) if data is not None else None
 
                 # string + binary
-                if self.__handle_file_type(
+                if self._handle_file_type(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -74,7 +74,7 @@ class PropertyParser:
                     continue
 
                 # free-form object
-                if self.__handle_object_type(
+                if self._handle_object_type(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -83,7 +83,7 @@ class PropertyParser:
                     continue
 
                 # scalar
-                if self.__handle_scalar_type(
+                if self._handle_scalar_type(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -93,7 +93,7 @@ class PropertyParser:
 
         return property_container
 
-    def __handle_ref_type(
+    def _handle_ref_type(
         self,
         property_container: model.PropertyContainer,
         schema: oa.Schema,
@@ -107,11 +107,11 @@ class PropertyParser:
 
         value: dict[str, any]
 
-        target_schema_name, target_schema = self.__oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
             schema.ref
         )
 
-        is_required = self.__is_required(property_container.schema, name)
+        is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
             value = target_schema.default
@@ -143,7 +143,7 @@ class PropertyParser:
 
         return True
 
-    def __handle_array_ref_type(
+    def _handle_array_ref_type(
         self,
         property_container: model.PropertyContainer,
         schema: oa.Schema,
@@ -157,11 +157,11 @@ class PropertyParser:
 
         schema_refs = []
 
-        target_schema_name, target_schema = self.__oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
             schema.items.ref,
         )
 
-        is_required = self.__is_required(property_container.schema, name)
+        is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
             value = target_schema.default
@@ -197,7 +197,7 @@ class PropertyParser:
 
         return True
 
-    def __handle_file_type(
+    def _handle_file_type(
         self,
         property_container: model.PropertyContainer,
         schema: oa.Schema,
@@ -225,7 +225,7 @@ class PropertyParser:
 
         return True
 
-    def __handle_object_type(
+    def _handle_object_type(
         self,
         property_container: model.PropertyContainer,
         schema: oa.Schema,
@@ -251,7 +251,7 @@ class PropertyParser:
 
         return True
 
-    def __handle_scalar_type(
+    def _handle_scalar_type(
         self,
         property_container: model.PropertyContainer,
         schema: oa.Schema,
@@ -277,12 +277,12 @@ class PropertyParser:
 
         return True
 
-    def __sort_property_names(
+    def _sort_property_names(
         self,
         data: dict[str, any],
         properties: dict[str, oa.Reference | oa.Schema],
     ) -> list[str]:
-        if self.__order_by_example_data:
+        if self._order_by_example_data:
             # properties with example data are listed first
             sorted_properties = list(data)
 
@@ -301,5 +301,5 @@ class PropertyParser:
 
         return sorted_properties
 
-    def __is_required(self, schema: oa.Schema, prop_name: str) -> bool:
+    def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
         return schema.required and prop_name in schema.required

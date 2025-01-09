@@ -25,11 +25,11 @@ class PropertyProto(Protocol):
         self._set_is_nullable()
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def schema(self):
+    def schema(self) -> oa.Schema:
         return self._schema
 
     @property
@@ -38,15 +38,15 @@ class PropertyProto(Protocol):
         pass
 
     @property
-    def is_array(self):
+    def is_array(self) -> bool:
         return self._is_array
 
     @property
-    def is_required(self):
+    def is_required(self) -> bool:
         return self._is_required
 
     @property
-    def is_nullable(self):
+    def is_nullable(self) -> bool:
         return self._is_nullable
 
     def _set_is_array(self):

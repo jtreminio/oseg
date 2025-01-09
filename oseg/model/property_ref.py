@@ -46,7 +46,7 @@ class PropertyRef(model.PropertyProto):
         return self._value
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._type
 
     @type.setter
@@ -54,7 +54,7 @@ class PropertyRef(model.PropertyProto):
         self._type = value
 
     @property
-    def discriminator_base_type(self):
+    def discriminator_base_type(self) -> str | None:
         return self._discriminator_base_type
 
     @discriminator_base_type.setter
@@ -62,7 +62,7 @@ class PropertyRef(model.PropertyProto):
         self._discriminator_base_type = value
 
     @property
-    def is_required(self):
+    def is_required(self) -> bool:
         return self._is_required
 
     @is_required.setter

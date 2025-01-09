@@ -89,13 +89,13 @@ List.of {% if not parsed.values %}(){% else %}
     {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
 {%- endmacro -%}
 
-package {{ sdk_options.additionalProperties.finalPackageName }};
+package {{ sdk_options.additional_properties.finalPackageName }};
 
-import {{ sdk_options.additionalProperties.invokerPackage }}.ApiException;
-import {{ sdk_options.additionalProperties.invokerPackage }}.Configuration;
-import {{ sdk_options.additionalProperties.apiPackage }}.*;
-import {{ sdk_options.additionalProperties.invokerPackage }}.auth.*;
-import {{ sdk_options.additionalProperties.modelPackage }}.*;
+import {{ sdk_options.additional_properties.invokerPackage }}.ApiException;
+import {{ sdk_options.additional_properties.invokerPackage }}.Configuration;
+import {{ sdk_options.additional_properties.apiPackage }}.*;
+import {{ sdk_options.additional_properties.invokerPackage }}.auth.*;
+import {{ sdk_options.additional_properties.modelPackage }}.*;
 
 import java.io.File;
 import java.util.List;

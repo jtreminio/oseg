@@ -3,7 +3,7 @@ from oseg import parser, model
 
 
 class OperationParser:
-    __HTTP_METHODS = [
+    _HTTP_METHODS = [
         "get",
         "post",
         "put",
@@ -20,23 +20,24 @@ class OperationParser:
         request_body_parser: "parser.RequestBodyParser",
         operation_id: str | None = None,
     ):
-        self.oa_parser = oa_parser
-        self.request_body_parser = request_body_parser
-        self.request_operations: dict[str, model.RequestOperation] = {}
-        self.__setup_request_operations(operation_id)
+        self._oa_parser = oa_parser
+        self._request_body_parser = request_body_parser
+        self._request_operations: dict[str, model.RequestOperation] = {}
+
+        self._setup_request_operations(operation_id)
 
     def get_request_operations(
         self,
         operation_id: str | None = None,
     ) -> dict[str, model.RequestOperation]:
         if operation_id:
-            return {operation_id: self.request_operations[operation_id]}
+            return {operation_id: self._request_operations[operation_id]}
 
-        return self.request_operations
+        return self._request_operations
 
-    def __setup_request_operations(self, operation_id: str | None) -> None:
-        for path, path_item in self.oa_parser.get_paths().items():
-            for method in self.__HTTP_METHODS:
+    def _setup_request_operations(self, operation_id: str | None):
+        for path, path_item in self._oa_parser.paths.items():
+            for method in self._HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
 
                 if not operation:
@@ -48,26 +49,25 @@ class OperationParser:
                 ):
                     continue
 
-                api_name = self.__get_api_name(operation)
-                has_response, is_binary_response = self.__get_response_data(operation)
-                has_form_data = self.request_body_parser.has_form_data(operation)
-                example_data = self.__create_example_data(operation)
+                api_name = self._get_api_name(operation)
+                has_response, is_binary_response = self._get_response_data(operation)
+                has_form_data = self._request_body_parser.has_form_data(operation)
+                example_data = self._create_example_data(operation)
 
-                self.request_operations[operation.operationId] = model.RequestOperation(
-                    operation_id=operation.operationId,
-                    operation=operation,
-                    api_name=api_name,
-                    method=method,
-                    has_response=has_response,
-                    has_form_data=has_form_data,
-                    is_binary_response=is_binary_response,
-                    request_data=example_data,
+                self._request_operations[operation.operationId] = (
+                    model.RequestOperation(
+                        operation_id=operation.operationId,
+                        operation=operation,
+                        api_name=api_name,
+                        method=method,
+                        has_response=has_response,
+                        has_form_data=has_form_data,
+                        is_binary_response=is_binary_response,
+                        request_data=example_data,
+                    )
                 )
 
-    def __get_response_data(
-        self,
-        operation: oa.Operation,
-    ) -> tuple[bool, bool]:
+    def _get_response_data(self, operation: oa.Operation):
         """Does the current operation have a response?
 
         We only want to check the first response, if any
@@ -100,19 +100,16 @@ class OperationParser:
 
                 return has_response, is_binary_response
 
-    def __create_example_data(
-        self,
-        operation: oa.Operation,
-    ) -> list[model.ExampleData]:
+    def _create_example_data(self, operation: oa.Operation):
         examples = []
 
-        result = self.request_body_parser.get_body_params_by_example(
+        result = self._request_body_parser.get_body_params_by_example(
             operation,
         )
 
         http_custom_example_data, body_params_by_example = result
 
-        http_params = self.__get_http_parameters(
+        http_params = self._get_http_parameters(
             operation,
             http_custom_example_data,
         )
@@ -137,11 +134,11 @@ class OperationParser:
 
         return examples
 
-    def __get_http_parameters(
+    def _get_http_parameters(
         self,
         operation: oa.Operation,
         http_custom_example_data: dict[str, any] | None,
-    ) -> dict[str, model.PropertyScalar]:
+    ):
         """Add path and query parameter examples to request operation
 
         Only parameters that have example or default data will be included.
@@ -150,15 +147,14 @@ class OperationParser:
 
         http_params = {}
 
-        if not operation.parameters:
-            return http_params
-
         allowed_param_in = [
             oa.ParameterLocation.QUERY,
             oa.ParameterLocation.PATH,
         ]
 
-        for parameter in operation.parameters:
+        parameters = operation.parameters if operation.parameters else []
+
+        for parameter in parameters:
             if parameter.param_in not in allowed_param_in:
                 continue
 
@@ -189,7 +185,7 @@ class OperationParser:
 
         return http_params
 
-    def __get_api_name(self, operation: oa.Operation) -> str:
+    def _get_api_name(self, operation: oa.Operation) -> str:
         tags = operation.tags
 
         if not tags or not len(tags):

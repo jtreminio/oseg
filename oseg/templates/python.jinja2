@@ -78,7 +78,7 @@ open("{{ parsed.value }}", "rb").read()
 
 from pprint import pprint
 
-from {{ sdk_options.additionalProperties.packageName }} import ApiClient, ApiException, Configuration, api, models
+from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiException, Configuration, api, models
 
 configuration = Configuration()
 

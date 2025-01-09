@@ -37,7 +37,7 @@ class JavaExtension(BaseExtension):
                     if i == "":
                         parsed.values.append("EMPTY")
                     else:
-                        parsed.values.append(self.__get_enum_name(item, i))
+                        parsed.values.append(self._get_enum_name(item, i))
                 else:
                     value = self._fix_ints(item, i)
                     parsed.values.append(
@@ -50,7 +50,7 @@ class JavaExtension(BaseExtension):
 
         if item.type == "string" and item.is_enum:
             parsed.is_enum = True
-            enum_name = self.__get_enum_name(item, item.value)
+            enum_name = self._get_enum_name(item, item.value)
 
             if enum_name is None:
                 parsed.value = "null"
@@ -122,7 +122,7 @@ class JavaExtension(BaseExtension):
 
         return parsed
 
-    def __get_enum_name(
+    def _get_enum_name(
         self,
         item: model.PropertyScalar,
         value: any,
