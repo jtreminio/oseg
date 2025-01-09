@@ -1,4 +1,5 @@
 import unittest
+from oseg import model
 from test_utils import TestUtils
 
 
@@ -6,141 +7,76 @@ class TestOperationParser(unittest.TestCase):
     def setUp(self):
         self.utils = TestUtils()
 
-    def test_param_with_example(self):
-        """Always use example value if set"""
+    def _get_request_operation(self, operation_id: str) -> model.RequestOperation:
+        return self.utils.operation_parser.get_request_operations()[operation_id]
 
-        operation_id = "param_with_example"
+    def test_common_path_query_param_scenarios(self):
         self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
 
-        expected_name = "param_name_1"
-        expected_value = "value_1"
-        expected_required = False
+        data_provider = {
+            # Always use example value if set
+            "param_with_example": {
+                "name": "param_name_1",
+                "value": "value_1",
+                "required": False,
+            },
+            # If example value is set, ignore default value
+            "param_with_example_with_default": {
+                "name": "param_name_1",
+                "value": "value_1",
+                "required": False,
+            },
+            # Use default value if no example value, and is required
+            "param_without_example_with_default_is_required": {
+                "name": "param_name_1",
+                "value": "value_2",
+                "required": True,
+            },
+            # No example value and no default value and required
+            "param_without_example_without_default_is_required": {
+                "name": "param_name_1",
+                "value": None,
+                "required": True,
+            },
+            # No example value and no default value and not required
+            "param_without_example_without_default_not_required": {
+                "name": "param_name_1",
+                "value": None,
+                "required": False,
+            },
+            # Test array type
+            "param_as_array": {
+                "name": "param_name_1",
+                "value": ["value_1", "value_2"],
+                "required": False,
+            },
+            # Anything where 'in' is not query or path is ignored
+            "param_not_in_query_or_path": {
+                "name": "param_name_1",
+                "value": "value_1",
+                "required": False,
+            },
+        }
 
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
+        for operation_id, expected in data_provider.items():
+            with self.subTest(operation_id):
+                result = self._get_request_operation(operation_id)
 
-        parameter = request_operation.request_data[0].http[expected_name]
+                self.assertIsNone(result.request_data[0].body)
+                self.assertTrue(len(result.request_data[0].http) == 1)
 
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
+                parameter = result.request_data[0].http[expected["name"]]
 
-    def test_param_with_example_with_default(self):
-        """If example value is set, ignore default value"""
-
-        operation_id = "param_with_example_with_default"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = "value_1"
-        expected_required = False
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
-
-    def test_param_without_example_with_default_is_required(self):
-        """Use default value if no example value, and is required"""
-
-        operation_id = "param_without_example_with_default_is_required"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = "value_2"
-        expected_required = True
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
-
-    def test_param_without_example_without_default_is_required(self):
-        """No example value and no default value and required"""
-
-        operation_id = "param_without_example_without_default_is_required"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = None
-        expected_required = True
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
-
-    def test_param_without_example_without_default_not_required(self):
-        """No example value and no default value and not required"""
-
-        operation_id = "param_without_example_without_default_not_required"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = None
-        expected_required = False
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
-
-    def test_param_as_array(self):
-        """Test array type"""
-
-        operation_id = "param_as_array"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = [
-            "value_1",
-            "value_2",
-        ]
-        expected_required = False
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
+                self.assertEqual(expected["name"], parameter.name)
+                self.assertEqual(expected["value"], parameter.value)
+                self.assertEqual(expected["required"], parameter.is_required)
 
     def test_mixed_params(self):
         """Test mixed params"""
 
         operation_id = "mixed_params"
         self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
+        result = self._get_request_operation(operation_id)
 
         expected_keys = [
             "param_with_example",
@@ -190,77 +126,94 @@ class TestOperationParser(unittest.TestCase):
             },
         ]
 
-        self.assertEqual(
-            expected_keys, list(request_operation.request_data[0].http.keys())
-        )
+        self.assertEqual(expected_keys, list(result.request_data[0].http.keys()))
 
         for expected in expected_result:
-            parameter = request_operation.request_data[0].http[expected["name"]]
+            parameter = result.request_data[0].http[expected["name"]]
 
             self.assertEqual(expected["name"], parameter.name)
             self.assertEqual(expected["value"], parameter.value)
             self.assertEqual(expected["required"], parameter.is_required)
 
-    def test_param_not_in_query_or_path(self):
-        """Anything where 'in' is not query or path is ignored"""
-
-        operation_id = "param_not_in_query_or_path"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self.utils.request_operation(operation_id)
-
-        expected_name = "param_name_1"
-        expected_value = "value_1"
-        expected_required = False
-
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertIsNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 1)
-
-        parameter = request_operation.request_data[0].http[expected_name]
-
-        self.assertEqual(expected_name, parameter.name)
-        self.assertEqual(expected_value, parameter.value)
-        self.assertEqual(expected_required, parameter.is_required)
-
-    def test_single_request_body(self):
-        """If single requestBody is defined, use it"""
-
-        operation_id = "single_request_body"
+    def test_common_request_body_param_scenarios(self):
         self.utils.use_fixture_file("single-requestBody")
-        request_operation = self.utils.request_operation(operation_id)
 
-        expected_example_name = "default_example"
-        expected_example_body_type = "Pet"
+        data_provider = {
+            # If single requestBody is defined, use it
+            "single_request_body": {
+                "name": "default_example",
+                "body_type": "Pet",
+            },
+            # Only ever use the first requestBody no matter how many are defined
+            "multiple_request_body": {
+                "name": "default_example",
+                "body_type": "Customer",
+            },
+        }
 
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertTrue(len(request_operation.request_data) == 1)
-        self.assertIsNotNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 0)
+        for operation_id, expected in data_provider.items():
+            with self.subTest(operation_id):
+                result = self._get_request_operation(operation_id)
 
-        example = request_operation.request_data[0]
+                self.assertTrue(len(result.request_data) == 1)
+                self.assertIsNotNone(result.request_data[0].body)
+                self.assertTrue(len(result.request_data[0].http) == 0)
 
-        self.assertEqual(expected_example_name, example.name)
-        self.assertEqual(expected_example_body_type, example.body.type)
+                example = result.request_data[0]
 
-    def test_multiple_request_body_only_first_used(self):
-        """Only ever use the first requestBody no matter how many are defined"""
+                self.assertEqual(expected["name"], example.name)
+                self.assertEqual(expected["body_type"], example.body.type)
 
-        operation_id = "multiple_request_body"
-        self.utils.use_fixture_file("single-requestBody")
-        request_operation = self.utils.request_operation(operation_id)
+    def test_different_responses(self):
+        self.utils.use_fixture_file("different-responses")
 
-        expected_example_name = "default_example"
-        expected_example_body_type = "Customer"
+        data_provider = {
+            # Most common single response
+            "single_response": {
+                "has_response": True,
+                "is_binary_response": False,
+            },
+            # Most common single response, with error
+            "single_response_with_error": {
+                "has_response": True,
+                "is_binary_response": False,
+            },
+            # Most common single response, with 400 listed before 200
+            "single_response_with_error_first": {
+                "has_response": True,
+                "is_binary_response": False,
+            },
+            # Multiple response types, all 200s
+            "multi_response": {
+                "has_response": True,
+                "is_binary_response": False,
+            },
+            # Only contains a single 4xx response, should be handled as an exception
+            "only_400_response": {
+                "has_response": False,
+                "is_binary_response": False,
+            },
+            # With binary response, aka file download
+            "binary_response": {
+                "has_response": True,
+                "is_binary_response": True,
+            },
+            # No response
+            "no_response": {
+                "has_response": False,
+                "is_binary_response": False,
+            },
+        }
 
-        self.assertEqual(operation_id, request_operation.operation_id)
-        self.assertTrue(len(request_operation.request_data) == 1)
-        self.assertIsNotNone(request_operation.request_data[0].body)
-        self.assertTrue(len(request_operation.request_data[0].http) == 0)
+        for operation_id, expected in data_provider.items():
+            with self.subTest(operation_id):
+                result = self._get_request_operation(operation_id)
 
-        example = request_operation.request_data[0]
-
-        self.assertEqual(expected_example_name, example.name)
-        self.assertEqual(expected_example_body_type, example.body.type)
+                self.assertEqual(result.has_response, expected["has_response"])
+                self.assertEqual(
+                    result.is_binary_response,
+                    expected["is_binary_response"],
+                )
 
 
 if __name__ == "__main__":

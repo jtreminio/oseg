@@ -78,11 +78,14 @@ class OperationParser:
 
         for code, response in operation.responses.items():
             if not response.content:
-                return has_response, is_binary_response
+                continue
 
             for content_type, media_type in response.content.items():
                 if media_type is None or media_type.media_type_schema is None:
-                    return has_response, is_binary_response
+                    continue
+
+                has_response = True
+                is_binary_response = False
 
                 if (
                     media_type is not None
@@ -90,15 +93,11 @@ class OperationParser:
                     and hasattr(media_type.media_type_schema, "schema_format")
                     and media_type.media_type_schema.schema_format == "binary"
                 ):
-                    has_response = True
                     is_binary_response = True
 
-                    return has_response, is_binary_response
-
-                has_response = True
-                is_binary_response = False
-
                 return has_response, is_binary_response
+
+        return has_response, is_binary_response
 
     def _create_example_data(self, operation: oa.Operation):
         examples = []

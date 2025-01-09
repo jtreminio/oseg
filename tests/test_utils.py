@@ -1,5 +1,5 @@
 import os
-from oseg import parser, model
+from oseg import parser
 
 
 class TestUtils:
@@ -13,17 +13,15 @@ class TestUtils:
         self._base_dir = os.path.dirname(os.path.abspath(__file__))
         self._oas_file = ""
 
+    @property
+    def operation_parser(self) -> parser.OperationParser:
+        return self._operation_parser
+
     def use_fixture_file(self, filename: str):
         self._refresh_dependencies(f"{self._base_dir}/fixtures/{filename}.yaml")
 
     def use_petstore_file(self):
         self._refresh_dependencies(f"{self._base_dir}/../data/petstore/openapi.yaml")
-
-    def request_operation(self, operation_id: str) -> model.RequestOperation:
-        return self._operation_parser.get_request_operations()[operation_id]
-
-    def request_operations(self) -> dict[str, model.RequestOperation]:
-        return self._operation_parser.get_request_operations()
 
     def _refresh_dependencies(self, oas_file: str):
         if self._oas_file and oas_file == self._oas_file:

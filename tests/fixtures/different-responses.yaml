@@ -1,0 +1,106 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Fixture - Different Responses
+tags:
+  - name: tag_1
+paths:
+  /single_response:
+    get:
+      tags:
+        - tag_1
+      operationId: single_response
+      responses:
+        '200':
+          description: 'successful operation'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /single_response_with_error:
+    get:
+      tags:
+        - tag_1
+      operationId: single_response_with_error
+      responses:
+        '200':
+          description: 'successful operation'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+        '400':
+          description: Invalid ID supplied
+  /single_response_with_error_first:
+    get:
+      tags:
+        - tag_1
+      operationId: single_response_with_error_first
+      responses:
+        '400':
+          description: Invalid ID supplied
+        '200':
+          description: 'successful operation'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /multi_response:
+    get:
+      tags:
+        - tag_1
+      operationId: multi_response
+      responses:
+        '200':
+          description: 'successful operation'
+          content:
+            application/xml:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /only_400_response:
+    get:
+      tags:
+        - tag_1
+      operationId: only_400_response
+      responses:
+        '400':
+          description: Invalid ID supplied
+  /binary_response:
+    get:
+      tags:
+        - tag_1
+      operationId: binary_response
+      responses:
+        '200':
+          description: 'successful operation'
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+  /no_response:
+    get:
+      tags:
+        - tag_1
+      operationId: no_response
+      responses:
+        default:
+          description: 'successful operation'
