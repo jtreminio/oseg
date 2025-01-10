@@ -350,11 +350,14 @@ class BaseExtension(Protocol):
 
                 return result
 
-            first_item = array_ref.value[0]
-            parsed.target_type = first_item.type
+            if array_ref.value:
+                first_item = array_ref.value[0]
+                parsed.target_type = first_item.type
 
-            if first_item.discriminator_base_type:
-                parsed.target_type = first_item.discriminator_base_type
+                if first_item.discriminator_base_type:
+                    parsed.target_type = first_item.discriminator_base_type
+            else:
+                parsed.target_type = array_ref.type
 
             for _ in array_ref.value:
                 parsed.values.append(f"{parent_name}{property_name}_{i}")
