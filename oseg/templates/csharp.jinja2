@@ -123,8 +123,8 @@ public class {{ operation_id|pascal_case }}{{ example_data.name|pascal_case }}
             {{ name|setter_property_name }}: {{ value }}{% if not loop.last %},{% endif %}
 
             {% endfor %}
-        );
         {% endcall %}
+        );
     {% else %}
         var {{ ref_name|setter_property_name }} = {{ "" }}
         {%- call(value) parse_body_property_list_macro(ref, parent_name, 8) %}

@@ -110,8 +110,9 @@ public class {{ operation_id|pascal_case }}_{{ example_data.name|snake_case }}
 {% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
     {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
     {% if not ref.is_array %}
-        var {{ ref_name|setter_property_name }} = new {{ ref.type }}()
         {% call(properties) parse_body_properties_macro(ref, parent_name, 12) %}
+        var {{ ref_name|setter_property_name }} = new {{ ref.type }}(){% if not properties %};{% endif %}
+
             {% for name, value in properties.items() %}
             .{{ name|setter_property_name }}({{ value }}){% if loop.last %};{% endif %}
 

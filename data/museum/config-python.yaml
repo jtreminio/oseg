@@ -1,0 +1,9 @@
+generatorName: python
+additionalProperties:
+  packageName: openapimuseum_client
+  projectName: openapimuseum-client
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

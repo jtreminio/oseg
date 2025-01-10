@@ -5,8 +5,7 @@ from oseg import Generator
 if __name__ == "__main__":
     __DIR = os.path.dirname(os.path.abspath(__file__))
 
-    oas_file = f"{__DIR}/data/petstore/openapi.yaml"
-    operation_id = None
+    projects = ["petstore", "museum"]
 
     sdks = [
         "csharp",
@@ -17,12 +16,16 @@ if __name__ == "__main__":
         "typescript-node",
     ]
 
-    generator = Generator(oas_file, operation_id)
+    for project in projects:
+        oas_file = f"{__DIR}/data/{project}/openapi.yaml"
+        operation_id = None
 
-    for sdk in sdks:
-        config_file = f"{__DIR}/data/petstore/config-{sdk}.yaml"
+        generator = Generator(oas_file, operation_id)
 
-        generator.generate(
-            config_file=config_file,
-            output_dir=f"{__DIR}/data/petstore/oseg_generated/{sdk}",
-        )
+        for sdk in sdks:
+            config_file = f"{__DIR}/data/{project}/config-{sdk}.yaml"
+
+            generator.generate(
+                config_file=config_file,
+                output_dir=f"{__DIR}/data/{project}/oseg_generated/{sdk}",
+            )

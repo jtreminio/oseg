@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## example: ./bin/run-oag museum typescript-node
+
 set -e
 
 DIR=$(cd `dirname $0` && pwd)
@@ -32,7 +34,7 @@ if [[ -f "${CONFIG_FILE}" ]]; then
   CONFIG_PARAM="-c /local/config-${SDK}.yaml"
 fi
 
-if [[ -d "${OUTPUT_DIR}/${SDK}" ]]; then
+if [[ ! -d "${OUTPUT_DIR}/${SDK}" ]]; then
   mkdir -p "${OUTPUT_DIR}/${SDK}"
 fi
 
@@ -48,6 +50,20 @@ if [[ "${SOURCE_DIR}" == "petstore" ]] && [[ -d "${BASE_DIR}/oseg_generated/${SD
     SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/Org.OpenAPITools/examples"
   elif [[ "${SDK}" == "java" ]]; then
     SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/main/java/org/openapitools/client/examples"
+  else
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/examples"
+  fi
+
+  if [[ ! -L "${SYMLINK_TARGET}" ]]; then
+    ln -s "${BASE_DIR}/oseg_generated/${SDK}" "${SYMLINK_TARGET}"
+  fi
+fi
+
+if [[ "${SOURCE_DIR}" == "museum" ]] && [[ -d "${BASE_DIR}/oseg_generated/${SDK}" ]]; then
+  if [[ "${SDK}" == "csharp" ]]; then
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/Org.OpenAPIMuseum/examples"
+  elif [[ "${SDK}" == "java" ]]; then
+    SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/src/main/java/org/openapimuseum/client/examples"
   else
     SYMLINK_TARGET="${OUTPUT_DIR}/${SDK}/examples"
   fi
