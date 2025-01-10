@@ -77,6 +77,9 @@ class OperationParser:
         is_binary_response = False
 
         for code, response in operation.responses.items():
+            if isinstance(response, oa.Reference) and response.ref:
+                _, response = self._oa_parser.response_schema_from_ref(response.ref)
+
             if not response.content:
                 continue
 
@@ -154,6 +157,11 @@ class OperationParser:
         parameters = operation.parameters if operation.parameters else []
 
         for parameter in parameters:
+            if hasattr(parameter, "ref"):
+                name, parameter = self._oa_parser.parameter_schema_from_ref(
+                    parameter.ref
+                )
+
             if parameter.param_in not in allowed_param_in:
                 continue
 

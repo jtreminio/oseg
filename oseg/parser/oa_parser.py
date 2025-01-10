@@ -59,6 +59,18 @@ class OaParser:
 
         return name, schema
 
+    def parameter_schema_from_ref(self, ref: str) -> tuple[str, oa.Parameter | None]:
+        name = ref.split("/").pop()
+        schema = self._openapi.components.parameters.get(name)
+
+        return name, schema
+
+    def response_schema_from_ref(self, ref: str) -> tuple[str, oa.Response | None]:
+        name = ref.split("/").pop()
+        schema = self._openapi.components.responses.get(name)
+
+        return name, schema
+
     def request_body_schema_from_ref(
         self,
         ref: str,
