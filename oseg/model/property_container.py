@@ -13,7 +13,7 @@ class PropertyContainer:
         self._schema = schema
         self._type = type
         self._properties: T_PROPERTIES = {}
-        self._discriminator_target_type: str | None = None
+        self._discriminator_base_type: str | None = None
 
     @property
     def schema(self) -> oa.Schema:
@@ -45,12 +45,17 @@ class PropertyContainer:
         return self._properties
 
     @property
-    def discriminator_target_type(self) -> str | None:
-        return self._discriminator_target_type
+    def discriminator_base_type(self) -> str | None:
+        return self._discriminator_base_type
 
-    @discriminator_target_type.setter
-    def discriminator_target_type(self, val: str | None):
-        self._discriminator_target_type = val
+    def set_discriminator(self, discriminator: str | None):
+        if discriminator is None:
+            self._discriminator_base_type = None
+
+            return
+
+        self._discriminator_base_type = self._type
+        self._type = discriminator
 
     @property
     def refs(self) -> dict[str, "model.PropertyRef"]:

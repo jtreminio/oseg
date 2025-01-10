@@ -5,11 +5,24 @@ info:
 tags:
   - name: pet
 paths:
-  /discriminator_dog:
+  /discriminator_at_root:
     post:
       tags:
         - pet
-      operationId: discriminator_dog
+      operationId: discriminator_at_root
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dog'
+  /discriminator_nested:
+    post:
+      tags:
+        - pet
+      operationId: discriminator_nested
       responses:
         '200':
           description: Successful operation

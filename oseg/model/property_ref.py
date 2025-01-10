@@ -56,9 +56,14 @@ class PropertyRef(model.PropertyProto):
     def discriminator_base_type(self) -> str | None:
         return self._discriminator_base_type
 
-    @discriminator_base_type.setter
-    def discriminator_base_type(self, value: str | None):
-        self._discriminator_base_type = value
+    def set_discriminator(self, discriminator: str | None):
+        if discriminator is None:
+            self._discriminator_base_type = None
+
+            return
+
+        self._discriminator_base_type = self._type
+        self._type = discriminator
 
     @property
     def is_required(self) -> bool:

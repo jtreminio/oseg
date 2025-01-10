@@ -29,9 +29,11 @@ class PropertyParser:
 
         schemas = merged_values.schemas
         properties = merged_values.properties
-        property_container.discriminator_target_type = (
-            merged_values.discriminator_target_name
-        )
+
+        if merged_values.discriminator_target_name:
+            property_container.set_discriminator(
+                merged_values.discriminator_target_name
+            )
 
         # properties with example data are listed first
         sorted_properties = self._sort_property_names(data, properties)
@@ -129,12 +131,6 @@ class PropertyParser:
             data=value,
         )
 
-        discriminator_base_type = None
-
-        if parsed.discriminator_target_type:
-            discriminator_base_type = target_schema_name
-            target_schema_name = parsed.discriminator_target_type
-
         property_ref = model.PropertyRef(
             name=name,
             value=parsed,
@@ -142,7 +138,9 @@ class PropertyParser:
             parent=property_container.schema,
         )
         property_ref.type = target_schema_name
-        property_ref.discriminator_base_type = discriminator_base_type
+
+        if parsed.discriminator_base_type:
+            property_ref.set_discriminator(parsed.type)
 
         property_container.add(name, property_ref)
 
@@ -187,11 +185,6 @@ class PropertyParser:
             )
 
             target_schema_type = target_schema_name
-            discriminator_base_type = None
-
-            if parsed.discriminator_target_type:
-                target_schema_type = parsed.discriminator_target_type
-                discriminator_base_type = target_schema_name
 
             property_ref = model.PropertyRef(
                 name=name,
@@ -200,7 +193,9 @@ class PropertyParser:
                 parent=parent,
             )
             property_ref.type = target_schema_type
-            property_ref.discriminator_base_type = discriminator_base_type
+
+            if parsed.discriminator_base_type:
+                property_ref.set_discriminator(parsed.type)
 
             result.append(property_ref)
 

@@ -10,8 +10,58 @@ class TestPropertyParser(unittest.TestCase):
     def _get_request_operation(self, operation_id: str) -> model.RequestOperation:
         return self.utils.operation_parser.get_request_operations()[operation_id]
 
-    def test_discriminator(self):
-        operation_id = "discriminator_dog"
+    def test_discriminator_at_root(self):
+        operation_id = "discriminator_at_root"
+
+        example_data = {
+            operation_id: {
+                "beagle_example": {
+                    "id": 10000,
+                    "breed": "beagle",
+                    "group": "hound",
+                },
+                "terrier_example": {
+                    "id": 10000,
+                    "breed": "terrier",
+                    "group": "hunting",
+                },
+                # without the discriminator value in "breed", discriminator is not used
+                "no_discriminator_value": {
+                    "id": 10000,
+                },
+            },
+        }
+
+        self.utils.use_fixture_file("discriminator", example_data)
+        request_operation = self._get_request_operation(operation_id)
+
+        data_provider = {
+            "beagle": {
+                "base_type": "Dog",
+                "final_type": "Beagle",
+            },
+            "terrier": {
+                "base_type": "Dog",
+                "final_type": "Terrier",
+            },
+            "no_discriminator_value": {
+                "base_type": None,
+                "final_type": "Dog",
+            },
+        }
+
+        i = 0
+        for breed, expected in data_provider.items():
+            with self.subTest(breed):
+                dog = request_operation.request_data[i].body.value
+
+                self.assertEqual(expected["base_type"], dog.discriminator_base_type)
+                self.assertEqual(expected["final_type"], dog.type)
+
+                i += 1
+
+    def test_discriminator_nested(self):
+        operation_id = "discriminator_nested"
 
         example_data = {
             operation_id: {
