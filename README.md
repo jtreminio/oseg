@@ -1,6 +1,4 @@
-# OSEG
-
-**O**penAPI **S**DK **E**xample **G**enerator
+# OSEG - (O)penAPI (S)DK (E)xample (G)enerator
 
 Create (almost) ready to use SDK snippets for SDKs generated using [openapi-generator](https://openapi-generator.tech/) using example data from your OpenAPI spec.
 
