@@ -52,6 +52,7 @@ class PropertyProto(Protocol):
     def _set_is_array(self):
         self._is_array = bool(
             hasattr(self._schema, "type")
+            and self._schema.type
             and self._schema.type.value == "array"
             and hasattr(self._schema, "items")
             and self._schema.items

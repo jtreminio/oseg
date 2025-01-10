@@ -30,6 +30,16 @@ class PropertyContainer:
         self._discriminator_target_type = val
 
     @property
+    def properties(self) -> dict[str, model.PropertyProto]:
+        return {
+            **self._refs,
+            **self._array_refs,
+            **self._scalars,
+            **self._files,
+            **self._objects,
+        }
+
+    @property
     def refs(self) -> dict[str, "model.PropertyRef"]:
         return self._refs
 

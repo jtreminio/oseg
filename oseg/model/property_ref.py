@@ -28,6 +28,7 @@ class PropertyRef(model.PropertyProto):
     def is_schema_valid_array(schema: oa.Schema) -> bool:
         return bool(
             hasattr(schema, "type")
+            and schema.type
             and schema.type.value == "array"
             and schema.items
             and hasattr(schema.items, "ref")
