@@ -16,7 +16,12 @@ public class BuyMuseumTickets_general_entry
     {
         var config = Configuration.getDefaultApiClient();
 
-        var buyMuseumTickets = new BuyMuseumTickets();
+        var buyMuseumTickets = new BuyMuseumTickets()
+            .ticketType(BuyMuseumTickets.TicketTypeEnum.GENERAL)
+            .ticketDate("2023-09-07")
+            .email("todd@example.com")
+            .ticketId(null)
+            .eventId(null);
 
         try
         {

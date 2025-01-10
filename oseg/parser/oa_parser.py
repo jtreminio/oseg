@@ -26,10 +26,15 @@ class OaParser:
         if schema.properties is None:
             return None
 
-        property_schema: oa.Schema = schema.properties.get(property_name)
+        property_schema = schema.properties.get(property_name)
 
         if property_schema is None:
             return None
+
+        if isinstance(property_schema, oa.Reference):
+            _, property_schema = self.component_schema_from_ref(
+                property_schema.ref,
+            )
 
         if not hasattr(property_schema, "type") or not property_schema.type:
             return None

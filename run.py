@@ -6,6 +6,7 @@ if __name__ == "__main__":
     __DIR = os.path.dirname(os.path.abspath(__file__))
 
     projects = ["petstore", "museum"]
+    operation_id = None
 
     sdks = [
         "csharp",
@@ -18,7 +19,6 @@ if __name__ == "__main__":
 
     for project in projects:
         oas_file = f"{__DIR}/data/{project}/openapi.yaml"
-        operation_id = None
 
         generator = Generator(oas_file, operation_id)
 

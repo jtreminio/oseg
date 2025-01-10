@@ -6,6 +6,11 @@ configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
     special_event = models.SpecialEvent()
+    special_event.name = "Mermaid Treasure Identification and Analysis"
+    special_event.location = "Under the seaaa 🦀 🎶 🌊."
+    special_event.eventDescription = "Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel."
+    special_event.price = 0
+    special_event.eventId = None
 
     try:
         api_caller = api.EventsApi(api_client)

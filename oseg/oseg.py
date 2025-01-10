@@ -77,9 +77,10 @@ class Generator:
             example_data=example_data,
         )
 
-        f = open(f"{output_dir}/{filename}.{file_extension}", "w")
-        f.write(rendered)
-        f.close()
+        target_file = f"{output_dir}/{filename}.{file_extension}"
+
+        with open(target_file, "w", encoding="utf-8") as f:
+            f.write(rendered)
 
     def _get_sdk_options(self, config_file: str) -> model.SdkOptions:
         if not os.path.isfile(config_file):

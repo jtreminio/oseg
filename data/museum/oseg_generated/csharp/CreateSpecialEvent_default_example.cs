@@ -13,6 +13,11 @@ public class CreateSpecialEventDefaultExample
         var config = new Configuration();
 
         var specialEvent = new SpecialEvent(
+            name: "Mermaid Treasure Identification and Analysis",
+            location: "Under the seaaa 🦀 🎶 🌊.",
+            eventDescription: "Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.",
+            price: 0,
+            eventId: null
         );
 
         try

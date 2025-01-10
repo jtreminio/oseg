@@ -59,6 +59,9 @@ class PropertyParser:
                 continue
 
         for property_name in sorted_properties:
+            if property_container.has(property_name):
+                continue
+
             for current_schema in schemas:
                 resolved_schema = self._oa_parser.get_property_schema(
                     current_schema,

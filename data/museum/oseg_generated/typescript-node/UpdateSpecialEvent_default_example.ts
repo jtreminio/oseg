@@ -4,6 +4,10 @@ import * as openapimuseum_client from "openapimuseum_client";
 const apiCaller = new openapimuseum_client.EventsApi();
 
 const special_event_fields: openapimuseum_client.SpecialEventFields = {
+    location: "On the beach.",
+    price: 15,
+    name: undefined,
+    eventDescription: undefined,
 };
 
 apiCaller.updateSpecialEvent(

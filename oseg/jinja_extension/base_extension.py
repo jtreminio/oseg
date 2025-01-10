@@ -371,7 +371,7 @@ class BaseExtension(Protocol):
         return result
 
     def _to_json(self, value: any) -> str:
-        return json.dumps(value)
+        return json.dumps(value, ensure_ascii=False)
 
     def _get_enum_varname(
         self,

@@ -4,7 +4,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $config = OpenAPIMuseum\Client\Configuration::getDefaultConfiguration();
 
-$special_event_fields = (new OpenAPIMuseum\Client\Model\SpecialEventFields());
+$special_event_fields = (new OpenAPIMuseum\Client\Model\SpecialEventFields())
+    ->setLocation("On the beach.")
+    ->setPrice(15)
+    ->setName(null)
+    ->setEventDescription(null);
 
 try {
     $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);
