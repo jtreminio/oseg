@@ -42,7 +42,7 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         self.utils.use_fixture_file("discriminator", example_data)
-        result = self._get_request_operation(operation_id)
+        request_operation = self._get_request_operation(operation_id)
 
         data_provider = {
             "beagle": {
@@ -62,17 +62,16 @@ class TestPropertyParser(unittest.TestCase):
         i = 0
         for breed, expected in data_provider.items():
             with self.subTest(breed):
-                body_data = result.request_data[i].body.value
-                dog = body_data.properties["dog"]
-                assert isinstance(dog, model.PropertyRef)
+                body_data = request_operation.request_data[i].body.value
+                dog = body_data.refs["dog"]
 
                 self.assertEqual(expected["base_type"], dog.discriminator_base_type)
                 self.assertEqual(expected["final_type"], dog.type)
 
                 i += 1
 
-    def test_all_of(self):
-        operation_id = "all_of_terrier"
+    def test_all_of_at_root(self):
+        operation_id = "all_of_root"
 
         example_data = {
             operation_id: {
@@ -86,16 +85,44 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         self.utils.use_fixture_file("all_of", example_data)
-        result = self._get_request_operation(operation_id)
+        request_operation = self._get_request_operation(operation_id)
 
-        body_data = result.request_data[0].body.value
-        dog = body_data.properties["dog"]
-        assert isinstance(dog, model.PropertyRef)
+        terrier = request_operation.request_data[0].body.value
+        expected = example_data[operation_id]["default_example"]
 
-        expected_type = "Terrier"
+        self.assertEqual(expected["id"], terrier.get("id").value)
+        self.assertEqual(expected["type"], terrier.get("type").value)
+        self.assertEqual(expected["breed"], terrier.get("breed").value)
+        self.assertEqual(expected["group"], terrier.get("group").value)
 
-        self.assertIsNone(dog.discriminator_base_type)
-        self.assertEqual(expected_type, dog.type)
+    def test_all_of_nested(self):
+        operation_id = "all_of_nested"
+
+        example_data = {
+            operation_id: {
+                "default_example": {
+                    "type": {
+                        "id": 10000,
+                        "type": "dog",
+                        "breed": "terrier",
+                        "group": "hunting",
+                    },
+                },
+            },
+        }
+
+        self.utils.use_fixture_file("all_of", example_data)
+        request_operation = self._get_request_operation(operation_id)
+
+        animal = request_operation.request_data[0].body.value
+        terrier = animal.refs["type"]
+
+        expected = example_data[operation_id]["default_example"]["type"]
+
+        self.assertEqual(expected["id"], terrier.value.get("id").value)
+        self.assertEqual(expected["type"], terrier.value.get("type").value)
+        self.assertEqual(expected["breed"], terrier.value.get("breed").value)
+        self.assertEqual(expected["group"], terrier.value.get("group").value)
 
 
 if __name__ == "__main__":

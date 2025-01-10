@@ -22,6 +22,10 @@ class PropertyScalar(model.PropertyProto):
         schema: oa.Schema,
         parent: oa.Schema,
     ):
+        self._type = ""
+        self._format = None
+        self._is_enum = False
+
         super().__init__(name, value, schema, parent)
 
         self._normalize_value()

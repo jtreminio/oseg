@@ -11,6 +11,7 @@ from .property_container import PropertyContainer
 from .property_file import PropertyFile
 from .property_object import PropertyObject
 from .property_ref import PropertyRef
+from .property_ref_array import PropertyRefArray
 from .property_scalar import PropertyScalar
 from .request_body_content import RequestBodyContent
 from .request_operation import RequestOperation

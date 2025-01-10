@@ -60,12 +60,12 @@ class TestOperationParser(unittest.TestCase):
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                result = self._get_request_operation(operation_id)
+                request_operation = self._get_request_operation(operation_id)
 
-                self.assertIsNone(result.request_data[0].body)
-                self.assertTrue(len(result.request_data[0].http) == 1)
+                self.assertIsNone(request_operation.request_data[0].body)
+                self.assertTrue(len(request_operation.request_data[0].http) == 1)
 
-                parameter = result.request_data[0].http[expected["name"]]
+                parameter = request_operation.request_data[0].http[expected["name"]]
 
                 self.assertEqual(expected["name"], parameter.name)
                 self.assertEqual(expected["value"], parameter.value)
@@ -76,7 +76,7 @@ class TestOperationParser(unittest.TestCase):
 
         operation_id = "mixed_params"
         self.utils.use_fixture_file("path-query-parameters")
-        result = self._get_request_operation(operation_id)
+        request_operation = self._get_request_operation(operation_id)
 
         expected_keys = [
             "param_with_example",
@@ -126,10 +126,13 @@ class TestOperationParser(unittest.TestCase):
             },
         ]
 
-        self.assertEqual(expected_keys, list(result.request_data[0].http.keys()))
+        self.assertEqual(
+            expected_keys,
+            list(request_operation.request_data[0].http.keys()),
+        )
 
         for expected in expected_result:
-            parameter = result.request_data[0].http[expected["name"]]
+            parameter = request_operation.request_data[0].http[expected["name"]]
 
             self.assertEqual(expected["name"], parameter.name)
             self.assertEqual(expected["value"], parameter.value)
@@ -153,13 +156,13 @@ class TestOperationParser(unittest.TestCase):
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                result = self._get_request_operation(operation_id)
+                request_operation = self._get_request_operation(operation_id)
 
-                self.assertTrue(len(result.request_data) == 1)
-                self.assertIsNotNone(result.request_data[0].body)
-                self.assertTrue(len(result.request_data[0].http) == 0)
+                self.assertTrue(len(request_operation.request_data) == 1)
+                self.assertIsNotNone(request_operation.request_data[0].body)
+                self.assertTrue(len(request_operation.request_data[0].http) == 0)
 
-                example = result.request_data[0]
+                example = request_operation.request_data[0]
 
                 self.assertEqual(expected["name"], example.name)
                 self.assertEqual(expected["body_type"], example.body.type)
@@ -207,11 +210,13 @@ class TestOperationParser(unittest.TestCase):
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                result = self._get_request_operation(operation_id)
+                request_operation = self._get_request_operation(operation_id)
 
-                self.assertEqual(result.has_response, expected["has_response"])
                 self.assertEqual(
-                    result.is_binary_response,
+                    request_operation.has_response, expected["has_response"]
+                )
+                self.assertEqual(
+                    request_operation.is_binary_response,
                     expected["is_binary_response"],
                 )
 

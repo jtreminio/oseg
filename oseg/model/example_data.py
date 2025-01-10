@@ -25,7 +25,7 @@ class ExampleData:
     def body(self) -> Optional["model.PropertyRef"]:
         return self._body
 
-    def get_non_refs(
+    def non_refs(
         self,
         required: bool,
     ) -> dict[str, Union["model.PropertyObject", "model.PropertyScalar"]]:
@@ -36,7 +36,7 @@ class ExampleData:
                 ordered[name] = prop
 
         if self.body:
-            ordered |= self.body.value.get_non_refs(required)
+            ordered |= self.body.value.non_refs(required)
 
         for name, prop in self.http.items():
             if not prop.is_required:

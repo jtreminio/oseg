@@ -134,6 +134,7 @@ class RequestBodyParser:
 
             container = self._property_parser.parse(
                 schema=request_body_content.schema,
+                type=request_body_content.name,
                 data=example,
             )
 

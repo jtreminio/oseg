@@ -17,9 +17,10 @@ class PropertyParser:
     def parse(
         self,
         schema: oa.Schema,
+        type: str | None,
         data: dict[str, any],
     ) -> model.PropertyContainer:
-        property_container = model.PropertyContainer(schema)
+        property_container = model.PropertyContainer(schema, type)
 
         if data is None:
             data = {}
@@ -124,6 +125,7 @@ class PropertyParser:
 
         parsed = self.parse(
             schema=target_schema,
+            type=target_schema_name,
             data=value,
         )
 
@@ -142,10 +144,7 @@ class PropertyParser:
         property_ref.type = target_schema_name
         property_ref.discriminator_base_type = discriminator_base_type
 
-        property_container.add_ref(
-            name=name,
-            ref=property_ref,
-        )
+        property_container.add(name, property_ref)
 
         return True
 
@@ -161,8 +160,6 @@ class PropertyParser:
         if not model.PropertyRef.is_schema_valid_array(schema):
             return False
 
-        schema_refs = []
-
         target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
             schema.items.ref,
         )
@@ -175,9 +172,17 @@ class PropertyParser:
             if value is None:
                 return False
 
+        result = []
+
+        if property_container.schema.properties:
+            parent = property_container.schema.properties.get(name)
+        else:
+            parent = property_container.schema
+
         for example in value:
             parsed = self.parse(
                 schema=target_schema,
+                type=target_schema_name,
                 data=example,
             )
 
@@ -192,14 +197,22 @@ class PropertyParser:
                 name=name,
                 value=parsed,
                 schema=target_schema,
-                parent=property_container.schema,
+                parent=parent,
             )
             property_ref.type = target_schema_type
             property_ref.discriminator_base_type = discriminator_base_type
 
-            schema_refs.append(property_ref)
+            result.append(property_ref)
 
-        property_container.add_array_refs(name, schema_refs)
+        property_ref_array = model.PropertyRefArray(
+            name=name,
+            value=result,
+            schema=parent,
+            parent=property_container.schema,
+        )
+        property_ref_array.type = target_schema_name
+
+        property_container.add(name, property_ref_array)
 
         return True
 
@@ -217,7 +230,7 @@ class PropertyParser:
         ) and not model.PropertyFile.is_schema_valid_array(schema):
             return False
 
-        property_container.add_file(
+        property_container.add(
             name,
             model.PropertyFile(
                 name=name,
@@ -226,8 +239,6 @@ class PropertyParser:
                 parent=property_container.schema,
             ),
         )
-
-        property_container.files[name] = value
 
         return True
 
@@ -245,7 +256,7 @@ class PropertyParser:
         ) and not model.PropertyObject.is_schema_valid_array(schema):
             return False
 
-        property_container.add_object(
+        property_container.add(
             name,
             model.PropertyObject(
                 name=name,
@@ -271,7 +282,7 @@ class PropertyParser:
         ) and not model.PropertyScalar.is_schema_valid_array(schema):
             return False
 
-        property_container.add_scalar(
+        property_container.add(
             name,
             model.PropertyScalar(
                 name=name,

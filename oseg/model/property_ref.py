@@ -6,9 +6,6 @@ T = Union["model.PropertyContainer", list[model.PropertyContainer]]
 
 
 class PropertyRef(model.PropertyProto):
-    _type: str
-    _discriminator_base_type: str | None
-
     def __init__(
         self,
         name: str,
@@ -16,9 +13,10 @@ class PropertyRef(model.PropertyProto):
         schema: oa.Schema,
         parent: oa.Schema | None,
     ):
-        super().__init__(name, value, schema, parent)
+        self._type = ""
+        self._discriminator_base_type: str | None = None
 
-        self._discriminator_base_type = None
+        super().__init__(name, value, schema, parent)
 
     @staticmethod
     def is_schema_valid_single(schema: oa.Schema) -> bool:

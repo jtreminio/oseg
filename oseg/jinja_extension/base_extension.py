@@ -92,7 +92,7 @@ class BaseExtension(Protocol):
         result = self._parse_non_ref_properties(
             context=context,
             parent_type=parent.type,
-            properties=parent.value.get_non_refs(),
+            properties=parent.value.non_refs(),
         )
 
         print_ref_value: Macro = context.vars["print_ref_value"]
@@ -118,7 +118,7 @@ class BaseExtension(Protocol):
         result = self._parse_non_ref_properties(
             context=context,
             parent_type=parent.type,
-            properties=parent.value.get_non_refs(),
+            properties=parent.value.non_refs(),
         )
 
         print_ref_value: Macro = context.vars["print_ref_value"]
@@ -190,13 +190,13 @@ class BaseExtension(Protocol):
                 body_params_required = self._parse_non_ref_properties(
                     context=context,
                     parent_type="",
-                    properties=example_data.body.value.get_non_refs(True),
+                    properties=example_data.body.value.non_refs(True),
                 )
 
                 body_params_optional = self._parse_non_ref_properties(
                     context=context,
                     parent_type="",
-                    properties=example_data.body.value.get_non_refs(False),
+                    properties=example_data.body.value.non_refs(False),
                 )
 
                 for k, v in body_params_required.items():
@@ -242,9 +242,9 @@ class BaseExtension(Protocol):
             result |= sub_results
             result[sub_name] = sub_ref
 
-        for name, refs in ref.value.array_refs.items():
+        for name, array_ref in ref.value.array_refs.items():
             i = 1
-            for sub_ref in refs:
+            for sub_ref in array_ref.value:
                 sub_name = f"{parent_name}{name}_{i}"
                 sub_results = self._flatten_refs(sub_ref, sub_name)
                 result |= sub_results
@@ -326,16 +326,16 @@ class BaseExtension(Protocol):
             parsed.value = f"{parent_name}{property_name}"
             parsed.target_type = sub_ref.type
 
-        for property_name, refs in ref.value.array_refs.items():
+        for property_name, array_ref in ref.value.array_refs.items():
             i = 1
 
             parsed = model.ParsedRefArray()
             result[property_name] = parsed
 
-            if refs is None:
+            if array_ref is None:
                 return result
 
-            if not refs:
+            if not array_ref:
                 if hasattr(ref.value.schema, "items") and hasattr(
                     ref.value.schema.items, "ref"
                 ):
@@ -350,13 +350,13 @@ class BaseExtension(Protocol):
 
                 return result
 
-            first_item = refs[0]
+            first_item = array_ref.value[0]
             parsed.target_type = first_item.type
 
             if first_item.discriminator_base_type:
                 parsed.target_type = first_item.discriminator_base_type
 
-            for _ in refs:
+            for _ in array_ref.value:
                 parsed.values.append(f"{parent_name}{property_name}_{i}")
                 i += 1
 

@@ -4,10 +4,6 @@ from typing import Protocol
 
 
 class PropertyProto(Protocol):
-    _is_array: bool
-    _is_required: bool
-    _is_nullable: bool
-
     def __init__(
         self,
         name: str,
@@ -19,6 +15,9 @@ class PropertyProto(Protocol):
         self._value = value
         self._schema = schema
         self._parent = parent
+        self._is_array = False
+        self._is_required = False
+        self._is_nullable = False
 
         self._set_is_array()
         self._set_is_required()

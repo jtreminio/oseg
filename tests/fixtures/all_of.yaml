@@ -5,11 +5,11 @@ info:
 tags:
   - name: pet
 paths:
-  /all_of_terrier:
+  /all_of_root:
     post:
       tags:
         - pet
-      operationId: all_of_terrier
+      operationId: all_of_root
       responses:
         '200':
           description: Successful operation
@@ -18,8 +18,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Terrier'
+  /all_of_nested:
+    post:
+      tags:
+        - pet
+      operationId: all_of_nested
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Animal'
 components:
   schemas:
+    Animal:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/Terrier'
     Pet:
       type: object
       required:
