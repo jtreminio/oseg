@@ -17,13 +17,27 @@ class TestUtils:
     def operation_parser(self) -> parser.OperationParser:
         return self._operation_parser
 
-    def use_fixture_file(self, filename: str):
-        self._refresh_dependencies(f"{self._base_dir}/fixtures/{filename}.yaml")
+    def use_fixture_file(
+        self,
+        filename: str,
+        example_data: dict[str, any] | None = None,
+    ):
+        self._refresh_dependencies(
+            oas_file=f"{self._base_dir}/fixtures/{filename}.yaml",
+            example_data=example_data,
+        )
 
-    def use_petstore_file(self):
-        self._refresh_dependencies(f"{self._base_dir}/../data/petstore/openapi.yaml")
+    def use_petstore_file(self, example_data: dict[str, any] | None = None):
+        self._refresh_dependencies(
+            oas_file=f"{self._base_dir}/../data/petstore/openapi.yaml",
+            example_data=example_data,
+        )
 
-    def _refresh_dependencies(self, oas_file: str):
+    def _refresh_dependencies(
+        self,
+        oas_file: str,
+        example_data: dict[str, any] | None = None,
+    ):
         if self._oas_file and oas_file == self._oas_file:
             return
 
@@ -35,6 +49,7 @@ class TestUtils:
         self._request_body_parser = parser.RequestBodyParser(
             oa_parser=self._oa_parser,
             property_parser=self._property_parser,
+            example_data=example_data,
         )
 
         self._operation_parser = parser.OperationParser(

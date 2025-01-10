@@ -1,0 +1,68 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Fixture - Discriminator
+tags:
+  - name: pet
+paths:
+  /with_discriminator:
+    post:
+      tags:
+        - pet
+      operationId: with_discriminator
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100000
+        dog:
+          $ref: '#/components/schemas/Dog'
+    Dog:
+      type: object
+      required:
+        - breed
+      properties:
+        id:
+          type: integer
+          example: 100000
+        breed:
+          type: string
+          example: terrier
+      discriminator:
+        propertyName: breed
+        mapping:
+          beagle: '#/components/schemas/Beagle'
+          terrier: '#/components/schemas/Terrier'
+    Beagle:
+      allOf:
+        - $ref: '#/components/schemas/Dog'
+        -
+          type: object
+          required:
+            - group
+          properties:
+            group:
+              type: string
+              default: hound
+    Terrier:
+      allOf:
+        - $ref: '#/components/schemas/Dog'
+        -
+          type: object
+          required:
+            - group
+          properties:
+            group:
+              type: string
+              default: hunting

@@ -8,6 +8,7 @@ class Generator:
         self,
         oas_file: str,
         operation_id: str | None = None,
+        example_data: dict[str, any] | None = None,
     ):
         oa_parser = parser.OaParser(oas_file)
         property_parser = parser.PropertyParser(oa_parser)
@@ -15,6 +16,7 @@ class Generator:
         request_body_parser = parser.RequestBodyParser(
             oa_parser=oa_parser,
             property_parser=property_parser,
+            example_data=example_data,
         )
 
         self._generator_extension = jinja_extension.GeneratorExtension.factory()

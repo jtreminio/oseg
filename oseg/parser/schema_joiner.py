@@ -85,7 +85,7 @@ class SchemaJoiner:
 
         schemas = []
 
-        for i in schema.allOf:
+        for i in discriminator_target_schema.allOf:
             property_schema = i
 
             if hasattr(i, "ref") and i.ref:

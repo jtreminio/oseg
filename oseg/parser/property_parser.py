@@ -21,6 +21,9 @@ class PropertyParser:
     ) -> model.PropertyContainer:
         property_container = model.PropertyContainer(schema)
 
+        if data is None:
+            data = {}
+
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
 
         schemas = merged_values.schemas
@@ -124,7 +127,10 @@ class PropertyParser:
             data=value,
         )
 
+        discriminator_base_type = None
+
         if parsed.discriminator_target_type:
+            discriminator_base_type = target_schema_name
             target_schema_name = parsed.discriminator_target_type
 
         property_ref = model.PropertyRef(
@@ -134,7 +140,7 @@ class PropertyParser:
             parent=property_container.schema,
         )
         property_ref.type = target_schema_name
-        property_ref.discriminator_base_type = None
+        property_ref.discriminator_base_type = discriminator_base_type
 
         property_container.add_ref(
             name=name,

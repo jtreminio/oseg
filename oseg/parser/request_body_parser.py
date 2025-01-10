@@ -19,9 +19,11 @@ class RequestBodyParser:
         self,
         oa_parser: "parser.OaParser",
         property_parser: "parser.PropertyParser",
+        example_data: dict[str, any] | None = None,
     ):
         self._oa_parser = oa_parser
         self._property_parser = property_parser
+        self._example_data = example_data
 
     def get_body_params_by_example(
         self,
@@ -56,12 +58,19 @@ class RequestBodyParser:
 
         default_example_name = "default_example"
 
+        passed_examples = self._get_data_from_passed_example_data(
+            operation.operationId,
+        )
+
         custom_examples = self._get_data_from_custom_examples(
             operation.operationId,
         )
 
-        # custom examples override everything
-        if custom_examples:
+        # always try against any passed examples first
+        if passed_examples:
+            http_data, examples = passed_examples
+        # otherwise custom example files override everything
+        elif custom_examples:
             http_data, examples = custom_examples
         # only a single example
         elif content.example:
@@ -291,6 +300,36 @@ class RequestBodyParser:
             example_name = example_name.replace(Path(example_name).suffix, "")
 
             if example_name == "":
+                example_name = "default_example"
+
+            results[example_name] = data
+
+        return http_data, results
+
+    def _get_data_from_passed_example_data(
+        self,
+        operation_id: str,
+    ) -> tuple[dict[str, any], dict[str, dict[str, any]]] | None:
+        """If example data was passed as a JSON blob, use it"""
+
+        if self._example_data is None or operation_id not in self._example_data:
+            return None
+
+        results = {}
+        http_data: dict[str, any] = {}
+        http_key_name = "__http__"
+
+        for example_name, data in self._example_data[operation_id].items():
+            if not data or not isinstance(data, dict):
+                continue
+
+            # Only read http data from first file that has data
+            if http_key_name in data:
+                if not http_data:
+                    http_data = data[http_key_name]
+                del data[http_key_name]
+
+            if not example_name or example_name == "":
                 example_name = "default_example"
 
             results[example_name] = data
