@@ -30,7 +30,7 @@ class RequestBodyParser:
     def get_body_params_by_example(
         self,
         operation: oa.Operation,
-    ) -> tuple[dict[str, any], dict[str, "model.PropertyRef"]]:
+    ) -> tuple[dict[str, any], dict[str, "model.PropertyObject"]]:
         """Grab example data from requestBody schema
 
         Will read data directly from requestBody.content.example[s], or $ref:
@@ -140,7 +140,7 @@ class RequestBodyParser:
                 data=example,
             )
 
-            property_ref = model.PropertyRef(
+            property_ref = model.PropertyObject(
                 name="",
                 value=container,
                 schema=request_body_content.schema,

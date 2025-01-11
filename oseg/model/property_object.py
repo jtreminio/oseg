@@ -1,10 +1,11 @@
 import openapi_pydantic as oa
+from typing import Union
 from oseg import model
 
-T = list[model.PropertyRef]
+T = Union["model.PropertyContainer", list[model.PropertyContainer]]
 
 
-class PropertyRefArray(model.PropertyProto):
+class PropertyObject(model.PropertyProto):
     def __init__(
         self,
         name: str,
@@ -12,7 +13,8 @@ class PropertyRefArray(model.PropertyProto):
         schema: oa.Schema,
         parent: oa.Schema | None,
     ):
-        self._type: str = ""
+        self._type = ""
+        self._discriminator_base_type: str | None = None
 
         super().__init__(name, value, schema, parent)
 
@@ -27,6 +29,19 @@ class PropertyRefArray(model.PropertyProto):
     @type.setter
     def type(self, value: str):
         self._type = value
+
+    @property
+    def discriminator_base_type(self) -> str | None:
+        return self._discriminator_base_type
+
+    def set_discriminator(self, discriminator: str | None):
+        if discriminator is None:
+            self._discriminator_base_type = None
+
+            return
+
+        self._discriminator_base_type = self._type
+        self._type = discriminator
 
     @property
     def is_required(self) -> bool:

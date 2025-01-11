@@ -78,7 +78,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
-    ) -> dict[str, model.PropertyRef]:
+    ) -> dict[str, model.PropertyObject]:
         return self._sdk_generator.parse_body_data(
             example_data,
             single_body_value,
@@ -88,7 +88,7 @@ class GeneratorExtension(jinja2.ext.Extension):
     def _parse_body_properties(
         self,
         context: Context,
-        parent: model.PropertyRef,
+        parent: model.PropertyObject,
         parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
@@ -103,7 +103,7 @@ class GeneratorExtension(jinja2.ext.Extension):
     def _parse_body_property_list(
         self,
         context: Context,
-        parent: model.PropertyRef,
+        parent: model.PropertyObject,
         parent_name: str,
         indent_count: int,
     ) -> str:

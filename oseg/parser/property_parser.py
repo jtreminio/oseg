@@ -137,7 +137,7 @@ class PropertyParser:
             data=value,
         )
 
-        property_ref = model.PropertyRef(
+        property_ref = model.PropertyObject(
             name=name,
             value=parsed,
             schema=target_schema,
@@ -195,7 +195,7 @@ class PropertyParser:
 
             target_schema_type = target_schema_name
 
-            property_ref = model.PropertyRef(
+            property_ref = model.PropertyObject(
                 name=name,
                 value=parsed,
                 schema=target_schema,
@@ -208,7 +208,7 @@ class PropertyParser:
 
             result.append(property_ref)
 
-        property_ref_array = model.PropertyRefArray(
+        property_ref_array = model.PropertyObjectArray(
             name=name,
             value=result,
             schema=parent,

@@ -60,12 +60,12 @@ class PropertyContainer:
         self._type = discriminator
 
     @property
-    def refs(self) -> dict[str, "model.PropertyRef"]:
-        return self._get_properties_of_type(model.PropertyRef, False)
+    def refs(self) -> dict[str, "model.PropertyObject"]:
+        return self._get_properties_of_type(model.PropertyObject, False)
 
     @property
-    def array_refs(self) -> dict[str, "model.PropertyRefArray"]:
-        return self._get_properties_of_type(model.PropertyRefArray, True)
+    def array_refs(self) -> dict[str, "model.PropertyObjectArray"]:
+        return self._get_properties_of_type(model.PropertyObjectArray, True)
 
     @property
     def scalars(self) -> dict[str, "model.PropertyScalar"]:

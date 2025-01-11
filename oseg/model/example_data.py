@@ -7,7 +7,7 @@ class ExampleData:
         self,
         name: str,
         http: dict[str, "model.PropertyScalar"],
-        body: Optional["model.PropertyRef"],
+        body: Optional["model.PropertyObject"],
     ):
         self._name = name
         self._http = http
@@ -22,7 +22,7 @@ class ExampleData:
         return self._http
 
     @property
-    def body(self) -> Optional["model.PropertyRef"]:
+    def body(self) -> Optional["model.PropertyObject"]:
         return self._body
 
     def non_refs(

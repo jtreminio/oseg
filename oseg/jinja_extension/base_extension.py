@@ -64,7 +64,7 @@ class BaseExtension(Protocol):
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
-    ) -> dict[str, model.PropertyRef]:
+    ) -> dict[str, model.PropertyObject]:
         """Parses body data that is sent as instantiated Model objects
 
         Drills down into dependent Model objects
@@ -83,7 +83,7 @@ class BaseExtension(Protocol):
     def parse_body_properties(
         self,
         context: Context,
-        parent: model.PropertyRef,
+        parent: model.PropertyObject,
         parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
@@ -99,7 +99,7 @@ class BaseExtension(Protocol):
         print_ref_array_value: Macro = context.vars["print_ref_array_value"]
 
         for name, parsed in self._parse_ref(parent, parent_name).items():
-            if isinstance(parsed, model.ParsedRef):
+            if isinstance(parsed, model.ParsedObject):
                 result[name] = print_ref_value(parsed)
             else:
                 result[name] = print_ref_array_value(parsed)
@@ -109,7 +109,7 @@ class BaseExtension(Protocol):
     def parse_body_property_list(
         self,
         context: Context,
-        parent: model.PropertyRef,
+        parent: model.PropertyObject,
         parent_name: str,
         indent_count: int,
     ) -> str:
@@ -125,7 +125,7 @@ class BaseExtension(Protocol):
         print_ref_array_value: Macro = context.vars["print_ref_array_value"]
 
         for name, parsed in self._parse_ref(parent, parent_name).items():
-            if isinstance(parsed, model.ParsedRef):
+            if isinstance(parsed, model.ParsedObject):
                 result[name] = print_ref_value(parsed)
             else:
                 result[name] = print_ref_array_value(parsed)
@@ -229,9 +229,9 @@ class BaseExtension(Protocol):
 
     def _flatten_refs(
         self,
-        ref: model.PropertyRef,
+        ref: model.PropertyObject,
         parent_name: str,
-    ) -> dict[str, model.PropertyRef]:
+    ) -> dict[str, model.PropertyObject]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
@@ -315,14 +315,14 @@ class BaseExtension(Protocol):
 
     def _parse_ref(
         self,
-        ref: model.PropertyRef,
+        ref: model.PropertyObject,
         parent_name: str,
-    ) -> dict[str, model.ParsedRef | model.ParsedRefArray]:
+    ) -> dict[str, model.ParsedObject | model.ParsedObjectArray]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
         for property_name, sub_ref in ref.value.refs.items():
-            parsed = model.ParsedRef()
+            parsed = model.ParsedObject()
             result[property_name] = parsed
 
             parsed.value = f"{parent_name}{property_name}"
@@ -331,7 +331,7 @@ class BaseExtension(Protocol):
         for property_name, array_ref in ref.value.array_refs.items():
             i = 1
 
-            parsed = model.ParsedRefArray()
+            parsed = model.ParsedObjectArray()
             result[property_name] = parsed
 
             if array_ref is None:
