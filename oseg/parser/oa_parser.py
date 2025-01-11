@@ -47,7 +47,7 @@ class OaParser:
         name = ref.split("/").pop()
 
         return model.ResolvedComponent(
-            name=name,
+            type=name,
             schema=self._openapi.components.schemas.get(name),
         )
 

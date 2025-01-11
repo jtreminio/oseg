@@ -30,9 +30,9 @@ class PropertyParser:
         schemas = merged_values.schemas
         properties = merged_values.properties
 
-        if merged_values.discriminator_target_name:
+        if merged_values.discriminator_target_type:
             property_container.set_discriminator(
-                merged_values.discriminator_target_name
+                merged_values.discriminator_target_type
             )
 
         # properties with example data are listed first
@@ -42,7 +42,7 @@ class PropertyParser:
             property_schema = properties.get(property_name)
             property_value = data.get(property_name) if data is not None else None
 
-            if self._handle_ref_type(
+            if self.handle_ref(
                 property_container=property_container,
                 schema=property_schema,
                 name=property_name,
@@ -50,7 +50,7 @@ class PropertyParser:
             ):
                 continue
 
-            if self._handle_array_ref_type(
+            if self._handle_array_ref(
                 property_container=property_container,
                 schema=property_schema,
                 name=property_name,
@@ -73,8 +73,7 @@ class PropertyParser:
 
                 property_value = data.get(property_name) if data is not None else None
 
-                # string + binary
-                if self._handle_file_type(
+                if self._handle_file(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -82,8 +81,7 @@ class PropertyParser:
                 ):
                     continue
 
-                # free-form object
-                if self._handle_object_type(
+                if self._handle_free_form(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -91,8 +89,7 @@ class PropertyParser:
                 ):
                     continue
 
-                # scalar
-                if self._handle_scalar_type(
+                if self._handle_scalar(
                     property_container=property_container,
                     schema=resolved_schema,
                     name=property_name,
@@ -102,7 +99,7 @@ class PropertyParser:
 
         return property_container
 
-    def _handle_ref_type(
+    def handle_ref(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
@@ -132,7 +129,7 @@ class PropertyParser:
 
         parsed = self.parse(
             schema=resolved.schema,
-            type=resolved.name,
+            type=resolved.type,
             data=value,
         )
 
@@ -142,7 +139,7 @@ class PropertyParser:
             schema=resolved.schema,
             parent=property_container.schema,
         )
-        property_ref.type = resolved.name
+        property_ref.type = resolved.type
 
         if parsed.discriminator_base_type:
             property_ref.set_discriminator(parsed.type)
@@ -151,7 +148,7 @@ class PropertyParser:
 
         return True
 
-    def _handle_array_ref_type(
+    def _handle_array_ref(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
@@ -187,11 +184,11 @@ class PropertyParser:
         for example in value:
             parsed = self.parse(
                 schema=resolved.schema,
-                type=resolved.name,
+                type=resolved.type,
                 data=example,
             )
 
-            target_schema_type = resolved.name
+            target_schema_type = resolved.type
 
             property_ref = model.PropertyObject(
                 name=name,
@@ -212,13 +209,13 @@ class PropertyParser:
             schema=parent,
             parent=property_container.schema,
         )
-        property_ref_array.type = resolved.name
+        property_ref_array.type = resolved.type
 
         property_container.add(name, property_ref_array)
 
         return True
 
-    def _handle_file_type(
+    def _handle_file(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Schema,
@@ -244,7 +241,7 @@ class PropertyParser:
 
         return True
 
-    def _handle_object_type(
+    def _handle_free_form(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Schema,
@@ -270,7 +267,7 @@ class PropertyParser:
 
         return True
 
-    def _handle_scalar_type(
+    def _handle_scalar(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Schema,

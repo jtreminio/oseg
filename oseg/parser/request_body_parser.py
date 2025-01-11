@@ -206,13 +206,13 @@ class RequestBodyParser:
             resolved = self._oa_parser.resolve_component(
                 content.media_type_schema.ref,
             )
-            name = resolved.name
+            name = resolved.type
             schema = resolved.schema
         elif parser.TypeChecker.is_ref_array(content.media_type_schema):
             schema = content.media_type_schema
             name = self._oa_parser.resolve_component(
                 content.media_type_schema.items.ref,
-            ).name
+            ).type
         # inline schema definition
         elif hasattr(content.media_type_schema, "type"):
             name = self._INLINE_REQUEST_BODY_NAME

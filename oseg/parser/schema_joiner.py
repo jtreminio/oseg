@@ -7,7 +7,7 @@ from oseg import parser
 class JoinedValues:
     schemas: list[oa.Schema]
     properties: dict[str, oa.Reference | oa.Schema]
-    discriminator_target_name: str | None
+    discriminator_target_type: str | None
 
 
 class SchemaJoiner:
@@ -30,7 +30,7 @@ class SchemaJoiner:
         if discriminated:
             return discriminated
 
-        all_of = self._resolve_all_of(schema, data, discriminator_target_name=None)
+        all_of = self._resolve_all_of(schema, data, discriminator_target_type=None)
 
         if all_of:
             return all_of
@@ -38,7 +38,7 @@ class SchemaJoiner:
         return JoinedValues(
             schemas=[schema],
             properties=self._get_properties([schema]),
-            discriminator_target_name=None,
+            discriminator_target_type=None,
         )
 
     def _resolve_discriminator(
@@ -79,14 +79,14 @@ class SchemaJoiner:
         return self._resolve_all_of(
             schema=resolved.schema,
             data=data,
-            discriminator_target_name=resolved.name,
+            discriminator_target_type=resolved.type,
         )
 
     def _resolve_all_of(
         self,
         schema: oa.Schema,
         data: dict[str, any] | None,
-        discriminator_target_name: str | None,
+        discriminator_target_type: str | None,
     ) -> JoinedValues | None:
         """Returns all schemas that build a ref via allOf
 
@@ -113,7 +113,7 @@ class SchemaJoiner:
         return JoinedValues(
             schemas=schemas,
             properties=self._get_properties(schemas),
-            discriminator_target_name=discriminator_target_name,
+            discriminator_target_type=discriminator_target_type,
         )
 
     def _get_properties(
@@ -123,11 +123,11 @@ class SchemaJoiner:
         result = {}
 
         for schema in schemas:
-            # property could actually be an array of refs
+            # property could be an array of refs
             if parser.TypeChecker.is_ref_array(schema):
                 body_name = self._oa_parser.resolve_component(
                     schema.items.ref,
-                ).name.lower()
+                ).type.lower()
 
                 if body_name not in result:
                     result[body_name] = schema

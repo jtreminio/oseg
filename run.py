@@ -5,7 +5,10 @@ from oseg import Generator
 if __name__ == "__main__":
     __DIR = os.path.dirname(os.path.abspath(__file__))
 
-    projects = ["petstore", "museum"]
+    projects = [
+        "petstore",
+        "museum",
+    ]
     operation_id = None
 
     sdks = [
