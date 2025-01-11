@@ -20,7 +20,7 @@ class PropertyScalar(model.PropertyProto):
         name: str,
         value: T,
         schema: oa.Schema,
-        parent: oa.Schema,
+        parent: oa.Schema | oa.Parameter,
     ):
         self._type = ""
         self._format = None

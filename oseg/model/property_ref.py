@@ -20,12 +20,7 @@ class PropertyRef(model.PropertyProto):
 
     @staticmethod
     def is_schema_valid_single(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type
-            and schema.type.value == "object"
-            and hasattr(schema, "properties")
-        )
+        return bool(hasattr(schema, "ref") and schema.ref)
 
     @staticmethod
     def is_schema_valid_array(schema: oa.Schema) -> bool:

@@ -71,11 +71,6 @@ class PropertyParser:
                 if not resolved_schema:
                     continue
 
-                if isinstance(resolved_schema, oa.Reference) and resolved_schema.ref:
-                    _, resolved_schema = self._oa_parser.component_schema_from_ref(
-                        resolved_schema.ref,
-                    )
-
                 property_value = data.get(property_name) if data is not None else None
 
                 # string + binary
@@ -116,17 +111,17 @@ class PropertyParser:
     ) -> bool:
         """handle complex nested object schema with 'ref'"""
 
-        if not isinstance(schema, oa.Reference) or not schema.ref:
-            return False
-
-        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
-            schema.ref,
-        )
-
-        if not model.PropertyRef.is_schema_valid_single(target_schema):
+        if not model.PropertyRef.is_schema_valid_single(schema):
             return False
 
         value: dict[str, any]
+
+        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
+            schema.ref
+        )
+
+        if target_schema.type and target_schema.type.value != "object":
+            return False
 
         is_required = self._is_required(property_container.schema, name)
 
@@ -166,9 +161,6 @@ class PropertyParser:
     ) -> bool:
         """handle arrays of complex objects"""
 
-        if isinstance(schema, oa.Reference) and schema.ref:
-            schema_name, schema = self._oa_parser.component_schema_from_ref(schema.ref)
-
         if not model.PropertyRef.is_schema_valid_array(schema):
             return False
 
@@ -176,7 +168,7 @@ class PropertyParser:
             schema.items.ref,
         )
 
-        if not model.PropertyRef.is_schema_valid_single(target_schema):
+        if target_schema.type and target_schema.type.value != "object":
             return False
 
         is_required = self._is_required(property_container.schema, name)

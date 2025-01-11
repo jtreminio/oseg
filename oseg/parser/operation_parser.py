@@ -77,7 +77,7 @@ class OperationParser:
         is_binary_response = False
 
         for code, response in operation.responses.items():
-            if isinstance(response, oa.Reference) and response.ref:
+            if hasattr(response, "ref"):
                 _, response = self._oa_parser.response_schema_from_ref(response.ref)
 
             if not response.content:
