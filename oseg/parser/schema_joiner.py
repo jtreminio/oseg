@@ -30,7 +30,7 @@ class SchemaJoiner:
         if discriminated:
             return discriminated
 
-        all_of = self._resolve_all_of(schema, data, discriminator_target_type=None)
+        all_of = self._resolve_all_of(schema, data)
 
         if all_of:
             return all_of
@@ -55,38 +55,35 @@ class SchemaJoiner:
         if not parser.TypeChecker.is_discriminator(schema) or data is None:
             return None
 
-        # the property that is used as the discriminator
-        discriminator_property_key = schema.discriminator.propertyName
-        # all possible discriminator targets, [property_key: target_schema]
-        discriminator_mapping = schema.discriminator.mapping
+        # the property that is used as the discriminator key
+        key = schema.discriminator.propertyName
+        # all possible discriminator targets, [key value: target_schema]
+        mapping = schema.discriminator.mapping
         # value decides the final schema
-        discriminator_property_value: str = data.get(discriminator_property_key)
+        value: str = data.get(key)
 
-        if not discriminator_property_value:
+        if not value:
             return None
 
-        discriminator_target_ref = discriminator_mapping.get(
-            discriminator_property_value
-        )
+        ref = mapping.get(value)
 
-        if not discriminator_target_ref:
+        if not ref:
             return None
 
-        resolved = self._oa_parser.resolve_component(
-            discriminator_target_ref,
-        )
+        resolved = self._oa_parser.resolve_component(ref)
 
-        return self._resolve_all_of(
+        joined = self._resolve_all_of(
             schema=resolved.schema,
             data=data,
-            discriminator_target_type=resolved.type,
         )
+        joined.discriminator_target_type = resolved.type
+
+        return joined
 
     def _resolve_all_of(
         self,
         schema: oa.Schema,
         data: dict[str, any] | None,
-        discriminator_target_type: str | None,
     ) -> JoinedValues | None:
         """Returns all schemas that build a ref via allOf
 
@@ -113,7 +110,7 @@ class SchemaJoiner:
         return JoinedValues(
             schemas=schemas,
             properties=self._get_properties(schemas),
-            discriminator_target_type=discriminator_target_type,
+            discriminator_target_type=None,
         )
 
     def _get_properties(

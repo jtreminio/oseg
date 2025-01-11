@@ -59,9 +59,6 @@ class PropertyParser:
                 continue
 
         for property_name in sorted_properties:
-            if property_container.has(property_name):
-                continue
-
             for current_schema in schemas:
                 resolved_schema = self._oa_parser.get_property_schema(
                     current_schema,
@@ -115,8 +112,11 @@ class PropertyParser:
 
         resolved = self._oa_parser.resolve_component(schema.ref)
 
-        # todo "type" unavailable when allOf
-        if resolved.schema.type and resolved.schema.type.value != "object":
+        # allOf to be handled recursively
+        if (
+            not parser.TypeChecker.is_object(resolved.schema)
+            and resolved.schema.allOf is None
+        ):
             return False
 
         is_required = self._is_required(property_container.schema, name)
@@ -162,8 +162,11 @@ class PropertyParser:
 
         resolved = self._oa_parser.resolve_component(schema.items.ref)
 
-        # todo "type" unavailable when allOf
-        if resolved.schema.type and resolved.schema.type.value != "object":
+        # allOf to be handled recursively
+        if (
+            not parser.TypeChecker.is_object(resolved.schema)
+            and resolved.schema.allOf is None
+        ):
             return False
 
         is_required = self._is_required(property_container.schema, name)
