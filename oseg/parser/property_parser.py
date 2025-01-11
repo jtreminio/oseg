@@ -262,7 +262,7 @@ class PropertyParser:
 
         property_container.add(
             name,
-            model.PropertyObject(
+            model.PropertyFreeForm(
                 name=name,
                 value=value,
                 schema=schema,

@@ -68,10 +68,10 @@ class RubyExtension(BaseExtension):
     def _parse_object(
         self,
         name: str,
-        item: model.PropertyObject,
-    ) -> model.ParsedObject | model.ParsedObjectArray:
+        item: model.PropertyFreeForm,
+    ) -> model.ParsedFreeForm | model.ParsedFreeFormArray:
         if item.is_array:
-            parsed = model.ParsedObjectArray()
+            parsed = model.ParsedFreeFormArray()
 
             if item.value is None:
                 parsed.values = None
@@ -88,7 +88,7 @@ class RubyExtension(BaseExtension):
 
             return parsed
 
-        parsed = model.ParsedObject()
+        parsed = model.ParsedFreeForm()
 
         if item.value is None:
             parsed.value = None

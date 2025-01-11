@@ -28,7 +28,7 @@ class ExampleData:
     def non_refs(
         self,
         required: bool,
-    ) -> dict[str, Union["model.PropertyObject", "model.PropertyScalar"]]:
+    ) -> dict[str, Union["model.PropertyFreeForm", "model.PropertyScalar"]]:
         ordered = {}
 
         for name, prop in self.http.items():

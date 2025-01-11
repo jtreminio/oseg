@@ -5,7 +5,9 @@ from oseg import model
 
 T_PROPERTIES = dict[str, model.PropertyProto]
 TYPE = TypeVar("TYPE", bound=type)
-T_NON_REFS = Union["model.PropertyFile", "model.PropertyObject", "model.PropertyScalar"]
+T_NON_REFS = Union[
+    "model.PropertyFile", "model.PropertyFreeForm", "model.PropertyScalar"
+]
 
 
 class PropertyContainer:
@@ -82,12 +84,12 @@ class PropertyContainer:
         return self._get_properties_of_type(model.PropertyFile, True)
 
     @property
-    def objects(self) -> dict[str, "model.PropertyObject"]:
-        return self._get_properties_of_type(model.PropertyObject, False)
+    def objects(self) -> dict[str, "model.PropertyFreeForm"]:
+        return self._get_properties_of_type(model.PropertyFreeForm, False)
 
     @property
-    def array_objects(self) -> dict[str, "model.PropertyObject"]:
-        return self._get_properties_of_type(model.PropertyObject, True)
+    def array_objects(self) -> dict[str, "model.PropertyFreeForm"]:
+        return self._get_properties_of_type(model.PropertyFreeForm, True)
 
     def non_refs(self, required: bool | None = None) -> dict[str, T_NON_REFS]:
         all_props = (

@@ -56,8 +56,8 @@ class BaseExtension(Protocol):
     def _parse_object(
         self,
         name: str,
-        item: model.PropertyObject,
-    ) -> model.ParsedObject | model.ParsedObjectArray:
+        item: model.PropertyFreeForm,
+    ) -> model.ParsedFreeForm | model.ParsedFreeFormArray:
         raise NotImplementedError
 
     def parse_body_data(
@@ -259,7 +259,9 @@ class BaseExtension(Protocol):
         parent_type: str,
         properties: dict[
             str,
-            Union["model.PropertyFile", "model.PropertyObject", "model.PropertyScalar"],
+            Union[
+                "model.PropertyFile", "model.PropertyFreeForm", "model.PropertyScalar"
+            ],
         ],
     ) -> dict[str, any]:
         print_scalar_value: Macro = context.vars["print_scalar_value"]
@@ -286,7 +288,7 @@ class BaseExtension(Protocol):
                     result[name] = print_file_array_value(parsed)
                 else:
                     result[name] = print_file_value(parsed)
-            elif isinstance(prop, model.PropertyObject):
+            elif isinstance(prop, model.PropertyFreeForm):
                 parsed = self._parse_object(name, prop)
 
                 if prop.is_array:

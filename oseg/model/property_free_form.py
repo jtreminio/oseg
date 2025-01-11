@@ -3,8 +3,7 @@ from typing import Union
 from oseg import model
 
 
-# todo rename to PropertyFreeForm
-class PropertyObject(model.PropertyProto):
+class PropertyFreeForm(model.PropertyProto):
     T = Union[dict[str, any] | list[dict[str, any]] | None]
 
     def __init__(
