@@ -57,7 +57,15 @@ class TypeChecker:
 
     @classmethod
     def is_object(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
-        return cls._is_of_type(schema, oa.DataType.OBJECT) and schema.properties
+        return (
+            not cls.is_ref(schema)
+            and cls._is_of_type(schema, oa.DataType.OBJECT)
+            and schema.properties
+        )
+
+    @classmethod
+    def is_object_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+        return cls.is_array(schema) and cls.is_object(schema.items)
 
     @classmethod
     def is_ref(cls, schema: Union[BaseModel, oa.Reference]) -> bool:

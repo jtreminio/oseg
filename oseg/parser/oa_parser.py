@@ -1,6 +1,8 @@
 import os
+from typing import Optional
 
 import openapi_pydantic as oa
+from oseg import model
 from oseg.parser.file_loader import FileLoader
 from oseg.parser.type_checker import TypeChecker
 
@@ -34,52 +36,61 @@ class OaParser:
             return None
 
         if TypeChecker.is_ref(property_schema):
-            _, property_schema = self.resolve_component(
-                property_schema.ref,
-            )
+            property_schema = self.resolve_component(property_schema.ref).schema
 
         if not hasattr(property_schema, "type") or not property_schema.type:
             return None
 
         return property_schema
 
-    def resolve_component(self, ref: str) -> tuple[str, oa.Schema | None]:
+    def resolve_component(self, ref: str) -> "model.ResolvedComponent":
         name = ref.split("/").pop()
-        schema = self._openapi.components.schemas.get(name)
 
-        return name, schema
+        return model.ResolvedComponent(
+            name=name,
+            schema=self._openapi.components.schemas.get(name),
+        )
 
-    def resolve_example(self, ref: str) -> tuple[str, oa.Example | None]:
+    def resolve_example(self, ref: str) -> Optional["model.ResolvedExample"]:
         name = ref.split("/").pop()
         schema: oa.Example | None = self._openapi.components.examples.get(name)
 
         if schema is None:
-            return name, None
+            return None
 
         if TypeChecker.is_ref(schema):
             raise LookupError(
-                f"Reference for components.examples not supported, schema {name}"
+                f"$ref for components.examples not supported, schema {name}"
             )
 
-        if not hasattr(schema, "value"):
-            raise LookupError(f"'value' missing for components.examples schema {name}")
+        if schema.value is None:
+            return None
 
-        return name, schema
+        return model.ResolvedExample(
+            name=name,
+            schema=schema,
+        )
 
-    def resolve_parameter(self, ref: str) -> tuple[str, oa.Parameter | None]:
+    def resolve_parameter(self, ref: str) -> "model.ResolvedParameter":
         name = ref.split("/").pop()
-        schema = self._openapi.components.parameters.get(name)
 
-        return name, schema
+        return model.ResolvedParameter(
+            name=name,
+            schema=self._openapi.components.parameters.get(name),
+        )
 
-    def resolve_response(self, ref: str) -> tuple[str, oa.Response | None]:
+    def resolve_request_body(self, ref: str) -> "model.ResolvedRequestBody":
         name = ref.split("/").pop()
-        schema = self._openapi.components.responses.get(name)
 
-        return name, schema
+        return model.ResolvedRequestBody(
+            name=name,
+            schema=self._openapi.components.requestBodies.get(name),
+        )
 
-    def resolve_request_body(self, ref: str) -> tuple[str, oa.RequestBody | None]:
+    def resolve_response(self, ref: str) -> "model.ResolvedResponse":
         name = ref.split("/").pop()
-        schema = self._openapi.components.requestBodies.get(name)
 
-        return name, schema
+        return model.ResolvedResponse(
+            name=name,
+            schema=self._openapi.components.responses.get(name),
+        )

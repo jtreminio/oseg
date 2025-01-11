@@ -93,12 +93,10 @@ class RequestBodyParser:
 
                 # switch to $ref schema if necessary
                 if parser.TypeChecker.is_ref(example_schema):
-                    basename, ref_schema = self._oa_parser.resolve_example(
-                        example_schema.ref
-                    )
+                    resolved = self._oa_parser.resolve_example(example_schema.ref)
 
-                    if ref_schema:
-                        target_schema = ref_schema
+                    if resolved:
+                        target_schema = resolved.schema
 
                 file_data = self._get_data_from_file(target_schema)
 
@@ -177,9 +175,9 @@ class RequestBodyParser:
             return
 
         if parser.TypeChecker.is_ref(operation.requestBody):
-            _, schema = self._oa_parser.resolve_request_body(
-                operation.requestBody.ref,
-            )
+            schema = self._oa_parser.resolve_request_body(
+                operation.requestBody.ref
+            ).schema
 
             contents = schema.content
             required = schema.required
@@ -205,17 +203,19 @@ class RequestBodyParser:
             return
 
         if parser.TypeChecker.is_ref(content.media_type_schema):
-            body_name, schema = self._oa_parser.resolve_component(
+            resolved = self._oa_parser.resolve_component(
                 content.media_type_schema.ref,
             )
+            name = resolved.name
+            schema = resolved.schema
         elif parser.TypeChecker.is_ref_array(content.media_type_schema):
             schema = content.media_type_schema
-            body_name, _ = self._oa_parser.resolve_component(
+            name = self._oa_parser.resolve_component(
                 content.media_type_schema.items.ref,
-            )
+            ).name
         # inline schema definition
         elif hasattr(content.media_type_schema, "type"):
-            body_name = self._INLINE_REQUEST_BODY_NAME
+            name = self._INLINE_REQUEST_BODY_NAME
             schema = content.media_type_schema
         else:
             return
@@ -224,7 +224,7 @@ class RequestBodyParser:
             return
 
         return model.RequestBodyContent(
-            name=body_name,
+            name=name,
             content=content,
             schema=schema,
             required=required,
@@ -352,15 +352,9 @@ class RequestBodyParser:
         if not parser.TypeChecker.is_ref(schema):
             return {}
 
-        target_schema_name, target_schema = self._oa_parser.resolve_component(
-            schema.ref
+        return self._parse_components(
+            schema=self._oa_parser.resolve_component(schema.ref).schema,
         )
-
-        parsed = self._parse_components(
-            schema=target_schema,
-        )
-
-        return parsed
 
     def _handle_array_ref_type(
         self,

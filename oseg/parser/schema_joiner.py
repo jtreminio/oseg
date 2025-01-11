@@ -72,16 +72,14 @@ class SchemaJoiner:
         if not discriminator_target_ref:
             return None
 
-        discriminator_target_name, discriminator_target_schema = (
-            self._oa_parser.resolve_component(
-                discriminator_target_ref,
-            )
+        resolved = self._oa_parser.resolve_component(
+            discriminator_target_ref,
         )
 
         return self._resolve_all_of(
-            schema=discriminator_target_schema,
+            schema=resolved.schema,
             data=data,
-            discriminator_target_name=discriminator_target_name,
+            discriminator_target_name=resolved.name,
         )
 
     def _resolve_all_of(
@@ -108,7 +106,7 @@ class SchemaJoiner:
             property_schema = i
 
             if parser.TypeChecker.is_ref(i):
-                _, property_schema = self._oa_parser.resolve_component(i.ref)
+                property_schema = self._oa_parser.resolve_component(i.ref).schema
 
             schemas.append(property_schema)
 
@@ -127,11 +125,9 @@ class SchemaJoiner:
         for schema in schemas:
             # property could actually be an array of refs
             if parser.TypeChecker.is_ref_array(schema):
-                body_name, _ = self._oa_parser.resolve_component(
+                body_name = self._oa_parser.resolve_component(
                     schema.items.ref,
-                )
-
-                body_name = body_name.lower()
+                ).name.lower()
 
                 if body_name not in result:
                     result[body_name] = schema

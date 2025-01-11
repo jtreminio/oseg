@@ -78,7 +78,7 @@ class OperationParser:
 
         for code, response in operation.responses.items():
             if parser.TypeChecker.is_ref(response):
-                _, response = self._oa_parser.resolve_response(response.ref)
+                response = self._oa_parser.resolve_response(response.ref).schema
 
             if not response.content:
                 continue
@@ -157,7 +157,7 @@ class OperationParser:
 
         for parameter in parameters:
             if parser.TypeChecker.is_ref(parameter):
-                name, parameter = self._oa_parser.resolve_parameter(parameter.ref)
+                parameter = self._oa_parser.resolve_parameter(parameter.ref).schema
 
             if parameter.param_in not in allowed_param_in:
                 continue

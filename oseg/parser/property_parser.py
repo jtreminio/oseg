@@ -116,34 +116,33 @@ class PropertyParser:
 
         value: dict[str, any]
 
-        target_schema_name, target_schema = self._oa_parser.resolve_component(
-            schema.ref
-        )
+        resolved = self._oa_parser.resolve_component(schema.ref)
 
-        if target_schema.type and target_schema.type.value != "object":
+        # todo "type" unavailable when allOf
+        if resolved.schema.type and resolved.schema.type.value != "object":
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = target_schema.default
+            value = resolved.schema.default
 
             if value is None:
                 return False
 
         parsed = self.parse(
-            schema=target_schema,
-            type=target_schema_name,
+            schema=resolved.schema,
+            type=resolved.name,
             data=value,
         )
 
         property_ref = model.PropertyObject(
             name=name,
             value=parsed,
-            schema=target_schema,
+            schema=resolved.schema,
             parent=property_container.schema,
         )
-        property_ref.type = target_schema_name
+        property_ref.type = resolved.name
 
         if parsed.discriminator_base_type:
             property_ref.set_discriminator(parsed.type)
@@ -164,17 +163,16 @@ class PropertyParser:
         if not parser.TypeChecker.is_ref_array(schema):
             return False
 
-        target_schema_name, target_schema = self._oa_parser.resolve_component(
-            schema.items.ref,
-        )
+        resolved = self._oa_parser.resolve_component(schema.items.ref)
 
-        if target_schema.type and target_schema.type.value != "object":
+        # todo "type" unavailable when allOf
+        if resolved.schema.type and resolved.schema.type.value != "object":
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = target_schema.default
+            value = resolved.schema.default
 
             if value is None:
                 return False
@@ -188,17 +186,17 @@ class PropertyParser:
 
         for example in value:
             parsed = self.parse(
-                schema=target_schema,
-                type=target_schema_name,
+                schema=resolved.schema,
+                type=resolved.name,
                 data=example,
             )
 
-            target_schema_type = target_schema_name
+            target_schema_type = resolved.name
 
             property_ref = model.PropertyObject(
                 name=name,
                 value=parsed,
-                schema=target_schema,
+                schema=resolved.schema,
                 parent=parent,
             )
             property_ref.type = target_schema_type
@@ -214,7 +212,7 @@ class PropertyParser:
             schema=parent,
             parent=property_container.schema,
         )
-        property_ref_array.type = target_schema_name
+        property_ref_array.type = resolved.name
 
         property_container.add(name, property_ref_array)
 

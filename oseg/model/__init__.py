@@ -16,4 +16,9 @@ from .property_scalar import PropertyScalar
 from .request_body_content import RequestBodyContent
 from .request_operation import RequestOperation
 from .request_parameter import RequestParameter
+from .resolved_component import ResolvedComponent
+from .resolved_example import ResolvedExample
+from .resolved_parameter import ResolvedParameter
+from .resolved_request_body import ResolvedRequestBody
+from .resolved_response import ResolvedResponse
 from .sdk_options import SdkOptions
