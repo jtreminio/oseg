@@ -30,11 +30,11 @@ new SplFileObject("{{ parsed.value }}")
 
 {%- macro print_object_value(parsed) -%}
     {% if parsed.value == None %}null{% else %}
-{
+[
         {% for k, v in parsed.value.items() %}
     "{{ k }}": {{ v }},
         {% endfor %}
-}
+]
     {%- endif %}
 {%- endmacro -%}
 
@@ -42,11 +42,11 @@ new SplFileObject("{{ parsed.value }}")
     {% if parsed.values == None %}null{% else %}
 [
         {% for obj in parsed.values %}
-    {
+    [
             {% for k, v in obj.items() %}
         "{{ k }}": {{ v }},
             {% endfor %}
-    },
+    ],
         {% endfor %}
 ]
     {%- endif %}
