@@ -29,7 +29,7 @@ class OperationParser:
     def get_request_operations(
         self,
         operation_id: str | None = None,
-    ) -> dict[str, model.RequestOperation]:
+    ) -> dict[str, "model.RequestOperation"]:
         if operation_id:
             return {operation_id: self._request_operations[operation_id]}
 
@@ -77,8 +77,8 @@ class OperationParser:
         is_binary_response = False
 
         for code, response in operation.responses.items():
-            if hasattr(response, "ref"):
-                _, response = self._oa_parser.response_schema_from_ref(response.ref)
+            if parser.TypeChecker.is_ref(response):
+                _, response = self._oa_parser.resolve_response(response.ref)
 
             if not response.content:
                 continue
@@ -93,8 +93,7 @@ class OperationParser:
                 if (
                     media_type is not None
                     and media_type.media_type_schema is not None
-                    and hasattr(media_type.media_type_schema, "schema_format")
-                    and media_type.media_type_schema.schema_format == "binary"
+                    and parser.TypeChecker.is_file(media_type.media_type_schema)
                 ):
                     is_binary_response = True
 
@@ -157,10 +156,8 @@ class OperationParser:
         parameters = operation.parameters if operation.parameters else []
 
         for parameter in parameters:
-            if hasattr(parameter, "ref"):
-                name, parameter = self._oa_parser.parameter_schema_from_ref(
-                    parameter.ref
-                )
+            if parser.TypeChecker.is_ref(parameter):
+                name, parameter = self._oa_parser.resolve_parameter(parameter.ref)
 
             if parameter.param_in not in allowed_param_in:
                 continue

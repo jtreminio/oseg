@@ -1,5 +1,5 @@
 import openapi_pydantic as oa
-from oseg import parser, model
+from oseg import model, parser
 
 
 class PropertyParser:
@@ -19,7 +19,7 @@ class PropertyParser:
         schema: oa.Schema,
         type: str | None,
         data: dict[str, any],
-    ) -> model.PropertyContainer:
+    ) -> "model.PropertyContainer":
         property_container = model.PropertyContainer(schema, type)
 
         if data is None:
@@ -104,19 +104,19 @@ class PropertyParser:
 
     def _handle_ref_type(
         self,
-        property_container: model.PropertyContainer,
+        property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: any,
     ) -> bool:
         """handle complex nested object schema with 'ref'"""
 
-        if not model.PropertyRef.is_schema_valid_single(schema):
+        if not parser.TypeChecker.is_ref(schema):
             return False
 
         value: dict[str, any]
 
-        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.resolve_component(
             schema.ref
         )
 
@@ -154,17 +154,17 @@ class PropertyParser:
 
     def _handle_array_ref_type(
         self,
-        property_container: model.PropertyContainer,
+        property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: any,
     ) -> bool:
         """handle arrays of complex objects"""
 
-        if not model.PropertyRef.is_schema_valid_array(schema):
+        if not parser.TypeChecker.is_ref_array(schema):
             return False
 
-        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.resolve_component(
             schema.items.ref,
         )
 
@@ -222,16 +222,16 @@ class PropertyParser:
 
     def _handle_file_type(
         self,
-        property_container: model.PropertyContainer,
+        property_container: "model.PropertyContainer",
         schema: oa.Schema,
         name: str,
         value: any,
     ) -> bool:
         """handle binary (file upload) types"""
 
-        if not model.PropertyFile.is_schema_valid_single(
+        if not parser.TypeChecker.is_file(
             schema
-        ) and not model.PropertyFile.is_schema_valid_array(schema):
+        ) and not parser.TypeChecker.is_file_array(schema):
             return False
 
         property_container.add(
@@ -248,16 +248,16 @@ class PropertyParser:
 
     def _handle_object_type(
         self,
-        property_container: model.PropertyContainer,
+        property_container: "model.PropertyContainer",
         schema: oa.Schema,
         name: str,
         value: any,
     ) -> bool:
         """handle non-ref objects, ignore inline schemas that should use $ref"""
 
-        if not model.PropertyObject.is_schema_valid_single(
+        if not parser.TypeChecker.is_free_form(
             schema
-        ) and not model.PropertyObject.is_schema_valid_array(schema):
+        ) and not parser.TypeChecker.is_free_form_array(schema):
             return False
 
         property_container.add(
@@ -274,16 +274,16 @@ class PropertyParser:
 
     def _handle_scalar_type(
         self,
-        property_container: model.PropertyContainer,
+        property_container: "model.PropertyContainer",
         schema: oa.Schema,
         name: str,
         value: any,
     ) -> bool:
         """handle scalar types"""
 
-        if not model.PropertyScalar.is_schema_valid_single(
+        if not parser.TypeChecker.is_scalar(
             schema
-        ) and not model.PropertyScalar.is_schema_valid_array(schema):
+        ) and not parser.TypeChecker.is_scalar_array(schema):
             return False
 
         property_container.add(

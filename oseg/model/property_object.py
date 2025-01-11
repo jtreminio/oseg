@@ -3,6 +3,7 @@ from typing import Union
 from oseg import model
 
 
+# todo rename to PropertyFreeForm
 class PropertyObject(model.PropertyProto):
     T = Union[dict[str, any] | list[dict[str, any]] | None]
 
@@ -14,27 +15,6 @@ class PropertyObject(model.PropertyProto):
         parent: oa.Schema,
     ):
         super().__init__(name, value, schema, parent)
-
-    @staticmethod
-    def is_schema_valid_single(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type.value == "object"
-            and schema.properties
-        )
-
-    @staticmethod
-    def is_schema_valid_array(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type.value == "array"
-            and schema.items
-            and hasattr(schema.items, "type")
-            and schema.items.type
-            and schema.items.type.value == "object"
-            and schema.properties
-            and schema.items.properties
-        )
 
     @property
     def value(self) -> T:

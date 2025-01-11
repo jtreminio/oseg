@@ -1,6 +1,8 @@
 import os
+
 import openapi_pydantic as oa
 from oseg.parser.file_loader import FileLoader
+from oseg.parser.type_checker import TypeChecker
 
 
 class OaParser:
@@ -31,8 +33,8 @@ class OaParser:
         if property_schema is None:
             return None
 
-        if isinstance(property_schema, oa.Reference):
-            _, property_schema = self.component_schema_from_ref(
+        if TypeChecker.is_ref(property_schema):
+            _, property_schema = self.resolve_component(
                 property_schema.ref,
             )
 
@@ -41,20 +43,20 @@ class OaParser:
 
         return property_schema
 
-    def component_schema_from_ref(self, ref: str) -> tuple[str, oa.Schema | None]:
+    def resolve_component(self, ref: str) -> tuple[str, oa.Schema | None]:
         name = ref.split("/").pop()
         schema = self._openapi.components.schemas.get(name)
 
         return name, schema
 
-    def example_schema_from_ref(self, ref: str) -> tuple[str, oa.Example | None]:
+    def resolve_example(self, ref: str) -> tuple[str, oa.Example | None]:
         name = ref.split("/").pop()
         schema: oa.Example | None = self._openapi.components.examples.get(name)
 
         if schema is None:
             return name, None
 
-        if hasattr(schema, "ref"):
+        if TypeChecker.is_ref(schema):
             raise LookupError(
                 f"Reference for components.examples not supported, schema {name}"
             )
@@ -64,22 +66,19 @@ class OaParser:
 
         return name, schema
 
-    def parameter_schema_from_ref(self, ref: str) -> tuple[str, oa.Parameter | None]:
+    def resolve_parameter(self, ref: str) -> tuple[str, oa.Parameter | None]:
         name = ref.split("/").pop()
         schema = self._openapi.components.parameters.get(name)
 
         return name, schema
 
-    def response_schema_from_ref(self, ref: str) -> tuple[str, oa.Response | None]:
+    def resolve_response(self, ref: str) -> tuple[str, oa.Response | None]:
         name = ref.split("/").pop()
         schema = self._openapi.components.responses.get(name)
 
         return name, schema
 
-    def request_body_schema_from_ref(
-        self,
-        ref: str,
-    ) -> tuple[str, oa.RequestBody | None]:
+    def resolve_request_body(self, ref: str) -> tuple[str, oa.RequestBody | None]:
         name = ref.split("/").pop()
         schema = self._openapi.components.requestBodies.get(name)
 

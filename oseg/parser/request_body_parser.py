@@ -1,6 +1,8 @@
 import glob
 import json
 import os
+from typing import Optional
+
 import openapi_pydantic as oa
 from pathlib import Path
 from oseg import parser, model
@@ -28,7 +30,7 @@ class RequestBodyParser:
     def get_body_params_by_example(
         self,
         operation: oa.Operation,
-    ) -> tuple[dict[str, any], dict[str, model.PropertyRef]]:
+    ) -> tuple[dict[str, any], dict[str, "model.PropertyRef"]]:
         """Grab example data from requestBody schema
 
         Will read data directly from requestBody.content.example[s], or $ref:
@@ -90,8 +92,8 @@ class RequestBodyParser:
                     )
 
                 # switch to $ref schema if necessary
-                if hasattr(example_schema, "ref"):
-                    basename, ref_schema = self._oa_parser.example_schema_from_ref(
+                if parser.TypeChecker.is_ref(example_schema):
+                    basename, ref_schema = self._oa_parser.resolve_example(
                         example_schema.ref
                     )
 
@@ -170,12 +172,12 @@ class RequestBodyParser:
     def _get_request_body_content(
         self,
         operation: oa.Operation,
-    ) -> model.RequestBodyContent | None:
+    ) -> Optional["model.RequestBodyContent"]:
         if not operation.requestBody:
             return
 
-        if hasattr(operation.requestBody, "ref"):
-            _, schema = self._oa_parser.request_body_schema_from_ref(
+        if parser.TypeChecker.is_ref(operation.requestBody):
+            _, schema = self._oa_parser.resolve_request_body(
                 operation.requestBody.ref,
             )
 
@@ -202,18 +204,13 @@ class RequestBodyParser:
         if content_type is None or content is None:
             return
 
-        if hasattr(content.media_type_schema, "ref"):
-            body_name, schema = self._oa_parser.component_schema_from_ref(
+        if parser.TypeChecker.is_ref(content.media_type_schema):
+            body_name, schema = self._oa_parser.resolve_component(
                 content.media_type_schema.ref,
             )
-        elif (
-            hasattr(content.media_type_schema, "type")
-            and content.media_type_schema.type.value == "array"
-            and hasattr(content.media_type_schema, "items")
-            and content.media_type_schema.items.ref
-        ):
+        elif parser.TypeChecker.is_ref_array(content.media_type_schema):
             schema = content.media_type_schema
-            body_name, _ = self._oa_parser.component_schema_from_ref(
+            body_name, _ = self._oa_parser.resolve_component(
                 content.media_type_schema.items.ref,
             )
         # inline schema definition
@@ -352,10 +349,10 @@ class RequestBodyParser:
     ) -> dict[str, any]:
         """handle complex nested object schema with 'ref'"""
 
-        if not hasattr(schema, "ref") or not schema.ref:
+        if not parser.TypeChecker.is_ref(schema):
             return {}
 
-        target_schema_name, target_schema = self._oa_parser.component_schema_from_ref(
+        target_schema_name, target_schema = self._oa_parser.resolve_component(
             schema.ref
         )
 
@@ -377,12 +374,7 @@ class RequestBodyParser:
         result: dict[str, any] = {}
 
         for property_name, property_schema in schema.properties.items():
-            if (
-                not hasattr(property_schema, "type")
-                or property_schema.type.value != "array"
-                or not property_schema.items
-                or not hasattr(property_schema.items, "ref")
-            ):
+            if not parser.TypeChecker.is_ref_array(schema):
                 continue
 
             parsed = self._parse_components(

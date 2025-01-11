@@ -1,6 +1,7 @@
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol
+from oseg import parser
 
 
 class PropertyProto(Protocol):
@@ -15,13 +16,11 @@ class PropertyProto(Protocol):
         self._value = value
         self._schema = schema
         self._parent = parent
-        self._is_array = False
+        self._is_array = parser.TypeChecker.is_array(self._schema)
         self._is_required = False
-        self._is_nullable = False
+        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
 
-        self._set_is_array()
         self._set_is_required()
-        self._set_is_nullable()
 
     @property
     def name(self) -> str:
@@ -48,15 +47,6 @@ class PropertyProto(Protocol):
     def is_nullable(self) -> bool:
         return self._is_nullable
 
-    def _set_is_array(self):
-        self._is_array = bool(
-            hasattr(self._schema, "type")
-            and self._schema.type
-            and self._schema.type.value == "array"
-            and hasattr(self._schema, "items")
-            and self._schema.items
-        )
-
     def _set_is_required(self):
         if self._parent is None:
             return False
@@ -72,8 +62,3 @@ class PropertyProto(Protocol):
             return
 
         self._is_required = self._name in self._parent.required
-
-    def _set_is_nullable(self):
-        self._is_nullable = bool(
-            hasattr(self._schema, "nullable") and self._schema.nullable
-        )

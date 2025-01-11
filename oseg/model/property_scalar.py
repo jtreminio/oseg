@@ -8,13 +8,6 @@ T = Union[T_SINGLE, T_LIST, None]
 
 
 class PropertyScalar(model.PropertyProto):
-    _PRIMITIVE_TYPES = [
-        "boolean",
-        "integer",
-        "number",
-        "string",
-    ]
-
     def __init__(
         self,
         name: str,
@@ -32,29 +25,6 @@ class PropertyScalar(model.PropertyProto):
         self._type = self._set_type()
         self._format = self._set_string_format()
         self._is_enum = self._set_is_enum()
-
-    @staticmethod
-    def is_primitive_type(propery_type: str) -> bool:
-        return propery_type in PropertyScalar._PRIMITIVE_TYPES
-
-    @staticmethod
-    def is_schema_valid_single(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and model.PropertyScalar.is_primitive_type(schema.type)
-            and not model.PropertyFile.is_schema_valid_single(schema)
-        )
-
-    @staticmethod
-    def is_schema_valid_array(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type.value == "array"
-            and schema.items
-            and hasattr(schema.items, "type")
-            and model.PropertyScalar.is_primitive_type(schema.items.type)
-            and not model.PropertyFile.is_schema_valid_array(schema)
-        )
 
     @property
     def value(self) -> T:
@@ -84,9 +54,9 @@ class PropertyScalar(model.PropertyProto):
             result = []
 
             for i in self._value:
-                if self._schema.type == "string":
+                if self._schema.type == oa.DataType.STRING.value:
                     result.append(str(i))
-                elif self._schema.type == "boolean":
+                elif self._schema.type == oa.DataType.BOOLEAN.value:
                     result.append(bool(i))
                 else:
                     i: int
@@ -96,9 +66,9 @@ class PropertyScalar(model.PropertyProto):
 
             return
 
-        if self._schema.type == "string":
+        if self._schema.type == oa.DataType.STRING.value:
             self._value = str(self._value)
-        elif self._schema.type == "boolean":
+        elif self._schema.type == oa.DataType.BOOLEAN.value:
             self._value = bool(self._value)
 
     # todo currently only support single type, not list of types
@@ -110,19 +80,11 @@ class PropertyScalar(model.PropertyProto):
                 type_value, str
             ), f"'{self._schema}' has invalid array items type"
 
-            assert (
-                type_value in PropertyScalar._PRIMITIVE_TYPES
-            ), f"'{type_value}' not a valid scalar type"
-
             return type_value
 
         type_value = self._schema.type.value
 
         assert isinstance(type_value, str), f"'{self._schema}' has invalid item type"
-
-        assert (
-            type_value in PropertyScalar._PRIMITIVE_TYPES
-        ), f"'{type_value}' not a valid scalar type"
 
         return type_value
 

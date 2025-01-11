@@ -18,28 +18,6 @@ class PropertyRef(model.PropertyProto):
 
         super().__init__(name, value, schema, parent)
 
-    @staticmethod
-    def is_schema_valid_single(schema: oa.Schema) -> bool:
-        return bool(hasattr(schema, "ref") and schema.ref)
-
-    @staticmethod
-    def is_schema_valid_array(schema: oa.Schema) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type
-            and schema.type.value == "array"
-            and schema.items
-            and hasattr(schema.items, "ref")
-        )
-
-    @staticmethod
-    def is_schema_discriminator(schema: oa.Schema) -> bool:
-        return bool(
-            schema.discriminator
-            and schema.discriminator.propertyName
-            and schema.discriminator.mapping
-        )
-
     @property
     def value(self) -> T:
         return self._value

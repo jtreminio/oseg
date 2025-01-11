@@ -5,7 +5,7 @@ import openapi_pydantic as oa
 from abc import abstractmethod
 from jinja2.runtime import Macro, Context
 from typing import Protocol, Union
-from oseg import model
+from oseg import model, parser
 
 
 class BaseExtension(Protocol):
@@ -336,16 +336,14 @@ class BaseExtension(Protocol):
                 return result
 
             if not array_ref:
-                if hasattr(ref.value.schema, "items") and hasattr(
-                    ref.value.schema.items, "ref"
-                ):
+                if parser.TypeChecker.is_ref_array(ref.value.schema):
                     parsed.target_type = ref.value.schema.items.ref.split("/").pop()
 
                     return result
 
                 property_schema = ref.value.schema.properties[property_name]
 
-                if hasattr(property_schema.items, "ref"):
+                if parser.TypeChecker.is_ref_array(property_schema):
                     parsed.target_type = property_schema.items.ref.split("/").pop()
 
                 return result

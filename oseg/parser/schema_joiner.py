@@ -1,6 +1,6 @@
 import openapi_pydantic as oa
 from dataclasses import dataclass
-from oseg import model, parser
+from oseg import parser
 
 
 @dataclass
@@ -11,10 +11,7 @@ class JoinedValues:
 
 
 class SchemaJoiner:
-    def __init__(
-        self,
-        oa_parser: parser.OaParser,
-    ):
+    def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser = oa_parser
 
     def merge_schemas_and_properties(
@@ -55,7 +52,7 @@ class SchemaJoiner:
         and other metadata
         """
 
-        if not model.PropertyRef.is_schema_discriminator(schema) or data is None:
+        if not parser.TypeChecker.is_discriminator(schema) or data is None:
             return None
 
         # the property that is used as the discriminator
@@ -76,7 +73,7 @@ class SchemaJoiner:
             return None
 
         discriminator_target_name, discriminator_target_schema = (
-            self._oa_parser.component_schema_from_ref(
+            self._oa_parser.resolve_component(
                 discriminator_target_ref,
             )
         )
@@ -110,8 +107,8 @@ class SchemaJoiner:
         for i in schema.allOf:
             property_schema = i
 
-            if hasattr(i, "ref") and i.ref:
-                _, property_schema = self._oa_parser.component_schema_from_ref(i.ref)
+            if parser.TypeChecker.is_ref(i):
+                _, property_schema = self._oa_parser.resolve_component(i.ref)
 
             schemas.append(property_schema)
 
@@ -129,8 +126,8 @@ class SchemaJoiner:
 
         for schema in schemas:
             # property could actually be an array of refs
-            if model.PropertyRef.is_schema_valid_array(schema):
-                body_name, _ = self._oa_parser.component_schema_from_ref(
+            if parser.TypeChecker.is_ref_array(schema):
+                body_name, _ = self._oa_parser.resolve_component(
                     schema.items.ref,
                 )
 
