@@ -75,7 +75,7 @@ class Generator:
         output_dir: str,
         file_extension: str,
     ):
-        operation_id = request_operation.operation_id
+        operation_id = request_operation.operation.operationId
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_data.name}"
         print(f"Begin parsing for {filename}")
 

@@ -5,7 +5,6 @@ from oseg import model
 
 @dataclass
 class RequestOperation:
-    operation_id: str
     operation: oa.Operation
     api_name: str
     method: str

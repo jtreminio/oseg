@@ -53,7 +53,6 @@ class OperationParser:
                     continue
 
                 request_operation = model.RequestOperation(
-                    operation_id=operation.operationId,
                     operation=operation,
                     api_name=self._get_api_name(operation),
                     method=method,
