@@ -29,13 +29,8 @@ class OperationParser:
 
         self._setup_request_operations(operation_id)
 
-    def get_request_operations(
-        self,
-        operation_id: str | None = None,
-    ) -> dict[str, "model.RequestOperation"]:
-        if operation_id:
-            return {operation_id: self._request_operations[operation_id]}
-
+    @property
+    def operations(self) -> dict[str, "model.RequestOperation"]:
         return self._request_operations
 
     def _setup_request_operations(self, operation_id: str | None):

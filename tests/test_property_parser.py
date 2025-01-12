@@ -8,7 +8,7 @@ class TestPropertyParser(unittest.TestCase):
         self.utils = TestUtils()
 
     def _get_request_operation(self, operation_id: str) -> model.RequestOperation:
-        return self.utils.operation_parser.get_request_operations()[operation_id]
+        return self.utils.operation_parser.operations[operation_id]
 
     def test_discriminator_at_root(self):
         operation_id = "discriminator_at_root"

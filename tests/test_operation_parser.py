@@ -8,7 +8,7 @@ class TestOperationParser(unittest.TestCase):
         self.utils = TestUtils()
 
     def _get_request_operation(self, operation_id: str) -> model.RequestOperation:
-        return self.utils.operation_parser.get_request_operations()[operation_id]
+        return self.utils.operation_parser.operations[operation_id]
 
     def test_common_path_query_param_scenarios(self):
         self.utils.use_fixture_file("path-query-parameters")

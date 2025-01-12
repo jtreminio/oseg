@@ -60,6 +60,4 @@ class TestUtils:
             operation_id=None,
         )
 
-        self._request_body_parser.add_example_data(
-            self._operation_parser.get_request_operations()
-        )
+        self._request_body_parser.add_example_data(self._operation_parser.operations)

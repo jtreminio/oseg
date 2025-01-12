@@ -34,9 +34,7 @@ class Generator:
             operation_id=operation_id,
         )
 
-        request_body_parser.add_example_data(
-            self._operation_parser.get_request_operations()
-        )
+        request_body_parser.add_example_data(self._operation_parser.operations)
 
     def generate(
         self,
@@ -51,7 +49,7 @@ class Generator:
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
 
-        for _, request_operation in self.request_operations.items():
+        for _, request_operation in self._operation_parser.operations.items():
             for example_data in request_operation.request_data:
                 self._parse_request_operation(
                     request_operation=request_operation,
@@ -65,7 +63,7 @@ class Generator:
 
     @property
     def request_operations(self) -> dict[str, model.RequestOperation]:
-        return self._operation_parser.get_request_operations()
+        return self._operation_parser.operations
 
     def _parse_request_operation(
         self,
