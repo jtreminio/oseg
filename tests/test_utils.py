@@ -57,5 +57,9 @@ class TestUtils:
 
         self._operation_parser = parser.OperationParser(
             oa_parser=self._oa_parser,
-            request_body_parser=self._request_body_parser,
+            operation_id=None,
+        )
+
+        self._request_body_parser.add_example_data(
+            self._operation_parser.get_request_operations()
         )

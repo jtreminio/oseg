@@ -4,11 +4,6 @@ from oseg import parser, model
 
 
 class RequestBodyParser:
-    _FORM_DATA_CONTENT_TYPES = [
-        "application/x-www-form-urlencoded",
-        "multipart/form-data",
-    ]
-
     _INLINE_REQUEST_BODY_NAME = "__INLINE_REQUEST_BODY_NAME__"
 
     def __init__(
@@ -23,7 +18,96 @@ class RequestBodyParser:
         self._property_parser = property_parser
         self._example_data = example_data
 
-    def get_body_params_by_example(
+    def add_example_data(
+        self,
+        request_operations: dict[str, "model.RequestOperation"],
+    ) -> None:
+        for _, request_operation in request_operations.items():
+            request_operation.request_data = []
+
+            http_examples, body_examples = self._get_body_params_by_example(
+                request_operation.operation,
+            )
+
+            http_params = self._get_http_parameters(
+                request_operation.operation,
+                http_examples,
+            )
+
+            if not body_examples:
+                request_operation.request_data.append(
+                    model.ExampleData(
+                        name="default_example",
+                        http=http_params,
+                        body=None,
+                    )
+                )
+
+            for example_name, body_params in body_examples.items():
+                request_operation.request_data.append(
+                    model.ExampleData(
+                        name=example_name,
+                        http=http_params,
+                        body=body_params,
+                    )
+                )
+
+    def _get_http_parameters(
+        self,
+        operation: oa.Operation,
+        http_custom_example_data: dict[str, any] | None,
+    ) -> dict[str, "model.PropertyScalar"]:
+        """Add path and query parameter examples to request operation
+
+        Only parameters that have example or default data will be included.
+        Will only ever read the first example of any parameter.
+        """
+
+        http_params = {}
+
+        allowed_param_in = [
+            oa.ParameterLocation.QUERY,
+            oa.ParameterLocation.PATH,
+        ]
+
+        parameters = operation.parameters if operation.parameters else []
+
+        for parameter in parameters:
+            if parser.TypeChecker.is_ref(parameter):
+                # todo check, this is now using generics
+                parameter = self._oa_parser.resolve_parameter(parameter.ref).schema
+
+            if parameter.param_in not in allowed_param_in:
+                continue
+
+            param_schema = parameter.param_schema
+            value = None
+
+            # custom example data beats all
+            if http_custom_example_data and parameter.name in http_custom_example_data:
+                value = http_custom_example_data[parameter.name]
+            elif parameter.example:
+                value = parameter.example
+            elif param_schema and param_schema.example:
+                value = param_schema.example
+            elif parameter.examples:
+                for k, v in parameter.examples.items():
+                    if v.value is not None:
+                        value = v.value
+
+                        # only want the first value
+                        break
+
+            http_params[parameter.name] = model.PropertyScalar(
+                name=parameter.name,
+                value=value,
+                schema=param_schema,
+                parent=parameter,
+            )
+
+        return http_params
+
+    def _get_body_params_by_example(
         self,
         operation: oa.Operation,
     ) -> tuple[dict[str, any], dict[str, "model.PropertyObject"]]:
@@ -149,27 +233,6 @@ class RequestBodyParser:
             result[example_name] = property_ref
 
         return http_data, result
-
-    def has_form_data(
-        self,
-        operation: oa.Operation,
-    ) -> bool:
-        """openapi-generator will generate a different interface for an API request
-        method depending on the request's content_type.
-
-        We only want the first result, because openapi-generator only ever uses
-        the first definition. If you have multiple requestBody defined, the first
-        being type application/json and second multipart/form-data, openapi-generator
-        will considered the operation as having no form data.
-
-        This is a silly thing and I hate it greatly.
-        """
-
-        if not self._has_content(operation):
-            return False
-
-        for content_type, body in operation.requestBody.content.items():
-            return content_type in self._FORM_DATA_CONTENT_TYPES
 
     def _get_request_body_content(
         self,

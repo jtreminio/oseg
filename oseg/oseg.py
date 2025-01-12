@@ -11,11 +11,15 @@ class Generator:
         example_data: dict[str, any] | None = None,
         example_data_dir: str | None = None,
     ):
+        self._generator_extension = jinja_extension.GeneratorExtension.factory()
+
         file_loader = parser.FileLoader(
             oas_file=oas_file,
             example_data_dir=example_data_dir,
         )
+
         oa_parser = parser.OaParser(oas_file, file_loader)
+
         property_parser = parser.PropertyParser(oa_parser)
 
         request_body_parser = parser.RequestBodyParser(
@@ -25,11 +29,13 @@ class Generator:
             example_data=example_data,
         )
 
-        self._generator_extension = jinja_extension.GeneratorExtension.factory()
         self._operation_parser = parser.OperationParser(
             oa_parser=oa_parser,
-            request_body_parser=request_body_parser,
             operation_id=operation_id,
+        )
+
+        request_body_parser.add_example_data(
+            self._operation_parser.get_request_operations()
         )
 
     def generate(
