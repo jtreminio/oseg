@@ -7,7 +7,7 @@ T = TypeVar("T")
 @dataclass
 class ResolvedComponent(Generic[T]):
     def __init__(self, type: str, schema: T):
-        """Holds a resolved $ref schema
+        """Holds a resolved $ref schema.
 
         type is the $ref ID, minus the "#/components/{TYPE}/" portion.
         ie: "#/components/schemas/Tag" -> "Tag"

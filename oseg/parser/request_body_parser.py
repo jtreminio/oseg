@@ -57,7 +57,7 @@ class RequestBodyParser:
         operation: oa.Operation,
         http_custom_example_data: dict[str, any] | None,
     ) -> dict[str, "model.PropertyScalar"]:
-        """Add path and query parameter examples to request operation
+        """Add path and query parameter examples to request operation.
 
         Only parameters that have example or default data will be included.
         Will only ever read the first example of any parameter.
@@ -111,7 +111,7 @@ class RequestBodyParser:
         self,
         operation: oa.Operation,
     ) -> tuple[dict[str, any], dict[str, "model.PropertyObject"]]:
-        """Grab example data from requestBody schema
+        """Grab example data from requestBody schema.
 
         Will read data directly from requestBody.content.example[s], or $ref:
         1) "properties.example"

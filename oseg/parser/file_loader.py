@@ -28,10 +28,11 @@ class FileLoader:
             return yaml.safe_load(f)
 
     def get_example_data(self, example_schema: oa.Example) -> dict[str, any] | None:
-        """Read example data from external file
+        """Read example data from external file.
 
         The filename comes from embedded $ref value in an Example schema.
-        Filenames are prepended with the directory where the OAS file is located.
+        Filenames are prepended with the directory where the OAS file is
+        located.
         """
 
         filename = example_schema.value.get("$ref")
@@ -51,10 +52,11 @@ class FileLoader:
         self,
         operation: oa.Operation,
     ) -> Optional["model.CustomExampleData"]:
-        """Read example data from external file
+        """Read example data from external file.
 
-        The filenames are not embedded in the OAS file like in ::get_example_data()
-        Instead, we search a given directory and match files using operation ID
+        The filenames are not embedded in the OAS file like in
+        ::get_example_data(). Instead, we search a given directory and match
+        files using operation ID
         """
 
         if not self._example_data_dir or not os.path.isdir(self._example_data_dir):
@@ -73,7 +75,8 @@ class FileLoader:
             if not data or not isinstance(data, dict):
                 continue
 
-            # Only read http data from first file that has data, for any given operation
+            # Only read http data from first file that has data,
+            # for any given operation
             if http_key_name in data:
                 if not http:
                     http = data[http_key_name]

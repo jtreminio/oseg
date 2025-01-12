@@ -65,7 +65,7 @@ class BaseExtension(Protocol):
         example_data: model.ExampleData,
         single_body_value: bool,
     ) -> dict[str, model.PropertyObject]:
-        """Parses body data that is sent as instantiated Model objects
+        """Parses body data that is sent as instantiated Model objects.
 
         Drills down into dependent Model objects
         """
@@ -140,7 +140,7 @@ class BaseExtension(Protocol):
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
-        """Parse data passed directly to an API object
+        """Parse data passed directly to an API object.
 
         Can include HTTP path/query params as well as body data.
         If current request is of type "multipart/form-data" or

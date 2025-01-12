@@ -111,13 +111,14 @@ class OperationParser:
         return operation.tags[0].replace(" ", "")
 
     def _get_has_form_data(self, operation: oa.Operation) -> bool:
-        """openapi-generator will generate a different interface for an API request
-        method depending on the request's content_type.
+        """openapi-generator will generate a different interface for an API
+        request method depending on the request's content_type.
 
-        We only want the first result, because openapi-generator only ever uses
-        the first definition. If you have multiple requestBody defined, the first
-        being type application/json and second multipart/form-data, openapi-generator
-        will considered the operation as having no form data.
+        We only want the first result, because openapi-generator only ever
+        uses the first definition. If you have multiple requestBody defined,
+        the first being application/json and second multipart/form-data,
+        openapi-generator will considered the operation as having no form
+        data.
 
         This is a silly thing and I hate it greatly.
         """

@@ -20,9 +20,9 @@ class SchemaJoiner:
         data: dict[str, any] | None,
     ) -> JoinedValues:
         """When a Schema uses allOf will merge all Schemas and the properties
-        of those Schemas
+        of those Schemas.
 
-        Currently only useful for Schema that use a discriminator and allOf
+        Currently only useful for Schema that use a discriminator and allOf.
         """
 
         discriminated = self._resolve_discriminator(schema, data)
@@ -46,7 +46,7 @@ class SchemaJoiner:
         schema: oa.Schema,
         data: dict[str, any] | None,
     ) -> JoinedValues | None:
-        """Returns all schemas that build a discriminator
+        """Returns all schemas that build a discriminator.
 
         The last Schema will always take precedence with regards to properties
         and other metadata
@@ -85,7 +85,7 @@ class SchemaJoiner:
         schema: oa.Schema,
         data: dict[str, any] | None,
     ) -> JoinedValues | None:
-        """Returns all schemas that build a ref via allOf
+        """Returns all schemas that build a ref via allOf.
 
         The last Schema will always take precedence with regards to properties
         and other metadata
