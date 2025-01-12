@@ -60,19 +60,19 @@ class PropertyParser:
 
         for property_name in sorted_properties:
             for current_schema in schemas:
-                resolved_schema = self._oa_parser.get_property_schema(
-                    current_schema,
-                    property_name,
+                resolved = self._oa_parser.resolve_property(
+                    name=property_name,
+                    properties=current_schema.properties,
                 )
 
-                if not resolved_schema:
+                if not resolved:
                     continue
 
                 property_value = data.get(property_name) if data is not None else None
 
                 if self._handle_file(
                     property_container=property_container,
-                    schema=resolved_schema,
+                    schema=resolved.schema,
                     name=property_name,
                     value=property_value,
                 ):
@@ -80,7 +80,7 @@ class PropertyParser:
 
                 if self._handle_free_form(
                     property_container=property_container,
-                    schema=resolved_schema,
+                    schema=resolved.schema,
                     name=property_name,
                     value=property_value,
                 ):
@@ -88,7 +88,7 @@ class PropertyParser:
 
                 if self._handle_scalar(
                     property_container=property_container,
-                    schema=resolved_schema,
+                    schema=resolved.schema,
                     name=property_name,
                     value=property_value,
                 ):

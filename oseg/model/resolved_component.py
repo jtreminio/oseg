@@ -1,7 +1,26 @@
-import openapi_pydantic as oa
+from dataclasses import dataclass
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
 
 
-class ResolvedComponent:
-    def __init__(self, type: str, schema: oa.Schema):
+@dataclass
+class ResolvedComponent(Generic[T]):
+    def __init__(self, type: str, schema: T):
+        """Holds a resolved $ref schema
+
+        type is the $ref ID, minus the "#/components/{TYPE}/" portion.
+        ie: "#/components/schemas/Tag" -> "Tag"
+        This value is used for identifying the SDK class that holds the data.
+
+        T can be one of:
+            * oa.Schema
+            * oa.Example
+            * oa.Parameter
+            * oa.Response
+
+        or any other OpenAPI definition that was resolvable via $ref,
+        other than outside resources like files or URLs
+        """
         self.type = type
-        self.schema = schema
+        self.schema: T = schema

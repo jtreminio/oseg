@@ -14,30 +14,33 @@ class OaParser:
     def paths(self) -> dict[str, oa.PathItem]:
         return self._openapi.paths
 
-    def get_property_schema(
+    def resolve_property(
         self,
-        schema: oa.Reference | oa.Schema,
-        property_name: str,
-    ) -> oa.Schema | None:
+        name: str,
+        properties: dict[str, oa.Reference | oa.Schema] | None,
+    ) -> Optional["model.ResolvedComponent[oa.Schema]"]:
         """Only returns a Schema for properties that have a 'type' value"""
 
-        if schema.properties is None:
+        if properties is None:
             return None
 
-        property_schema = schema.properties.get(property_name)
+        schema = properties.get(name)
 
-        if property_schema is None:
+        if schema is None:
             return None
 
-        if parser.TypeChecker.is_ref(property_schema):
-            property_schema = self.resolve_component(property_schema.ref).schema
+        if parser.TypeChecker.is_ref(schema):
+            schema = self.resolve_component(schema.ref).schema
 
-        if not hasattr(property_schema, "type") or not property_schema.type:
+        if not hasattr(schema, "type") or not schema.type:
             return None
 
-        return property_schema
+        return model.ResolvedComponent(
+            type=schema.type,
+            schema=schema,
+        )
 
-    def resolve_component(self, ref: str) -> "model.ResolvedComponent":
+    def resolve_component(self, ref: str) -> "model.ResolvedComponent[oa.Schema]":
         name = ref.split("/").pop()
 
         return model.ResolvedComponent(
@@ -45,7 +48,10 @@ class OaParser:
             schema=self._openapi.components.schemas.get(name),
         )
 
-    def resolve_example(self, ref: str) -> Optional["model.ResolvedExample"]:
+    def resolve_example(
+        self,
+        ref: str,
+    ) -> Optional["model.ResolvedComponent[oa.Example]"]:
         name = ref.split("/").pop()
         schema: oa.Example | None = self._openapi.components.examples.get(name)
 
@@ -60,31 +66,34 @@ class OaParser:
         if schema.value is None:
             return None
 
-        return model.ResolvedExample(
-            name=name,
+        return model.ResolvedComponent(
+            type=name,
             schema=schema,
         )
 
-    def resolve_parameter(self, ref: str) -> "model.ResolvedParameter":
+    def resolve_parameter(self, ref: str) -> "model.ResolvedComponent[oa.Parameter]":
         name = ref.split("/").pop()
 
-        return model.ResolvedParameter(
-            name=name,
+        return model.ResolvedComponent(
+            type=name,
             schema=self._openapi.components.parameters.get(name),
         )
 
-    def resolve_request_body(self, ref: str) -> "model.ResolvedRequestBody":
+    def resolve_request_body(
+        self,
+        ref: str,
+    ) -> "model.ResolvedComponent[oa.RequestBody]":
         name = ref.split("/").pop()
 
-        return model.ResolvedRequestBody(
-            name=name,
+        return model.ResolvedComponent(
+            type=name,
             schema=self._openapi.components.requestBodies.get(name),
         )
 
-    def resolve_response(self, ref: str) -> "model.ResolvedResponse":
+    def resolve_response(self, ref: str) -> "model.ResolvedComponent[oa.Response]":
         name = ref.split("/").pop()
 
-        return model.ResolvedResponse(
-            name=name,
+        return model.ResolvedComponent(
+            type=name,
             schema=self._openapi.components.responses.get(name),
         )
