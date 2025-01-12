@@ -11,7 +11,7 @@ class RequestExampleData:
     body: dict[str, dict[str, any]]
 
 
-class RequestBodyParser:
+class ExampleDataParser:
     _INLINE_REQUEST_BODY_NAME = "__INLINE_REQUEST_BODY_NAME__"
     _DEFAULT_EXAMPLE_NAME = "default_example"
 

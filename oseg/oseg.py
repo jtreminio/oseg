@@ -22,7 +22,7 @@ class Generator:
 
         property_parser = parser.PropertyParser(oa_parser)
 
-        request_body_parser = parser.RequestBodyParser(
+        example_data_parser = parser.ExampleDataParser(
             oa_parser=oa_parser,
             file_loader=file_loader,
             property_parser=property_parser,
@@ -34,7 +34,7 @@ class Generator:
             operation_id=operation_id,
         )
 
-        request_body_parser.add_example_data(self._operation_parser.operations)
+        example_data_parser.add_example_data(self._operation_parser.operations)
 
     def generate(
         self,

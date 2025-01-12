@@ -7,7 +7,7 @@ class TestUtils:
     _file_loader: parser.FileLoader
     _oa_parser: parser.OaParser
     _property_parser: parser.PropertyParser
-    _request_body_parser: parser.RequestBodyParser
+    _example_data_parser: parser.ExampleDataParser
     _operation_parser: parser.OperationParser
 
     def __init__(self):
@@ -48,7 +48,7 @@ class TestUtils:
         self._oa_parser = parser.OaParser(self._oas_file, self._file_loader)
         self._property_parser = parser.PropertyParser(self._oa_parser)
 
-        self._request_body_parser = parser.RequestBodyParser(
+        self._example_data_parser = parser.ExampleDataParser(
             oa_parser=self._oa_parser,
             file_loader=self._file_loader,
             property_parser=self._property_parser,
@@ -60,4 +60,4 @@ class TestUtils:
             operation_id=None,
         )
 
-        self._request_body_parser.add_example_data(self._operation_parser.operations)
+        self._example_data_parser.add_example_data(self._operation_parser.operations)
