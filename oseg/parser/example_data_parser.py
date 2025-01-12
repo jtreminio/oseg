@@ -372,15 +372,13 @@ class ExampleDataParser:
         return property_ref
 
     def _parse_components(self, schema: oa.Schema | oa.Reference) -> dict[str, any]:
-        example_data: dict[str, any] = {}
+        return {
+            **self._example_data_from_ref(schema),
+            **self._example_data_from_ref_array(schema),
+            **self._example_data_from_schema(schema),
+        }
 
-        example_data = {**example_data, **self._handle_ref_type(schema)}
-        example_data = {**example_data, **self._handle_array_ref_type(schema)}
-        example_data = {**example_data, **self._handle_non_ref_types(schema)}
-
-        return example_data
-
-    def _handle_ref_type(
+    def _example_data_from_ref(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
@@ -390,56 +388,56 @@ class ExampleDataParser:
             return {}
 
         return self._parse_components(
-            schema=self._oa_parser.resolve_component(schema.ref).schema,
+            self._oa_parser.resolve_component(schema.ref).schema
         )
 
-    def _handle_array_ref_type(
+    def _example_data_from_ref_array(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
         """handle arrays of ref objects"""
 
-        if not hasattr(schema, "properties") or not schema.properties:
+        if not parser.TypeChecker.is_ref_array(schema):
             return {}
 
         result: dict[str, any] = {}
 
         for property_name, property_schema in schema.properties.items():
-            if not parser.TypeChecker.is_ref_array(schema):
+            parsed = self._parse_components(property_schema.items)
+
+            if not len(parsed):
                 continue
 
-            parsed = self._parse_components(
-                schema=property_schema.items,
-            )
+            if property_name not in result.keys():
+                result[property_name] = []
 
-            if len(parsed):
-                if property_name not in result.keys():
-                    result[property_name] = []
-
-                result[property_name].append(parsed)
+            result[property_name].append(parsed)
 
         return result
 
-    def _handle_non_ref_types(
+    def _example_data_from_schema(
         self,
         schema: oa.Schema | oa.Reference,
     ) -> dict[str, any]:
         """handle non-ref types"""
 
+        if parser.TypeChecker.is_ref(schema) or parser.TypeChecker.is_ref_array(schema):
+            return {}
+
         result: dict[str, any] = {}
 
-        is_set, value = self._get_property_schema_example(schema)
+        value = self._get_property_schema_example(schema)
 
-        if is_set and isinstance(value, dict):
+        if value is not None and isinstance(value, dict):
             result = value
 
         if not hasattr(schema, "properties") or not schema.properties:
             return result
 
         for property_name, property_schema in schema.properties.items():
-            is_set, value = self._get_property_schema_example(property_schema)
+            value = self._get_property_schema_example(property_schema)
 
-            if is_set:
+            if value is not None:
                 result[property_name] = value
 
         return result
@@ -447,14 +445,14 @@ class ExampleDataParser:
     def _get_property_schema_example(
         self,
         schema: oa.Schema,
-    ) -> tuple[bool, any]:
+    ) -> any:
         if hasattr(schema, "example") and schema.example:
-            return True, schema.example
+            return schema.example
         elif hasattr(schema, "examples") and schema.examples:
             for example in schema.examples:
-                return True, example
+                return example
 
-        return False, None
+        return None
 
     def _has_content(self, operation: oa.Operation) -> bool:
         return (
