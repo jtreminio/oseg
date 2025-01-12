@@ -8,6 +8,10 @@ begin
 
     api_caller.update_pet_with_form(
         nil,
+        {
+            name: nil,
+            status: nil,
+        },
     )
 rescue OpenapiClient::ApiError => e
     puts "Exception when calling Pet#update_pet_with_form: #{e}"

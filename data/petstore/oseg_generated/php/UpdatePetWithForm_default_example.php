@@ -9,6 +9,8 @@ try {
 
     $api_caller->updatePetWithForm(
         pet_id: null,
+        name: null,
+        status: null,
     );
 } catch (OpenAPI\Client\ApiException $e) {
     echo 'Exception when calling Pet#updatePetWithForm: '

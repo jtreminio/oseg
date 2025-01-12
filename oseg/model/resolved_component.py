@@ -6,21 +6,21 @@ T = TypeVar("T")
 
 @dataclass
 class ResolvedComponent(Generic[T]):
-    def __init__(self, type: str, schema: T):
-        """Holds a resolved $ref schema.
+    """Holds a resolved $ref schema.
 
-        type is the $ref ID, minus the "#/components/{TYPE}/" portion.
-        ie: "#/components/schemas/Tag" -> "Tag"
-        This value is used for identifying the SDK class that holds the data.
+    type is the $ref ID, minus the "#/components/{TYPE}/" portion.
+    ie: "#/components/schemas/Tag" -> "Tag"
+    This value is used for identifying the SDK class that holds the data.
 
-        T can be one of:
-            * oa.Schema
-            * oa.Example
-            * oa.Parameter
-            * oa.Response
+    T can be one of:
+        * oa.Schema
+        * oa.Example
+        * oa.Parameter
+        * oa.Response
 
-        or any other OpenAPI definition that was resolvable via $ref,
-        other than outside resources like files or URLs
-        """
-        self.type = type
-        self.schema: T = schema
+    or any other OpenAPI definition that was resolvable via $ref,
+    other than outside resources like files or URLs
+    """
+
+    type: str
+    schema: T

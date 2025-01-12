@@ -19,7 +19,7 @@ const tags_2: openapi_client.Tag = {
 };
 
 const pet: openapi_client.Pet = {
-    name: "doggie",
+    name: "My pet name",
     photoUrls: [
         "https://example.com/picture_1.jpg",
         "https://example.com/picture_1.jpg",

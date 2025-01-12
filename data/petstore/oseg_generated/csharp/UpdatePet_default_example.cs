@@ -28,7 +28,7 @@ public class UpdatePetDefaultExample
         );
 
         var pet = new Pet(
-            name: "doggie",
+            name: "My pet name",
             photoUrls: new List<string>
             {
                 "https://example.com/picture_1.jpg",

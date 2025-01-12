@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import openapi_pydantic as oa
+import re
 import yaml
 from pathlib import Path
 from typing import Optional
@@ -11,7 +12,9 @@ from oseg import model
 class FileLoader:
     def __init__(self, oas_file: str, example_data_dir: str | None = None):
         self._base_dir = os.path.dirname(oas_file)
-        self._example_data_dir = example_data_dir
+        self._example_data_file_list: dict[str, str] = {}
+
+        self._read_example_data_dir(example_data_dir)
 
     @property
     def base_dir(self) -> str:
@@ -51,7 +54,7 @@ class FileLoader:
     def get_example_data_from_custom_file(
         self,
         operation: oa.Operation,
-    ) -> Optional["model.CustomExampleData"]:
+    ) -> dict[str, dict[str, any]]:
         """Read example data from external file.
 
         The filenames are not embedded in the OAS file like in
@@ -59,35 +62,34 @@ class FileLoader:
         files using operation ID
         """
 
-        if not self._example_data_dir or not os.path.isdir(self._example_data_dir):
-            return None
+        if not self._example_data_file_list:
+            return {}
 
+        # example: "addPet__default_example.json"
         base_filename = f"{operation.operationId}__"
-        http_key_name = "__http__"
+        r = re.compile(f".*/{base_filename}.*")
+        results = {}
 
-        body = {}
-        http: dict[str, any] = {}
-
-        path = os.path.join(self._example_data_dir, f"{base_filename}*")
-        for filepath in glob.glob(path):
-            data = self.get_file_contents(filepath)
+        for filename in list(filter(r.match, self._example_data_file_list)):
+            data = self.get_file_contents(filename)
 
             if not data or not isinstance(data, dict):
                 continue
 
-            # Only read http data from first file that has data,
-            # for any given operation
-            if http_key_name in data:
-                if not http:
-                    http = data[http_key_name]
+            results[Path(filename).stem] = data
 
-                del data[http_key_name]
+        return results
 
-            example_name = Path(filepath).stem.replace(base_filename, "")
+    def _read_example_data_dir(self, example_data_dir: str | dict | None):
+        if (
+            not example_data_dir
+            or not isinstance(example_data_dir, str)
+            or not os.path.isdir(example_data_dir)
+        ):
+            return
 
-            if example_name == "":
-                example_name = "default_example"
-
-            body[example_name] = data
-
-        return model.CustomExampleData(http, body)
+        self._example_data_file_list = [
+            f"{example_data_dir}/{f}"
+            for f in os.listdir(example_data_dir)
+            if os.path.isfile(os.path.join(example_data_dir, f))
+        ]

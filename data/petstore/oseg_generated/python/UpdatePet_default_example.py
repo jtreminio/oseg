@@ -18,7 +18,7 @@ with ApiClient(configuration) as api_client:
     tags_2.name = "tag_2"
 
     pet = models.Pet()
-    pet.name = "doggie"
+    pet.name = "My pet name"
     pet.photoUrls = [
         "https://example.com/picture_1.jpg",
         "https://example.com/picture_1.jpg",

@@ -17,7 +17,7 @@ $tags_2 = (new OpenAPI\Client\Model\Tag())
     ->setName("tag_2");
 
 $pet = (new OpenAPI\Client\Model\Pet())
-    ->setName("doggie")
+    ->setName("My pet name")
     ->setPhotoUrls([
         "https://example.com/picture_1.jpg",
         "https://example.com/picture_2.jpg",

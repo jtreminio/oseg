@@ -29,7 +29,7 @@ public class AddPet_default_example
             .name("tag_2");
 
         var pet = new Pet()
-            .name("doggie")
+            .name("My pet name")
             .photoUrls(List.of (
                 "https://example.com/picture_1.jpg",
                 "https://example.com/picture_2.jpg"

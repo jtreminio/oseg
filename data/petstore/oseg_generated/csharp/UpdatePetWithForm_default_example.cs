@@ -17,7 +17,9 @@ public class UpdatePetWithFormDefaultExample
             var apiCaller = new PetApi(config);
 
             apiCaller.UpdatePetWithForm(
-                petId: null
+                petId: null,
+                name: null,
+                status: null
             );
         }
         catch (ApiException e)

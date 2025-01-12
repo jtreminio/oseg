@@ -10,6 +10,8 @@ with ApiClient(configuration) as api_client:
 
         api_caller.update_pet_with_form(
             pet_id=None,
+            name=None,
+            status=None,
         )
     except ApiException as e:
         print("Exception when calling Pet#update_pet_with_form: %s\n" % e)

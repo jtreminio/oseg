@@ -16,7 +16,7 @@ tags_2.id = 98765
 tags_2.name = "tag_2"
 
 pet = OpenapiClient::Pet.new
-pet.name = "doggie"
+pet.name = "My pet name"
 pet.photo_urls = [
     "https://example.com/picture_1.jpg",
     "https://example.com/picture_2.jpg",

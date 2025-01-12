@@ -21,6 +21,8 @@ public class UpdatePetWithForm_default_example
             var apiCaller = new PetApi(config);
 
             apiCaller.updatePetWithForm(
+                null,
+                null,
                 null
             );
         } catch (ApiException e) {
