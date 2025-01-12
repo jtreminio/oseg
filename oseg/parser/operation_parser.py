@@ -36,6 +36,9 @@ class OperationParser:
         return self._request_operations
 
     def _setup_request_operations(self, operation_id: str | None):
+        if operation_id:
+            operation_id = operation_id.lower()
+
         for path, path_item in self._oa_parser.paths.items():
             for method in self._HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
@@ -43,10 +46,7 @@ class OperationParser:
                 if not operation:
                     continue
 
-                if (
-                    operation_id
-                    and operation.operationId.lower() != operation_id.lower()
-                ):
+                if operation_id and operation.operationId.lower() != operation_id:
                     continue
 
                 api_name = self._get_api_name(operation)
@@ -67,32 +67,32 @@ class OperationParser:
                     )
                 )
 
-    def _get_response_data(self, operation: oa.Operation):
+    def _get_response_data(self, operation: oa.Operation) -> tuple[bool, bool]:
         """Does the current operation have a response?
 
-        We only want to check the first response, if any
+        Exit early as soon as we find a response
         """
 
         has_response = False
         is_binary_response = False
 
-        for code, response in operation.responses.items():
+        for _, response in operation.responses.items():
             if parser.TypeChecker.is_ref(response):
                 response = self._oa_parser.resolve_response(response.ref).schema
 
             if not response.content:
                 continue
 
-            for content_type, media_type in response.content.items():
-                if media_type is None or media_type.media_type_schema is None:
+            for _, media_type in response.content.items():
+                if not media_type or not media_type.media_type_schema:
                     continue
 
                 has_response = True
                 is_binary_response = False
 
                 if (
-                    media_type is not None
-                    and media_type.media_type_schema is not None
+                    media_type
+                    and media_type.media_type_schema
                     and parser.TypeChecker.is_file(media_type.media_type_schema)
                 ):
                     is_binary_response = True
@@ -101,21 +101,24 @@ class OperationParser:
 
         return has_response, is_binary_response
 
-    def _create_example_data(self, operation: oa.Operation):
+    def _create_example_data(
+        self,
+        operation: oa.Operation,
+    ) -> list["model.ExampleData"]:
         examples = []
 
-        result = self._request_body_parser.get_body_params_by_example(
-            operation,
+        http_examples, body_examples = (
+            self._request_body_parser.get_body_params_by_example(
+                operation,
+            )
         )
-
-        http_custom_example_data, body_params_by_example = result
 
         http_params = self._get_http_parameters(
             operation,
-            http_custom_example_data,
+            http_examples,
         )
 
-        if not body_params_by_example:
+        if not body_examples:
             examples.append(
                 model.ExampleData(
                     name="default_example",
@@ -124,7 +127,7 @@ class OperationParser:
                 )
             )
 
-        for example_name, body_params in body_params_by_example.items():
+        for example_name, body_params in body_examples.items():
             examples.append(
                 model.ExampleData(
                     name=example_name,
@@ -139,7 +142,7 @@ class OperationParser:
         self,
         operation: oa.Operation,
         http_custom_example_data: dict[str, any] | None,
-    ):
+    ) -> dict[str, "model.PropertyScalar"]:
         """Add path and query parameter examples to request operation
 
         Only parameters that have example or default data will be included.
@@ -166,7 +169,7 @@ class OperationParser:
             value = None
 
             # custom example data beats all
-            if parameter.name in http_custom_example_data:
+            if http_custom_example_data and parameter.name in http_custom_example_data:
                 value = http_custom_example_data[parameter.name]
             elif parameter.example:
                 value = parameter.example
@@ -190,12 +193,10 @@ class OperationParser:
         return http_params
 
     def _get_api_name(self, operation: oa.Operation) -> str:
-        tags = operation.tags
-
-        if not tags or not len(tags):
+        if not operation.tags or not len(operation.tags):
             raise LookupError(
                 f"Operation '{operation.operationId}' has no tags "
                 f"for generating API name",
             )
 
-        return tags[0].replace(" ", "")
+        return operation.tags[0].replace(" ", "")

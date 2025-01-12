@@ -22,8 +22,14 @@ if __name__ == "__main__":
 
     for project in projects:
         oas_file = f"{__DIR}/data/{project}/openapi.yaml"
+        example_data_dir = f"{__DIR}/data/{project}/custom_examples"
 
-        generator = Generator(oas_file, operation_id)
+        generator = Generator(
+            oas_file=oas_file,
+            operation_id=operation_id,
+            example_data=None,
+            example_data_dir=example_data_dir,
+        )
 
         for sdk in sdks:
             config_file = f"{__DIR}/data/{project}/config-{sdk}.yaml"

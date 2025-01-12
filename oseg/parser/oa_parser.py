@@ -1,20 +1,14 @@
-import os
 from typing import Optional
 
 import openapi_pydantic as oa
-from oseg import model
-from oseg.parser.file_loader import FileLoader
-from oseg.parser.type_checker import TypeChecker
+from oseg import model, parser
 
 
 class OaParser:
-    def __init__(self, oas_file: str):
-        self._openapi: oa.OpenAPI = oa.parse_obj(FileLoader.get_file_contents(oas_file))
-        self._oas_dirname = os.path.dirname(oas_file)
-
-    @property
-    def oas_dirname(self) -> str:
-        return self._oas_dirname
+    def __init__(self, oas_file: str, file_loader: "parser.FileLoader"):
+        self._openapi: oa.OpenAPI = oa.parse_obj(
+            file_loader.get_file_contents(oas_file)
+        )
 
     @property
     def paths(self) -> dict[str, oa.PathItem]:
@@ -35,7 +29,7 @@ class OaParser:
         if property_schema is None:
             return None
 
-        if TypeChecker.is_ref(property_schema):
+        if parser.TypeChecker.is_ref(property_schema):
             property_schema = self.resolve_component(property_schema.ref).schema
 
         if not hasattr(property_schema, "type") or not property_schema.type:
@@ -58,7 +52,7 @@ class OaParser:
         if schema is None:
             return None
 
-        if TypeChecker.is_ref(schema):
+        if parser.TypeChecker.is_ref(schema):
             raise LookupError(
                 f"$ref for components.examples not supported, schema {name}"
             )

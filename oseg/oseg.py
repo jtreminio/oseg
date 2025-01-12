@@ -9,12 +9,18 @@ class Generator:
         oas_file: str,
         operation_id: str | None = None,
         example_data: dict[str, any] | None = None,
+        example_data_dir: str | None = None,
     ):
-        oa_parser = parser.OaParser(oas_file)
+        file_loader = parser.FileLoader(
+            oas_file=oas_file,
+            example_data_dir=example_data_dir,
+        )
+        oa_parser = parser.OaParser(oas_file, file_loader)
         property_parser = parser.PropertyParser(oa_parser)
 
         request_body_parser = parser.RequestBodyParser(
             oa_parser=oa_parser,
+            file_loader=file_loader,
             property_parser=property_parser,
             example_data=example_data,
         )

@@ -1,5 +1,6 @@
 from .property_proto import PropertyProto
 
+from .custom_example_data import CustomExampleData
 from .example_data import ExampleData
 from .parsed_free_form import ParsedFreeForm
 from .parsed_free_form_array import ParsedFreeFormArray

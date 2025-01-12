@@ -1,12 +1,6 @@
-import glob
-import json
-import os
-from typing import Optional
-
 import openapi_pydantic as oa
-from pathlib import Path
+from typing import Optional
 from oseg import parser, model
-from oseg.parser.file_loader import FileLoader
 
 
 class RequestBodyParser:
@@ -20,10 +14,12 @@ class RequestBodyParser:
     def __init__(
         self,
         oa_parser: "parser.OaParser",
+        file_loader: "parser.FileLoader",
         property_parser: "parser.PropertyParser",
         example_data: dict[str, any] | None = None,
     ):
         self._oa_parser = oa_parser
+        self._file_loader = file_loader
         self._property_parser = property_parser
         self._example_data = example_data
 
@@ -64,16 +60,16 @@ class RequestBodyParser:
             operation.operationId,
         )
 
-        custom_examples = self._get_data_from_custom_examples(
-            operation.operationId,
-        )
+        custom_examples = self._file_loader.get_example_data_from_custom_file(operation)
 
         # always try against any passed examples first
-        if passed_examples:
-            http_data, examples = passed_examples
+        if passed_examples and passed_examples.has_data():
+            http_data = passed_examples.http
+            examples = passed_examples.body
         # otherwise custom example files override everything
-        elif custom_examples:
-            http_data, examples = custom_examples
+        elif custom_examples and custom_examples.has_data():
+            http_data = custom_examples.http
+            examples = custom_examples.body
         # only a single example
         elif content.example:
             examples[default_example_name] = content.example
@@ -98,14 +94,16 @@ class RequestBodyParser:
                     if resolved:
                         target_schema = resolved.schema
 
-                file_data = self._get_data_from_file(target_schema)
+                file_data = self._file_loader.get_example_data(target_schema)
 
-                if file_data is not None:
+                if file_data:
                     examples[example_name] = file_data
 
                     continue
 
-                inline_data = self._get_data_from_inline_value(target_schema)
+                inline_data = (
+                    target_schema.value if hasattr(target_schema, "value") else None
+                )
 
                 if inline_data is not None:
                     examples[example_name] = inline_data
@@ -156,14 +154,20 @@ class RequestBodyParser:
         self,
         operation: oa.Operation,
     ) -> bool:
-        if (
-            not operation.requestBody
-            or not hasattr(operation.requestBody, "content")
-            or not operation.requestBody.content
-        ):
+        """openapi-generator will generate a different interface for an API request
+        method depending on the request's content_type.
+
+        We only want the first result, because openapi-generator only ever uses
+        the first definition. If you have multiple requestBody defined, the first
+        being type application/json and second multipart/form-data, openapi-generator
+        will considered the operation as having no form data.
+
+        This is a silly thing and I hate it greatly.
+        """
+
+        if not self._has_content(operation):
             return False
 
-        # we only want the first result
         for content_type, body in operation.requestBody.content.items():
             return content_type in self._FORM_DATA_CONTENT_TYPES
 
@@ -175,15 +179,11 @@ class RequestBodyParser:
             return
 
         if parser.TypeChecker.is_ref(operation.requestBody):
-            schema = self._oa_parser.resolve_request_body(
-                operation.requestBody.ref
-            ).schema
+            resolved = self._oa_parser.resolve_request_body(operation.requestBody.ref)
 
-            contents = schema.content
-            required = schema.required
-        elif (
-            hasattr(operation.requestBody, "content") and operation.requestBody.content
-        ):
+            contents = resolved.schema.content
+            required = resolved.schema.required
+        elif self._has_content(operation):
             contents = operation.requestBody.content
             required = operation.requestBody.required
         else:
@@ -203,16 +203,15 @@ class RequestBodyParser:
             return
 
         if parser.TypeChecker.is_ref(content.media_type_schema):
-            resolved = self._oa_parser.resolve_component(
-                content.media_type_schema.ref,
-            )
+            resolved = self._oa_parser.resolve_component(content.media_type_schema.ref)
             name = resolved.type
             schema = resolved.schema
         elif parser.TypeChecker.is_ref_array(content.media_type_schema):
+            resolved = self._oa_parser.resolve_component(
+                content.media_type_schema.items.ref
+            )
+            name = resolved.type
             schema = content.media_type_schema
-            name = self._oa_parser.resolve_component(
-                content.media_type_schema.items.ref,
-            ).type
         # inline schema definition
         elif hasattr(content.media_type_schema, "type"):
             name = self._INLINE_REQUEST_BODY_NAME
@@ -230,91 +229,17 @@ class RequestBodyParser:
             required=required,
         )
 
-    def _get_data_from_file(
-        self,
-        example_schema: oa.Example,
-    ) -> dict[str, any] | None:
-        """Read example data from external file"""
-
-        if "$ref" not in example_schema.value:
-            return None
-
-        filename = f"{self._oa_parser.oas_dirname}/{example_schema.value.get("$ref")}"
-
-        if not os.path.isfile(filename):
-            return None
-
-        try:
-            with open(filename, "r") as file:
-                data: dict[str, any] = json.load(file)
-                file.close()
-
-                return data
-        except Exception as e:
-            print(f"Error reading example file {filename}")
-            print(e)
-
-    def _get_data_from_inline_value(
-        self,
-        example_schema: oa.Example,
-    ) -> dict[str, any] | None:
-        """Read example data from inline 'value'"""
-
-        if not hasattr(example_schema, "value"):
-            return None
-
-        return example_schema.value
-
-    def _get_data_from_custom_examples(
-        self,
-        operation_id: str,
-    ) -> tuple[dict[str, any], dict[str, dict[str, any]]] | None:
-        """Read example data from external file"""
-
-        directory = f"{self._oa_parser.oas_dirname}/custom_examples/"
-        base_filename = f"{operation_id}__"
-        http_key_name = "__http__"
-
-        if not os.path.isdir(directory):
-            return None
-
-        results = {}
-        http_data: dict[str, any] = {}
-
-        for filepath in glob.glob(os.path.join(directory, f"{base_filename}*")):
-            data = FileLoader.get_file_contents(filepath)
-
-            if not data or not isinstance(data, dict):
-                continue
-
-            # Only read http data from first file that has data
-            if http_key_name in data:
-                if not http_data:
-                    http_data = data[http_key_name]
-                del data[http_key_name]
-
-            filename = filepath.replace(directory, "")
-            example_name = filename.replace(base_filename, "")
-            example_name = example_name.replace(Path(example_name).suffix, "")
-
-            if example_name == "":
-                example_name = "default_example"
-
-            results[example_name] = data
-
-        return http_data, results
-
     def _get_data_from_passed_example_data(
         self,
         operation_id: str,
-    ) -> tuple[dict[str, any], dict[str, dict[str, any]]] | None:
+    ) -> Optional["model.CustomExampleData"]:
         """If example data was passed as a JSON blob, use it"""
 
         if self._example_data is None or operation_id not in self._example_data:
             return None
 
-        results = {}
-        http_data: dict[str, any] = {}
+        body = {}
+        http: dict[str, any] = {}
         http_key_name = "__http__"
 
         for example_name, data in self._example_data[operation_id].items():
@@ -323,16 +248,17 @@ class RequestBodyParser:
 
             # Only read http data from first file that has data
             if http_key_name in data:
-                if not http_data:
-                    http_data = data[http_key_name]
+                if not http:
+                    http = data[http_key_name]
+
                 del data[http_key_name]
 
             if not example_name or example_name == "":
                 example_name = "default_example"
 
-            results[example_name] = data
+            body[example_name] = data
 
-        return http_data, results
+        return model.CustomExampleData(http, body)
 
     def _parse_components(self, schema: oa.Schema | oa.Reference) -> dict[str, any]:
         example_data: dict[str, any] = {}
@@ -418,3 +344,10 @@ class RequestBodyParser:
                 return True, example
 
         return False, None
+
+    def _has_content(self, operation: oa.Operation) -> bool:
+        return (
+            operation.requestBody
+            and hasattr(operation.requestBody, "content")
+            and operation.requestBody.content
+        )

@@ -4,6 +4,7 @@ from oseg import parser
 
 class TestUtils:
     _oas_file: str
+    _file_loader: parser.FileLoader
     _oa_parser: parser.OaParser
     _property_parser: parser.PropertyParser
     _request_body_parser: parser.RequestBodyParser
@@ -43,11 +44,13 @@ class TestUtils:
 
         self._oas_file = oas_file
 
-        self._oa_parser = parser.OaParser(self._oas_file)
+        self._file_loader = parser.FileLoader(self._oas_file)
+        self._oa_parser = parser.OaParser(self._oas_file, self._file_loader)
         self._property_parser = parser.PropertyParser(self._oa_parser)
 
         self._request_body_parser = parser.RequestBodyParser(
             oa_parser=self._oa_parser,
+            file_loader=self._file_loader,
             property_parser=self._property_parser,
             example_data=example_data,
         )
