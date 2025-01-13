@@ -2,10 +2,10 @@ import openapi_pydantic as oa
 from typing import Union
 from oseg import model
 
+T = Union[dict[str, any] | list[dict[str, any]] | None]
+
 
 class PropertyFreeForm(model.PropertyProto):
-    T = Union[dict[str, any] | list[dict[str, any]] | None]
-
     def __init__(
         self,
         name: str,

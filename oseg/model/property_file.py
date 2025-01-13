@@ -6,6 +6,8 @@ T = Union[str, list[str], None]
 
 
 class PropertyFile(model.PropertyProto):
+    _FORMAT_BYTES = "byte"
+
     def __init__(
         self,
         name: str,
@@ -18,3 +20,7 @@ class PropertyFile(model.PropertyProto):
     @property
     def value(self) -> T:
         return self._value
+
+    @property
+    def is_bytes(self) -> bool:
+        return self._schema.schema_format == self._FORMAT_BYTES
