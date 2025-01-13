@@ -1,4 +1,4 @@
-import convert_case
+import caseconverter
 import jinja2
 import json
 import openapi_pydantic as oa
@@ -68,16 +68,16 @@ class BaseExtension(Protocol):
         raise NotImplementedError
 
     def camel_case(self, value: str) -> str:
-        return convert_case.camel_case(value)
+        return caseconverter.camelcase(value)
 
     def pascal_case(self, value: str) -> str:
-        return convert_case.pascal_case(value)
+        return caseconverter.pascalcase(value)
 
     def snake_case(self, value: str) -> str:
-        return convert_case.snake_case(value)
+        return caseconverter.snakecase(value)
 
     def upper_case(self, value: str) -> str:
-        return convert_case.upper_case(value)
+        return value.upper()
 
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
