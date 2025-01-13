@@ -17,8 +17,6 @@ class TypeChecker:
         "binary",
     ]
 
-    _FILE_CONTENT_MEDIA_TYPE = "application/octet-stream"
-
     @classmethod
     def is_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
         return cls._is_of_type(schema, oa.DataType.ARRAY)
@@ -34,21 +32,21 @@ class TypeChecker:
 
     @classmethod
     def is_file(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
-        if not cls._is_of_type(schema, oa.DataType.STRING):
-            return False
+        """OpenAPI 3.1 has several possible ways to define a file upload property
+        but openapi-generator does not care and ignored anything that is not
+        "type=string" and "format=binary" or "format=byte".
 
-        # 3.0
-        if (
-            hasattr(schema, "schema_format")
-            and schema.schema_format in cls._FILE_FORMATS
-        ):
-            return True
+        The following are considered "files" by OpenAPI 3.1 but not by
+        openapi-generator:
 
-        # 3.1
-        # ignore contentEncoding because that will be treated as string in SDKs
+        * contentMediaType: application/octet-stream
+        * contentEncoding: base64
+        """
+
         return (
-            hasattr(schema, "contentMediaType")
-            and schema.contentMediaType == cls._FILE_CONTENT_MEDIA_TYPE
+            cls._is_of_type(schema, oa.DataType.STRING)
+            and hasattr(schema, "schema_format")
+            and schema.schema_format in cls._FILE_FORMATS
         )
 
     @classmethod

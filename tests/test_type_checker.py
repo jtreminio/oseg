@@ -47,12 +47,10 @@ class TestTypeChecker(unittest.TestCase):
         expected_true_single = [
             "prop_file_binary",
             "prop_file_byte",
-            "prop_file_contentMediaType",
         ]
         expected_true_array = [
             "prop_file_binary_array",
             "prop_file_byte_array",
-            "prop_file_contentMediaType_array",
         ]
 
         for name, prop in together.properties.items():
@@ -91,6 +89,7 @@ class TestTypeChecker(unittest.TestCase):
         expected_true_single = [
             "prop_file_base64",
             "prop_file_contentEncoding",
+            "prop_file_contentMediaType",
             "prop_scalar_bool",
             "prop_scalar_integer",
             "prop_scalar_number",
@@ -102,6 +101,7 @@ class TestTypeChecker(unittest.TestCase):
         expected_true_array = [
             "prop_file_base64_array",
             "prop_file_contentEncoding_array",
+            "prop_file_contentMediaType_array",
             "prop_scalar_bool_array",
             "prop_scalar_integer_array",
             "prop_scalar_number_array",

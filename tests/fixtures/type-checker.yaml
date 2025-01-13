@@ -42,10 +42,11 @@ components:
                 type: string
         prop_discriminator:
           $ref: '#/components/schemas/Dog'
-        # considered string (scalar)
+        # considered string(s) by SDKs
         prop_file_base64:
           type: string
           format: base64
+        # considered string(s) by SDKs
         prop_file_base64_array:
           type: array
           items:
@@ -67,17 +68,21 @@ components:
           items:
             type: string
             format: byte
+        # considered string(s) by SDKs
         prop_file_contentMediaType:
           type: string
           contentMediaType: application/octet-stream
+        # considered string(s) by SDKs
         prop_file_contentMediaType_array:
           type: array
           items:
             type: string
             contentMediaType: application/octet-stream
+        # considered string(s) by SDKs
         prop_file_contentEncoding:
           type: string
           contentEncoding: base64
+        # considered string(s) by SDKs
         prop_file_contentEncoding_array:
           type: array
           items:
