@@ -28,7 +28,7 @@ new SplFileObject("{{ parsed.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_value(parsed) -%}
+{%- macro print_free_form_value(parsed) -%}
     {% if parsed.value == None %}null{% else %}
 [
         {% for k, v in parsed.value.items() %}
@@ -38,7 +38,7 @@ new SplFileObject("{{ parsed.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_array_value(parsed) -%}
+{%- macro print_free_form_array_value(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 [
         {% for obj in parsed.values %}

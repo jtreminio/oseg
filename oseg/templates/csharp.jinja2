@@ -40,7 +40,7 @@ new List<Stream>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_value(parsed) -%}
+{%- macro print_free_form_value(parsed) -%}
     {% if parsed.value == None %}null{% else %}
 new Dictionary<string, object>{% if not parsed.value %}(){% else %}
 
@@ -53,7 +53,7 @@ new Dictionary<string, object>{% if not parsed.value %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_array_value(parsed) -%}
+{%- macro print_free_form_array_value(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new List<Dictionary<string, object>>{% if not parsed.values %}(){% else %}
 

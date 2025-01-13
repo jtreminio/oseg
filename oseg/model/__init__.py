@@ -1,6 +1,7 @@
 from .property_proto import PropertyProto
 
 from .example_data import ExampleData
+from .jinja_macros import JinjaMacros
 from .parsed_free_form import ParsedFreeForm
 from .parsed_free_form_array import ParsedFreeFormArray
 from .parsed_object import ParsedObject

@@ -13,7 +13,7 @@ class PythonExtension(BaseExtension):
     def setter_property_name(self, name: str) -> str:
         return self.snake_case(name)
 
-    def _parse_scalar(
+    def parse_scalar(
         self,
         parent_type: str,
         name: str,
@@ -41,7 +41,7 @@ class PythonExtension(BaseExtension):
 
         return parsed
 
-    def _parse_file(
+    def parse_file(
         self,
         parent_type: str,
         name: str,
@@ -65,7 +65,7 @@ class PythonExtension(BaseExtension):
 
         return parsed
 
-    def _parse_object(
+    def parse_free_form(
         self,
         name: str,
         item: model.PropertyFreeForm,

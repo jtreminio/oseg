@@ -98,7 +98,7 @@ class CSharpExtension(BaseExtension):
 
         return name
 
-    def _parse_scalar(
+    def parse_scalar(
         self,
         parent_type: str,
         name: str,
@@ -155,7 +155,7 @@ class CSharpExtension(BaseExtension):
 
         return parsed
 
-    def _parse_file(
+    def parse_file(
         self,
         parent_type: str,
         name: str,
@@ -179,7 +179,7 @@ class CSharpExtension(BaseExtension):
 
         return parsed
 
-    def _parse_object(
+    def parse_free_form(
         self,
         name: str,
         item: model.PropertyFreeForm,

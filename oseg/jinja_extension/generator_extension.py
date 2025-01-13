@@ -74,12 +74,19 @@ class GeneratorExtension(jinja2.ext.Extension):
         self._sdk_generator = self._generators[sdk_options.generator_name]
         self._sdk_generator.sdk_options = sdk_options
 
+    def add_generator(
+        self,
+        name: str,
+        generator: "jinja_extension.BaseExtension",
+    ) -> None:
+        self._generators[name] = generator
+
     def _parse_body_data(
         self,
         example_data: model.ExampleData,
         single_body_value: bool,
     ) -> dict[str, model.PropertyObject]:
-        return self._sdk_generator.parse_body_data(
+        return self._sdk_generator.template_parser.parse_body_data(
             example_data,
             single_body_value,
         )
@@ -92,11 +99,11 @@ class GeneratorExtension(jinja2.ext.Extension):
         parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
-        return self._sdk_generator.parse_body_properties(
-            context,
-            parent,
-            parent_name,
-            indent_count,
+        return self._sdk_generator.template_parser.parse_body_properties(
+            macros=model.JinjaMacros(context),
+            parent=parent,
+            parent_name=parent_name,
+            indent_count=indent_count,
         )
 
     @pass_context
@@ -107,11 +114,11 @@ class GeneratorExtension(jinja2.ext.Extension):
         parent_name: str,
         indent_count: int,
     ) -> str:
-        return self._sdk_generator.parse_body_property_list(
-            context,
-            parent,
-            parent_name,
-            indent_count,
+        return self._sdk_generator.template_parser.parse_body_property_list(
+            macros=model.JinjaMacros(context),
+            parent=parent,
+            parent_name=parent_name,
+            indent_count=indent_count,
         )
 
     @pass_context
@@ -123,10 +130,10 @@ class GeneratorExtension(jinja2.ext.Extension):
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
-        return self._sdk_generator.parse_request_data(
-            context,
-            example_data,
-            single_body_value,
-            indent_count,
-            required_flag,
+        return self._sdk_generator.template_parser.parse_request_data(
+            macros=model.JinjaMacros(context),
+            example_data=example_data,
+            single_body_value=single_body_value,
+            indent_count=indent_count,
+            required_flag=required_flag,
         )
