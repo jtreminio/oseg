@@ -24,15 +24,14 @@ class TestOperationParser(unittest.TestCase):
         )
 
         expected_true = [
-            "form_data_1",
-            "form_data_2",
-            "form_data_3",
-            "form_data_4",
-            "form_data_5",
-            "form_data_6",
-            "form_data_7",
-            "form_data_8",
-            "form_data_9",
+            "request_x_www_form_urlencoded",
+            "request_multipart_form_data",
+            "request_x_www_form_urlencoded_with_ref",
+            "request_multipart_form_data_with_ref",
+            "request_x_www_form_urlencoded_and_multipart_form_data",
+            "request_multipart_form_data_and_x_www_form_urlencoded",
+            "request_x_www_form_urlencoded_and_application_json",
+            "request_multipart_form_data_and_application_json",
             "request_body_ref_1",
         ]
 
@@ -43,8 +42,17 @@ class TestOperationParser(unittest.TestCase):
                 else:
                     self.assertFalse(operation.has_form_data)
 
+    def test_octet_stream_not_form_data(self):
+        operation_parser = parser.OperationParser(
+            oa_parser=self.oa_parser_requests,
+            operation_id=None,
+        )
+
+        operation = operation_parser.operations.get("request_octet_stream")
+        self.assertFalse(operation.has_form_data)
+
     def test_single_operation_loaded(self):
-        operation_id = "form_data_1"
+        operation_id = "request_x_www_form_urlencoded"
 
         operation_parser = parser.OperationParser(
             oa_parser=self.oa_parser_requests,

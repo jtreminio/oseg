@@ -130,9 +130,4 @@ class OperationParser:
             return False
 
         for content_type, body in request_body.content.items():
-            return (
-                content_type in self._FORM_DATA_CONTENT_TYPES
-                # 3.1
-                # see https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0
-                or body.media_type_schema is None
-            )
+            return content_type in self._FORM_DATA_CONTENT_TYPES
