@@ -1,8 +1,8 @@
-{%- macro print_scalar_value(parsed) -%}
+{%- macro print_scalar(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array_value(parsed) -%}
+{%- macro print_scalar_array(parsed) -%}
     {% if parsed.values == None %}None{% else %}
 [
         {% for i in parsed.values %}
@@ -12,13 +12,13 @@
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_value(parsed) -%}
+{%- macro print_file(parsed) -%}
     {% if parsed.values == None %}None{% else %}
 open("{{ parsed.value }}", "rb").read()
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array_value(parsed) -%}
+{%- macro print_file_array(parsed) -%}
     {% if parsed.values == None %}None{% else %}
 [
         {% for i in parsed.values %}
@@ -28,7 +28,7 @@ open("{{ parsed.value }}", "rb").read()
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_value(parsed) -%}
+{%- macro print_free_form(parsed) -%}
     {% if parsed.value == None %}None{% else %}
 {
         {% for k, v in parsed.value.items() %}
@@ -38,7 +38,7 @@ open("{{ parsed.value }}", "rb").read()
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array_value(parsed) -%}
+{%- macro print_free_form_array(parsed) -%}
     {% if parsed.values == None %}None{% else %}
 [
         {% for obj in parsed.values %}
@@ -52,11 +52,11 @@ open("{{ parsed.value }}", "rb").read()
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_ref_value(parsed) -%}
+{%- macro print_object(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_ref_array_value(parsed) -%}
+{%- macro print_object_array(parsed) -%}
 [
     {% for i in parsed.values %}
     {{ i }},
@@ -64,12 +64,12 @@ open("{{ parsed.value }}", "rb").read()
 ]
 {%- endmacro -%}
 
-{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_properties_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_property_list_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
 {%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
@@ -83,18 +83,18 @@ from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiEx
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
-    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
-    {% if not ref.is_array %}
-    {{ ref_name|setter_property_name }} = models.{{ ref.type }}()
-        {% call(properties) parse_body_properties_macro(ref, parent_name, 4) %}
+{% for obj_name, obj in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = obj_name if obj_name != example_data.body.type else "" %}
+    {% if not obj.is_array %}
+    {{ obj_name|setter_property_name }} = models.{{ obj.type }}()
+        {% call(properties) parse_body_properties_macro(obj, parent_name, 4) %}
             {% for name, value in properties.items() %}
-    {{ ref_name|setter_property_name }}.{{ name }} = {{ value }}
+    {{ obj_name|setter_property_name }}.{{ name }} = {{ value }}
             {% endfor %}
         {% endcall %}
     {% else %}
-    {{ ref_name|setter_property_name }} = {{ "" }}
-        {%- call(value) parse_body_property_list_macro(ref, parent_name, 4) %}
+    {{ obj_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(obj, parent_name, 4) %}
             {{- value }}
         {% endcall %}
     {% endif %}

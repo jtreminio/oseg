@@ -19,12 +19,12 @@ class TemplateParser:
         if not example_data.body:
             return {}
 
-        refs = self._flatten_refs(example_data.body, "")
+        result = self._flatten_objects(example_data.body, "")
 
         if single_body_value:
-            refs[example_data.body.type] = example_data.body
+            result[example_data.body.type] = example_data.body
 
-        return refs
+        return result
 
     def parse_body_properties(
         self,
@@ -35,17 +35,17 @@ class TemplateParser:
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
-        result = self._parse_non_ref_properties(
+        result = self._parse_non_objects(
             macros=macros,
             parent_type=parent.type,
-            properties=parent.value.non_refs(),
+            properties=parent.value.non_objects(),
         )
 
-        for name, parsed in self._parse_ref(parent, parent_name).items():
+        for name, parsed in self._parse_object(parent, parent_name).items():
             if isinstance(parsed, model.ParsedObject):
-                result[name] = macros.print_ref_value(parsed)
+                result[name] = macros.print_object(parsed)
             else:
-                result[name] = macros.print_ref_array_value(parsed)
+                result[name] = macros.print_object_array(parsed)
 
         return self._indent(result, indent_count)
 
@@ -58,17 +58,17 @@ class TemplateParser:
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
 
-        result = self._parse_non_ref_properties(
+        result = self._parse_non_objects(
             macros=macros,
             parent_type=parent.type,
-            properties=parent.value.non_refs(),
+            properties=parent.value.non_objects(),
         )
 
-        for name, parsed in self._parse_ref(parent, parent_name).items():
+        for name, parsed in self._parse_object(parent, parent_name).items():
             if isinstance(parsed, model.ParsedObject):
-                result[name] = macros.print_ref_value(parsed)
+                result[name] = macros.print_object(parsed)
             else:
-                result[name] = macros.print_ref_array_value(parsed)
+                result[name] = macros.print_object_array(parsed)
 
             return self._indent(result, indent_count)[name]
 
@@ -106,13 +106,13 @@ class TemplateParser:
             else:
                 http_optional[name] = parameter
 
-        params_required = self._parse_non_ref_properties(
+        params_required = self._parse_non_objects(
             macros=macros,
             parent_type="",
             properties=http_required,
         )
 
-        params_optional = self._parse_non_ref_properties(
+        params_optional = self._parse_non_objects(
             macros=macros,
             parent_type="",
             properties=http_optional,
@@ -127,16 +127,16 @@ class TemplateParser:
                 else:
                     params_optional[example_data.body.type] = value
             else:
-                body_params_required = self._parse_non_ref_properties(
+                body_params_required = self._parse_non_objects(
                     macros=macros,
                     parent_type="",
-                    properties=example_data.body.value.non_refs(True),
+                    properties=example_data.body.value.non_objects(True),
                 )
 
-                body_params_optional = self._parse_non_ref_properties(
+                body_params_optional = self._parse_non_objects(
                     macros=macros,
                     parent_type="",
-                    properties=example_data.body.value.non_refs(False),
+                    properties=example_data.body.value.non_objects(False),
                 )
 
                 for k, v in body_params_required.items():
@@ -155,33 +155,33 @@ class TemplateParser:
 
         return self._indent(params_required, indent_count)
 
-    def _flatten_refs(
+    def _flatten_objects(
         self,
-        ref: "model.PropertyObject",
+        obj: "model.PropertyObject",
         parent_name: str,
     ) -> dict[str, "model.PropertyObject"]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
-        for name, sub_ref in ref.value.refs.items():
+        for name, sub_obj in obj.value.objects.items():
             sub_name = f"{parent_name}{name}"
 
-            sub_results = self._flatten_refs(sub_ref, sub_name)
+            sub_results = self._flatten_objects(sub_obj, sub_name)
             result |= sub_results
-            result[sub_name] = sub_ref
+            result[sub_name] = sub_obj
 
-        for name, array_ref in ref.value.array_refs.items():
+        for name, array_obj in obj.value.array_objects.items():
             i = 1
-            for sub_ref in array_ref.value:
+            for sub_obj in array_obj.value:
                 sub_name = f"{parent_name}{name}_{i}"
-                sub_results = self._flatten_refs(sub_ref, sub_name)
+                sub_results = self._flatten_objects(sub_obj, sub_name)
                 result |= sub_results
-                result[sub_name] = sub_ref
+                result[sub_name] = sub_obj
                 i += 1
 
         return result
 
-    def _parse_non_ref_properties(
+    def _parse_non_objects(
         self,
         macros: "model.JinjaMacros",
         parent_type: str,
@@ -201,73 +201,73 @@ class TemplateParser:
                 parsed = self._extension.parse_scalar(parent_type, name, prop)
 
                 if prop.is_array:
-                    result[name] = macros.print_scalar_array_value(parsed)
+                    result[name] = macros.print_scalar_array(parsed)
                 else:
-                    result[name] = macros.print_scalar_value(parsed)
+                    result[name] = macros.print_scalar(parsed)
             elif isinstance(prop, model.PropertyFile):
                 parsed = self._extension.parse_file(parent_type, name, prop)
 
                 if prop.is_array:
-                    result[name] = macros.print_file_array_value(parsed)
+                    result[name] = macros.print_file_array(parsed)
                 else:
-                    result[name] = macros.print_file_value(parsed)
+                    result[name] = macros.print_file(parsed)
             elif isinstance(prop, model.PropertyFreeForm):
                 parsed = self._extension.parse_free_form(name, prop)
 
                 if prop.is_array:
-                    result[name] = macros.print_free_form_array_value(parsed)
+                    result[name] = macros.print_free_form_array(parsed)
                 else:
-                    result[name] = macros.print_free_form_value(parsed)
+                    result[name] = macros.print_free_form(parsed)
 
         return result
 
-    def _parse_ref(
+    def _parse_object(
         self,
-        ref: "model.PropertyObject",
+        obj: "model.PropertyObject",
         parent_name: str,
     ) -> dict[str, Union["model.ParsedObject", "model.ParsedObjectArray"]]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
-        for property_name, sub_ref in ref.value.refs.items():
+        for property_name, sub_obj in obj.value.objects.items():
             parsed = model.ParsedObject()
             result[property_name] = parsed
 
             parsed.value = f"{parent_name}{property_name}"
-            parsed.target_type = sub_ref.type
+            parsed.target_type = sub_obj.type
 
-        for property_name, array_ref in ref.value.array_refs.items():
+        for property_name, array_obj in obj.value.array_objects.items():
             i = 1
 
             parsed = model.ParsedObjectArray()
             result[property_name] = parsed
 
-            if array_ref is None:
+            if array_obj is None:
                 return result
 
-            if not array_ref:
-                if parser.TypeChecker.is_ref_array(ref.value.schema):
-                    parsed.target_type = ref.value.schema.items.ref.split("/").pop()
+            if not array_obj:
+                if parser.TypeChecker.is_object_array(obj.value.schema):
+                    parsed.target_type = obj.value.schema.items.ref.split("/").pop()
 
                     return result
 
-                property_schema = ref.value.schema.properties[property_name]
+                property_schema = obj.value.schema.properties[property_name]
 
-                if parser.TypeChecker.is_ref_array(property_schema):
+                if parser.TypeChecker.is_object_array(property_schema):
                     parsed.target_type = property_schema.items.ref.split("/").pop()
 
                 return result
 
-            if array_ref.value:
-                first_item = array_ref.value[0]
+            if array_obj.value:
+                first_item = array_obj.value[0]
                 parsed.target_type = first_item.type
 
                 if first_item.discriminator_base_type:
                     parsed.target_type = first_item.discriminator_base_type
             else:
-                parsed.target_type = array_ref.type
+                parsed.target_type = array_obj.type
 
-            for _ in array_ref.value:
+            for _ in array_obj.value:
                 parsed.values.append(f"{parent_name}{property_name}_{i}")
                 i += 1
 

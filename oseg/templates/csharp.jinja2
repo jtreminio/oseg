@@ -1,8 +1,8 @@
-{%- macro print_scalar_value(parsed) -%}
+{%- macro print_scalar(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array_value(parsed) -%}
+{%- macro print_scalar_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
 
@@ -15,7 +15,7 @@ new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_value(parsed) -%}
+{%- macro print_file(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new FileStream(
     path: "{{ parsed.value }}",
@@ -24,7 +24,7 @@ new FileStream(
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array_value(parsed) -%}
+{%- macro print_file_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new List<Stream>{% if not parsed.values %}(){% else %}
 
@@ -40,7 +40,7 @@ new List<Stream>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_value(parsed) -%}
+{%- macro print_free_form(parsed) -%}
     {% if parsed.value == None %}null{% else %}
 new Dictionary<string, object>{% if not parsed.value %}(){% else %}
 
@@ -53,7 +53,7 @@ new Dictionary<string, object>{% if not parsed.value %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array_value(parsed) -%}
+{%- macro print_free_form_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new List<Dictionary<string, object>>{% if not parsed.values %}(){% else %}
 
@@ -71,11 +71,11 @@ new List<Dictionary<string, object>>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_ref_value(parsed) -%}
+{%- macro print_object(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_ref_array_value(parsed) -%}
+{%- macro print_object_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
 
@@ -88,12 +88,12 @@ new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_properties_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_property_list_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
 {%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
@@ -114,11 +114,11 @@ public class {{ operation_id|pascal_case }}{{ example_data.name|pascal_case }}
     {
         var config = new Configuration();
 
-{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
-    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
-    {% if not ref.is_array %}
-        var {{ ref_name|setter_property_name }} = new {{ ref.type }}(
-        {% call(properties) parse_body_properties_macro(ref, parent_name, 12) %}
+{% for obj_name, obj in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = obj_name if obj_name != example_data.body.type else "" %}
+    {% if not obj.is_array %}
+        var {{ obj_name|setter_property_name }} = new {{ obj.type }}(
+        {% call(properties) parse_body_properties_macro(obj, parent_name, 12) %}
             {% for name, value in properties.items() %}
             {{ name|setter_property_name }}: {{ value }}{% if not loop.last %},{% endif %}
 
@@ -126,8 +126,8 @@ public class {{ operation_id|pascal_case }}{{ example_data.name|pascal_case }}
         {% endcall %}
         );
     {% else %}
-        var {{ ref_name|setter_property_name }} = {{ "" }}
-        {%- call(value) parse_body_property_list_macro(ref, parent_name, 8) %}
+        var {{ obj_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(obj, parent_name, 8) %}
         {{- value }};
         {% endcall %}
     {% endif %}

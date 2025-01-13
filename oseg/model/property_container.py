@@ -5,8 +5,10 @@ from oseg import model
 
 T_PROPERTIES = dict[str, model.PropertyProto]
 TYPE = TypeVar("TYPE", bound=type)
-T_NON_REFS = Union[
-    "model.PropertyFile", "model.PropertyFreeForm", "model.PropertyScalar"
+T_NON_OBJECTS = Union[
+    "model.PropertyFile",
+    "model.PropertyFreeForm",
+    "model.PropertyScalar",
 ]
 
 
@@ -60,11 +62,11 @@ class PropertyContainer:
         self._type = discriminator
 
     @property
-    def refs(self) -> dict[str, "model.PropertyObject"]:
+    def objects(self) -> dict[str, "model.PropertyObject"]:
         return self._get_properties_of_type(model.PropertyObject, False)
 
     @property
-    def array_refs(self) -> dict[str, "model.PropertyObjectArray"]:
+    def array_objects(self) -> dict[str, "model.PropertyObjectArray"]:
         return self._get_properties_of_type(model.PropertyObjectArray, True)
 
     @property
@@ -84,21 +86,21 @@ class PropertyContainer:
         return self._get_properties_of_type(model.PropertyFile, True)
 
     @property
-    def objects(self) -> dict[str, "model.PropertyFreeForm"]:
+    def free_forms(self) -> dict[str, "model.PropertyFreeForm"]:
         return self._get_properties_of_type(model.PropertyFreeForm, False)
 
     @property
-    def array_objects(self) -> dict[str, "model.PropertyFreeForm"]:
+    def array_free_forms(self) -> dict[str, "model.PropertyFreeForm"]:
         return self._get_properties_of_type(model.PropertyFreeForm, True)
 
-    def non_refs(self, required: bool | None = None) -> dict[str, T_NON_REFS]:
+    def non_objects(self, required: bool | None = None) -> dict[str, T_NON_OBJECTS]:
         all_props = (
             self.scalars
             | self.array_scalars
             | self.files
             | self.array_files
-            | self.objects
-            | self.array_objects
+            | self.free_forms
+            | self.array_free_forms
         )
         ordered = {}
 

@@ -9,7 +9,7 @@ class ExampleData:
     http: dict[str, "model.PropertyScalar"] = field(default_factory=dict)
     body: Optional["model.PropertyObject"] = None
 
-    def non_refs(
+    def non_objects(
         self,
         required: bool,
     ) -> dict[str, Union["model.PropertyFreeForm", "model.PropertyScalar"]]:
@@ -20,7 +20,7 @@ class ExampleData:
                 ordered[name] = prop
 
         if self.body:
-            ordered |= self.body.value.non_refs(required)
+            ordered |= self.body.value.non_objects(required)
 
         for name, prop in self.http.items():
             if not prop.is_required:

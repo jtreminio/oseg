@@ -1,8 +1,8 @@
-{%- macro print_scalar_value(parsed) -%}
+{%- macro print_scalar(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array_value(parsed) -%}
+{%- macro print_scalar_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 List.of {% if not parsed.values %}(){% else %}
 (
@@ -14,13 +14,13 @@ List.of {% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_value(parsed) -%}
+{%- macro print_file(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 new File("{{ parsed.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array_value(parsed) -%}
+{%- macro print_file_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 List.of {% if not parsed.values %}(){% else %}
 (
@@ -32,7 +32,7 @@ List.of {% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_value(parsed) -%}
+{%- macro print_free_form(parsed) -%}
     {% if parsed.value == None %}null{% else %}
 Map.of {% if not parsed.value %}(){% else %}
 (
@@ -44,7 +44,7 @@ Map.of {% if not parsed.value %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array_value(parsed) -%}
+{%- macro print_free_form_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 List.of {% if not parsed.values %}(){% else %}
 (
@@ -61,11 +61,11 @@ List.of {% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_ref_value(parsed) -%}
+{%- macro print_object(parsed) -%}
 {{ parsed.value }}
 {%- endmacro -%}
 
-{%- macro print_ref_array_value(parsed) -%}
+{%- macro print_object_array(parsed) -%}
     {% if parsed.values == None %}null{% else %}
 List.of {% if not parsed.values %}(){% else %}
 (
@@ -77,12 +77,12 @@ List.of {% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro parse_body_properties_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_properties(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_properties_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_properties(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_body_property_list_macro(ref, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_property_list(ref, parent_property_name, indent_count)) }}
+{%- macro parse_body_property_list_macro(obj, parent_property_name, indent_count) -%}
+    {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
 {%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
@@ -107,11 +107,11 @@ public class {{ operation_id|pascal_case }}_{{ example_data.name|snake_case }}
     {
         var config = Configuration.getDefaultApiClient();
 
-{% for ref_name, ref in parse_body_data(example_data, single_body_value).items() %}
-    {% set parent_name = ref_name if ref_name != example_data.body.type else "" %}
-    {% if not ref.is_array %}
-        {% call(properties) parse_body_properties_macro(ref, parent_name, 12) %}
-        var {{ ref_name|setter_property_name }} = new {{ ref.type }}(){% if not properties %};{% endif %}
+{% for obj_name, obj in parse_body_data(example_data, single_body_value).items() %}
+    {% set parent_name = obj_name if obj_name != example_data.body.type else "" %}
+    {% if not obj.is_array %}
+        {% call(properties) parse_body_properties_macro(obj, parent_name, 12) %}
+        var {{ obj_name|setter_property_name }} = new {{ obj.type }}(){% if not properties %};{% endif %}
 
             {% for name, value in properties.items() %}
             .{{ name|setter_property_name }}({{ value }}){% if loop.last %};{% endif %}
@@ -119,8 +119,8 @@ public class {{ operation_id|pascal_case }}_{{ example_data.name|snake_case }}
             {% endfor %}
         {% endcall %}
     {% else %}
-        var {{ ref_name|setter_property_name }} = {{ "" }}
-        {%- call(value) parse_body_property_list_macro(ref, parent_name, 8) %}
+        var {{ obj_name|setter_property_name }} = {{ "" }}
+        {%- call(value) parse_body_property_list_macro(obj, parent_name, 8) %}
             {{- value }};
         {% endcall %}
     {% endif %}
