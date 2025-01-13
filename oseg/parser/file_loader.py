@@ -1,12 +1,9 @@
-import glob
 import json
 import os
 import openapi_pydantic as oa
 import re
 import yaml
 from pathlib import Path
-from typing import Optional
-from oseg import model
 
 
 class FileLoader:

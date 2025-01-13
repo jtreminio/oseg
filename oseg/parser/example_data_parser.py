@@ -1,5 +1,5 @@
 import openapi_pydantic as oa
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 from oseg import parser, model
 
@@ -7,8 +7,8 @@ from oseg import parser, model
 @dataclass
 class RequestExampleData:
     name: str
-    http: dict[str, "model.PropertyScalar"]
-    body: dict[str, dict[str, any]]
+    http: dict[str, "model.PropertyScalar"] = field(default_factory=dict)
+    body: dict[str, dict[str, any]] = field(default_factory=dict)
 
 
 class ExampleDataParser:
@@ -132,8 +132,7 @@ class ExampleDataParser:
         return [
             RequestExampleData(
                 name=self._DEFAULT_EXAMPLE_NAME,
-                http=self._get_http_data(operation, None),
-                body={},
+                http=self._get_http_data(operation),
             )
         ]
 
@@ -168,7 +167,10 @@ class ExampleDataParser:
                 http = self._get_http_data(operation, data[http_key_name])
                 del data[http_key_name]
 
-            example_name = fullname.replace(f"{operation.operationId}__", "")
+            example_name = fullname.replace(
+                f"{operation.operationId}__",
+                "",
+            )
 
             if not example_name or example_name == "":
                 example_name = self._DEFAULT_EXAMPLE_NAME
@@ -212,7 +214,7 @@ class ExampleDataParser:
         if not content:
             return None
 
-        http = self._get_http_data(operation, None)
+        http = self._get_http_data(operation)
         results = []
 
         # only a single example
@@ -290,7 +292,7 @@ class ExampleDataParser:
     def _get_http_data(
         self,
         operation: oa.Operation,
-        custom_data: dict[str, any] | None,
+        custom_data: dict[str, any] | None = None,
     ) -> dict[str, "model.PropertyScalar"]:
         """Add path and query parameter examples to request operation.
 

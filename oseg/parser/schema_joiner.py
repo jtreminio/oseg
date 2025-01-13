@@ -7,7 +7,7 @@ from oseg import parser
 class JoinedValues:
     schemas: list[oa.Schema]
     properties: dict[str, oa.Reference | oa.Schema]
-    discriminator_target_type: str | None
+    discriminator_target_type: str | None = None
 
 
 class SchemaJoiner:
@@ -38,7 +38,6 @@ class SchemaJoiner:
         return JoinedValues(
             schemas=[schema],
             properties=self._get_properties([schema]),
-            discriminator_target_type=None,
         )
 
     def _resolve_discriminator(
@@ -110,7 +109,6 @@ class SchemaJoiner:
         return JoinedValues(
             schemas=schemas,
             properties=self._get_properties(schemas),
-            discriminator_target_type=None,
         )
 
     def _get_properties(

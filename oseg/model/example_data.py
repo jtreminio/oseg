@@ -1,29 +1,13 @@
+from dataclasses import dataclass, field
 from typing import Optional, Union
 from oseg import model
 
 
+@dataclass
 class ExampleData:
-    def __init__(
-        self,
-        name: str,
-        http: dict[str, "model.PropertyScalar"],
-        body: Optional["model.PropertyObject"],
-    ):
-        self._name = name
-        self._http = http
-        self._body = body
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def http(self) -> dict[str, "model.PropertyScalar"]:
-        return self._http
-
-    @property
-    def body(self) -> Optional["model.PropertyObject"]:
-        return self._body
+    name: str
+    http: dict[str, "model.PropertyScalar"] = field(default_factory=dict)
+    body: Optional["model.PropertyObject"] = None
 
     def non_refs(
         self,
