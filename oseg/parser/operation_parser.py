@@ -41,10 +41,9 @@ class OperationParser:
             for method in self._HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
 
-                if not operation:
-                    continue
-
-                if operation_id and operation.operationId.lower() != operation_id:
+                if not operation or (
+                    operation_id and operation.operationId.lower() != operation_id
+                ):
                     continue
 
                 request_operation = model.RequestOperation(
@@ -85,13 +84,14 @@ class OperationParser:
                 if not media_type or not media_type.media_type_schema:
                     continue
 
+                schema = media_type.media_type_schema
+
+                if parser.TypeChecker.is_ref(schema):
+                    schema = self._oa_parser.resolve_component(schema.ref).schema
+
                 request_operation.has_response = True
 
-                if (
-                    media_type
-                    and media_type.media_type_schema
-                    and parser.TypeChecker.is_file(media_type.media_type_schema)
-                ):
+                if parser.TypeChecker.is_file(schema):
                     request_operation.is_binary_response = True
 
                 return
@@ -118,12 +118,16 @@ class OperationParser:
         This is a silly thing and I hate it greatly.
         """
 
-        if not (
-            operation.requestBody
-            and hasattr(operation.requestBody, "content")
-            and operation.requestBody.content
-        ):
+        if not operation.requestBody:
             return False
 
-        for content_type, body in operation.requestBody.content.items():
+        request_body = operation.requestBody
+
+        if parser.TypeChecker.is_ref(request_body):
+            request_body = self._oa_parser.resolve_request_body(request_body.ref).schema
+
+        if hasattr(request_body, "content") and not len(request_body.content.keys()):
+            return False
+
+        for content_type, body in request_body.content.items():
             return content_type in self._FORM_DATA_CONTENT_TYPES

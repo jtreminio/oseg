@@ -8,6 +8,7 @@ from pathlib import Path
 
 class FileLoader:
     def __init__(self, oas_file: str, example_data_dir: str | None = None):
+        self._oas_file = oas_file
         self._base_dir = os.path.dirname(oas_file)
         self._example_data_file_list: dict[str, str] = {}
 
@@ -16,6 +17,9 @@ class FileLoader:
     @property
     def base_dir(self) -> str:
         return self._base_dir
+
+    def oas(self):
+        return self.get_file_contents(self._oas_file)
 
     def get_file_contents(self, filename: str) -> dict[str, any]:
         if not os.path.isfile(filename):

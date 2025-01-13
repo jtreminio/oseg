@@ -1,18 +1,31 @@
+from pydantic import BaseModel
 from typing import Optional
-
 import openapi_pydantic as oa
 from oseg import model, parser
 
 
 class OaParser:
-    def __init__(self, oas_file: str, file_loader: "parser.FileLoader"):
-        self._openapi: oa.OpenAPI = oa.parse_obj(
-            file_loader.get_file_contents(oas_file)
-        )
+    def __init__(self, file_loader: "parser.FileLoader"):
+        self._openapi: oa.OpenAPI = oa.parse_obj(file_loader.oas())
 
     @property
     def paths(self) -> dict[str, oa.PathItem]:
         return self._openapi.paths
+
+    def resolve_component(self, ref: str) -> "model.ResolvedComponent[oa.Schema]":
+        return self._get_resolved_component(ref, self._openapi.components.schemas)
+
+    def resolve_parameter(self, ref: str) -> "model.ResolvedComponent[oa.Parameter]":
+        return self._get_resolved_component(ref, self._openapi.components.parameters)
+
+    def resolve_request_body(
+        self,
+        ref: str,
+    ) -> "model.ResolvedComponent[oa.RequestBody]":
+        return self._get_resolved_component(ref, self._openapi.components.requestBodies)
+
+    def resolve_response(self, ref: str) -> "model.ResolvedComponent[oa.Response]":
+        return self._get_resolved_component(ref, self._openapi.components.responses)
 
     def resolve_property(
         self,
@@ -40,14 +53,6 @@ class OaParser:
             schema=schema,
         )
 
-    def resolve_component(self, ref: str) -> "model.ResolvedComponent[oa.Schema]":
-        name = ref.split("/").pop()
-
-        return model.ResolvedComponent(
-            type=name,
-            schema=self._openapi.components.schemas.get(name),
-        )
-
     def resolve_example(
         self,
         ref: str,
@@ -71,29 +76,14 @@ class OaParser:
             schema=schema,
         )
 
-    def resolve_parameter(self, ref: str) -> "model.ResolvedComponent[oa.Parameter]":
-        name = ref.split("/").pop()
-
-        return model.ResolvedComponent(
-            type=name,
-            schema=self._openapi.components.parameters.get(name),
-        )
-
-    def resolve_request_body(
+    def _get_resolved_component(
         self,
-        ref: str,
-    ) -> "model.ResolvedComponent[oa.RequestBody]":
-        name = ref.split("/").pop()
+        name: str,
+        components: dict[str, BaseModel],
+    ) -> "model.ResolvedComponent":
+        name = name.split("/").pop()
 
         return model.ResolvedComponent(
             type=name,
-            schema=self._openapi.components.requestBodies.get(name),
-        )
-
-    def resolve_response(self, ref: str) -> "model.ResolvedComponent[oa.Response]":
-        name = ref.split("/").pop()
-
-        return model.ResolvedComponent(
-            type=name,
-            schema=self._openapi.components.responses.get(name),
+            schema=components.get(name),
         )

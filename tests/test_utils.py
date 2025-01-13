@@ -3,6 +3,8 @@ from oseg import parser
 
 
 class TestUtils:
+    _BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
+
     _oas_file: str
     _file_loader: parser.FileLoader
     _oa_parser: parser.OaParser
@@ -11,8 +13,11 @@ class TestUtils:
     _operation_parser: parser.OperationParser
 
     def __init__(self):
-        self._base_dir = os.path.dirname(os.path.abspath(__file__))
         self._oas_file = ""
+
+    @staticmethod
+    def fixture_file(filename: str) -> str:
+        return f"{TestUtils._BASE_DIR}/fixtures/{filename}.yaml"
 
     @property
     def operation_parser(self) -> parser.OperationParser:
@@ -24,13 +29,7 @@ class TestUtils:
         example_data: dict[str, any] | None = None,
     ):
         self._refresh_dependencies(
-            oas_file=f"{self._base_dir}/fixtures/{filename}.yaml",
-            example_data=example_data,
-        )
-
-    def use_petstore_file(self, example_data: dict[str, any] | None = None):
-        self._refresh_dependencies(
-            oas_file=f"{self._base_dir}/../data/petstore/openapi.yaml",
+            oas_file=self.fixture_file(filename),
             example_data=example_data,
         )
 
@@ -45,7 +44,7 @@ class TestUtils:
         self._oas_file = oas_file
 
         self._file_loader = parser.FileLoader(self._oas_file)
-        self._oa_parser = parser.OaParser(self._oas_file, self._file_loader)
+        self._oa_parser = parser.OaParser(self._file_loader)
         self._property_parser = parser.PropertyParser(self._oa_parser)
 
         self._example_data_parser = parser.ExampleDataParser(

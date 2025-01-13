@@ -1,0 +1,184 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Fixture - OperationParser
+tags:
+  - name: pet
+paths:
+  /form_data_1:
+    post:
+      tags:
+        - pet
+      operationId: form_data_1
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_2:
+    post:
+      tags:
+        - pet
+      operationId: form_data_2
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_3:
+    post:
+      tags:
+        - pet
+      operationId: form_data_3
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_4:
+    post:
+      tags:
+        - pet
+      operationId: form_data_4
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_5:
+    post:
+      tags:
+        - pet
+      operationId: form_data_5
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_6:
+    post:
+      tags:
+        - pet
+      operationId: form_data_6
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /body_data_1:
+    post:
+      tags:
+        - pet
+      operationId: body_data_1
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /body_data_2:
+    post:
+      tags:
+        - pet
+      operationId: body_data_2
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /parameter_data:
+    get:
+      tags:
+        - pet
+      operationId: parameter_data
+      parameters:
+        -
+          name: param_name_1
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /request_body_ref_1:
+    post:
+      tags:
+        - pet
+      operationId: request_body_ref_1
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        $ref: '#/components/requestBodies/RequestBodyRef1'
+  /request_body_ref_2:
+    post:
+      tags:
+        - pet
+      operationId: request_body_ref_2
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        $ref: '#/components/requestBodies/RequestBodyRef2'
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+  requestBodies:
+    RequestBodyRef1:
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/Pet'
+    RequestBodyRef2:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'

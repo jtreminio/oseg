@@ -3,12 +3,12 @@ info:
   version: 1.0.0
   title: Fixture - Different Responses
 tags:
-  - name: tag_1
+  - name: pet
 paths:
   /single_response:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: single_response
       responses:
         '200':
@@ -16,14 +16,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                $ref: '#/components/schemas/Pet'
   /single_response_with_error:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: single_response_with_error
       responses:
         '200':
@@ -31,16 +28,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                $ref: '#/components/schemas/Pet'
         '400':
           description: Invalid ID supplied
   /single_response_with_error_first:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: single_response_with_error_first
       responses:
         '400':
@@ -50,14 +44,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                $ref: '#/components/schemas/Pet'
   /multi_response:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: multi_response
       responses:
         '200':
@@ -65,20 +56,14 @@ paths:
           content:
             application/xml:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                $ref: '#/components/schemas/Pet'
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                $ref: '#/components/schemas/Pet'
   /only_400_response:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: only_400_response
       responses:
         '400':
@@ -86,7 +71,7 @@ paths:
   /binary_response:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: binary_response
       responses:
         '200':
@@ -99,8 +84,52 @@ paths:
   /no_response:
     get:
       tags:
-        - tag_1
+        - pet
       operationId: no_response
       responses:
         default:
           description: 'successful operation'
+  /response_ref_1:
+    get:
+      tags:
+        - pet
+      operationId: response_ref_1
+      responses:
+        '200':
+          $ref: '#/components/responses/ResponseRef1'
+  /response_ref_2:
+    get:
+      tags:
+        - pet
+      operationId: response_ref_2
+      responses:
+        '200':
+          $ref: '#/components/responses/ResponseRef2'
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+    FileSchema:
+      type: string
+      format: binary
+  responses:
+    ResponseRef1:
+      description: 'successful operation'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+    ResponseRef2:
+      description: 'successful operation'
+      content:
+        application/zip:
+          schema:
+            $ref: '#/components/schemas/FileSchema'

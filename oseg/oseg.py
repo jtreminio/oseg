@@ -18,7 +18,7 @@ class Generator:
             example_data_dir=example_data_dir,
         )
 
-        oa_parser = parser.OaParser(oas_file, file_loader)
+        oa_parser = parser.OaParser(file_loader)
 
         property_parser = parser.PropertyParser(oa_parser)
 
