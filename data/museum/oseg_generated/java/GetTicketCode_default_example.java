@@ -23,8 +23,10 @@ public class GetTicketCode_default_example
             var response = apiCaller.getTicketCode(
                 "a54a57ca-36f8-421b-a6b4-2e8f26858a4c"
             );
-
-            System.out.println(response);
+            var fileStream = File.Create("file_response.zip");
+            response.Seek(0, SeekOrigin.Begin);
+            response.CopyTo(fileStream);
+            fileStream.Close();
         } catch (ApiException e) {
             System.err.println("Exception when calling Tickets#getTicketCode");
             System.err.println("Status code: " + e.getCode());

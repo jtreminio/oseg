@@ -19,8 +19,10 @@ public class GetTicketCodeDefaultExample
             var response = apiCaller.GetTicketCode(
                 ticketId: "a54a57ca-36f8-421b-a6b4-2e8f26858a4c"
             );
-
-            Console.WriteLine(response);
+            var fileStream = File.Create("file_response.zip");
+            response.Seek(0, SeekOrigin.Begin);
+            response.CopyTo(fileStream);
+            fileStream.Close();
         }
         catch (ApiException e)
         {

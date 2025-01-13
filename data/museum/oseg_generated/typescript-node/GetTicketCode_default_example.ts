@@ -7,7 +7,7 @@ const ticketId = "a54a57ca-36f8-421b-a6b4-2e8f26858a4c";
 apiCaller.getTicketCode(
     ticketId,
 ).then(response => {
-  console.log(response.body);
+  fs.createWriteStream('file_response.zip').write(response.body);
 }).catch(error => {
   console.log("Exception when calling Tickets#getTicketCode:");
   console.log(error.body);

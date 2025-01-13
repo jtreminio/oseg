@@ -12,6 +12,6 @@ with ApiClient(configuration) as api_client:
             ticket_id="a54a57ca-36f8-421b-a6b4-2e8f26858a4c",
         )
 
-        pprint(response)
+        open("file_response.zip", "wb").write(response.read())
     except ApiException as e:
         print("Exception when calling Tickets#get_ticket_code: %s\n" % e)
