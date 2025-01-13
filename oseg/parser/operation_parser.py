@@ -33,7 +33,7 @@ class OperationParser:
     def operations(self) -> dict[str, "model.RequestOperation"]:
         return self._request_operations
 
-    def _setup_request_operations(self, operation_id: str | None):
+    def _setup_request_operations(self, operation_id: str | None) -> None:
         if operation_id:
             operation_id = operation_id.lower()
 

@@ -11,6 +11,8 @@ class BaseExtension(Protocol):
     FILE_EXTENSION: str
     GENERATOR: str
     TEMPLATE: str
+    X_ENUM_VARNAMES = "x-enum-varnames"
+    X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
     _sdk_options: "model.SdkOptions"
     _template_parser: "parser.TemplateParser"
@@ -77,14 +79,6 @@ class BaseExtension(Protocol):
     def upper_case(self, value: str) -> str:
         return convert_case.upper_case(value)
 
-    def _remove_empty_items(self, items: list) -> list:
-        result = []
-        for item in items:
-            if item is not None and item != "":
-                result.append(item)
-
-        return result
-
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 
@@ -93,7 +87,7 @@ class BaseExtension(Protocol):
         schema: oa.Schema,
         value: any,
     ) -> str | None:
-        enum_varnames = schema.model_extra.get("x-enum-varnames")
+        enum_varnames = schema.model_extra.get(self.X_ENUM_VARNAMES)
 
         if not enum_varnames:
             return None
@@ -108,7 +102,7 @@ class BaseExtension(Protocol):
         schema: oa.Schema,
         value: any,
     ) -> str | None:
-        enum_varnames_override = schema.model_extra.get("x-enum-varnames-override")
+        enum_varnames_override = schema.model_extra.get(self.X_ENUM_VARNAMES_OVERRIDE)
 
         if not enum_varnames_override:
             return None

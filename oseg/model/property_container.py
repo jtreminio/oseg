@@ -38,7 +38,7 @@ class PropertyContainer:
         self,
         name: str,
         value: model.PropertyProto,
-    ):
+    ) -> None:
         self._properties[name] = value
 
     def has(self, name: str) -> bool:
@@ -52,7 +52,7 @@ class PropertyContainer:
     def discriminator_base_type(self) -> str | None:
         return self._discriminator_base_type
 
-    def set_discriminator(self, discriminator: str | None):
+    def set_discriminator(self, discriminator: str | None) -> None:
         if discriminator is None:
             self._discriminator_base_type = None
 

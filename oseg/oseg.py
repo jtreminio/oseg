@@ -72,7 +72,7 @@ class Generator:
         sdk_options: model.SdkOptions,
         output_dir: str,
         file_extension: str,
-    ):
+    ) -> None:
         operation_id = request_operation.operation.operationId
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_data.name}"
         print(f"Begin parsing for {filename}")

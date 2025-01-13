@@ -11,7 +11,7 @@ class PropertyParser:
         self._schema_joiner = parser.SchemaJoiner(oa_parser)
         self._order_by_example_data = True
 
-    def order_by_example_data(self, flag: bool):
+    def order_by_example_data(self, flag: bool) -> None:
         self._order_by_example_data = flag
 
     def parse(

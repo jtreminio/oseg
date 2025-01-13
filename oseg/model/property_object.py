@@ -34,7 +34,7 @@ class PropertyObject(model.PropertyProto):
     def discriminator_base_type(self) -> str | None:
         return self._discriminator_base_type
 
-    def set_discriminator(self, discriminator: str | None):
+    def set_discriminator(self, discriminator: str | None) -> None:
         if discriminator is None:
             self._discriminator_base_type = None
 

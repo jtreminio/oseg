@@ -17,10 +17,8 @@ class PropertyProto(Protocol):
         self._schema = schema
         self._parent = parent
         self._is_array = parser.TypeChecker.is_array(self._schema)
-        self._is_required = False
+        self._is_required = self._set_is_required()
         self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
-
-        self._set_is_required()
 
     @property
     def name(self) -> str:
@@ -47,18 +45,14 @@ class PropertyProto(Protocol):
     def is_nullable(self) -> bool:
         return self._is_nullable
 
-    def _set_is_required(self):
+    def _set_is_required(self) -> bool:
         if self._parent is None:
             return False
 
         if self._parent.required is None:
-            self._is_required = False
-
-            return
+            return False
 
         if isinstance(self._parent.required, bool):
-            self._is_required = self._parent.required
+            return self._parent.required
 
-            return
-
-        self._is_required = self._name in self._parent.required
+        return self._name in self._parent.required

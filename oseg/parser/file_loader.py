@@ -77,7 +77,7 @@ class FileLoader:
 
         return results
 
-    def _read_example_data_dir(self, example_data_dir: str | dict | None):
+    def _read_example_data_dir(self, example_data_dir: str | dict | None) -> None:
         if (
             not example_data_dir
             or not isinstance(example_data_dir, str)

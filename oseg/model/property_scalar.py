@@ -42,7 +42,7 @@ class PropertyScalar(model.PropertyProto):
     def is_enum(self) -> bool:
         return self._is_enum
 
-    def _normalize_value(self):
+    def _normalize_value(self) -> None:
         if self._value is None and self._schema.default is not None:
             self._value = self._schema.default
 
