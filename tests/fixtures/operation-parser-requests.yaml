@@ -133,7 +133,6 @@ paths:
         -
           name: param_name_1
           in: query
-          required: false
           schema:
             type: string
       responses:
@@ -163,9 +162,6 @@ components:
   schemas:
     Pet:
       type: object
-      required:
-        - id
-        - type
       properties:
         id:
           type: integer

@@ -9,61 +9,67 @@ class TestOperationParser(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        TestOperationParser.oa_parser_requests = parser.OaParser(
+        cls.oa_parser_requests = parser.OaParser(
             parser.FileLoader(TestUtils.fixture_file("operation-parser-requests"))
         )
 
-        TestOperationParser.oa_parser_responses = parser.OaParser(
+        cls.oa_parser_responses = parser.OaParser(
             parser.FileLoader(TestUtils.fixture_file("operation-parser-responses"))
         )
 
     def test_has_form_data(self):
         operation_parser = parser.OperationParser(
-            oa_parser=TestOperationParser.oa_parser_requests,
+            oa_parser=self.oa_parser_requests,
             operation_id=None,
         )
 
-        data_provider = {
-            "form_data_1": {
-                "has_form_data": True,
-            },
-            "form_data_2": {
-                "has_form_data": True,
-            },
-            "form_data_3": {
-                "has_form_data": True,
-            },
-            "form_data_4": {
-                "has_form_data": True,
-            },
-            "form_data_5": {
-                "has_form_data": True,
-            },
-            "form_data_6": {
-                "has_form_data": True,
-            },
-            "body_data_1": {
-                "has_form_data": False,
-            },
-            "body_data_2": {
-                "has_form_data": False,
-            },
-            "parameter_data": {
-                "has_form_data": False,
-            },
-        }
+        expected_true = [
+            "form_data_1",
+            "form_data_2",
+            "form_data_3",
+            "form_data_4",
+            "form_data_5",
+            "form_data_6",
+            "request_body_ref_1",
+        ]
 
-        for operation_id, expected in data_provider.items():
+        for operation_id, operation in operation_parser.operations.items():
             with self.subTest(operation_id):
-                operation = operation_parser.operations[operation_id]
+                if operation_id in expected_true:
+                    self.assertTrue(operation.has_form_data)
+                else:
+                    self.assertFalse(operation.has_form_data)
 
-                self.assertEqual(expected["has_form_data"], operation.has_form_data)
+    def test_has_form_data_v31(self):
+        """See https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0"""
+
+        oa_parser_requests = parser.OaParser(
+            parser.FileLoader(TestUtils.fixture_file("operation-parser-requests-3.1"))
+        )
+
+        operation_parser = parser.OperationParser(
+            oa_parser=oa_parser_requests,
+            operation_id=None,
+        )
+
+        expected_true = [
+            "form_data_1",
+            "form_data_2",
+            "form_data_3",
+        ]
+
+        for operation_id, operation in operation_parser.operations.items():
+            with self.subTest(operation_id):
+                if operation_id in expected_true:
+                    self.assertTrue(operation.has_form_data)
+                else:
+                    self.assertFalse(operation.has_form_data)
 
     def test_single_operation_loaded(self):
         operation_id = "form_data_1"
 
         operation_parser = parser.OperationParser(
-            oa_parser=TestOperationParser.oa_parser_requests,
+            oa_parser=self.oa_parser_requests,
             operation_id=operation_id,
         )
 
@@ -72,28 +78,24 @@ class TestOperationParser(unittest.TestCase):
 
     def test_request_body_refs_resolved(self):
         operation_parser = parser.OperationParser(
-            oa_parser=TestOperationParser.oa_parser_requests,
+            oa_parser=self.oa_parser_requests,
             operation_id=None,
         )
 
         data_provider = {
-            "request_body_ref_1": {
-                "has_form_data": True,
-            },
-            "request_body_ref_2": {
-                "has_form_data": False,
-            },
+            "request_body_ref_1": True,
+            "request_body_ref_2": False,
         }
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
                 operation = operation_parser.operations[operation_id]
 
-                self.assertEqual(expected["has_form_data"], operation.has_form_data)
+                self.assertEqual(expected, operation.has_form_data)
 
     def test_different_responses(self):
         operation_parser = parser.OperationParser(
-            oa_parser=TestOperationParser.oa_parser_responses,
+            oa_parser=self.oa_parser_responses,
             operation_id=None,
         )
 
