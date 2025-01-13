@@ -54,7 +54,6 @@ class TypeChecker:
         return cls.is_array(schema) and cls.is_file(schema.items)
 
     @classmethod
-    # todo allow inline-defined properties (not using $ref)
     def is_free_form(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
         return bool(
             cls._is_of_type(schema, oa.DataType.OBJECT)
