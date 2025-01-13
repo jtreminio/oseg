@@ -30,32 +30,10 @@ class TestOperationParser(unittest.TestCase):
             "form_data_4",
             "form_data_5",
             "form_data_6",
+            "form_data_7",
+            "form_data_8",
+            "form_data_9",
             "request_body_ref_1",
-        ]
-
-        for operation_id, operation in operation_parser.operations.items():
-            with self.subTest(operation_id):
-                if operation_id in expected_true:
-                    self.assertTrue(operation.has_form_data)
-                else:
-                    self.assertFalse(operation.has_form_data)
-
-    def test_has_form_data_v31(self):
-        """See https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0"""
-
-        oa_parser_requests = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("operation-parser-requests-3.1"))
-        )
-
-        operation_parser = parser.OperationParser(
-            oa_parser=oa_parser_requests,
-            operation_id=None,
-        )
-
-        expected_true = [
-            "form_data_1",
-            "form_data_2",
-            "form_data_3",
         ]
 
         for operation_id, operation in operation_parser.operations.items():

@@ -1,4 +1,4 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
   version: 1.0.0
   title: Fixture - OperationParser
@@ -15,9 +15,7 @@ paths:
           description: Successful operation
       requestBody:
         content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Pet'
+          application/x-www-form-urlencoded: {}
   /form_data_2:
     post:
       tags:
@@ -28,9 +26,7 @@ paths:
           description: Successful operation
       requestBody:
         content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Pet'
+          multipart/form-data: {}
   /form_data_3:
     post:
       tags:
@@ -41,12 +37,7 @@ paths:
           description: Successful operation
       requestBody:
         content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Pet'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Pet'
+          application/octet-stream: {}
   /form_data_4:
     post:
       tags:
@@ -57,9 +48,6 @@ paths:
           description: Successful operation
       requestBody:
         content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Pet'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Pet'
@@ -73,10 +61,7 @@ paths:
           description: Successful operation
       requestBody:
         content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Pet'
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/Pet'
   /form_data_6:
@@ -84,6 +69,54 @@ paths:
       tags:
         - pet
       operationId: form_data_6
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_7:
+    post:
+      tags:
+        - pet
+      operationId: form_data_7
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_8:
+    post:
+      tags:
+        - pet
+      operationId: form_data_8
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /form_data_9:
+    post:
+      tags:
+        - pet
+      operationId: form_data_9
       responses:
         '200':
           description: Successful operation
