@@ -113,7 +113,7 @@ class TestPropertyParser(unittest.TestCase):
         for breed, expected in data_provider.items():
             with self.subTest(breed):
                 body_data = request_operation.request_data[i].body.value
-                dog = body_data.refs["dog"]
+                dog = body_data.objects["dog"]
 
                 self.assertEqual(expected["base_type"], dog.discriminator_base_type)
                 self.assertEqual(expected["final_type"], dog.type)
@@ -165,7 +165,7 @@ class TestPropertyParser(unittest.TestCase):
         request_operation = self._get_request_operation(operation_id)
 
         animal = request_operation.request_data[0].body.value
-        terrier = animal.refs["type"]
+        terrier = animal.objects["type"]
 
         expected = example_data[operation_id]["default_example"]["type"]
 

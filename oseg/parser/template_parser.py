@@ -19,7 +19,7 @@ class TemplateParser:
         if not example_data.body:
             return {}
 
-        result = self._flatten_objects(example_data.body, "")
+        result = self._flatten_object(example_data.body, "")
 
         if single_body_value:
             result[example_data.body.type] = example_data.body
@@ -118,32 +118,32 @@ class TemplateParser:
             properties=http_optional,
         )
 
-        if example_data.body:
-            if single_body_value:
-                value = self._extension.setter_property_name(example_data.body.type)
+        if example_data.body and single_body_value:
+            value = self._extension.setter_property_name(example_data.body.type)
 
-                if example_data.body.is_required:
-                    params_required[example_data.body.type] = value
-                else:
-                    params_optional[example_data.body.type] = value
+            if example_data.body.is_required:
+                params_required[example_data.body.type] = value
             else:
-                body_params_required = self._parse_non_objects(
-                    macros=macros,
-                    parent_type="",
-                    properties=example_data.body.value.non_objects(True),
-                )
+                params_optional[example_data.body.type] = value
 
-                body_params_optional = self._parse_non_objects(
-                    macros=macros,
-                    parent_type="",
-                    properties=example_data.body.value.non_objects(False),
-                )
+        if example_data.body and not single_body_value:
+            body_params_required = self._parse_non_objects(
+                macros=macros,
+                parent_type="",
+                properties=example_data.body.value.non_objects(True),
+            )
 
-                for k, v in body_params_required.items():
-                    params_required[k] = v
+            body_params_optional = self._parse_non_objects(
+                macros=macros,
+                parent_type="",
+                properties=example_data.body.value.non_objects(False),
+            )
 
-                for k, v in body_params_optional.items():
-                    params_optional[k] = v
+            for k, v in body_params_required.items():
+                params_required[k] = v
+
+            for k, v in body_params_optional.items():
+                params_optional[k] = v
 
         if required_flag:
             params_optional = {}
@@ -155,7 +155,7 @@ class TemplateParser:
 
         return self._indent(params_required, indent_count)
 
-    def _flatten_objects(
+    def _flatten_object(
         self,
         obj: "model.PropertyObject",
         parent_name: str,
@@ -166,7 +166,7 @@ class TemplateParser:
         for name, sub_obj in obj.value.objects.items():
             sub_name = f"{parent_name}{name}"
 
-            sub_results = self._flatten_objects(sub_obj, sub_name)
+            sub_results = self._flatten_object(sub_obj, sub_name)
             result |= sub_results
             result[sub_name] = sub_obj
 
@@ -174,7 +174,7 @@ class TemplateParser:
             i = 1
             for sub_obj in array_obj.value:
                 sub_name = f"{parent_name}{name}_{i}"
-                sub_results = self._flatten_objects(sub_obj, sub_name)
+                sub_results = self._flatten_object(sub_obj, sub_name)
                 result |= sub_results
                 result[sub_name] = sub_obj
                 i += 1
