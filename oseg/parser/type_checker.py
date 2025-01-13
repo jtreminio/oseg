@@ -11,6 +11,14 @@ class TypeChecker:
         "string",
     ]
 
+    # Exclude "base64" because that will be considered a string in SDKs
+    _FILE_FORMATS = [
+        "byte",
+        "binary",
+    ]
+
+    _FILE_CONTENT_MEDIA_TYPE = "application/octet-stream"
+
     @classmethod
     def is_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
         return cls._is_of_type(schema, oa.DataType.ARRAY)
@@ -30,12 +38,17 @@ class TypeChecker:
             return False
 
         # 3.0
-        if hasattr(schema, "schema_format") and schema.schema_format == "binary":
+        if (
+            hasattr(schema, "schema_format")
+            and schema.schema_format in cls._FILE_FORMATS
+        ):
             return True
 
         # 3.1
-        return bool(
-            hasattr(schema, "contentMediaType") and schema.contentMediaType is not None
+        # ignore contentEncoding because that will be treated as string in SDKs
+        return (
+            hasattr(schema, "contentMediaType")
+            and schema.contentMediaType == cls._FILE_CONTENT_MEDIA_TYPE
         )
 
     @classmethod
@@ -100,17 +113,35 @@ class TypeChecker:
         )
 
     @classmethod
+    def is_nullable_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+        return cls.is_array(schema) and cls.is_nullable(schema)
+
+    @classmethod
     def _is_of_type(
         cls,
         schema: Union[BaseModel, oa.Schema],
         data_type: oa.DataType,
     ) -> bool:
-        return bool(
-            hasattr(schema, "type")
-            and schema.type
-            and schema.type.value == data_type.value
-        )
+        if not hasattr(schema, "type") or not schema.type:
+            return False
+
+        # 3.1
+        if isinstance(schema.type, list):
+            for t in schema.type:
+                if data_type.value == t.value:
+                    return True
+
+            return False
+
+        return schema.type.value == data_type.value
 
     @classmethod
-    def _is_of_scalar_type(cls, propery_type: str) -> bool:
+    def _is_of_scalar_type(cls, propery_type: str | list[str]) -> bool:
+        if isinstance(propery_type, list):
+            for t in propery_type:
+                if t.value in cls._SCALAR_TYPES:
+                    return True
+
+            return False
+
         return propery_type in cls._SCALAR_TYPES

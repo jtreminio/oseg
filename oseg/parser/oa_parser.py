@@ -12,6 +12,10 @@ class OaParser:
     def paths(self) -> dict[str, oa.PathItem]:
         return self._openapi.paths
 
+    @property
+    def components(self) -> oa.Components:
+        return self._openapi.components
+
     def resolve_component(self, ref: str) -> "model.ResolvedComponent[oa.Schema]":
         return self._get_resolved_component(ref, self._openapi.components.schemas)
 
