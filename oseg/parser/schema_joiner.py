@@ -129,6 +129,9 @@ class SchemaJoiner:
 
                     continue
 
+            if not hasattr(schema, "properties") or schema.properties is None:
+                continue
+
             for property_name, property_schema in schema.properties.items():
                 if property_name not in result:
                     result[property_name] = property_schema

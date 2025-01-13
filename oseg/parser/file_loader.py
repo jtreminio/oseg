@@ -23,9 +23,11 @@ class FileLoader:
 
         with open(filename, "r", encoding="utf-8") as f:
             if Path(filename).suffix == ".json":
-                return json.load(f)
+                results = json.load(f)
+            else:
+                results = yaml.safe_load(f)
 
-            return yaml.safe_load(f)
+            return results if isinstance(results, dict) else {}
 
     def get_example_data(self, example_schema: oa.Example) -> dict[str, any] | None:
         """Read example data from external file.
@@ -34,6 +36,9 @@ class FileLoader:
         Filenames are prepended with the directory where the OAS file is
         located.
         """
+
+        if not isinstance(example_schema.value, dict):
+            return None
 
         filename = example_schema.value.get("$ref")
 

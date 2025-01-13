@@ -30,6 +30,9 @@ class PropertyParser:
         schemas = merged_values.schemas
         properties = merged_values.properties
 
+        if not len(properties.keys()):
+            return property_container
+
         if merged_values.discriminator_target_type:
             property_container.set_discriminator(
                 merged_values.discriminator_target_type

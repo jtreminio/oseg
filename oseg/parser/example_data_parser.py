@@ -151,7 +151,7 @@ class ExampleDataParser:
                 operation
             )
 
-        if not len(example_data.keys()):
+        if not isinstance(example_data, dict) or not len(example_data.keys()):
             return None
 
         http_key_name = "__http__"
@@ -218,7 +218,11 @@ class ExampleDataParser:
         results = []
 
         # only a single example
-        if content.example and len(content.example.keys()):
+        if (
+            content.example
+            and isinstance(content.example, dict)
+            and len(content.example.keys())
+        ):
             results.append(
                 RequestExampleData(
                     name=self._DEFAULT_EXAMPLE_NAME,
@@ -257,7 +261,7 @@ class ExampleDataParser:
 
                 inline_data = schema.value if hasattr(schema, "value") else None
 
-                if inline_data is not None:
+                if inline_data is not None and isinstance(inline_data, dict):
                     results.append(
                         RequestExampleData(
                             name=example_name,
@@ -269,9 +273,12 @@ class ExampleDataParser:
         # merge data from components
         if content.media_type_schema:
             component_examples = self._parse_components(content.media_type_schema)
+            component_examples_valid = bool(
+                component_examples and isinstance(component_examples, dict)
+            )
 
             # no results so far, use whatever came from component examples
-            if component_examples and not len(results):
+            if component_examples_valid and not len(results):
                 results.append(
                     RequestExampleData(
                         name=self._DEFAULT_EXAMPLE_NAME,
@@ -280,7 +287,7 @@ class ExampleDataParser:
                     )
                 )
             # apply component example data to existing example data
-            elif component_examples:
+            elif component_examples_valid:
                 for result in results:
                     result.body = {
                         **result.body,
