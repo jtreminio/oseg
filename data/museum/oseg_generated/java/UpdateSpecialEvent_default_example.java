@@ -17,10 +17,10 @@ public class UpdateSpecialEvent_default_example
         var config = Configuration.getDefaultApiClient();
 
         var specialEventFields = new SpecialEventFields()
-            .location("On the beach.")
-            .price(15F)
             .name(null)
-            .eventDescription(null);
+            .location("On the beach.")
+            .eventDescription(null)
+            .price(15F);
 
         try
         {

@@ -17,10 +17,10 @@ public class BuyMuseumTickets_general_entry
         var config = Configuration.getDefaultApiClient();
 
         var buyMuseumTickets = new BuyMuseumTickets()
-            .ticketType(BuyMuseumTickets.TicketTypeEnum.GENERAL)
-            .ticketDate("2023-09-07")
             .email("todd@example.com")
             .ticketId(null)
+            .ticketDate("2023-09-07")
+            .ticketType(BuyMuseumTickets.TicketTypeEnum.GENERAL)
             .eventId(null);
 
         try

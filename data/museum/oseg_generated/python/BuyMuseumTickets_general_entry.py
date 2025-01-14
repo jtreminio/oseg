@@ -6,10 +6,10 @@ configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
     buy_museum_tickets = models.BuyMuseumTickets()
-    buy_museum_tickets.ticketType = "general"
-    buy_museum_tickets.ticketDate = "2023-09-07"
     buy_museum_tickets.email = "todd@example.com"
     buy_museum_tickets.ticketId = None
+    buy_museum_tickets.ticketDate = "2023-09-07"
+    buy_museum_tickets.ticketType = "general"
     buy_museum_tickets.eventId = None
 
     try:

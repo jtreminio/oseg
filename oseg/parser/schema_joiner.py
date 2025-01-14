@@ -16,7 +16,7 @@ class SchemaJoiner:
 
     def merge_schemas_and_properties(
         self,
-        schema: oa.Reference | oa.Schema,
+        schema: oa.Schema,
         data: dict[str, any] | None,
     ) -> JoinedValues:
         """When a Schema uses allOf will merge all Schemas and the properties
@@ -26,8 +26,6 @@ class SchemaJoiner:
 
         data is only used by discriminator
         """
-
-        schema = self._oa_parser.resolve_component(schema)
 
         discriminated = self._resolve_discriminator(schema, data)
 

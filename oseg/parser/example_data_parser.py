@@ -350,13 +350,8 @@ class ExampleDataParser:
         if not request_body_content:
             return
 
-        self._property_parser.order_by_example_data(
-            request_body_content.name != self._INLINE_REQUEST_BODY_NAME,
-        )
-
         container = self._property_parser.parse(
             schema=request_body_content.schema,
-            type=request_body_content.name,
             data=example.body,
         )
 

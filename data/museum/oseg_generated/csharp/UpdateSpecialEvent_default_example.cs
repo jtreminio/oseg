@@ -13,10 +13,10 @@ public class UpdateSpecialEventDefaultExample
         var config = new Configuration();
 
         var specialEventFields = new SpecialEventFields(
-            location: "On the beach.",
-            price: 15,
             name: null,
-            eventDescription: null
+            location: "On the beach.",
+            eventDescription: null,
+            price: 15
         );
 
         try

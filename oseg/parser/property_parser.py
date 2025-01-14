@@ -3,149 +3,133 @@ from oseg import model, parser
 
 
 class PropertyParser:
-    def __init__(
-        self,
-        oa_parser: parser.OaParser,
-    ):
+    def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser = oa_parser
         self._schema_joiner = parser.SchemaJoiner(oa_parser)
-        self._order_by_example_data = True
-
-    def order_by_example_data(self, flag: bool) -> None:
-        self._order_by_example_data = flag
 
     def parse(
         self,
         schema: oa.Schema,
-        type: str | None,
         data: dict[str, any],
     ) -> "model.PropertyContainer":
-        property_container = model.PropertyContainer(schema, type)
-
         if data is None:
             data = {}
 
+        schema = self._oa_parser.resolve_component(schema)
+        schema_type = self._oa_parser.get_schema_name(schema)
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
-
-        schemas = merged_values.schemas
         properties = merged_values.properties
 
-        if not len(properties.keys()):
-            return property_container
+        property_container = model.PropertyContainer(schema, schema_type)
+        property_container.set_discriminator(merged_values.discriminator_target_type)
 
-        if merged_values.discriminator_target_type:
-            property_container.set_discriminator(
-                merged_values.discriminator_target_type
-            )
+        processed_properties = []
 
-        # properties with example data are listed first
-        sorted_properties = self._sort_property_names(data, properties)
+        for name, property_schema in properties.items():
+            value = data.get(name)
 
-        for property_name in sorted_properties:
-            property_schema = properties.get(property_name)
-            property_value = data.get(property_name) if data is not None else None
-
-            if self.handle_ref(
+            if self._handle_ref(
                 property_container=property_container,
                 schema=property_schema,
-                name=property_name,
-                value=property_value,
+                name=name,
+                value=value,
             ):
+                processed_properties.append(name)
+
                 continue
 
             if self._handle_array_ref(
                 property_container=property_container,
                 schema=property_schema,
-                name=property_name,
-                value=property_value,
+                name=name,
+                value=value,
             ):
+                processed_properties.append(name)
+
                 continue
 
-        for property_name in sorted_properties:
-            for current_schema in schemas:
+        for name, property_schema in properties.items():
+            if name in processed_properties:
+                continue
+
+            for current_schema in merged_values.schemas:
                 property_schema = self._oa_parser.resolve_property(
                     schema=current_schema,
-                    property_name=property_name,
+                    property_name=name,
                 )
 
                 if not property_schema:
                     continue
 
-                property_value = data.get(property_name) if data is not None else None
+                value = data.get(name)
 
                 if self._handle_file(
                     property_container=property_container,
                     schema=property_schema,
-                    name=property_name,
-                    value=property_value,
+                    name=name,
+                    value=value,
                 ):
                     continue
 
                 if self._handle_free_form(
                     property_container=property_container,
                     schema=property_schema,
-                    name=property_name,
-                    value=property_value,
+                    name=name,
+                    value=value,
                 ):
                     continue
 
                 if self._handle_scalar(
                     property_container=property_container,
                     schema=property_schema,
-                    name=property_name,
-                    value=property_value,
+                    name=name,
+                    value=value,
                 ):
                     continue
 
         return property_container
 
-    def handle_ref(
+    def _handle_ref(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
-        value: any,
+        value: dict[str, any] | None,
     ) -> bool:
         """handle complex nested object schema with 'ref'"""
 
         if not parser.TypeChecker.is_ref(schema):
             return False
 
-        value: dict[str, any]
-
-        resolved = self._oa_parser.resolve_component(schema)
-        resolved_name = self._oa_parser.get_schema_name(resolved)
+        schema = self._oa_parser.resolve_component(schema)
+        resolved_type = self._oa_parser.get_schema_name(schema)
 
         # allOf to be handled recursively
-        if not parser.TypeChecker.is_object(resolved) and resolved.allOf is None:
+        if not parser.TypeChecker.is_object(schema) and not schema.allOf:
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = resolved.default
+            value = schema.default
 
             if value is None:
                 return False
 
-        parsed = self.parse(
-            schema=resolved,
-            type=resolved_name,
-            data=value,
-        )
+        parsed = self.parse(schema, value)
 
-        property_ref = model.PropertyObject(
+        property_object = model.PropertyObject(
             name=name,
             value=parsed,
-            schema=resolved,
+            schema=schema,
             parent=property_container.schema,
         )
-        property_ref.type = resolved_name
+        property_object.type = resolved_type
 
         if parsed.discriminator_base_type:
-            property_ref.set_discriminator(parsed.type)
+            property_object.set_discriminator(parsed.type)
 
-        property_container.add(name, property_ref)
+        property_container.add(name, property_object)
 
         return True
 
@@ -154,24 +138,24 @@ class PropertyParser:
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
-        value: any,
+        value: dict[str, any] | None,
     ) -> bool:
         """handle arrays of complex objects"""
 
         if not parser.TypeChecker.is_ref_array(schema):
             return False
 
-        resolved = self._oa_parser.resolve_component(schema.items)
-        resolved_name = self._oa_parser.get_schema_name(resolved)
+        schema = self._oa_parser.resolve_component(schema.items)
+        resolved_type = self._oa_parser.get_schema_name(schema)
 
         # allOf to be handled recursively
-        if not parser.TypeChecker.is_object(resolved) and resolved.allOf is None:
+        if not parser.TypeChecker.is_object(schema) and not schema.allOf:
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = resolved.default
+            value = schema.default
 
             if value is None:
                 return False
@@ -184,36 +168,30 @@ class PropertyParser:
             parent = property_container.schema
 
         for example in value:
-            parsed = self.parse(
-                schema=resolved,
-                type=resolved_name,
-                data=example,
-            )
+            parsed = self.parse(schema, example)
 
-            target_schema_type = resolved_name
-
-            property_ref = model.PropertyObject(
+            property_object = model.PropertyObject(
                 name=name,
                 value=parsed,
-                schema=resolved,
+                schema=schema,
                 parent=parent,
             )
-            property_ref.type = target_schema_type
+            property_object.type = resolved_type
 
             if parsed.discriminator_base_type:
-                property_ref.set_discriminator(parsed.type)
+                property_object.set_discriminator(parsed.type)
 
-            result.append(property_ref)
+            result.append(property_object)
 
-        property_ref_array = model.PropertyObjectArray(
+        property_object_array = model.PropertyObjectArray(
             name=name,
             value=result,
             schema=parent,
             parent=property_container.schema,
         )
-        property_ref_array.type = resolved_name
+        property_object_array.type = resolved_type
 
-        property_container.add(name, property_ref_array)
+        property_container.add(name, property_object_array)
 
         return True
 
@@ -250,7 +228,7 @@ class PropertyParser:
         name: str,
         value: any,
     ) -> bool:
-        """handle non-ref objects, ignore inline schemas that should use $ref"""
+        """handle free-form type, ignore inline schemas that should use $ref"""
 
         if not parser.TypeChecker.is_free_form(
             schema
@@ -294,30 +272,6 @@ class PropertyParser:
         )
 
         return True
-
-    def _sort_property_names(
-        self,
-        data: dict[str, any],
-        properties: dict[str, oa.Reference | oa.Schema],
-    ) -> list[str]:
-        if self._order_by_example_data:
-            # properties with example data are listed first
-            sorted_properties = list(data)
-
-            # properties without example data are listed last
-            for property_name, _ in properties.items():
-                if property_name not in sorted_properties:
-                    sorted_properties.append(property_name)
-
-            return sorted_properties
-
-        sorted_properties = list(properties)
-
-        for property_name, _ in data.items():
-            if property_name not in sorted_properties:
-                sorted_properties.append(property_name)
-
-        return sorted_properties
 
     def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
         return schema.required and prop_name in schema.required
