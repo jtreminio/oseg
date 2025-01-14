@@ -133,7 +133,7 @@ class TypeChecker:
         return schema.type.value == data_type.value
 
     @classmethod
-    def _is_of_scalar_type(cls, propery_type: str | list[str]) -> bool:
+    def _is_of_scalar_type(cls, propery_type: oa.DataType | list[oa.DataType]) -> bool:
         if isinstance(propery_type, list):
             for t in propery_type:
                 if t.value in cls._SCALAR_TYPES:

@@ -9,7 +9,7 @@ class TestTypeChecker(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("type-checker"))
+            parser.FileLoader(TestUtils.fixture_file("type_checker"))
         )
 
     def test_is_array(self):
@@ -178,7 +178,7 @@ class TestTypeChecker(unittest.TestCase):
 
     def test_is_nullable_30(self):
         oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("type-checker-3.0"))
+            parser.FileLoader(TestUtils.fixture_file("type_checker-3.0"))
         )
 
         together = oa_parser.components.schemas.get("Together")

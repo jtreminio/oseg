@@ -10,11 +10,11 @@ class TestOperationParser(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.oa_parser_requests = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("operation-parser-requests"))
+            parser.FileLoader(TestUtils.fixture_file("operation_parser-requests"))
         )
 
         cls.oa_parser_responses = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("operation-parser-responses"))
+            parser.FileLoader(TestUtils.fixture_file("operation_parser-responses"))
         )
 
     def test_has_form_data(self):
