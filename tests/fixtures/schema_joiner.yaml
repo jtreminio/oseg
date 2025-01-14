@@ -1,0 +1,61 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Fixture - Schema Joiner
+tags:
+  - name: pet
+paths:
+  /default:
+    post:
+      tags:
+        - pet
+      operationId: default
+      responses:
+        '200':
+          description: Successful operation
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+    Dog:
+      type: object
+      properties:
+        id:
+          type: integer
+        breed:
+          type: string
+        benefits:
+          $ref: '#/components/schemas/Benefits'
+      discriminator:
+        propertyName: breed
+        mapping:
+          beagle: '#/components/schemas/Beagle'
+          terrier: '#/components/schemas/Terrier'
+    Beagle:
+      allOf:
+        - $ref: '#/components/schemas/Dog'
+        -
+          type: object
+          properties:
+            group:
+              type: string
+              default: hound
+    Terrier:
+      allOf:
+        - $ref: '#/components/schemas/Dog'
+        -
+          type: object
+          properties:
+            group:
+              type: string
+              default: hunting
+    Benefits:
+      type: object
+      properties:
+        mans_best_friend:
+          type: boolean

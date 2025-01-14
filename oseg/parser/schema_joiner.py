@@ -16,21 +16,25 @@ class SchemaJoiner:
 
     def merge_schemas_and_properties(
         self,
-        schema: oa.Schema,
+        schema: oa.Reference | oa.Schema,
         data: dict[str, any] | None,
     ) -> JoinedValues:
         """When a Schema uses allOf will merge all Schemas and the properties
         of those Schemas.
 
         Currently only useful for Schema that use a discriminator and allOf.
+
+        data is only used by discriminator
         """
+
+        schema = self._oa_parser.resolve_component(schema)
 
         discriminated = self._resolve_discriminator(schema, data)
 
         if discriminated:
             return discriminated
 
-        all_of = self._resolve_all_of(schema, data)
+        all_of = self._resolve_all_of(schema)
 
         if all_of:
             return all_of
@@ -74,29 +78,19 @@ class SchemaJoiner:
             self._oa_parser.components.schemas.get(resolved_name)
         )
 
-        joined = self._resolve_all_of(
-            schema=resolved,
-            data=data,
-        )
+        joined = self._resolve_all_of(resolved)
         joined.discriminator_target_type = resolved_name
 
         return joined
 
-    def _resolve_all_of(
-        self,
-        schema: oa.Schema,
-        data: dict[str, any] | None,
-    ) -> JoinedValues | None:
+    def _resolve_all_of(self, schema: oa.Schema) -> JoinedValues | None:
         """Returns all schemas that build a ref via allOf.
 
         The last Schema will always take precedence with regards to properties
         and other metadata
         """
 
-        if data is None:
-            return None
-
-        if not hasattr(schema, "allOf") or not schema.allOf:
+        if not schema.allOf:
             return None
 
         schemas = []
