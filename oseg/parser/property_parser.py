@@ -63,19 +63,19 @@ class PropertyParser:
 
         for property_name in sorted_properties:
             for current_schema in schemas:
-                resolved = self._oa_parser.resolve_property(
-                    name=property_name,
-                    properties=current_schema.properties,
+                property_schema = self._oa_parser.resolve_property(
+                    schema=current_schema,
+                    property_name=property_name,
                 )
 
-                if not resolved:
+                if not property_schema:
                     continue
 
                 property_value = data.get(property_name) if data is not None else None
 
                 if self._handle_file(
                     property_container=property_container,
-                    schema=resolved.schema,
+                    schema=property_schema,
                     name=property_name,
                     value=property_value,
                 ):
@@ -83,7 +83,7 @@ class PropertyParser:
 
                 if self._handle_free_form(
                     property_container=property_container,
-                    schema=resolved.schema,
+                    schema=property_schema,
                     name=property_name,
                     value=property_value,
                 ):
@@ -91,7 +91,7 @@ class PropertyParser:
 
                 if self._handle_scalar(
                     property_container=property_container,
-                    schema=resolved.schema,
+                    schema=property_schema,
                     name=property_name,
                     value=property_value,
                 ):
@@ -113,36 +113,34 @@ class PropertyParser:
 
         value: dict[str, any]
 
-        resolved = self._oa_parser.resolve_component(schema.ref)
+        resolved = self._oa_parser.resolve_component(schema)
+        resolved_name = self._oa_parser.get_schema_name(resolved)
 
         # allOf to be handled recursively
-        if (
-            not parser.TypeChecker.is_object(resolved.schema)
-            and resolved.schema.allOf is None
-        ):
+        if not parser.TypeChecker.is_object(resolved) and resolved.allOf is None:
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = resolved.schema.default
+            value = resolved.default
 
             if value is None:
                 return False
 
         parsed = self.parse(
-            schema=resolved.schema,
-            type=resolved.type,
+            schema=resolved,
+            type=resolved_name,
             data=value,
         )
 
         property_ref = model.PropertyObject(
             name=name,
             value=parsed,
-            schema=resolved.schema,
+            schema=resolved,
             parent=property_container.schema,
         )
-        property_ref.type = resolved.type
+        property_ref.type = resolved_name
 
         if parsed.discriminator_base_type:
             property_ref.set_discriminator(parsed.type)
@@ -163,19 +161,17 @@ class PropertyParser:
         if not parser.TypeChecker.is_ref_array(schema):
             return False
 
-        resolved = self._oa_parser.resolve_component(schema.items.ref)
+        resolved = self._oa_parser.resolve_component(schema.items)
+        resolved_name = self._oa_parser.get_schema_name(resolved)
 
         # allOf to be handled recursively
-        if (
-            not parser.TypeChecker.is_object(resolved.schema)
-            and resolved.schema.allOf is None
-        ):
+        if not parser.TypeChecker.is_object(resolved) and resolved.allOf is None:
             return False
 
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = resolved.schema.default
+            value = resolved.default
 
             if value is None:
                 return False
@@ -189,17 +185,17 @@ class PropertyParser:
 
         for example in value:
             parsed = self.parse(
-                schema=resolved.schema,
-                type=resolved.type,
+                schema=resolved,
+                type=resolved_name,
                 data=example,
             )
 
-            target_schema_type = resolved.type
+            target_schema_type = resolved_name
 
             property_ref = model.PropertyObject(
                 name=name,
                 value=parsed,
-                schema=resolved.schema,
+                schema=resolved,
                 parent=parent,
             )
             property_ref.type = target_schema_type
@@ -215,7 +211,7 @@ class PropertyParser:
             schema=parent,
             parent=property_container.schema,
         )
-        property_ref_array.type = resolved.type
+        property_ref_array.type = resolved_name
 
         property_container.add(name, property_ref_array)
 

@@ -69,13 +69,16 @@ class SchemaJoiner:
         if not ref:
             return None
 
-        resolved = self._oa_parser.resolve_component(ref)
+        resolved_name = ref.split("/").pop()
+        resolved = self._oa_parser.resolve_component(
+            self._oa_parser.components.schemas.get(resolved_name)
+        )
 
         joined = self._resolve_all_of(
-            schema=resolved.schema,
+            schema=resolved,
             data=data,
         )
-        joined.discriminator_target_type = resolved.type
+        joined.discriminator_target_type = resolved_name
 
         return joined
 
@@ -99,12 +102,7 @@ class SchemaJoiner:
         schemas = []
 
         for i in schema.allOf:
-            property_schema = i
-
-            if parser.TypeChecker.is_ref(i):
-                property_schema = self._oa_parser.resolve_component(i.ref).schema
-
-            schemas.append(property_schema)
+            schemas.append(self._oa_parser.resolve_component(i))
 
         return JoinedValues(
             schemas=schemas,
@@ -120,9 +118,8 @@ class SchemaJoiner:
         for schema in schemas:
             # property could be an array of refs
             if parser.TypeChecker.is_ref_array(schema):
-                body_name = self._oa_parser.resolve_component(
-                    schema.items.ref,
-                ).type.lower()
+                ref_schema = self._oa_parser.resolve_component(schema.items)
+                body_name = self._oa_parser.get_schema_name(ref_schema).lower()
 
                 if body_name not in result:
                     result[body_name] = schema

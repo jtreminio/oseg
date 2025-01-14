@@ -63,10 +63,10 @@ class ExampleDataParser:
             return
 
         if parser.TypeChecker.is_ref(operation.requestBody):
-            resolved = self._oa_parser.resolve_request_body(operation.requestBody.ref)
+            schema = self._oa_parser.resolve_request_body(operation.requestBody)
 
-            contents = resolved.schema.content
-            required = resolved.schema.required
+            contents = schema.content
+            required = schema.required
         elif self._has_content(operation):
             contents = operation.requestBody.content
             required = operation.requestBody.required
@@ -87,15 +87,14 @@ class ExampleDataParser:
             return
 
         if parser.TypeChecker.is_ref(content.media_type_schema):
-            resolved = self._oa_parser.resolve_component(content.media_type_schema.ref)
-            name = resolved.type
-            schema = resolved.schema
+            schema = self._oa_parser.resolve_component(content.media_type_schema)
+            name = self._oa_parser.get_schema_name(schema)
         elif parser.TypeChecker.is_ref_array(content.media_type_schema):
-            resolved = self._oa_parser.resolve_component(
-                content.media_type_schema.items.ref
+            items_schema = self._oa_parser.resolve_component(
+                content.media_type_schema.items
             )
-            name = resolved.type
             schema = content.media_type_schema
+            name = self._oa_parser.get_schema_name(items_schema)
         # inline schema definition
         elif hasattr(content.media_type_schema, "type"):
             name = self._INLINE_REQUEST_BODY_NAME
@@ -239,13 +238,7 @@ class ExampleDataParser:
                         f" schema {operation.operationId}.{example_name}"
                     )
 
-                # switch to $ref schema if necessary
-                if parser.TypeChecker.is_ref(schema):
-                    resolved = self._oa_parser.resolve_example(schema.ref)
-
-                    if resolved:
-                        schema = resolved.schema
-
+                schema = self._oa_parser.resolve_example(schema)
                 file_data = self._file_loader.get_example_data(schema)
 
                 if file_data:
@@ -317,8 +310,7 @@ class ExampleDataParser:
         parameters = operation.parameters if operation.parameters else []
 
         for parameter in parameters:
-            if parser.TypeChecker.is_ref(parameter):
-                parameter = self._oa_parser.resolve_parameter(parameter.ref).schema
+            parameter = self._oa_parser.resolve_parameter(parameter)
 
             if parameter.param_in not in allowed_param_in:
                 continue
@@ -396,9 +388,7 @@ class ExampleDataParser:
         if not parser.TypeChecker.is_ref(schema):
             return {}
 
-        return self._parse_components(
-            self._oa_parser.resolve_component(schema.ref).schema
-        )
+        return self._parse_components(self._oa_parser.resolve_component(schema))
 
     def _example_data_from_ref_array(
         self,

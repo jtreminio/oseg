@@ -74,8 +74,7 @@ class OperationParser:
         """
 
         for _, response in operation.responses.items():
-            if parser.TypeChecker.is_ref(response):
-                response = self._oa_parser.resolve_response(response.ref).schema
+            response = self._oa_parser.resolve_response(response)
 
             if not response.content:
                 continue
@@ -84,11 +83,7 @@ class OperationParser:
                 if not media_type or not media_type.media_type_schema:
                     continue
 
-                schema = media_type.media_type_schema
-
-                if parser.TypeChecker.is_ref(schema):
-                    schema = self._oa_parser.resolve_component(schema.ref).schema
-
+                schema = self._oa_parser.resolve_component(media_type.media_type_schema)
                 request_operation.has_response = True
 
                 if parser.TypeChecker.is_file(schema):
@@ -121,10 +116,7 @@ class OperationParser:
         if not operation.requestBody:
             return False
 
-        request_body = operation.requestBody
-
-        if parser.TypeChecker.is_ref(request_body):
-            request_body = self._oa_parser.resolve_request_body(request_body.ref).schema
+        request_body = self._oa_parser.resolve_request_body(operation.requestBody)
 
         if hasattr(request_body, "content") and not len(request_body.content.keys()):
             return False
