@@ -2,7 +2,7 @@ import os
 from oseg import Generator
 
 
-if __name__ == "__main__":
+def main():
     __DIR = os.path.dirname(os.path.abspath(__file__))
 
     projects = [
@@ -38,3 +38,7 @@ if __name__ == "__main__":
                 config_file=config_file,
                 output_dir=f"{__DIR}/data/{project}/oseg_generated/{sdk}",
             )
+
+
+if __name__ == "__main__":
+    main()

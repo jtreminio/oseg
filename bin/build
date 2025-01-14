@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+BASE_DIR="${DIR}/.."
+
+if [[ -f "${BASE_DIR}/venv/bin/python" ]]; then
+  PYTHON="venv/bin/python"
+else
+  PYTHON="python3"
+fi
+
+pushd "${BASE_DIR}"
+${PYTHON} -m build --wheel
+popd
