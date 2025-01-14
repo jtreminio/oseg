@@ -47,10 +47,7 @@ class OaParser:
     def resolve_response(self, schema: oa.Response | oa.Reference) -> oa.Response:
         return self._get_resolved_component(schema, self.components.responses)
 
-    def resolve_example(
-        self,
-        schema: oa.Example | oa.Reference,
-    ) -> oa.Example | None:
+    def resolve_example(self, schema: oa.Example | oa.Reference) -> oa.Example | None:
         return self._get_resolved_component(schema, self.components.examples)
 
     def resolve_property(

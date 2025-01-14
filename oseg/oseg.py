@@ -1,5 +1,4 @@
 import os
-import yaml
 from . import jinja_extension, model, parser
 
 
@@ -13,19 +12,17 @@ class Generator:
     ):
         self._generator_extension = jinja_extension.GeneratorExtension.factory()
 
-        file_loader = parser.FileLoader(
+        self._file_loader = parser.FileLoader(
             oas_file=oas_file,
             example_data_dir=example_data_dir,
         )
 
-        oa_parser = parser.OaParser(file_loader)
-
-        property_parser = parser.PropertyParser(oa_parser)
+        oa_parser = parser.OaParser(self._file_loader)
 
         example_data_parser = parser.ExampleDataParser(
             oa_parser=oa_parser,
-            file_loader=file_loader,
-            property_parser=property_parser,
+            file_loader=self._file_loader,
+            property_parser=parser.PropertyParser(oa_parser),
             example_data=example_data,
         )
 
@@ -42,7 +39,6 @@ class Generator:
         output_dir: str,
     ) -> int:
         sdk_options = self._get_sdk_options(config_file)
-
         self._generator_extension.sdk_generator = sdk_options
         file_extension = self._generator_extension.sdk_generator.FILE_EXTENSION
 
@@ -60,10 +56,6 @@ class Generator:
                 )
 
         return 0
-
-    @property
-    def request_operations(self) -> dict[str, model.RequestOperation]:
-        return self._operation_parser.operations
 
     def _parse_request_operation(
         self,
@@ -93,14 +85,9 @@ class Generator:
             f.write(rendered)
 
     def _get_sdk_options(self, config_file: str) -> model.SdkOptions:
-        if not os.path.isfile(config_file):
-            raise NotImplementedError(f"{config_file} does not exist or is unreadable")
+        data = self._file_loader.get_file_contents(config_file)
 
-        file = open(config_file, "r")
-        data = yaml.safe_load(file)
-        file.close()
-
-        if not data or not len(data):
+        if not len(data):
             raise NotImplementedError(f"{config_file} contains invalid data")
 
         return model.SdkOptions(config_file, data)

@@ -80,7 +80,7 @@ class OperationParser:
                 continue
 
             for _, media_type in response.content.items():
-                if not media_type or not media_type.media_type_schema:
+                if not media_type.media_type_schema:
                     continue
 
                 schema = self._oa_parser.resolve_component(media_type.media_type_schema)
@@ -118,8 +118,7 @@ class OperationParser:
 
         request_body = self._oa_parser.resolve_request_body(operation.requestBody)
 
-        if hasattr(request_body, "content") and not len(request_body.content.keys()):
-            return False
-
         for content_type, body in request_body.content.items():
             return content_type in self._FORM_DATA_CONTENT_TYPES
+
+        return False
