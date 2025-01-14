@@ -4,9 +4,22 @@ import openapi_pydantic as oa
 from oseg import model, parser
 
 
+class NamedSchema:
+    def __init__(self, name: str, schema: oa.Schema):
+        self.name = name
+        self.schema = schema
+
+
 class OaParser:
     def __init__(self, file_loader: "parser.FileLoader"):
         self._openapi: oa.OpenAPI = oa.parse_obj(file_loader.oas())
+        self._named_schemas: dict[int, NamedSchema] = {}
+
+        for name, schema in self.components.schemas.items():
+            self._named_schemas[id(schema)] = NamedSchema(
+                name=name,
+                schema=schema,
+            )
 
     @property
     def paths(self) -> dict[str, oa.PathItem]:
@@ -79,6 +92,14 @@ class OaParser:
             type=name,
             schema=schema,
         )
+
+    def get_schema_name(self, schema: oa.Schema) -> str | None:
+        schema_id = id(schema)
+
+        if schema_id in self._named_schemas:
+            return self._named_schemas[schema_id].name
+
+        return None
 
     def _get_resolved_component(
         self,
