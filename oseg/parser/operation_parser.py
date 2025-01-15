@@ -27,6 +27,9 @@ class OperationParser:
         self._oa_parser = oa_parser
         self._request_operations: dict[str, model.RequestOperation] = {}
 
+        if operation_id:
+            operation_id = operation_id.lower()
+
         self._setup_request_operations(operation_id)
 
     @property
@@ -34,9 +37,6 @@ class OperationParser:
         return self._request_operations
 
     def _setup_request_operations(self, operation_id: str | None) -> None:
-        if operation_id:
-            operation_id = operation_id.lower()
-
         for path, path_item in self._oa_parser.paths.items():
             for method in self.HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
@@ -85,9 +85,9 @@ class OperationParser:
 
                 schema = self._oa_parser.resolve_component(media_type.media_type_schema)
                 request_operation.has_response = True
-
-                if parser.TypeChecker.is_file(schema):
-                    request_operation.is_binary_response = True
+                request_operation.is_binary_response = parser.TypeChecker.is_file(
+                    schema
+                )
 
                 return
 
@@ -116,9 +116,7 @@ class OperationParser:
         if not operation.requestBody:
             return False
 
-        request_body = self._oa_parser.resolve_request_body(operation.requestBody)
-
-        for content_type, body in request_body.content.items():
+        for content_type, body in operation.requestBody.content.items():
             return content_type in self._FORM_DATA_CONTENT_TYPES
 
         return False

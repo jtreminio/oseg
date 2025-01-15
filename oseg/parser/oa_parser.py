@@ -83,6 +83,9 @@ class OaParser:
         if not self._openapi.components.schemas:
             self._openapi.components.schemas = {}
 
+        if not self._openapi.components.requestBodies:
+            self._openapi.components.requestBodies = {}
+
         if not self._openapi.paths:
             self._openapi.paths = {}
 

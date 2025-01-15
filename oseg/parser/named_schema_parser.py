@@ -1,5 +1,15 @@
+from typing import Union
+
 import openapi_pydantic as oa
 from oseg import parser
+
+RESOLVABLE = Union[
+    oa.Example,
+    oa.Parameter,
+    oa.RequestBody,
+    oa.Response,
+    oa.Schema,
+]
 
 
 class NamedSchemaParser:
@@ -44,24 +54,25 @@ class NamedSchemaParser:
         self._names: dict[int, str] = {}
 
         self._find_component_schemas()
+        self._find_component_request_bodies()
         self._find_request_schemas()
 
-    def name(self, schema: oa.Schema) -> str | None:
+    def name(self, schema: RESOLVABLE) -> str | None:
         schema_id = id(schema)
 
         return self._names[schema_id] if schema_id in self._names else None
 
-    def _add(self, schema: oa.Schema, name: str) -> None:
+    def _add(self, schema: RESOLVABLE, name: str) -> None:
         self._names[id(schema)] = name
 
     def _find_component_schemas(self) -> None:
-        """Find named Component Schemas in '#/components/schemas/' first.
+        """Find named in '#/components/schemas/' first.
 
         Doing this process prevents incorrectly generating
         dynamically-named Schemas later on.
         """
 
-        component_schemas = {}
+        components = {}
 
         for name, schema in self._oa_parser.components.schemas.items():
             schema = self._oa_parser.resolve_component(schema)
@@ -71,10 +82,34 @@ class NamedSchemaParser:
                 continue
 
             self._add(schema, name)
-            component_schemas[name] = schema
+            components[name] = schema
 
-        for name, schema in component_schemas.items():
+        for name, schema in components.items():
             self._find_property_schemas(schema, name)
+
+    def _find_component_request_bodies(self) -> None:
+        """Find named in '#/components/requestBodies/'."""
+
+        for name, schema in self._oa_parser.components.requestBodies.items():
+            schema = self._oa_parser.resolve_request_body(schema)
+            self._oa_parser.components.requestBodies[name] = schema
+
+            if not self._is_nameable(schema):
+                continue
+
+            self._add(schema, name)
+
+            for content_type, media_type in schema.content.items():
+                media_type.media_type_schema = self._oa_parser.resolve_component(
+                    media_type.media_type_schema
+                )
+
+                if parser.TypeChecker.is_array(media_type.media_type_schema):
+                    media_type.media_type_schema.items = (
+                        self._oa_parser.resolve_component(
+                            media_type.media_type_schema.items
+                        )
+                    )
 
     def _find_request_schemas(self) -> None:
         """Operation Requests will contain schemas in 'parameters'
@@ -117,7 +152,7 @@ class NamedSchemaParser:
                     )
 
                     # openapi-generator will only ever look at the first request
-                    return
+                    break
 
     def _find_property_schemas(
         self,
@@ -149,16 +184,17 @@ class NamedSchemaParser:
         if self.name(schema):
             return
 
+        if parser.TypeChecker.is_array(schema):
+            schema.items = self._oa_parser.resolve_component(schema.items)
+
         if parser.TypeChecker.is_object_array(schema):
             """We do not want to get too crazy with unnamed nested arrays!
             It gets complicated quite quickly.
+            Nested array of non-named Schema type=object is not supported.
+            Instead, create a named schema in #/components/schemas/ and use $ref
             """
 
-            raise NotImplementedError(
-                "Nested array of non-named Schema type=object is not supported: "
-                f"{parent_name}#{name}. Instead, create a named schema "
-                "in #/components/schemas/ and use $ref"
-            )
+            return
 
         if parser.TypeChecker.is_array(schema):
             schema.items = self._oa_parser.resolve_component(schema.items)
@@ -169,11 +205,14 @@ class NamedSchemaParser:
         if parser.TypeChecker.is_object(schema):
             self._find_property_schemas(schema, final_name)
 
-    def _is_nameable(self, schema: oa.Schema) -> bool:
+    def _is_nameable(self, schema: RESOLVABLE) -> bool:
         return (
             parser.TypeChecker.is_ref(schema)
             or parser.TypeChecker.is_ref_array(schema)
             or parser.TypeChecker.is_object(schema)
             or parser.TypeChecker.is_object_array(schema)
+            # Schema
             or (hasattr(schema, "allOf") and schema.allOf)
+            # RequestBody
+            or (hasattr(schema, "content") and schema.content)
         )
