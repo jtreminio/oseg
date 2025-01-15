@@ -86,24 +86,19 @@ class ExampleDataParser:
         if content_type is None or content is None:
             return
 
-        if parser.TypeChecker.is_ref(content.media_type_schema):
-            schema = self._oa_parser.resolve_component(content.media_type_schema)
-            name = self._oa_parser.get_schema_name(schema)
-        elif parser.TypeChecker.is_ref_array(content.media_type_schema):
-            items_schema = self._oa_parser.resolve_component(
-                content.media_type_schema.items
-            )
-            schema = content.media_type_schema
-            name = self._oa_parser.get_schema_name(items_schema)
-        # inline schema definition
-        elif hasattr(content.media_type_schema, "type"):
-            name = self._INLINE_REQUEST_BODY_NAME
-            schema = content.media_type_schema
-        else:
-            return
+        content.media_type_schema = self._oa_parser.resolve_component(
+            content.media_type_schema
+        )
+        schema = content.media_type_schema
+        name = self._oa_parser.get_schema_name(schema)
 
-        if not schema:
-            return
+        if not name:
+            if parser.TypeChecker.is_array(schema):
+                schema.items = self._oa_parser.resolve_component(schema.items)
+                name = self._oa_parser.get_schema_name(schema.items)
+            # inline schema definition
+            elif hasattr(schema, "type"):
+                name = self._INLINE_REQUEST_BODY_NAME
 
         return model.RequestBodyContent(
             name=name,

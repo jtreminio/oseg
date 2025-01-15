@@ -30,6 +30,13 @@ class PropertyParser:
         for name, property_schema in properties.items():
             value = data.get(name)
 
+            property_schema = self._oa_parser.resolve_component(property_schema)
+
+            if parser.TypeChecker.is_array(property_schema):
+                property_schema.items = self._oa_parser.resolve_component(
+                    property_schema.items
+                )
+
             if self._handle_object(
                 property_container=property_container,
                 schema=property_schema,

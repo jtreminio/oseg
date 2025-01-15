@@ -108,10 +108,9 @@ class SchemaJoiner:
         result = {}
 
         for schema in schemas:
-            # property could be an array of refs
-            if parser.TypeChecker.is_ref_array(schema):
-                ref_schema = self._oa_parser.resolve_component(schema.items)
-                body_name = self._oa_parser.get_schema_name(ref_schema).lower()
+            if parser.TypeChecker.is_array(schema):
+                schema.items = self._oa_parser.resolve_component(schema.items)
+                body_name = self._oa_parser.get_schema_name(schema.items).lower()
 
                 if body_name not in result:
                     result[body_name] = schema
