@@ -1,3 +1,5 @@
+from typing import Callable
+
 import openapi_pydantic as oa
 from oseg import model, parser
 
@@ -207,11 +209,7 @@ class PropertyParser:
     ) -> bool:
         """handle binary (file upload) types"""
 
-        if (
-            not parser.TypeChecker.is_file(schema)
-            and not parser.TypeChecker.is_file_array(schema)
-            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_file)
-        ):
+        if not self._is_resolvable_of(schema, parser.TypeChecker.is_file):
             return False
 
         property_container.add(
@@ -236,11 +234,7 @@ class PropertyParser:
     ) -> bool:
         """handle free-form type, ignore inline schemas that should use $ref"""
 
-        if (
-            not parser.TypeChecker.is_free_form(schema)
-            and not parser.TypeChecker.is_free_form_array(schema)
-            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_free_form)
-        ):
+        if not self._is_resolvable_of(schema, parser.TypeChecker.is_free_form):
             return False
 
         property_container.add(
@@ -265,11 +259,7 @@ class PropertyParser:
     ) -> bool:
         """handle scalar types"""
 
-        if (
-            not parser.TypeChecker.is_scalar(schema)
-            and not parser.TypeChecker.is_scalar_array(schema)
-            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_scalar)
-        ):
+        if not self._is_resolvable_of(schema, parser.TypeChecker.is_scalar):
             return False
 
         property_container.add(
@@ -288,8 +278,8 @@ class PropertyParser:
     def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
         return schema.required and prop_name in schema.required
 
-    def _is_resolved_array_of(self, schema: oa.Schema, func) -> bool:
-        if not parser.TypeChecker.is_array(schema):
-            return False
-
-        return func(self._oa_parser.resolve_component(schema.items))
+    def _is_resolvable_of(self, schema: oa.Schema, callback: Callable) -> bool:
+        return callback(schema) or (
+            parser.TypeChecker.is_array(schema)
+            and callback(self._oa_parser.resolve_component(schema.items))
+        )
