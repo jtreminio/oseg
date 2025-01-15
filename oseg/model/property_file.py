@@ -1,6 +1,6 @@
 import openapi_pydantic as oa
 from typing import Union
-from oseg import model, parser
+from oseg import model
 
 T = Union[str, list[str], None]
 
@@ -12,11 +12,10 @@ class PropertyFile(model.PropertyProto):
         self,
         name: str,
         value: T,
-        oa_parser: parser.OaParser,
         schema: oa.Schema,
         parent: oa.Schema,
     ):
-        self._setup(name, value, oa_parser, schema, parent)
+        self._setup(name, value, schema, parent)
 
     @property
     def value(self) -> T:

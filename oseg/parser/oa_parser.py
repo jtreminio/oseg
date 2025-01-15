@@ -80,10 +80,7 @@ class OaParser:
 
         return None
 
-    def _find_named_schemas(
-        self,
-        schemas: dict[str, oa.Schema] | None,
-    ) -> None:
+    def _find_named_schemas(self, schemas: dict[str, oa.Schema] | None) -> None:
         if not schemas:
             return
 

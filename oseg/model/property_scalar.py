@@ -1,6 +1,6 @@
 import openapi_pydantic as oa
 from typing import Union
-from oseg import model, parser
+from oseg import model
 
 T_SINGLE = Union[str, int, bool]
 T_LIST = Union[list[str], list[int], list[bool]]
@@ -12,7 +12,6 @@ class PropertyScalar(model.PropertyProto):
         self,
         name: str,
         value: T,
-        oa_parser: parser.OaParser,
         schema: oa.Schema,
         parent: oa.Schema | oa.Parameter,
     ):
@@ -20,7 +19,7 @@ class PropertyScalar(model.PropertyProto):
         self._format = None
         self._is_enum = False
 
-        self._setup(name, value, oa_parser, schema, parent)
+        self._setup(name, value, schema, parent)
 
         self._type = self._set_type()
         self._normalize_value()
@@ -46,7 +45,7 @@ class PropertyScalar(model.PropertyProto):
     # todo currently only support single type, not list of types
     def _set_type(self) -> str:
         if self._is_array:
-            type_value = self._get_items().type.value
+            type_value = self._schema.items.type.value
 
             assert isinstance(
                 type_value, str
@@ -91,9 +90,11 @@ class PropertyScalar(model.PropertyProto):
 
     def _set_string_format(self) -> str | None:
         if self._is_array:
-            items = self._get_items()
-
-            return items.schema_format if hasattr(items, "schema_format") else None
+            return (
+                self._schema.items.schema_format
+                if hasattr(self._schema.items, "schema_format")
+                else None
+            )
 
         return (
             self._schema.schema_format
@@ -103,14 +104,9 @@ class PropertyScalar(model.PropertyProto):
 
     def _set_is_enum(self) -> bool:
         if self._is_array:
-            items = self._get_items()
-
-            return hasattr(items, "enum") and items.enum is not None
+            return (
+                hasattr(self._schema.items, "enum")
+                and self._schema.items.enum is not None
+            )
 
         return hasattr(self._schema, "enum") and self._schema.enum is not None
-
-    def _get_items(self) -> oa.Schema:
-        if parser.TypeChecker.is_ref(self._schema.items):
-            return self._oa_parser.resolve_component(self._schema.items)
-
-        return self._schema.items

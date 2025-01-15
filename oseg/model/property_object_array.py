@@ -1,5 +1,5 @@
 import openapi_pydantic as oa
-from oseg import model, parser
+from oseg import model
 
 T = list[model.PropertyObject]
 
@@ -9,13 +9,13 @@ class PropertyObjectArray(model.PropertyProto):
         self,
         name: str,
         value: T,
-        oa_parser: parser.OaParser,
         schema: oa.Schema,
         parent: oa.Schema | None,
+        type_of: str,
     ):
-        self._type: str = ""
+        self._type = type_of
 
-        self._setup(name, value, oa_parser, schema, parent)
+        self._setup(name, value, schema, parent)
 
     @property
     def value(self) -> T:

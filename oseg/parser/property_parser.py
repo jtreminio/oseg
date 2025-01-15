@@ -130,11 +130,10 @@ class PropertyParser:
         property_object = model.PropertyObject(
             name=name,
             value=parsed,
-            oa_parser=self._oa_parser,
             schema=schema,
             parent=property_container.schema,
+            type_of=resolved_type,
         )
-        property_object.type = resolved_type
 
         if parsed.discriminator_base_type:
             property_object.set_discriminator(parsed.type)
@@ -183,11 +182,10 @@ class PropertyParser:
             property_object = model.PropertyObject(
                 name=name,
                 value=parsed,
-                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=parent,
+                type_of=resolved_type,
             )
-            property_object.type = resolved_type
 
             if parsed.discriminator_base_type:
                 property_object.set_discriminator(parsed.type)
@@ -197,11 +195,10 @@ class PropertyParser:
         property_object_array = model.PropertyObjectArray(
             name=name,
             value=result,
-            oa_parser=self._oa_parser,
             schema=parent,
             parent=property_container.schema,
+            type_of=resolved_type,
         )
-        property_object_array.type = resolved_type
 
         property_container.add(name, property_object_array)
 
@@ -224,7 +221,6 @@ class PropertyParser:
             model.PropertyFile(
                 name=name,
                 value=value,
-                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
@@ -249,7 +245,6 @@ class PropertyParser:
             model.PropertyFreeForm(
                 name=name,
                 value=value,
-                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
@@ -274,7 +269,6 @@ class PropertyParser:
             model.PropertyScalar(
                 name=name,
                 value=value,
-                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
