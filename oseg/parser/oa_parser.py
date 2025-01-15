@@ -14,13 +14,18 @@ RESOLVABLE = Union[
 
 class OaParser:
     def __init__(self, file_loader: "parser.FileLoader"):
-        self._openapi: oa.OpenAPI = oa.parse_obj(file_loader.oas())
+        self._file_loader = file_loader
+        self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
         self._named_schemas: dict[int, str] = {}
 
         if not self._openapi.components:
             self._openapi.components = oa.Components()
 
         self._find_named_schemas(self._openapi.components.schemas)
+
+    @property
+    def file_loader(self) -> "parser.FileLoader":
+        return self._file_loader
 
     @property
     def paths(self) -> dict[str, oa.PathItem]:

@@ -1,7 +1,7 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
   version: 1.0.0
-  title: Fixture - Path & Query Parameters
+  title: Fixture - ExampleDataParser - Path & Query Parameters
 tags:
   - name: tag_1
 paths:

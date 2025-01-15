@@ -18,16 +18,17 @@ class ExampleDataParser:
     def __init__(
         self,
         oa_parser: "parser.OaParser",
-        file_loader: "parser.FileLoader",
         property_parser: "parser.PropertyParser",
         example_data: dict[str, any] | None = None,
     ):
         self._oa_parser = oa_parser
-        self._file_loader = file_loader
         self._property_parser = property_parser
         self._example_data = example_data
 
-    def add_example_data(
+    def set_custom_example_data(self, example_data: dict[str, any] | None = None):
+        self._example_data = example_data
+
+    def build_examples(
         self,
         request_operations: dict[str, "model.RequestOperation"],
     ) -> None:
@@ -141,8 +142,8 @@ class ExampleDataParser:
         if self._example_data and operation.operationId in self._example_data:
             example_data = self._example_data[operation.operationId]
         else:
-            example_data = self._file_loader.get_example_data_from_custom_file(
-                operation
+            example_data = (
+                self._oa_parser.file_loader.get_example_data_from_custom_file(operation)
             )
 
         if not isinstance(example_data, dict) or not len(example_data.keys()):
@@ -234,7 +235,7 @@ class ExampleDataParser:
                     )
 
                 schema = self._oa_parser.resolve_example(schema)
-                file_data = self._file_loader.get_example_data(schema)
+                file_data = self._oa_parser.file_loader.get_example_data(schema)
 
                 if file_data:
                     results.append(

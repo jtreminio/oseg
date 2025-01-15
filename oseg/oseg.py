@@ -10,28 +10,27 @@ class Generator:
         example_data: dict[str, any] | None = None,
         example_data_dir: str | None = None,
     ):
-        self._generator_extension = jinja_extension.GeneratorExtension.factory()
-
-        self._file_loader = parser.FileLoader(
+        file_loader = parser.FileLoader(
             oas_file=oas_file,
             example_data_dir=example_data_dir,
         )
 
-        oa_parser = parser.OaParser(self._file_loader)
+        self._generator_extension = jinja_extension.GeneratorExtension.factory()
 
-        example_data_parser = parser.ExampleDataParser(
-            oa_parser=oa_parser,
-            file_loader=self._file_loader,
-            property_parser=parser.PropertyParser(oa_parser),
-            example_data=example_data,
-        )
+        self._oa_parser = parser.OaParser(file_loader)
 
         self._operation_parser = parser.OperationParser(
-            oa_parser=oa_parser,
+            oa_parser=self._oa_parser,
             operation_id=operation_id,
         )
 
-        example_data_parser.add_example_data(self._operation_parser.operations)
+        example_data_parser = parser.ExampleDataParser(
+            oa_parser=self._oa_parser,
+            property_parser=parser.PropertyParser(self._oa_parser),
+            example_data=example_data,
+        )
+
+        example_data_parser.build_examples(self._operation_parser.operations)
 
     def generate(
         self,
@@ -85,7 +84,7 @@ class Generator:
             f.write(rendered)
 
     def _get_sdk_options(self, config_file: str) -> model.SdkOptions:
-        data = self._file_loader.get_file_contents(config_file)
+        data = self._oa_parser.file_loader.get_file_contents(config_file)
 
         if not len(data):
             raise NotImplementedError(f"{config_file} contains invalid data")

@@ -1,17 +1,31 @@
 import unittest
-from oseg import model, parser
+from oseg import parser
 from test_utils import TestUtils
 
 
 class TestExampleDataParser(unittest.TestCase):
-    def setUp(self):
-        self.utils = TestUtils()
+    oa_parser_path_query_parameters: parser.OaParser
+    oa_parser_single_requestBody: parser.OaParser
 
-    def _get_request_operation(self, operation_id: str) -> model.RequestOperation:
-        return self.utils.operation_parser.operations[operation_id]
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.oa_parser_path_query_parameters = TestUtils.oa_parser(
+            "example_data_parser-path-query-parameters"
+        )
+
+        cls.oa_parser_single_requestBody = TestUtils.oa_parser(
+            "example_data_parser-single-requestBody"
+        )
 
     def test_common_path_query_param_scenarios(self):
-        self.utils.use_fixture_file("path-query-parameters")
+        oa_parser = self.oa_parser_path_query_parameters
+        operation_parser = parser.OperationParser(oa_parser)
+        example_data_parser = parser.ExampleDataParser(
+            oa_parser=oa_parser,
+            property_parser=parser.PropertyParser(oa_parser),
+        )
+
+        example_data_parser.build_examples(operation_parser.operations)
 
         data_provider = {
             # Always use example value if set
@@ -60,7 +74,7 @@ class TestExampleDataParser(unittest.TestCase):
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                request_operation = self._get_request_operation(operation_id)
+                request_operation = operation_parser.operations.get(operation_id)
 
                 self.assertIsNone(request_operation.request_data[0].body)
                 self.assertTrue(len(request_operation.request_data[0].http) == 1)
@@ -75,8 +89,16 @@ class TestExampleDataParser(unittest.TestCase):
         """Test mixed params"""
 
         operation_id = "mixed_params"
-        self.utils.use_fixture_file("path-query-parameters")
-        request_operation = self._get_request_operation(operation_id)
+
+        oa_parser = self.oa_parser_path_query_parameters
+        operation_parser = parser.OperationParser(oa_parser)
+        example_data_parser = parser.ExampleDataParser(
+            oa_parser=oa_parser,
+            property_parser=parser.PropertyParser(oa_parser),
+        )
+
+        example_data_parser.build_examples(operation_parser.operations)
+        request_operation = operation_parser.operations.get(operation_id)
 
         expected_keys = [
             "param_with_example",
@@ -139,7 +161,14 @@ class TestExampleDataParser(unittest.TestCase):
             self.assertEqual(expected["required"], parameter.is_required)
 
     def test_common_request_body_param_scenarios(self):
-        self.utils.use_fixture_file("single-requestBody")
+        oa_parser = self.oa_parser_single_requestBody
+        operation_parser = parser.OperationParser(oa_parser)
+        example_data_parser = parser.ExampleDataParser(
+            oa_parser=oa_parser,
+            property_parser=parser.PropertyParser(oa_parser),
+        )
+
+        example_data_parser.build_examples(operation_parser.operations)
 
         data_provider = {
             # If single requestBody is defined, use it
@@ -156,7 +185,7 @@ class TestExampleDataParser(unittest.TestCase):
 
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                request_operation = self._get_request_operation(operation_id)
+                request_operation = operation_parser.operations.get(operation_id)
 
                 self.assertTrue(len(request_operation.request_data) == 1)
                 self.assertIsNotNone(request_operation.request_data[0].body)
