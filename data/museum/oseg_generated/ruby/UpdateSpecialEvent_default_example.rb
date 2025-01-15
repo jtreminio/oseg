@@ -4,10 +4,10 @@ OpenapiMuseumClient.configure do |config|
 end
 
 special_event_fields = OpenapiMuseumClient::SpecialEventFields.new
-special_event_fields.name = nil
-special_event_fields.location = "On the beach."
-special_event_fields.event_description = nil
-special_event_fields.price = 15
+special_event_fields.name = "Pirate Coding Workshop"
+special_event_fields.location = "Computer Room"
+special_event_fields.event_description = "Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang)."
+special_event_fields.price = 25
 special_event_fields.dates = nil
 
 begin

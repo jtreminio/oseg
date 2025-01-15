@@ -123,29 +123,14 @@ class TestTypeChecker(unittest.TestCase):
         func_single = parser.TypeChecker.is_object
         func_array = parser.TypeChecker.is_object_array
 
-        expected_true_single = ["prop_object"]
-        expected_true_array = []
-
-        for name, prop in together.properties.items():
-            with self.subTest(name):
-                if name in expected_true_single:
-                    self.assertTrue(func_single(prop))
-                elif name in expected_true_array:
-                    self.assertTrue(func_array(prop))
-                else:
-                    self.assertFalse(func_single(prop))
-                    self.assertFalse(func_array(prop))
-
-    def test_is_ref(self):
-        together = self.oa_parser.components.schemas.get("Together")
-        func_single = parser.TypeChecker.is_ref
-        func_array = parser.TypeChecker.is_ref_array
-
         expected_true_single = [
-            "prop_ref",
             "prop_discriminator",
+            "prop_ref",
+            "prop_object",
         ]
-        expected_true_array = ["prop_ref_array"]
+        expected_true_array = [
+            "prop_ref_array",
+        ]
 
         for name, prop in together.properties.items():
             with self.subTest(name):

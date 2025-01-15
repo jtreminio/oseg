@@ -17,15 +17,15 @@ public class CreateSpecialEvent_default_example
         var config = Configuration.getDefaultApiClient();
 
         var specialEvent = new SpecialEvent()
-            .name("Mermaid Treasure Identification and Analysis")
-            .location("Under the seaaa 🦀 🎶 🌊.")
-            .eventDescription("Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.")
-            .price(0F)
+            .name("Pirate Coding Workshop")
+            .location("Computer Room")
+            .eventDescription("Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).")
+            .price(25F)
             .dates(List.of (
                 "2023-09-05",
                 "2023-09-08"
             ))
-            .eventId(null);
+            .eventId("3be6453c-03eb-4357-ae5a-984a0e574a54");
 
         try
         {

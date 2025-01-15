@@ -5,15 +5,15 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPIMuseum\Client\Configuration::getDefaultConfiguration();
 
 $special_event = (new OpenAPIMuseum\Client\Model\SpecialEvent())
-    ->setName("Mermaid Treasure Identification and Analysis")
-    ->setLocation("Under the seaaa 🦀 🎶 🌊.")
-    ->setEventDescription("Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.")
-    ->setPrice(0)
+    ->setName("Pirate Coding Workshop")
+    ->setLocation("Computer Room")
+    ->setEventDescription("Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).")
+    ->setPrice(25)
     ->setDates([
         "2023-09-05",
         "2023-09-08",
     ])
-    ->setEventId(null);
+    ->setEventId("3be6453c-03eb-4357-ae5a-984a0e574a54");
 
 try {
     $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);
