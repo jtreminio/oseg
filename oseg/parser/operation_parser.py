@@ -3,7 +3,7 @@ from oseg import parser, model
 
 
 class OperationParser:
-    _HTTP_METHODS = [
+    HTTP_METHODS = [
         "get",
         "post",
         "put",
@@ -38,7 +38,7 @@ class OperationParser:
             operation_id = operation_id.lower()
 
         for path, path_item in self._oa_parser.paths.items():
-            for method in self._HTTP_METHODS:
+            for method in self.HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
 
                 if not operation or (

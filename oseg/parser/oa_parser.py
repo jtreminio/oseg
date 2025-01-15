@@ -16,12 +16,8 @@ class OaParser:
     def __init__(self, file_loader: "parser.FileLoader"):
         self._file_loader = file_loader
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
-        self._named_schemas: dict[int, str] = {}
-
-        if not self._openapi.components:
-            self._openapi.components = oa.Components()
-
-        self._find_named_schemas(self._openapi.components.schemas)
+        self._setup_oas()
+        self._named_schema_parser = parser.NamedSchemaParser(self)
 
     @property
     def file_loader(self) -> "parser.FileLoader":
@@ -78,77 +74,17 @@ class OaParser:
         return property_schema
 
     def get_schema_name(self, schema: oa.Schema) -> str | None:
-        schema_id = id(schema)
+        return self._named_schema_parser.name(schema)
 
-        if schema_id in self._named_schemas:
-            return self._named_schemas[schema_id]
+    def _setup_oas(self) -> None:
+        if not self._openapi.components:
+            self._openapi.components = oa.Components()
 
-        return None
+        if not self._openapi.components.schemas:
+            self._openapi.components.schemas = {}
 
-    def _find_named_schemas(self, schemas: dict[str, oa.Schema] | None) -> None:
-        if not schemas:
-            return
-
-        results = {}
-        for name, schema in schemas.items():
-            schema = self.resolve_component(schema)
-            schemas[name] = schema
-
-            if not self._is_nameable_schema(schema):
-                continue
-
-            self._named_schemas[id(schema)] = name
-            results[name] = schema
-
-        for name, schema in results.items():
-            self._find_dynamic_named_schemas(schema.properties, name)
-
-    def _find_dynamic_named_schemas(
-        self,
-        schemas: dict[str, oa.Schema] | None,
-        parent_name: str,
-    ) -> None:
-        if not schemas:
-            return None
-
-        for name, schema in schemas.items():
-            schema = self.resolve_component(schema)
-
-            schemas[name] = schema
-
-            if not self._is_nameable_schema(schema):
-                continue
-
-            schema_id = id(schema)
-
-            if schema_id in self._named_schemas:
-                continue
-
-            final_name = f"{parent_name}_{name}"
-
-            if parser.TypeChecker.is_object_array(schema):
-                raise NotImplementedError(
-                    "Nested array of non-named Schema type=object is not supported: "
-                    f"{parent_name}#{name}. Instead, create a named schema "
-                    "in #/components/schemas/ and use $ref"
-                )
-
-            if parser.TypeChecker.is_array(schema):
-                schema.items = self.resolve_component(schema.items)
-
-            self._named_schemas[id(schema)] = final_name
-
-            if parser.TypeChecker.is_object(schema):
-                self._find_dynamic_named_schemas(schema.properties, final_name)
-
-    def _is_nameable_schema(self, schema: oa.Schema) -> bool:
-        return (
-            parser.TypeChecker.is_ref(schema)
-            or parser.TypeChecker.is_ref_array(schema)
-            or parser.TypeChecker.is_object(schema)
-            or parser.TypeChecker.is_object_array(schema)
-            or (hasattr(schema, "allOf") and schema.allOf)
-        )
+        if not self._openapi.paths:
+            self._openapi.paths = {}
 
     def _get_resolved_component(
         self,
