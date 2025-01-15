@@ -10,7 +10,7 @@ class TestSchemaJoiner(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("schema_joiner"))
+            parser.FileLoader(TestUtils.fixture_file("discriminator"))
         )
 
         cls.schema_joiner = parser.SchemaJoiner(cls.oa_parser)
@@ -63,9 +63,7 @@ class TestSchemaJoiner(unittest.TestCase):
             "id": 123,
             "breed": "terrier",
             "group": "hunting",
-            "benefits": {
-                "mans_best_friend": True,
-            },
+            "mans_best_friend": True,
         }
 
         dog = self.oa_parser.components.schemas.get("Dog")
@@ -104,7 +102,7 @@ class TestSchemaJoiner(unittest.TestCase):
                 expected_properties = [
                     "id",
                     "breed",
-                    "benefits",
+                    "mans_best_friend",
                 ]
                 expected_schema_count = 1
 
@@ -127,9 +125,7 @@ class TestSchemaJoiner(unittest.TestCase):
                 "id": 123,
                 "breed": "terrier",
                 "group": "hunting",
-                "benefits": {
-                    "mans_best_friend": True,
-                },
+                "mans_best_friend": True,
             },
         ]
 
@@ -146,7 +142,7 @@ class TestSchemaJoiner(unittest.TestCase):
                     "id",
                     "breed",
                     "group",
-                    "benefits",
+                    "mans_best_friend",
                 ]
                 expected_schema_count = 2
 

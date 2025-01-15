@@ -8,7 +8,8 @@ $special_event_fields = (new OpenAPIMuseum\Client\Model\SpecialEventFields())
     ->setName(null)
     ->setLocation("On the beach.")
     ->setEventDescription(null)
-    ->setPrice(15);
+    ->setPrice(15)
+    ->setDates(null);
 
 try {
     $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);

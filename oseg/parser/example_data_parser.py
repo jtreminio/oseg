@@ -336,6 +336,7 @@ class ExampleDataParser:
             results[parameter.name] = model.PropertyScalar(
                 name=parameter.name,
                 value=value,
+                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=parameter,
             )
@@ -358,6 +359,7 @@ class ExampleDataParser:
         property_ref = model.PropertyObject(
             name="",
             value=container,
+            oa_parser=self._oa_parser,
             schema=request_body_content.schema,
             # todo figure out where parent comes from
             parent=request_body_content.schema,

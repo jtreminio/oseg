@@ -20,7 +20,8 @@ public class UpdateSpecialEvent_default_example
             .name(null)
             .location("On the beach.")
             .eventDescription(null)
-            .price(15F);
+            .price(15F)
+            .dates(null);
 
         try
         {

@@ -28,7 +28,7 @@ class PropertyParser:
         for name, property_schema in properties.items():
             value = data.get(name)
 
-            if self._handle_ref(
+            if self._handle_object(
                 property_container=property_container,
                 schema=property_schema,
                 name=name,
@@ -38,7 +38,7 @@ class PropertyParser:
 
                 continue
 
-            if self._handle_array_ref(
+            if self._handle_array_object(
                 property_container=property_container,
                 schema=property_schema,
                 name=name,
@@ -89,14 +89,14 @@ class PropertyParser:
 
         return property_container
 
-    def _handle_ref(
+    def _handle_object(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: dict[str, any] | None,
     ) -> bool:
-        """handle complex nested object schema with 'ref'"""
+        """handle named object"""
 
         if not parser.TypeChecker.is_ref(schema):
             return False
@@ -121,6 +121,7 @@ class PropertyParser:
         property_object = model.PropertyObject(
             name=name,
             value=parsed,
+            oa_parser=self._oa_parser,
             schema=schema,
             parent=property_container.schema,
         )
@@ -133,14 +134,14 @@ class PropertyParser:
 
         return True
 
-    def _handle_array_ref(
+    def _handle_array_object(
         self,
         property_container: "model.PropertyContainer",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: dict[str, any] | None,
     ) -> bool:
-        """handle arrays of complex objects"""
+        """handle arrays of named objects"""
 
         if not parser.TypeChecker.is_ref_array(schema):
             return False
@@ -173,6 +174,7 @@ class PropertyParser:
             property_object = model.PropertyObject(
                 name=name,
                 value=parsed,
+                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=parent,
             )
@@ -186,6 +188,7 @@ class PropertyParser:
         property_object_array = model.PropertyObjectArray(
             name=name,
             value=result,
+            oa_parser=self._oa_parser,
             schema=parent,
             parent=property_container.schema,
         )
@@ -204,9 +207,11 @@ class PropertyParser:
     ) -> bool:
         """handle binary (file upload) types"""
 
-        if not parser.TypeChecker.is_file(
-            schema
-        ) and not parser.TypeChecker.is_file_array(schema):
+        if (
+            not parser.TypeChecker.is_file(schema)
+            and not parser.TypeChecker.is_file_array(schema)
+            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_file)
+        ):
             return False
 
         property_container.add(
@@ -214,6 +219,7 @@ class PropertyParser:
             model.PropertyFile(
                 name=name,
                 value=value,
+                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
@@ -230,9 +236,11 @@ class PropertyParser:
     ) -> bool:
         """handle free-form type, ignore inline schemas that should use $ref"""
 
-        if not parser.TypeChecker.is_free_form(
-            schema
-        ) and not parser.TypeChecker.is_free_form_array(schema):
+        if (
+            not parser.TypeChecker.is_free_form(schema)
+            and not parser.TypeChecker.is_free_form_array(schema)
+            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_free_form)
+        ):
             return False
 
         property_container.add(
@@ -240,6 +248,7 @@ class PropertyParser:
             model.PropertyFreeForm(
                 name=name,
                 value=value,
+                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
@@ -256,9 +265,11 @@ class PropertyParser:
     ) -> bool:
         """handle scalar types"""
 
-        if not parser.TypeChecker.is_scalar(
-            schema
-        ) and not parser.TypeChecker.is_scalar_array(schema):
+        if (
+            not parser.TypeChecker.is_scalar(schema)
+            and not parser.TypeChecker.is_scalar_array(schema)
+            and not self._is_resolved_array_of(schema, parser.TypeChecker.is_scalar)
+        ):
             return False
 
         property_container.add(
@@ -266,6 +277,7 @@ class PropertyParser:
             model.PropertyScalar(
                 name=name,
                 value=value,
+                oa_parser=self._oa_parser,
                 schema=schema,
                 parent=property_container.schema,
             ),
@@ -275,3 +287,9 @@ class PropertyParser:
 
     def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
         return schema.required and prop_name in schema.required
+
+    def _is_resolved_array_of(self, schema: oa.Schema, func) -> bool:
+        if not parser.TypeChecker.is_array(schema):
+            return False
+
+        return func(self._oa_parser.resolve_component(schema.items))

@@ -8,6 +8,7 @@ special_event_fields.name = nil
 special_event_fields.location = "On the beach."
 special_event_fields.event_description = nil
 special_event_fields.price = 15
+special_event_fields.dates = nil
 
 begin
     api_caller = OpenapiMuseumClient::EventsApi.new

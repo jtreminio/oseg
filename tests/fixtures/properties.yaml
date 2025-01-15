@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Fixture - Property Examples
+tags:
+  - name: pet
+paths:
+  /default:
+    post:
+      tags:
+        - pet
+      operationId: default
+      responses:
+        '200':
+          description: Successful operation
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        prop_string:
+          type: string
+        prop_string_array:
+          type: array
+          items:
+            type: string
+        prop_string_ref:
+          $ref: '#/components/schemas/PropStringRef'
+        prop_string_array_ref:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropStringRef'
+        # todo freeform object
+    PropStringRef:
+      type: string

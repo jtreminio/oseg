@@ -8,6 +8,7 @@ const special_event_fields: openapimuseum_client.SpecialEventFields = {
     location: "On the beach.",
     eventDescription: undefined,
     price: 15,
+    dates: undefined,
 };
 
 apiCaller.updateSpecialEvent(

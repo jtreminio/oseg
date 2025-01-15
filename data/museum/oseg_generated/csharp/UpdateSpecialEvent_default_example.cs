@@ -16,7 +16,8 @@ public class UpdateSpecialEventDefaultExample
             name: null,
             location: "On the beach.",
             eventDescription: null,
-            price: 15
+            price: 15,
+            dates: null
         );
 
         try

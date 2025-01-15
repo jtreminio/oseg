@@ -1,58 +1,45 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
   version: 1.0.0
-  title: Fixture - Discriminator
+  title: Fixture - Discriminator Examples
 tags:
   - name: pet
 paths:
-  /discriminator_at_root:
+  /default:
     post:
       tags:
         - pet
-      operationId: discriminator_at_root
+      operationId: default
       responses:
         '200':
           description: Successful operation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Dog'
-  /discriminator_nested:
-    post:
-      tags:
-        - pet
-      operationId: discriminator_nested
-      responses:
-        '200':
-          description: Successful operation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Pet'
 components:
   schemas:
     Pet:
       type: object
-      required:
-        - id
-        - dog
       properties:
         id:
           type: integer
-        dog:
-          $ref: '#/components/schemas/Dog'
+        type:
+          type: string
+    # array of discriminators
+    Dogs:
+      type: object
+      properties:
+        dogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dog'
+    # single discriminator
     Dog:
       type: object
-      required:
-        - id
-        - breed
       properties:
         id:
           type: integer
         breed:
           type: string
+        mans_best_friend:
+          $ref: '#/components/schemas/MansBestFriend'
       discriminator:
         propertyName: breed
         mapping:
@@ -63,8 +50,6 @@ components:
         - $ref: '#/components/schemas/Dog'
         -
           type: object
-          required:
-            - group
           properties:
             group:
               type: string
@@ -74,9 +59,17 @@ components:
         - $ref: '#/components/schemas/Dog'
         -
           type: object
-          required:
-            - group
           properties:
             group:
               type: string
               default: hunting
+    # array of allOf without discriminator
+    Terriers:
+      type: object
+      properties:
+        terriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terrier'
+    MansBestFriend:
+      type: boolean

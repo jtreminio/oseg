@@ -9,6 +9,10 @@ $special_event = (new OpenAPIMuseum\Client\Model\SpecialEvent())
     ->setLocation("Under the seaaa 🦀 🎶 🌊.")
     ->setEventDescription("Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.")
     ->setPrice(0)
+    ->setDates([
+        "2023-09-05",
+        "2023-09-08",
+    ])
     ->setEventId(null);
 
 try {

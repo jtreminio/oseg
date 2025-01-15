@@ -10,6 +10,7 @@ with ApiClient(configuration) as api_client:
     special_event_fields.location = "On the beach."
     special_event_fields.eventDescription = None
     special_event_fields.price = 15
+    special_event_fields.dates = None
 
     try:
         api_caller = api.EventsApi(api_client)
