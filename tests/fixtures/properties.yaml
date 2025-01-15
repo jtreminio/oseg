@@ -18,18 +18,131 @@ components:
     Pet:
       type: object
       properties:
+        prop_object:
+          type: object
+          properties:
+            key_1:
+              type: string
+        prop_ref_object:
+          $ref: '#/components/schemas/PropRefObject'
+        prop_array_ref_object:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefObject'
+        prop_nested_object:
+          type: object
+          properties:
+            key_1:
+              type: object
+              properties:
+                key_2:
+                  type: string
+        prop_ref_nested_object:
+          $ref: '#/components/schemas/PropRefNestedObject'
+        prop_array_ref_nested_object:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefNestedObject'
         prop_string:
           type: string
-        prop_string_array:
+        prop_array_string:
           type: array
           items:
             type: string
-        prop_string_ref:
-          $ref: '#/components/schemas/PropStringRef'
-        prop_string_array_ref:
+        prop_ref_string:
+          $ref: '#/components/schemas/PropRefString'
+        prop_array_ref_string:
           type: array
           items:
-            $ref: '#/components/schemas/PropStringRef'
-        # todo freeform object
-    PropStringRef:
+            $ref: '#/components/schemas/PropRefString'
+        prop_integer:
+          type: integer
+        prop_array_integer:
+          type: array
+          items:
+            type: integer
+        prop_ref_integer:
+          $ref: '#/components/schemas/PropRefInteger'
+        prop_array_ref_integer:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefInteger'
+        prop_number:
+          type: number
+        prop_array_number:
+          type: array
+          items:
+            type: number
+        prop_ref_number:
+          $ref: '#/components/schemas/PropRefNumber'
+        prop_array_ref_number:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefNumber'
+        prop_boolean:
+          type: boolean
+        prop_array_boolean:
+          type: array
+          items:
+            type: boolean
+        prop_ref_boolean:
+          $ref: '#/components/schemas/PropRefBoolean'
+        prop_array_ref_boolean:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefBoolean'
+        prop_file:
+          type: string
+          format: binary
+        prop_array_file:
+          type: array
+          items:
+            type: string
+            format: binary
+        prop_ref_file:
+          $ref: '#/components/schemas/PropRefFile'
+        prop_array_ref_file:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefFile'
+        prop_free_form:
+          type: object
+          additionalProperties: {}
+        prop_array_free_form:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        prop_ref_free_form:
+          $ref: '#/components/schemas/PropRefFreeForm'
+        prop_array_ref_free_form:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropRefFreeForm'
+    PropRefObject:
+      type: object
+      properties:
+        key_1:
+          type: string
+    PropRefNestedObject:
+      type: object
+      properties:
+        key_1:
+          type: object
+          properties:
+            key_2:
+              type: string
+    PropRefString:
       type: string
+    PropRefInteger:
+      type: integer
+    PropRefNumber:
+      type: number
+    PropRefBoolean:
+      type: boolean
+    PropRefFile:
+      type: string
+      format: binary
+    PropRefFreeForm:
+      type: object
+      additionalProperties: {}

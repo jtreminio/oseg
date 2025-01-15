@@ -18,7 +18,6 @@ class TestTypeChecker(unittest.TestCase):
 
         expected_true_array = [
             "prop_ref_array",
-            "prop_object_array",
             "prop_file_base64_array",
             "prop_file_binary_array",
             "prop_file_byte_array",
@@ -125,7 +124,7 @@ class TestTypeChecker(unittest.TestCase):
         func_array = parser.TypeChecker.is_object_array
 
         expected_true_single = ["prop_object"]
-        expected_true_array = ["prop_object_array"]
+        expected_true_array = []
 
         for name, prop in together.properties.items():
             with self.subTest(name):

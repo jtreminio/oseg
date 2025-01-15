@@ -100,7 +100,7 @@ class PropertyParser:
     ) -> bool:
         """handle named object"""
 
-        if not parser.TypeChecker.is_ref(schema):
+        if parser.TypeChecker.is_array(schema):
             return False
 
         schema = self._oa_parser.resolve_component(schema)
@@ -145,7 +145,7 @@ class PropertyParser:
     ) -> bool:
         """handle arrays of named objects"""
 
-        if not parser.TypeChecker.is_ref_array(schema):
+        if not parser.TypeChecker.is_array(schema):
             return False
 
         schema = self._oa_parser.resolve_component(schema.items)

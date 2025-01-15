@@ -317,17 +317,52 @@ class TestPropertyParser(unittest.TestCase):
     def test_combined_properties(self):
         property_parser = parser.PropertyParser(self.oa_parser_properties)
 
+        val_object = {"key_1": "value"}
+        val_array_object = [{"key_1": "value_1"}, {"key_1": "value_2"}]
+        val_nested_object = {"key_1": {"key_2": "value"}}
+        val_array_nested_object = [
+            {"key_1": {"key_2": "value_1"}},
+            {"key_1": {"key_2": "value_2"}},
+        ]
+
+        val_array_string = ["value_1", "value_2"]
+        val_array_int = [123, 456]
+        val_array_bool = [True, False]
+        val_array_file = ["/path_file_1", "/path_file_2"]
+        val_free_form = {"key_1": "value"}
+        val_array_free_form = [{"key_1": "value_1"}, {"key_2": "value_2"}]
+
         data = {
-            "prop_string": "prop_string_value",
-            "prop_string_array": [
-                "prop_string_array_value_1",
-                "prop_string_array_value_2",
-            ],
-            "prop_string_ref": "prop_string_ref_value",
-            "prop_string_array_ref": [
-                "prop_string_array_ref_value_1",
-                "prop_string_array_ref_value_2",
-            ],
+            "prop_object": val_object,
+            "prop_ref_object": val_object,
+            "prop_array_ref_object": val_array_object,
+            "prop_nested_object": val_nested_object,
+            "prop_ref_nested_object": val_nested_object,
+            "prop_array_ref_nested_object": val_array_nested_object,
+            "prop_string": "value",
+            "prop_array_string": val_array_string,
+            "prop_ref_string": "value",
+            "prop_array_ref_string": val_array_string,
+            "prop_integer": 123,
+            "prop_array_integer": val_array_int,
+            "prop_ref_integer": 123,
+            "prop_array_ref_integer": val_array_int,
+            "prop_number": 123,
+            "prop_array_number": val_array_int,
+            "prop_ref_number": 123,
+            "prop_array_ref_number": val_array_int,
+            "prop_boolean": True,
+            "prop_array_boolean": val_array_bool,
+            "prop_ref_boolean": True,
+            "prop_array_ref_boolean": val_array_bool,
+            "prop_file": "/path_file",
+            "prop_array_file": val_array_file,
+            "prop_ref_file": "/path_file",
+            "prop_array_ref_file": val_array_file,
+            "prop_free_form": val_free_form,
+            "prop_array_free_form": val_array_free_form,
+            "prop_ref_free_form": val_free_form,
+            "prop_array_ref_free_form": val_array_free_form,
         }
 
         schema = self.oa_parser_properties.components.schemas.get("Pet")
@@ -336,10 +371,120 @@ class TestPropertyParser(unittest.TestCase):
             data=data,
         )
 
-        pass
+        self.assertEqual(set(data), set(parsed.properties))
 
-    def test_sorted_properties(self):
-        pass
+        non_object_props = [
+            "prop_string",
+            "prop_array_string",
+            "prop_ref_string",
+            "prop_array_ref_string",
+            "prop_integer",
+            "prop_array_integer",
+            "prop_ref_integer",
+            "prop_array_ref_integer",
+            "prop_number",
+            "prop_array_number",
+            "prop_ref_number",
+            "prop_array_ref_number",
+            "prop_boolean",
+            "prop_array_boolean",
+            "prop_ref_boolean",
+            "prop_array_ref_boolean",
+            "prop_file",
+            "prop_array_file",
+            "prop_ref_file",
+            "prop_array_ref_file",
+            "prop_free_form",
+            "prop_array_free_form",
+            "prop_ref_free_form",
+            "prop_array_ref_free_form",
+        ]
+
+        for name in non_object_props:
+            with self.subTest(name):
+                value = data[name]
+
+                self.assertEqual(value, parsed.properties.get(name).value)
+
+        prop_object = parsed.objects.get("prop_object")
+        self.assertEqual("Pet_prop_object", prop_object.type)
+        self.assertEqual(
+            prop_object.value.scalars.get("key_1").value,
+            val_object["key_1"],
+        )
+
+        prop_ref_object = parsed.objects.get("prop_ref_object")
+        self.assertEqual("PropRefObject", prop_ref_object.type)
+        self.assertEqual(
+            prop_ref_object.value.scalars.get("key_1").value,
+            val_object["key_1"],
+        )
+
+        prop_array_ref_object_1 = parsed.array_objects.get(
+            "prop_array_ref_object"
+        ).value[0]
+        self.assertEqual("PropRefObject", prop_array_ref_object_1.type)
+        self.assertEqual(
+            prop_array_ref_object_1.value.scalars.get("key_1").value,
+            val_array_object[0]["key_1"],
+        )
+
+        prop_array_ref_object_2 = parsed.array_objects.get(
+            "prop_array_ref_object"
+        ).value[1]
+        self.assertEqual("PropRefObject", prop_array_ref_object_2.type)
+        self.assertEqual(
+            prop_array_ref_object_2.value.scalars.get("key_1").value,
+            val_array_object[1]["key_1"],
+        )
+
+        prop_nested_object = parsed.objects.get("prop_nested_object")
+        self.assertEqual("Pet_prop_nested_object", prop_nested_object.type)
+        prop_nested_object_key_1 = prop_nested_object.value.objects.get("key_1")
+        self.assertEqual("Pet_prop_nested_object_key_1", prop_nested_object_key_1.type)
+        self.assertEqual(
+            prop_nested_object_key_1.value.scalars.get("key_2").value,
+            val_nested_object["key_1"]["key_2"],
+        )
+
+        prop_ref_nested_object = parsed.objects.get("prop_ref_nested_object")
+        self.assertEqual("PropRefNestedObject", prop_ref_nested_object.type)
+        prop_ref_nested_object_key_1 = prop_ref_nested_object.value.objects.get("key_1")
+        self.assertEqual("PropRefNestedObject_key_1", prop_ref_nested_object_key_1.type)
+        self.assertEqual(
+            prop_ref_nested_object_key_1.value.scalars.get("key_2").value,
+            val_nested_object["key_1"]["key_2"],
+        )
+
+        prop_array_ref_nested_object_1 = parsed.array_objects.get(
+            "prop_array_ref_nested_object"
+        ).value[0]
+        self.assertEqual("PropRefNestedObject", prop_array_ref_nested_object_1.type)
+        prop_array_ref_nested_object_1_key_1 = (
+            prop_array_ref_nested_object_1.value.objects.get("key_1")
+        )
+        self.assertEqual(
+            "PropRefNestedObject_key_1", prop_array_ref_nested_object_1_key_1.type
+        )
+        self.assertEqual(
+            prop_array_ref_nested_object_1_key_1.value.scalars.get("key_2").value,
+            val_array_nested_object[0]["key_1"]["key_2"],
+        )
+
+        prop_array_ref_nested_object_2 = parsed.array_objects.get(
+            "prop_array_ref_nested_object"
+        ).value[1]
+        self.assertEqual("PropRefNestedObject", prop_array_ref_nested_object_2.type)
+        prop_array_ref_nested_object_2_key_1 = (
+            prop_array_ref_nested_object_2.value.objects.get("key_1")
+        )
+        self.assertEqual(
+            "PropRefNestedObject_key_1", prop_array_ref_nested_object_2_key_1.type
+        )
+        self.assertEqual(
+            prop_array_ref_nested_object_2_key_1.value.scalars.get("key_2").value,
+            val_array_nested_object[1]["key_1"]["key_2"],
+        )
 
 
 if __name__ == "__main__":

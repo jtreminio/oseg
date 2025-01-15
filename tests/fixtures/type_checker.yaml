@@ -31,15 +31,6 @@ components:
               type: integer
             type:
               type: string
-        prop_object_array:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              type:
-                type: string
         prop_discriminator:
           $ref: '#/components/schemas/Dog'
         # considered string(s) by SDKs
