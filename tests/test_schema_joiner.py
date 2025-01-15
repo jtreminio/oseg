@@ -9,10 +9,7 @@ class TestSchemaJoiner(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("discriminator"))
-        )
-
+        cls.oa_parser = TestUtils.oa_parser("discriminator")
         cls.schema_joiner = parser.SchemaJoiner(cls.oa_parser)
 
     def test_no_all_of_no_discriminator(self):

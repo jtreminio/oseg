@@ -16,13 +16,22 @@ class TestUtils:
         self._oas_file = ""
 
     @staticmethod
+    def oa_parser(filename: str) -> parser.OaParser:
+        filepath = f"{TestUtils._BASE_DIR}/fixtures/{filename}.yaml"
+
+        return parser.OaParser(parser.FileLoader(filepath))
+
+    @staticmethod
+    # todo delete
     def fixture_file(filename: str) -> str:
         return f"{TestUtils._BASE_DIR}/fixtures/{filename}.yaml"
 
     @property
+    # todo delete
     def operation_parser(self) -> parser.OperationParser:
         return self._operation_parser
 
+    # todo delete
     def use_fixture_file(
         self,
         filename: str,
@@ -33,6 +42,7 @@ class TestUtils:
             example_data=example_data,
         )
 
+    # todo delete
     def _refresh_dependencies(
         self,
         oas_file: str,

@@ -8,9 +8,7 @@ class TestTypeChecker(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("type_checker"))
-        )
+        cls.oa_parser = TestUtils.oa_parser("type_checker")
 
     def test_is_array(self):
         together = self.oa_parser.components.schemas.get("Together")
@@ -161,9 +159,7 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_nullable_30(self):
-        oa_parser = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("type_checker-3.0"))
-        )
+        oa_parser = TestUtils.oa_parser("type_checker-3.0")
 
         together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_nullable

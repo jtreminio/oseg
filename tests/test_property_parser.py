@@ -9,13 +9,8 @@ class TestPropertyParser(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.oa_parser_discriminator = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("discriminator"))
-        )
-
-        cls.oa_parser_properties = parser.OaParser(
-            parser.FileLoader(TestUtils.fixture_file("properties"))
-        )
+        cls.oa_parser_discriminator = TestUtils.oa_parser("discriminator")
+        cls.oa_parser_properties = TestUtils.oa_parser("properties")
 
     def test_discriminator(self):
         property_parser = parser.PropertyParser(self.oa_parser_discriminator)
