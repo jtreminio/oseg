@@ -167,6 +167,42 @@ paths:
       responses:
         '200':
           description: Successful operation
+  /response_named_response:
+    post:
+      tags:
+        - pet
+      operationId: response_named_response
+      responses:
+        '200':
+          $ref: "#/components/responses/PropRefResponse"
+  /response_inline_response_named_object:
+    post:
+      tags:
+        - pet
+      operationId: response_inline_response_named_object
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropRefObject'
+  /response_inline_response_inline_object:
+    post:
+      tags:
+        - pet
+      operationId: response_inline_response_inline_object
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              # class post_response_inline_response_inline_object_200_response
+              schema:
+                type: object
+                properties:
+                  key_1:
+                    type: string
 components:
   schemas:
     Pet:
@@ -334,3 +370,16 @@ components:
           properties:
             id:
               type: integer
+  responses:
+    PropRefResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PropRefObject'
+    PropRefFileResponse:
+      description: Successful operation
+      content:
+        application/pdf:
+          schema:
+            $ref: '#/components/schemas/PropRefFile'

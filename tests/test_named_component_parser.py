@@ -375,6 +375,43 @@ class TestNamedComponentParser(unittest.TestCase):
             self.oa_parser.get_component_name(prop_nested_object_schema_key_1),
         )
 
+    def test_responses(self):
+        data = [
+            {
+                "path": "/response_named_response",
+                "response_name": "PropRefResponse",
+                "response_obj_name": "PropRefObject",
+            },
+            {
+                "path": "/response_inline_response_named_object",
+                "response_name": None,
+                "response_obj_name": "PropRefObject",
+            },
+            {
+                "path": "/response_inline_response_inline_object",
+                "response_name": None,
+                "response_obj_name": None,
+            },
+        ]
+
+        for expected in data:
+            with self.subTest(expected["path"]):
+                operation = self.oa_parser.paths.get(expected["path"]).post
+                response = operation.responses.get("200")
+                response_obj_schema = response.content.get(
+                    "application/json"
+                ).media_type_schema
+
+                self.assertEqual(
+                    expected["response_name"],
+                    self.oa_parser.get_component_name(response),
+                )
+
+                self.assertEqual(
+                    expected["response_obj_name"],
+                    self.oa_parser.get_component_name(response_obj_schema),
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

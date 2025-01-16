@@ -128,7 +128,11 @@ class NamedComponentParser:
             self._request_body(request_body)
 
     def _component_responses(self) -> None:
-        """Find named in '#/components/responses/'."""
+        """Find named in '#/components/responses/'.
+
+        Inline objects inside a '#/components/responses/' response will
+        NOT generate a distinct class!
+        """
 
         for name, response in self._oa_parser.components.responses.items():
             response = self._oa_parser.resolve_response(response)
