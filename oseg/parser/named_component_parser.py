@@ -181,6 +181,9 @@ class NamedComponentParser:
     ) -> None:
         self._all_of(parent_schema)
 
+        if parser.TypeChecker.is_array(parent_schema):
+            parent_schema.items = self._oa_parser.resolve_component(parent_schema.items)
+
         if not parent_schema.properties:
             return None
 
@@ -193,6 +196,11 @@ class NamedComponentParser:
                 parent_name=parent_name,
                 name=property_name,
             )
+
+            if parser.TypeChecker.is_array(property_schema):
+                property_schema.items = self._oa_parser.resolve_component(
+                    property_schema.items
+                )
 
             self._all_of(property_schema)
             self._examples(property_schema)
@@ -280,7 +288,11 @@ class NamedComponentParser:
         schemas = []
 
         for i in schema.allOf:
-            schemas.append(self._oa_parser.resolve_component(i))
+            resolved = self._oa_parser.resolve_component(i)
+            resolved_name = self.name(resolved)
+
+            self._schema_properties(resolved, resolved_name)
+            schemas.append(resolved)
 
         schema.allOf = schemas
 

@@ -17,7 +17,6 @@ class PropertyParser:
         if data is None:
             data = {}
 
-        schema = self._oa_parser.resolve_component(schema)
         schema_type = self._oa_parser.get_component_name(schema)
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
         properties = merged_values.properties
@@ -29,13 +28,6 @@ class PropertyParser:
 
         for name, property_schema in properties.items():
             value = data.get(name)
-
-            property_schema = self._oa_parser.resolve_component(property_schema)
-
-            if parser.TypeChecker.is_array(property_schema):
-                property_schema.items = self._oa_parser.resolve_component(
-                    property_schema.items
-                )
 
             if self._handle_object(
                 property_container=property_container,
@@ -110,9 +102,6 @@ class PropertyParser:
         if parser.TypeChecker.is_array(schema):
             return False
 
-        schema = self._oa_parser.resolve_component(schema)
-        resolved_type = self._oa_parser.get_component_name(schema)
-
         # allOf to be handled recursively
         if not parser.TypeChecker.is_object(schema) and not schema.allOf:
             return False
@@ -132,7 +121,7 @@ class PropertyParser:
             value=parsed,
             schema=schema,
             parent=property_container.schema,
-            type_of=resolved_type,
+            type_of=self._oa_parser.get_component_name(schema),
         )
 
         if parsed.discriminator_base_type:
@@ -154,17 +143,15 @@ class PropertyParser:
         if not parser.TypeChecker.is_array(schema):
             return False
 
-        schema = self._oa_parser.resolve_component(schema.items)
-        resolved_type = self._oa_parser.get_component_name(schema)
-
         # allOf to be handled recursively
-        if not parser.TypeChecker.is_object(schema) and not schema.allOf:
+        if not parser.TypeChecker.is_object(schema.items) and not schema.items.allOf:
             return False
 
+        type_of = self._oa_parser.get_component_name(schema.items)
         is_required = self._is_required(property_container.schema, name)
 
         if not is_required and value is None:
-            value = schema.default
+            value = schema.items.default
 
             if value is None:
                 return False
@@ -177,14 +164,14 @@ class PropertyParser:
             parent = property_container.schema
 
         for example in value:
-            parsed = self.parse(schema, example)
+            parsed = self.parse(schema.items, example)
 
             property_object = model.PropertyObject(
                 name=name,
                 value=parsed,
-                schema=schema,
+                schema=schema.items,
                 parent=parent,
-                type_of=resolved_type,
+                type_of=type_of,
             )
 
             if parsed.discriminator_base_type:
@@ -197,7 +184,7 @@ class PropertyParser:
             value=result,
             schema=parent,
             parent=property_container.schema,
-            type_of=resolved_type,
+            type_of=type_of,
         )
 
         property_container.add(name, property_object_array)
@@ -281,6 +268,5 @@ class PropertyParser:
 
     def _is_resolvable_of(self, schema: oa.Schema, callback: Callable) -> bool:
         return callback(schema) or (
-            parser.TypeChecker.is_array(schema)
-            and callback(self._oa_parser.resolve_component(schema.items))
+            parser.TypeChecker.is_array(schema) and callback(schema.items)
         )
