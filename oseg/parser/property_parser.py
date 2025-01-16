@@ -18,7 +18,7 @@ class PropertyParser:
             data = {}
 
         schema = self._oa_parser.resolve_component(schema)
-        schema_type = self._oa_parser.get_schema_name(schema)
+        schema_type = self._oa_parser.get_component_name(schema)
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
         properties = merged_values.properties
 
@@ -111,7 +111,7 @@ class PropertyParser:
             return False
 
         schema = self._oa_parser.resolve_component(schema)
-        resolved_type = self._oa_parser.get_schema_name(schema)
+        resolved_type = self._oa_parser.get_component_name(schema)
 
         # allOf to be handled recursively
         if not parser.TypeChecker.is_object(schema) and not schema.allOf:
@@ -155,7 +155,7 @@ class PropertyParser:
             return False
 
         schema = self._oa_parser.resolve_component(schema.items)
-        resolved_type = self._oa_parser.get_schema_name(schema)
+        resolved_type = self._oa_parser.get_component_name(schema)
 
         # allOf to be handled recursively
         if not parser.TypeChecker.is_object(schema) and not schema.allOf:

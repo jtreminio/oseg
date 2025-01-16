@@ -75,10 +75,10 @@ class ExampleDataParser:
             return
 
         schema = content.media_type_schema
-        name = self._oa_parser.get_schema_name(schema)
+        name = self._oa_parser.get_component_name(schema)
 
         if parser.TypeChecker.is_array(schema):
-            name = self._oa_parser.get_schema_name(schema.items)
+            name = self._oa_parser.get_component_name(schema.items)
 
         return model.RequestBodyContent(
             name=name,
@@ -213,7 +213,6 @@ class ExampleDataParser:
                         f" schema {operation.operationId}.{example_name}"
                     )
 
-                schema = self._oa_parser.resolve_example(schema)
                 file_data = self._oa_parser.file_loader.get_example_data(schema)
 
                 if file_data:

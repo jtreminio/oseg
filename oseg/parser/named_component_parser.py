@@ -12,8 +12,8 @@ RESOLVABLE = Union[
 ]
 
 
-class NamedSchemaParser:
-    """Keeps track of all named Component Schemas. Also generates
+class NamedComponentParser:
+    """Keeps track of all named Components. Also generates
     dynamic-named Schemas.
 
     "Named" Component Schemas are considered those explicitly defined in
@@ -95,6 +95,7 @@ class NamedSchemaParser:
 
             self._add(schema, name)
             components[name] = schema
+            self._examples(schema)
 
         for name, schema in components.items():
             self._schema_properties(schema, name)
@@ -110,6 +111,7 @@ class NamedSchemaParser:
 
             self._add(parameter, name)
             self._schema_properties(schema, name)
+            self._examples(parameter)
 
     def _component_request_bodies(self) -> None:
         """Find named in '#/components/requestBodies/'."""
@@ -164,6 +166,14 @@ class NamedSchemaParser:
                         operation.responses[http_code] = response
                         self._response(response)
 
+    def _examples(self, schema: oa.Schema | oa.MediaType | oa.Parameter) -> None:
+        if schema.example:
+            schema.example = self._oa_parser.resolve_example(schema.example)
+
+        if hasattr(schema, "examples") and schema.examples:
+            for example_name, example in schema.examples.items():
+                schema.examples[example_name] = self._oa_parser.resolve_example(example)
+
     def _schema_properties(
         self,
         parent_schema: oa.Schema,
@@ -181,6 +191,8 @@ class NamedSchemaParser:
                 parent_name=parent_name,
                 name=property_name,
             )
+
+            self._examples(property_schema)
 
     def _dynamic_property(
         self,
@@ -236,6 +248,7 @@ class NamedSchemaParser:
                 name = self.name(schema.items)
 
             self._schema_properties(schema, name)
+            self._examples(media_type)
 
             # openapi-generator will only ever look at the first request
             return
@@ -255,6 +268,7 @@ class NamedSchemaParser:
 
             schema = self._oa_parser.resolve_component(media_type.media_type_schema)
             media_type.media_type_schema = schema
+            self._examples(media_type)
 
     def _is_nameable(self, schema: RESOLVABLE) -> bool:
         return (

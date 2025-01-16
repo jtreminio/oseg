@@ -110,7 +110,7 @@ class SchemaJoiner:
         for schema in schemas:
             if parser.TypeChecker.is_array(schema):
                 schema.items = self._oa_parser.resolve_component(schema.items)
-                body_name = self._oa_parser.get_schema_name(schema.items).lower()
+                body_name = self._oa_parser.get_component_name(schema.items).lower()
 
                 if body_name not in result:
                     result[body_name] = schema

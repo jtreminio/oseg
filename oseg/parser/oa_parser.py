@@ -17,7 +17,7 @@ class OaParser:
         self._file_loader = file_loader
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
         self._setup_oas()
-        self._named_schema_parser = parser.NamedSchemaParser(self)
+        self._named_component_parser = parser.NamedComponentParser(self)
 
     @property
     def file_loader(self) -> "parser.FileLoader":
@@ -73,8 +73,8 @@ class OaParser:
 
         return property_schema
 
-    def get_schema_name(self, schema: oa.Schema) -> str | None:
-        return self._named_schema_parser.name(schema)
+    def get_component_name(self, schema: oa.Schema) -> str | None:
+        return self._named_component_parser.name(schema)
 
     def _setup_oas(self) -> None:
         if not self._openapi.components:
@@ -89,7 +89,10 @@ class OaParser:
         if not self._openapi.components.parameters:
             self._openapi.components.parameters = {}
 
-        if not self._openapi.components.pathItems:
+        if (
+            hasattr(self._openapi.components, "pathItems")
+            and not self._openapi.components.pathItems
+        ):
             self._openapi.components.pathItems = {}
 
         if not self._openapi.components.requestBodies:
