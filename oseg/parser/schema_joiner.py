@@ -72,9 +72,7 @@ class SchemaJoiner:
             return None
 
         resolved_name = ref.split("/").pop()
-        resolved = self._oa_parser.resolve_component(
-            self._oa_parser.components.schemas.get(resolved_name)
-        )
+        resolved = self._oa_parser.components.schemas.get(resolved_name)
 
         joined = self._resolve_all_of(resolved)
         joined.discriminator_target_type = resolved_name
@@ -91,14 +89,9 @@ class SchemaJoiner:
         if not schema.allOf:
             return None
 
-        schemas = []
-
-        for i in schema.allOf:
-            schemas.append(self._oa_parser.resolve_component(i))
-
         return JoinedValues(
-            schemas=schemas,
-            properties=self._get_properties(schemas),
+            schemas=schema.allOf,
+            properties=self._get_properties(schema.allOf),
         )
 
     def _get_properties(
@@ -109,7 +102,6 @@ class SchemaJoiner:
 
         for schema in schemas:
             if parser.TypeChecker.is_array(schema):
-                schema.items = self._oa_parser.resolve_component(schema.items)
                 body_name = self._oa_parser.get_component_name(schema.items).lower()
 
                 if body_name not in result:

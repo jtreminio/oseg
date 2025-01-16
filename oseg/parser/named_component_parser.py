@@ -179,6 +179,8 @@ class NamedComponentParser:
         parent_schema: oa.Schema,
         parent_name: str,
     ) -> None:
+        self._all_of(parent_schema)
+
         if not parent_schema.properties:
             return None
 
@@ -192,6 +194,7 @@ class NamedComponentParser:
                 name=property_name,
             )
 
+            self._all_of(property_schema)
             self._examples(property_schema)
 
     def _dynamic_property(
@@ -269,6 +272,17 @@ class NamedComponentParser:
             schema = self._oa_parser.resolve_component(media_type.media_type_schema)
             media_type.media_type_schema = schema
             self._examples(media_type)
+
+    def _all_of(self, schema: oa.Schema) -> None:
+        if not schema.allOf:
+            return
+
+        schemas = []
+
+        for i in schema.allOf:
+            schemas.append(self._oa_parser.resolve_component(i))
+
+        schema.allOf = schemas
 
     def _is_nameable(self, schema: RESOLVABLE) -> bool:
         return (
