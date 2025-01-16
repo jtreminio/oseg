@@ -73,7 +73,7 @@ class OaParser:
 
         return property_schema
 
-    def get_component_name(self, schema: oa.Schema) -> str | None:
+    def get_component_name(self, schema: RESOLVABLE) -> str | None:
         return self._named_component_parser.name(schema)
 
     def _setup_oas(self) -> None:

@@ -186,7 +186,6 @@ class TestTypeChecker(unittest.TestCase):
         for name, prop in together.properties.items():
             with self.subTest(name):
                 if name == expected_true:
-                    resolved = self.oa_parser.resolve_component(prop)
-                    self.assertTrue(parser.TypeChecker.is_discriminator(resolved))
+                    self.assertTrue(parser.TypeChecker.is_discriminator(prop))
                 else:
                     self.assertFalse(parser.TypeChecker.is_discriminator(prop))

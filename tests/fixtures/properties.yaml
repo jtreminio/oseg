@@ -10,6 +10,160 @@ paths:
       tags:
         - pet
       operationId: default
+      parameters:
+        # generates class, expected name default_paramObject_parameter
+        - name: paramObject
+          in: path
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+        # generates class, expected name default_paramArrayObject_parameter
+        - name: paramArrayObject
+          in: path
+          required: true
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+        # does not generate class
+        - name: paramString
+          in: query
+          schema:
+            type: string
+        # does not generate class
+        - $ref: "#/components/parameters/ParamComponentObject"
+        # does not generate class
+        - $ref: "#/components/parameters/ParamComponentArrayObject"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+      responses:
+        '200':
+          description: Successful operation
+  /inline_request_body_properties:
+    post:
+      tags:
+        - pet
+      operationId: inline_request_body_properties
+      requestBody:
+        content:
+          application/json:
+            # class inline_request_body_properties_request
+            schema:
+              type: object
+              properties:
+                # inline_request_body_properties_request_prop_object
+                prop_object:
+                  type: object
+                  properties:
+                    key_1:
+                      type: string
+                prop_ref_object:
+                  $ref: '#/components/schemas/PropRefObject'
+                prop_array_ref_object:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefObject'
+                # inline_request_body_properties_request_prop_nested_object
+                prop_nested_object:
+                  type: object
+                  properties:
+                    # inline_request_body_properties_request_prop_nested_object_key_1
+                    key_1:
+                      type: object
+                      properties:
+                        key_2:
+                          type: string
+                prop_ref_nested_object:
+                  $ref: '#/components/schemas/PropRefNestedObject'
+                prop_array_ref_nested_object:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefNestedObject'
+                prop_string:
+                  type: string
+                prop_array_string:
+                  type: array
+                  items:
+                    type: string
+                prop_ref_string:
+                  $ref: '#/components/schemas/PropRefString'
+                prop_array_ref_string:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefString'
+                prop_integer:
+                  type: integer
+                prop_array_integer:
+                  type: array
+                  items:
+                    type: integer
+                prop_ref_integer:
+                  $ref: '#/components/schemas/PropRefInteger'
+                prop_array_ref_integer:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefInteger'
+                prop_number:
+                  type: number
+                prop_array_number:
+                  type: array
+                  items:
+                    type: number
+                prop_ref_number:
+                  $ref: '#/components/schemas/PropRefNumber'
+                prop_array_ref_number:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefNumber'
+                prop_boolean:
+                  type: boolean
+                prop_array_boolean:
+                  type: array
+                  items:
+                    type: boolean
+                prop_ref_boolean:
+                  $ref: '#/components/schemas/PropRefBoolean'
+                prop_array_ref_boolean:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefBoolean'
+                prop_file:
+                  type: string
+                  format: binary
+                prop_array_file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                prop_ref_file:
+                  $ref: '#/components/schemas/PropRefFile'
+                prop_array_ref_file:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefFile'
+                prop_free_form:
+                  type: object
+                  additionalProperties: {}
+                prop_array_free_form:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: {}
+                prop_ref_free_form:
+                  $ref: '#/components/schemas/PropRefFreeForm'
+                prop_array_ref_free_form:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PropRefFreeForm'
       responses:
         '200':
           description: Successful operation
@@ -18,20 +172,25 @@ components:
     Pet:
       type: object
       properties:
+        # class, Pet_prop_object
         prop_object:
           type: object
           properties:
             key_1:
               type: string
+        # class, PropRefObject
         prop_ref_object:
           $ref: '#/components/schemas/PropRefObject'
+        # class, array<PropRefObject>
         prop_array_ref_object:
           type: array
           items:
             $ref: '#/components/schemas/PropRefObject'
+        # class, Pet_prop_nested_object
         prop_nested_object:
           type: object
           properties:
+            # class, Pet_prop_nested_object_key_1
             key_1:
               type: object
               properties:
@@ -132,17 +291,46 @@ components:
           properties:
             key_2:
               type: string
+    # no class
     PropRefString:
       type: string
     PropRefInteger:
       type: integer
+    # no class
     PropRefNumber:
       type: number
+    # no class
     PropRefBoolean:
       type: boolean
+    # no class
     PropRefFile:
       type: string
       format: binary
+    # no class
     PropRefFreeForm:
       type: object
       additionalProperties: {}
+  parameters:
+    ParamString:
+      name: paramString
+      in: query
+      schema:
+        type: string
+    ParamComponentObject:
+      name: paramComponentObject
+      in: query
+      schema:
+        type: object
+        properties:
+          id:
+            type: integer
+    ParamComponentArrayObject:
+      name: paramComponentArrayObject
+      in: query
+      schema:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer

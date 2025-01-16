@@ -101,7 +101,10 @@ class NamedComponentParser:
             self._schema_properties(schema, name)
 
     def _component_parameters(self) -> None:
-        """Find named in '#/components/parameters/'."""
+        """Find named in '#/components/parameters/'.
+
+        These components will NOT generate a distinct class!
+        """
 
         for name, parameter in self._oa_parser.components.parameters.items():
             parameter = self._oa_parser.resolve_parameter(parameter)
@@ -109,7 +112,8 @@ class NamedComponentParser:
             parameter.param_schema = schema
             self._oa_parser.components.parameters[name] = parameter
 
-            self._add(parameter, name)
+            # empty name to prevent class being used
+            self._add(parameter, "")
             self._schema_properties(schema, name)
             self._examples(parameter)
 
@@ -145,20 +149,13 @@ class NamedComponentParser:
                 if not operation:
                     continue
 
-                if operation.parameters:
-                    for i, parameter in enumerate(operation.parameters):
-                        parameter = self._oa_parser.resolve_parameter(parameter)
-                        schema = self._oa_parser.resolve_component(
-                            parameter.param_schema
-                        )
-                        parameter.param_schema = schema
-                        operation.parameters[i] = parameter
+                self._parameters(operation)
 
                 if operation.requestBody:
                     operation.requestBody = self._oa_parser.resolve_request_body(
                         operation.requestBody
                     )
-                    self._request_body(operation.requestBody)
+                    self._request_body(operation.requestBody, operation)
 
                 if operation.responses:
                     for http_code, response in operation.responses.items():
@@ -244,6 +241,7 @@ class NamedComponentParser:
     def _request_body(
         self,
         request_body: oa.RequestBody | oa.Reference,
+        operation: oa.Operation | None = None,
     ) -> None:
         for content_type, media_type in request_body.content.items():
             if not media_type.media_type_schema:
@@ -257,6 +255,10 @@ class NamedComponentParser:
             if parser.TypeChecker.is_array(schema):
                 schema.items = self._oa_parser.resolve_component(schema.items)
                 name = self.name(schema.items)
+
+            if name is None and operation:
+                name = f"{operation.operationId}_request"
+                self._add(schema, name)
 
             self._schema_properties(schema, name)
             self._examples(media_type)
@@ -280,6 +282,23 @@ class NamedComponentParser:
             schema = self._oa_parser.resolve_component(media_type.media_type_schema)
             media_type.media_type_schema = schema
             self._examples(media_type)
+
+    def _parameters(self, operation: oa.Operation) -> None:
+        """named parameters do not create a class"""
+
+        if not operation.parameters:
+            return
+
+        for i, parameter in enumerate(operation.parameters):
+            parameter = self._oa_parser.resolve_parameter(parameter)
+
+            if self.name(parameter) is None and self._is_nameable(parameter):
+                name = f"{operation.operationId}_{parameter.name}_parameter"
+                self._add(parameter, name)
+
+            schema = self._oa_parser.resolve_component(parameter.param_schema)
+            parameter.param_schema = schema
+            operation.parameters[i] = parameter
 
     def _all_of(self, schema: oa.Schema) -> None:
         if not schema.allOf:
@@ -307,5 +326,8 @@ class NamedComponentParser:
             # RequestBody / Response
             or (hasattr(schema, "content") and schema.content)
             # Parameter
-            or (hasattr(schema, "param_schema") and schema.param_schema)
+            or (
+                hasattr(schema, "param_schema")
+                and self._is_nameable(schema.param_schema)
+            )
         )
