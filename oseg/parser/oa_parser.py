@@ -80,11 +80,26 @@ class OaParser:
         if not self._openapi.components:
             self._openapi.components = oa.Components()
 
-        if not self._openapi.components.schemas:
-            self._openapi.components.schemas = {}
+        if not self._openapi.components.examples:
+            self._openapi.components.examples = {}
+
+        if not self._openapi.components.headers:
+            self._openapi.components.headers = {}
+
+        if not self._openapi.components.parameters:
+            self._openapi.components.parameters = {}
+
+        if not self._openapi.components.pathItems:
+            self._openapi.components.pathItems = {}
 
         if not self._openapi.components.requestBodies:
             self._openapi.components.requestBodies = {}
+
+        if not self._openapi.components.responses:
+            self._openapi.components.responses = {}
+
+        if not self._openapi.components.schemas:
+            self._openapi.components.schemas = {}
 
         if not self._openapi.paths:
             self._openapi.paths = {}

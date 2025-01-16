@@ -74,8 +74,6 @@ class OperationParser:
         """
 
         for _, response in operation.responses.items():
-            response = self._oa_parser.resolve_response(response)
-
             if not response.content:
                 continue
 
@@ -83,10 +81,9 @@ class OperationParser:
                 if not media_type.media_type_schema:
                     continue
 
-                schema = self._oa_parser.resolve_component(media_type.media_type_schema)
                 request_operation.has_response = True
                 request_operation.is_binary_response = parser.TypeChecker.is_file(
-                    schema
+                    media_type.media_type_schema
                 )
 
                 return

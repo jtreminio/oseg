@@ -60,52 +60,31 @@ class ExampleDataParser:
         self,
         operation: oa.Operation,
     ) -> Optional["model.RequestBodyContent"]:
-        if not operation.requestBody:
+        if not operation.requestBody or not self._has_content(operation):
             return
 
-        if parser.TypeChecker.is_ref(operation.requestBody):
-            schema = self._oa_parser.resolve_request_body(operation.requestBody)
-
-            contents = schema.content
-            required = schema.required
-        elif self._has_content(operation):
-            contents = operation.requestBody.content
-            required = operation.requestBody.required
-        else:
-            return
-
-        content_type: str | None = None
         content: oa.MediaType | None = None
 
         # we only want the first result
-        for i_type, body in contents.items():
-            content_type = i_type
+        for _, body in operation.requestBody.content.items():
             content = body
 
             break
 
-        if content_type is None or content is None:
+        if content is None:
             return
 
-        content.media_type_schema = self._oa_parser.resolve_component(
-            content.media_type_schema
-        )
         schema = content.media_type_schema
         name = self._oa_parser.get_schema_name(schema)
 
-        if not name:
-            if parser.TypeChecker.is_array(schema):
-                schema.items = self._oa_parser.resolve_component(schema.items)
-                name = self._oa_parser.get_schema_name(schema.items)
-            # inline schema definition
-            elif hasattr(schema, "type"):
-                name = self._INLINE_REQUEST_BODY_NAME
+        if parser.TypeChecker.is_array(schema):
+            name = self._oa_parser.get_schema_name(schema.items)
 
         return model.RequestBodyContent(
             name=name,
             content=content,
             schema=schema,
-            required=required,
+            required=operation.requestBody.required,
         )
 
     def _build_example_data(
@@ -261,7 +240,9 @@ class ExampleDataParser:
 
         # merge data from components
         if content.media_type_schema:
-            component_examples = self._parse_components(content.media_type_schema)
+            component_examples = self._example_data_from_schema(
+                content.media_type_schema
+            )
             component_examples_valid = bool(
                 component_examples and isinstance(component_examples, dict)
             )
@@ -306,8 +287,6 @@ class ExampleDataParser:
         parameters = operation.parameters if operation.parameters else []
 
         for parameter in parameters:
-            parameter = self._oa_parser.resolve_parameter(parameter)
-
             if parameter.param_in not in allowed_param_in:
                 continue
 
@@ -363,55 +342,10 @@ class ExampleDataParser:
 
         return property_ref
 
-    def _parse_components(self, schema: oa.Schema | oa.Reference) -> dict[str, any]:
-        return {
-            **self._example_data_from_ref(schema),
-            **self._example_data_from_ref_array(schema),
-            **self._example_data_from_schema(schema),
-        }
-
-    def _example_data_from_ref(
-        self,
-        schema: oa.Schema | oa.Reference,
-    ) -> dict[str, any]:
-        """handle complex nested object schema with 'ref'"""
-
-        if not parser.TypeChecker.is_ref(schema):
-            return {}
-
-        return self._parse_components(self._oa_parser.resolve_component(schema))
-
-    def _example_data_from_ref_array(
-        self,
-        schema: oa.Schema | oa.Reference,
-    ) -> dict[str, any]:
-        """handle arrays of ref objects"""
-
-        if not parser.TypeChecker.is_ref_array(schema):
-            return {}
-
-        result: dict[str, any] = {}
-
-        for property_name, property_schema in schema.properties.items():
-            parsed = self._parse_components(property_schema.items)
-
-            if not len(parsed):
-                continue
-
-            if property_name not in result.keys():
-                result[property_name] = []
-
-            result[property_name].append(parsed)
-
-        return result
-
-    def _example_data_from_schema(
-        self,
-        schema: oa.Schema | oa.Reference,
-    ) -> dict[str, any]:
-        """handle non-ref types"""
-
-        if parser.TypeChecker.is_ref(schema) or parser.TypeChecker.is_ref_array(schema):
+    def _example_data_from_schema(self, schema: oa.Schema) -> dict[str, any]:
+        if not parser.TypeChecker.is_object(
+            schema
+        ) or parser.TypeChecker.is_object_array(schema):
             return {}
 
         result: dict[str, any] = {}

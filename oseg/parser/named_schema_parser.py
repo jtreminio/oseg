@@ -53,9 +53,12 @@ class NamedSchemaParser:
         self._oa_parser = oa_parser
         self._names: dict[int, str] = {}
 
-        self._find_component_schemas()
-        self._find_component_request_bodies()
-        self._find_request_schemas()
+        self._component_examples()
+        self._component_schemas()
+        self._component_parameters()
+        self._component_request_bodies()
+        self._component_responses()
+        self._operations()
 
     def name(self, schema: RESOLVABLE) -> str | None:
         schema_id = id(schema)
@@ -65,7 +68,16 @@ class NamedSchemaParser:
     def _add(self, schema: RESOLVABLE, name: str) -> None:
         self._names[id(schema)] = name
 
-    def _find_component_schemas(self) -> None:
+    def _component_examples(self) -> None:
+        """Find named in '#/components/examples/'."""
+
+        for name, example in self._oa_parser.components.examples.items():
+            example = self._oa_parser.resolve_example(example)
+            self._oa_parser.components.examples[name] = example
+
+            self._add(example, name)
+
+    def _component_schemas(self) -> None:
         """Find named in '#/components/schemas/' first.
 
         Doing this process prevents incorrectly generating
@@ -85,76 +97,74 @@ class NamedSchemaParser:
             components[name] = schema
 
         for name, schema in components.items():
-            self._find_property_schemas(schema, name)
+            self._schema_properties(schema, name)
 
-    def _find_component_request_bodies(self) -> None:
+    def _component_parameters(self) -> None:
+        """Find named in '#/components/parameters/'."""
+
+        for name, parameter in self._oa_parser.components.parameters.items():
+            parameter = self._oa_parser.resolve_parameter(parameter)
+            schema = self._oa_parser.resolve_component(parameter.param_schema)
+            parameter.param_schema = schema
+            self._oa_parser.components.parameters[name] = parameter
+
+            self._add(parameter, name)
+            self._schema_properties(schema, name)
+
+    def _component_request_bodies(self) -> None:
         """Find named in '#/components/requestBodies/'."""
 
-        for name, schema in self._oa_parser.components.requestBodies.items():
-            schema = self._oa_parser.resolve_request_body(schema)
-            self._oa_parser.components.requestBodies[name] = schema
+        for name, request_body in self._oa_parser.components.requestBodies.items():
+            request_body = self._oa_parser.resolve_request_body(request_body)
+            self._oa_parser.components.requestBodies[name] = request_body
 
-            if not self._is_nameable(schema):
-                continue
+            self._add(request_body, name)
+            self._request_body(request_body)
 
-            self._add(schema, name)
+    def _component_responses(self) -> None:
+        """Find named in '#/components/responses/'."""
 
-            for content_type, media_type in schema.content.items():
-                media_type.media_type_schema = self._oa_parser.resolve_component(
-                    media_type.media_type_schema
-                )
+        for name, response in self._oa_parser.components.responses.items():
+            response = self._oa_parser.resolve_response(response)
+            self._oa_parser.components.responses[name] = response
 
-                if parser.TypeChecker.is_array(media_type.media_type_schema):
-                    media_type.media_type_schema.items = (
-                        self._oa_parser.resolve_component(
-                            media_type.media_type_schema.items
-                        )
-                    )
+            self._add(response, name)
+            self._response(response)
 
-    def _find_request_schemas(self) -> None:
+    def _operations(self) -> None:
         """Operation Requests will contain schemas in 'parameters'
         and 'requestBody'.
-
-        Support for named 'parameters' is still pending.
         """
 
-        for path, path_item in self._oa_parser.paths.items():
+        for _, path_item in self._oa_parser.paths.items():
             for method in parser.OperationParser.HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
 
-                if not operation or not operation.requestBody:
+                if not operation:
                     continue
 
-                operation.requestBody = self._oa_parser.resolve_request_body(
-                    operation.requestBody
-                )
-
-                for content_type, body in operation.requestBody.content.items():
-                    if not body.media_type_schema:
-                        continue
-
-                    schema = self._oa_parser.resolve_component(body.media_type_schema)
-                    body.media_type_schema = schema
-
-                    if parser.TypeChecker.is_array(schema):
-                        schema.items = self._oa_parser.resolve_component(schema.items)
-
-                        self._generate_dynamic_property_schema(
-                            schema=schema.items,
-                            parent_name=operation.operationId,
-                            name="request",
+                if operation.parameters:
+                    for i, parameter in enumerate(operation.parameters):
+                        parameter = self._oa_parser.resolve_parameter(parameter)
+                        schema = self._oa_parser.resolve_component(
+                            parameter.param_schema
                         )
+                        parameter.param_schema = schema
+                        operation.parameters[i] = parameter
 
-                    self._generate_dynamic_property_schema(
-                        schema=schema,
-                        parent_name=operation.operationId,
-                        name="request",
+                if operation.requestBody:
+                    operation.requestBody = self._oa_parser.resolve_request_body(
+                        operation.requestBody
                     )
+                    self._request_body(operation.requestBody)
 
-                    # openapi-generator will only ever look at the first request
-                    break
+                if operation.responses:
+                    for http_code, response in operation.responses.items():
+                        response = self._oa_parser.resolve_response(response)
+                        operation.responses[http_code] = response
+                        self._response(response)
 
-    def _find_property_schemas(
+    def _schema_properties(
         self,
         parent_schema: oa.Schema,
         parent_name: str,
@@ -162,17 +172,17 @@ class NamedSchemaParser:
         if not parent_schema.properties:
             return None
 
-        for name, schema in parent_schema.properties.items():
-            schema = self._oa_parser.resolve_component(schema)
-            parent_schema.properties[name] = schema
+        for property_name, property_schema in parent_schema.properties.items():
+            property_schema = self._oa_parser.resolve_component(property_schema)
+            parent_schema.properties[property_name] = property_schema
 
-            self._generate_dynamic_property_schema(
-                schema=schema,
+            self._dynamic_property(
+                schema=property_schema,
                 parent_name=parent_name,
-                name=name,
+                name=property_name,
             )
 
-    def _generate_dynamic_property_schema(
+    def _dynamic_property(
         self,
         schema: oa.Schema,
         parent_name: str,
@@ -184,10 +194,19 @@ class NamedSchemaParser:
         if self.name(schema):
             return
 
-        if parser.TypeChecker.is_array(schema):
-            schema.items = self._oa_parser.resolve_component(schema.items)
+        if not parser.TypeChecker.is_array(schema):
+            final_name = f"{parent_name}_{name}"
+            self._add(schema, final_name)
 
-        if parser.TypeChecker.is_object_array(schema):
+            if parser.TypeChecker.is_object(schema):
+                self._schema_properties(schema, final_name)
+
+            return
+
+        schema.items = self._oa_parser.resolve_component(schema.items)
+        items_name = self.name(schema.items)
+
+        if not items_name:
             """We do not want to get too crazy with unnamed nested arrays!
             It gets complicated quite quickly.
             Nested array of non-named Schema type=object is not supported.
@@ -196,14 +215,46 @@ class NamedSchemaParser:
 
             return
 
-        if parser.TypeChecker.is_array(schema):
-            schema.items = self._oa_parser.resolve_component(schema.items)
+        if parser.TypeChecker.is_object(schema.items):
+            self._schema_properties(schema.items, items_name)
 
-        final_name = f"{parent_name}_{name}"
-        self._add(schema, final_name)
+    def _request_body(
+        self,
+        request_body: oa.RequestBody | oa.Reference,
+    ) -> None:
+        for content_type, media_type in request_body.content.items():
+            if not media_type.media_type_schema:
+                continue
 
-        if parser.TypeChecker.is_object(schema):
-            self._find_property_schemas(schema, final_name)
+            schema = self._oa_parser.resolve_component(media_type.media_type_schema)
+            media_type.media_type_schema = schema
+            name = self.name(schema)
+
+            # if body data is an array, use the name of the items schema
+            if parser.TypeChecker.is_array(schema):
+                schema.items = self._oa_parser.resolve_component(schema.items)
+                name = self.name(schema.items)
+
+            self._schema_properties(schema, name)
+
+            # openapi-generator will only ever look at the first request
+            return
+
+    def _response(
+        self,
+        response: oa.Response | oa.Reference,
+    ) -> None:
+        """Unlike RequestBody, we don't care about properties in response schemas"""
+
+        if not response.content:
+            return
+
+        for content_type, media_type in response.content.items():
+            if not media_type.media_type_schema:
+                continue
+
+            schema = self._oa_parser.resolve_component(media_type.media_type_schema)
+            media_type.media_type_schema = schema
 
     def _is_nameable(self, schema: RESOLVABLE) -> bool:
         return (
@@ -213,6 +264,8 @@ class NamedSchemaParser:
             or parser.TypeChecker.is_object_array(schema)
             # Schema
             or (hasattr(schema, "allOf") and schema.allOf)
-            # RequestBody
+            # RequestBody / Response
             or (hasattr(schema, "content") and schema.content)
+            # Parameter
+            or (hasattr(schema, "param_schema") and schema.param_schema)
         )
