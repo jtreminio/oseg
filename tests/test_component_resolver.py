@@ -4,7 +4,7 @@ from oseg import parser
 from test_utils import TestUtils
 
 
-class TestNamedComponentParser(unittest.TestCase):
+class TestComponentResolver(unittest.TestCase):
     oa_parser: parser.OaParser
 
     @classmethod

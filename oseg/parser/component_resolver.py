@@ -12,7 +12,7 @@ RESOLVABLE = Union[
 ]
 
 
-class NamedComponentParser:
+class ComponentResolver:
     """Keeps track of all named Components. Also generates
     dynamic-named Schemas.
 

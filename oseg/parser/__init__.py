@@ -1,6 +1,6 @@
 from .example_data_parser import ExampleDataParser
 from .file_loader import FileLoader
-from .named_component_parser import NamedComponentParser
+from .component_resolver import ComponentResolver
 from .oa_parser import OaParser
 from .operation_parser import OperationParser
 from .property_parser import PropertyParser

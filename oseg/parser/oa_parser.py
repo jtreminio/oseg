@@ -17,7 +17,7 @@ class OaParser:
         self._file_loader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
         self._setup_oas()
-        self._named_component_parser = parser.NamedComponentParser(self)
+        self._component_resolver = parser.ComponentResolver(self)
 
     @property
     def file_loader(self) -> "parser.FileLoader":
@@ -74,7 +74,7 @@ class OaParser:
         return property_schema
 
     def get_component_name(self, schema: RESOLVABLE) -> str | None:
-        return self._named_component_parser.name(schema)
+        return self._component_resolver.name(schema)
 
     def _setup_oas(self) -> None:
         if not self._openapi.components:
