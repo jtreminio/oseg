@@ -72,8 +72,8 @@ File.new("{{ parsed.value }}", "r")
     {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count, required_flag) -%}
-    {{- caller(parse_request_data(example_data, single_body_value, indent_count, required_flag)) }}
+{%- macro parse_request_properties_macro(parsed_properties, single_body_value, indent_count, required_flag) -%}
+    {{- caller(parse_request_data(parsed_properties, single_body_value, indent_count, required_flag)) }}
 {%- endmacro -%}
 
 require "{{ sdk_options.additional_properties.gemName }}"
@@ -81,8 +81,8 @@ require "{{ sdk_options.additional_properties.gemName }}"
 {{ sdk_options.additional_properties.moduleName }}.configure do |config|
 end
 
-{% for obj_name, obj in parse_body_data(example_data, single_body_value).items() %}
-    {% set parent_name = obj_name if obj_name != example_data.body.type else "" %}
+{% for obj_name, obj in parse_body_data(parsed_properties, single_body_value).items() %}
+    {% set parent_name = obj_name if obj_name != parsed_properties.body.type else "" %}
     {% if not obj.is_array %}
 {{ obj_name|setter_property_name }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|pascal_case }}.new
         {% call(properties) parse_body_properties_macro(obj, parent_name, 0) %}
@@ -104,12 +104,12 @@ begin
     {{ "" -}}
     {% if has_response  %}response = {% endif -%}
     api_caller.{{ operation_id|snake_case }}(
-{% call(properties) parse_request_properties_macro(example_data, single_body_value, 4, True) %}
+{% call(properties) parse_request_properties_macro(parsed_properties, single_body_value, 4, True) %}
     {% for name, value in properties.items() %}
         {{ value }},
     {% endfor %}
 {% endcall %}
-{% call(properties) parse_request_properties_macro(example_data, single_body_value, 4, False) %}
+{% call(properties) parse_request_properties_macro(parsed_properties, single_body_value, 4, False) %}
     {% if properties %}
         {
         {% for name, value in properties.items() %}

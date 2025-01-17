@@ -8,7 +8,7 @@ class TemplateParser:
 
     def parse_body_data(
         self,
-        example_data: "model.ExampleData",
+        parsed_properties: "model.ParsedProperties",
         single_body_value: bool,
     ) -> dict[str, "model.PropertyObject"]:
         """Parses body data that is sent as instantiated Model objects.
@@ -16,13 +16,13 @@ class TemplateParser:
         Drills down into dependent Model objects
         """
 
-        if not example_data.body:
+        if not parsed_properties.body:
             return {}
 
-        result = self._flatten_object(example_data.body, "")
+        result = self._flatten_object(parsed_properties.body, "")
 
         if single_body_value:
-            result[example_data.body.type] = example_data.body
+            result[parsed_properties.body.type] = parsed_properties.body
 
         return result
 
@@ -75,7 +75,7 @@ class TemplateParser:
     def parse_request_data(
         self,
         macros: "model.JinjaMacros",
-        example_data: "model.ExampleData",
+        parsed_properties: "model.ParsedProperties",
         single_body_value: bool,
         indent_count: int,
         required_flag: bool | None = None,
@@ -100,7 +100,7 @@ class TemplateParser:
         http_required = {}
         http_optional = {}
 
-        for name, parameter in example_data.http.items():
+        for name, parameter in parsed_properties.http.items():
             if parameter.is_required:
                 http_required[name] = parameter
             else:
@@ -118,25 +118,25 @@ class TemplateParser:
             properties=http_optional,
         )
 
-        if example_data.body and single_body_value:
-            value = self._extension.setter_property_name(example_data.body.type)
+        if parsed_properties.body and single_body_value:
+            value = self._extension.setter_property_name(parsed_properties.body.type)
 
-            if example_data.body.is_required:
-                params_required[example_data.body.type] = value
+            if parsed_properties.body.is_required:
+                params_required[parsed_properties.body.type] = value
             else:
-                params_optional[example_data.body.type] = value
+                params_optional[parsed_properties.body.type] = value
 
-        if example_data.body and not single_body_value:
+        if parsed_properties.body and not single_body_value:
             body_params_required = self._parse_non_objects(
                 macros=macros,
                 parent_type="",
-                properties=example_data.body.value.non_objects(True),
+                properties=parsed_properties.body.value.non_objects(True),
             )
 
             body_params_optional = self._parse_non_objects(
                 macros=macros,
                 parent_type="",
-                properties=example_data.body.value.non_objects(False),
+                properties=parsed_properties.body.value.non_objects(False),
             )
 
             for k, v in body_params_required.items():

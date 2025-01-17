@@ -49,7 +49,7 @@ class ExampleDataParser:
                 )
 
                 request_operation.request_data.append(
-                    model.ExampleData(
+                    model.ParsedProperties(
                         name=example.name,
                         http=example.http,
                         body=property_container,

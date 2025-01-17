@@ -38,10 +38,10 @@ class Generator:
             os.makedirs(output_dir)
 
         for _, request_operation in self._operation_parser.operations.items():
-            for example_data in request_operation.request_data:
+            for parsed_properties in request_operation.request_data:
                 self._parse_request_operation(
                     request_operation=request_operation,
-                    example_data=example_data,
+                    parsed_properties=parsed_properties,
                     sdk_options=sdk_options,
                     output_dir=output_dir,
                     file_extension=file_extension,
@@ -52,13 +52,15 @@ class Generator:
     def _parse_request_operation(
         self,
         request_operation: model.RequestOperation,
-        example_data: model.ExampleData,
+        parsed_properties: model.ParsedProperties,
         sdk_options: model.SdkOptions,
         output_dir: str,
         file_extension: str,
     ) -> None:
         operation_id = request_operation.operation.operationId
-        filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_data.name}"
+        filename = (
+            f"{operation_id[:1].upper()}{operation_id[1:]}_{parsed_properties.name}"
+        )
         print(f"Begin parsing for {filename}")
 
         rendered = self._generator_extension.template.render(
@@ -68,7 +70,7 @@ class Generator:
             single_body_value=not request_operation.has_form_data,
             is_binary_response=request_operation.is_binary_response,
             api_name=request_operation.api_name,
-            example_data=example_data,
+            parsed_properties=parsed_properties,
         )
 
         target_file = f"{output_dir}/{filename}.{file_extension}"

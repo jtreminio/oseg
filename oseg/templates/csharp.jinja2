@@ -96,8 +96,8 @@ new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
     {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_request_properties_macro(example_data, single_body_value, indent_count) -%}
-    {{- caller(parse_request_data(example_data, single_body_value, indent_count)) }}
+{%- macro parse_request_properties_macro(parsed_properties, single_body_value, indent_count) -%}
+    {{- caller(parse_request_data(parsed_properties, single_body_value, indent_count)) }}
 {%- endmacro -%}
 
 using System;
@@ -108,14 +108,14 @@ using {{ sdk_options.additional_properties.packageName }}.Api;
 using {{ sdk_options.additional_properties.packageName }}.{{ sdk_options.additional_properties.clientPackage }};
 using {{ sdk_options.additional_properties.packageName }}.Model;
 
-public class {{ operation_id|pascal_case }}{{ example_data.name|pascal_case }}
+public class {{ operation_id|pascal_case }}{{ parsed_properties.name|pascal_case }}
 {
     public static void Main()
     {
         var config = new Configuration();
 
-{% for obj_name, obj in parse_body_data(example_data, single_body_value).items() %}
-    {% set parent_name = obj_name if obj_name != example_data.body.type else "" %}
+{% for obj_name, obj in parse_body_data(parsed_properties, single_body_value).items() %}
+    {% set parent_name = obj_name if obj_name != parsed_properties.body.type else "" %}
     {% if not obj.is_array %}
         var {{ obj_name|setter_property_name }} = new {{ obj.type }}(
         {% call(properties) parse_body_properties_macro(obj, parent_name, 12) %}
@@ -140,7 +140,7 @@ public class {{ operation_id|pascal_case }}{{ example_data.name|pascal_case }}
             {{ "" -}}
             {% if has_response  %}var response = {% endif -%}
             apiCaller.{{ operation_id|pascal_case }}(
-{% call(properties) parse_request_properties_macro(example_data, single_body_value, 16) %}
+{% call(properties) parse_request_properties_macro(parsed_properties, single_body_value, 16) %}
     {% for name, value in properties.items() %}
                 {{ name|setter_property_name }}: {{ value }}{% if not loop.last %},{% endif %}
 

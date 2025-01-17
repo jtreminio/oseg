@@ -11,4 +11,4 @@ class RequestOperation:
     has_response: bool
     has_form_data: bool
     is_binary_response: bool
-    request_data: list[model.ExampleData]
+    request_data: list[model.ParsedProperties]

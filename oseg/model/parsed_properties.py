@@ -4,7 +4,7 @@ from oseg import model
 
 
 @dataclass
-class ExampleData:
+class ParsedProperties:
     name: str
     http: dict[str, "model.PropertyScalar"] = field(default_factory=dict)
     body: Optional["model.PropertyObject"] = None

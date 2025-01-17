@@ -83,11 +83,11 @@ class GeneratorExtension(jinja2.ext.Extension):
 
     def _parse_body_data(
         self,
-        example_data: model.ExampleData,
+        parsed_properties: model.ParsedProperties,
         single_body_value: bool,
     ) -> dict[str, model.PropertyObject]:
         return self._sdk_generator.template_parser.parse_body_data(
-            example_data,
+            parsed_properties,
             single_body_value,
         )
 
@@ -125,14 +125,14 @@ class GeneratorExtension(jinja2.ext.Extension):
     def _parse_request_data(
         self,
         context: Context,
-        example_data: model.ExampleData,
+        parsed_properties: model.ParsedProperties,
         single_body_value: bool,
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_request_data(
             macros=model.JinjaMacros(context),
-            example_data=example_data,
+            parsed_properties=parsed_properties,
             single_body_value=single_body_value,
             indent_count=indent_count,
             required_flag=required_flag,
