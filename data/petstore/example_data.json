@@ -1,0 +1,171 @@
+{
+  "addPet": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "id": 12345,
+        "name": "My pet name",
+        "status": "available",
+        "photoUrls": [
+          "https://example.com/picture_1.jpg",
+          "https://example.com/picture_2.jpg"
+        ],
+        "category": {
+          "id": 12345,
+          "name": "Category_Name"
+        },
+        "tags": [
+          {
+            "id": 12345,
+            "name": "tag_1"
+          },
+          {
+            "id": 98765,
+            "name": "tag_2"
+          }
+        ]
+      }
+    }
+  },
+  "createUser": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "id": 12345,
+        "username": "my_user",
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john@example.com",
+        "password": "secure_123",
+        "phone": "555-123-1234",
+        "userStatus": 1
+      }
+    }
+  },
+  "createUsersWithArrayInput": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "user": [
+          {
+            "id": 12345,
+            "username": "my_user",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "secure_123",
+            "phone": "555-123-1234",
+            "userStatus": 1
+          },
+          {
+            "id": 12345,
+            "username": "my_user",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "secure_123",
+            "phone": "555-123-1234",
+            "userStatus": 1
+          }
+        ]
+      }
+    }
+  },
+  "createUsersWithListInput": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "user": [
+          {
+            "id": 12345,
+            "username": "my_user",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "secure_123",
+            "phone": "555-123-1234",
+            "userStatus": 1
+          },
+          {
+            "id": 12345,
+            "username": "my_user",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "secure_123",
+            "phone": "555-123-1234",
+            "userStatus": 1
+          }
+        ]
+      }
+    }
+  },
+  "placeOrder": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "id": 12345,
+        "petId": 98765,
+        "quantity": 5,
+        "shipDate": "2025-01-01T17:32:28Z",
+        "status": "approved",
+        "completed": false
+      }
+    }
+  },
+  "updatePet": {
+    "default_example": {
+      "parameters": {},
+      "body": {
+        "id": 12345,
+        "name": "My pet name",
+        "status": "available",
+        "photoUrls": [
+          "https://example.com/picture_1.jpg",
+          "https://example.com/picture_1.jpg"
+        ],
+        "category": {
+          "id": 12345,
+          "name": "Category_Name"
+        },
+        "tags": [
+          {
+            "id": 12345,
+            "name": "tag_1"
+          },
+          {
+            "id": 98765,
+            "name": "tag_2"
+          }
+        ]
+      }
+    }
+  },
+  "updateUser": {
+    "default_example": {
+      "parameters": {
+        "username": "my-username"
+      },
+      "body": {
+        "id": 12345,
+        "username": "new-username",
+        "firstName": "Joe",
+        "lastName": "Broke",
+        "email": "some-email@example.com",
+        "password": "so secure omg",
+        "phone": "555-867-5309",
+        "userStatus": 1
+      }
+    }
+  },
+  "uploadFile": {
+    "default_example": {
+      "parameters": {
+        "petId": 12345
+      },
+      "body": {
+        "file": "/path/to/file"
+      }
+    }
+  }
+}

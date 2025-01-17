@@ -8,16 +8,9 @@ class Generator:
         oas_file: str,
         operation_id: str | None = None,
         example_data: dict[str, any] | None = None,
-        example_data_dir: str | None = None,
     ):
-        file_loader = parser.FileLoader(
-            oas_file=oas_file,
-            example_data_dir=example_data_dir,
-        )
-
         self._generator_extension = jinja_extension.GeneratorExtension.factory()
-
-        self._oa_parser = parser.OaParser(file_loader)
+        self._oa_parser = parser.OaParser(oas_file)
 
         self._operation_parser = parser.OperationParser(
             oa_parser=self._oa_parser,

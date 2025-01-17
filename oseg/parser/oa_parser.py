@@ -13,8 +13,8 @@ RESOLVABLE = Union[
 
 
 class OaParser:
-    def __init__(self, file_loader: "parser.FileLoader"):
-        self._file_loader = file_loader
+    def __init__(self, oas_file: str):
+        self._file_loader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
         self._setup_oas()
         self._named_component_parser = parser.NamedComponentParser(self)

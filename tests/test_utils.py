@@ -9,4 +9,4 @@ class TestUtils:
     def oa_parser(filename: str) -> parser.OaParser:
         filepath = f"{TestUtils._BASE_DIR}/fixtures/{filename}.yaml"
 
-        return parser.OaParser(parser.FileLoader(filepath))
+        return parser.OaParser(filepath)

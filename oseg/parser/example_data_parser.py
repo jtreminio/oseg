@@ -118,28 +118,24 @@ class ExampleDataParser:
         or reads a file from custom example data directory, if it exists.
         """
 
+        example_data = None
+
         if self._example_data and operation.operationId in self._example_data:
             example_data = self._example_data[operation.operationId]
-        else:
-            example_data = (
-                self._oa_parser.file_loader.get_example_data_from_custom_file(operation)
-            )
 
         if not isinstance(example_data, dict) or not len(example_data.keys()):
             return None
 
-        http_key_name = "__http__"
         results = []
 
         for fullname, data in example_data.items():
             if not data or not isinstance(data, dict):
                 continue
 
-            http: dict[str, model.PropertyScalar] = {}
+            if "parameters" not in data and "body" not in data:
+                continue
 
-            if http_key_name in data:
-                http = self._get_http_data(operation, data[http_key_name])
-                del data[http_key_name]
+            http = self._get_http_data(operation, data.get("parameters", {}))
 
             example_name = fullname.replace(
                 f"{operation.operationId}__",
@@ -153,7 +149,7 @@ class ExampleDataParser:
                 RequestExampleData(
                     name=example_name,
                     http=http,
-                    body=data,
+                    body=data.get("body", {}),
                 )
             )
 

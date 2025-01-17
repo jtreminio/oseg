@@ -1,18 +1,15 @@
 import json
 import os
 import openapi_pydantic as oa
-import re
 import yaml
 from pathlib import Path
 
 
 class FileLoader:
-    def __init__(self, oas_file: str, example_data_dir: str | None = None):
+    def __init__(self, oas_file: str):
         self._oas_file = oas_file
         self._base_dir = os.path.dirname(oas_file)
-        self._example_data_file_list: dict[str, str] = {}
-
-        self._read_example_data_dir(example_data_dir)
+        self._cached_example_data: dict[str, dict[str, any]] = {}
 
     @property
     def base_dir(self) -> str:
@@ -44,58 +41,21 @@ class FileLoader:
         if not isinstance(example_schema.value, dict):
             return None
 
-        filename = example_schema.value.get("$ref")
+        ref = example_schema.value.get("$ref")
 
-        if not filename:
+        if not ref:
             return None
 
-        filename = f"{self.base_dir}/{filename}"
+        if ref in self._cached_example_data:
+            return self._cached_example_data[ref]
+
+        filename = f"{self.base_dir}/{ref}"
 
         try:
-            return self.get_file_contents(filename)
+            data = self.get_file_contents(filename)
+            self._cached_example_data[ref] = data
+
+            return data
         except Exception as e:
             print(f"Error reading example file {filename}")
             print(e)
-
-    def get_example_data_from_custom_file(
-        self,
-        operation: oa.Operation,
-    ) -> dict[str, dict[str, any]]:
-        """Read example data from external file.
-
-        The filenames are not embedded in the OAS file like in
-        ::get_example_data(). Instead, we search a given directory and match
-        files using operation ID
-        """
-
-        if not self._example_data_file_list:
-            return {}
-
-        # example: "addPet__default_example.json"
-        base_filename = f"{operation.operationId}__"
-        r = re.compile(f".*/{base_filename}.*")
-        results = {}
-
-        for filename in list(filter(r.match, self._example_data_file_list)):
-            data = self.get_file_contents(filename)
-
-            if not data or not isinstance(data, dict):
-                continue
-
-            results[Path(filename).stem] = data
-
-        return results
-
-    def _read_example_data_dir(self, example_data_dir: str | dict | None) -> None:
-        if (
-            not example_data_dir
-            or not isinstance(example_data_dir, str)
-            or not os.path.isdir(example_data_dir)
-        ):
-            return
-
-        self._example_data_file_list = [
-            f"{example_data_dir}/{f}"
-            for f in os.listdir(example_data_dir)
-            if os.path.isfile(os.path.join(example_data_dir, f))
-        ]
