@@ -2,7 +2,15 @@ import openapi_pydantic as oa
 from typing import Union, Optional
 from oseg import model
 
-T_PROPERTIES = dict[str, Union["model.PropertyProto", "model.PROPERTY_OBJECT_TYPE"]]
+T_PROPERTIES = dict[
+    str,
+    Union[
+        "model.PropertyFile",
+        "model.PropertyFreeForm",
+        "model.PropertyScalar",
+        "model.PROPERTY_OBJECT_TYPE",
+    ],
+]
 T_PARAMETER = Union["model.PropertyProto", "model.PropertyObject"]
 
 
