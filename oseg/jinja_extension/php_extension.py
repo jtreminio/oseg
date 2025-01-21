@@ -4,8 +4,8 @@ from oseg.jinja_extension import BaseExtension
 
 class PhpExtension(BaseExtension):
     FILE_EXTENSION = "php"
-    GENERATOR = "php"
-    TEMPLATE = "php.jinja2"
+    NAME = "php"
+    TEMPLATE = f"{NAME}.jinja2"
 
     def setter_method_name(self, name: str) -> str:
         return self.pascal_case(name)

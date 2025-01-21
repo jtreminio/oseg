@@ -4,8 +4,8 @@ from oseg.jinja_extension import BaseExtension
 
 class PythonExtension(BaseExtension):
     FILE_EXTENSION = "py"
-    GENERATOR = "python"
-    TEMPLATE = "python.jinja2"
+    NAME = "python"
+    TEMPLATE = f"{NAME}.jinja2"
 
     def setter_method_name(self, name: str) -> str:
         raise NotImplementedError

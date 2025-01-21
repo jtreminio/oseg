@@ -11,7 +11,7 @@ class Generator:
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
-        self._generator_extension = jinja_extension.GeneratorExtension.factory()
+        self._jinja = jinja_extension.JinjaExtension.factory()
         self._oa_parser = parser.OaParser(oas_file, operation_id, example_data)
 
     def generate(
@@ -20,8 +20,8 @@ class Generator:
         output_dir: str,
     ) -> int:
         sdk_options = self._get_sdk_options(config_file)
-        self._generator_extension.sdk_generator = sdk_options
-        file_extension = self._generator_extension.sdk_generator.FILE_EXTENSION
+        self._jinja.sdk_generator = sdk_options
+        file_extension = self._jinja.sdk_generator.FILE_EXTENSION
 
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
@@ -52,7 +52,7 @@ class Generator:
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_name}"
         print(f"Begin parsing for {filename}")
 
-        rendered = self._generator_extension.template.render(
+        rendered = self._jinja.template.render(
             operation=operation,
             property_container=property_container,
             example_name=example_name,

@@ -4,12 +4,12 @@ import json
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol
-from oseg import model, parser
+from oseg import jinja_extension as j, model, parser
 
 
 class BaseExtension(Protocol):
     FILE_EXTENSION: str
-    GENERATOR: str
+    NAME: str
     TEMPLATE: str
     X_ENUM_VARNAMES = "x-enum-varnames"
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
@@ -20,6 +20,19 @@ class BaseExtension(Protocol):
     def __init__(self, environment: jinja2.Environment):
         self._environment = environment
         self._template_parser = parser.TemplateParser(self)
+
+    @staticmethod
+    def default_generators(
+        environment: jinja2.Environment,
+    ) -> dict[str, "BaseExtension"]:
+        return {
+            j.CSharpExtension.NAME: j.CSharpExtension(environment),
+            j.JavaExtension.NAME: j.JavaExtension(environment),
+            j.PhpExtension.NAME: j.PhpExtension(environment),
+            j.PythonExtension.NAME: j.PythonExtension(environment),
+            j.RubyExtension.NAME: j.RubyExtension(environment),
+            j.TypescriptNodeExtension.NAME: j.TypescriptNodeExtension(environment),
+        }
 
     @property
     def sdk_options(self) -> "model.SdkOptions":
@@ -107,7 +120,7 @@ class BaseExtension(Protocol):
         if not enum_varnames_override:
             return None
 
-        enum_varnames = enum_varnames_override.get(self.GENERATOR)
+        enum_varnames = enum_varnames_override.get(self.NAME)
 
         if not enum_varnames:
             return None

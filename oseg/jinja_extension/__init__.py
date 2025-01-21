@@ -1,4 +1,4 @@
-from .generator_extension import GeneratorExtension
+from .jinja_extension import JinjaExtension
 from .base_extension import BaseExtension
 from .csharp_extension import CSharpExtension
 from .java_extension import JavaExtension

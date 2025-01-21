@@ -4,8 +4,8 @@ from oseg.jinja_extension import BaseExtension
 
 class CSharpExtension(BaseExtension):
     FILE_EXTENSION = "cs"
-    GENERATOR = "csharp"
-    TEMPLATE = "csharp.jinja2"
+    NAME = "csharp"
+    TEMPLATE = f"{NAME}.jinja2"
 
     RESERVED_KEYWORDS = [
         "abstract",

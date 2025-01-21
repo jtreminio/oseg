@@ -4,8 +4,8 @@ from oseg.jinja_extension import BaseExtension
 
 class TypescriptNodeExtension(BaseExtension):
     FILE_EXTENSION = "ts"
-    GENERATOR = "typescript-node"
-    TEMPLATE = "typescript-node.jinja2"
+    NAME = "typescript-node"
+    TEMPLATE = f"{NAME}.jinja2"
 
     def setter_method_name(self, name: str) -> str:
         return self.camel_case(name)

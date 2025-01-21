@@ -5,21 +5,19 @@ from typing import Callable
 from oseg import jinja_extension, model
 
 
-class GeneratorExtension(jinja2.ext.Extension):
+class JinjaExtension(jinja2.ext.Extension):
     _sdk_generator: "jinja_extension.BaseExtension"
 
     @staticmethod
-    def factory() -> "GeneratorExtension":
+    def factory() -> "JinjaExtension":
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,
             lstrip_blocks=True,
-            extensions=[GeneratorExtension],
+            extensions=[JinjaExtension],
         )
 
-        return env.extensions.get(
-            "oseg.jinja_extension.generator_extension.GeneratorExtension",
-        )
+        return env.extensions.get("oseg.jinja_extension.jinja_extension.JinjaExtension")
 
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)
@@ -48,14 +46,7 @@ class GeneratorExtension(jinja2.ext.Extension):
         )
         environment.globals.update(parse_request_data=self._parse_request_data)
 
-        self._generators: dict[str, jinja_extension.BaseExtension] = {
-            "csharp": jinja_extension.CSharpExtension(environment),
-            "java": jinja_extension.JavaExtension(environment),
-            "php": jinja_extension.PhpExtension(environment),
-            "python": jinja_extension.PythonExtension(environment),
-            "ruby": jinja_extension.RubyExtension(environment),
-            "typescript-node": jinja_extension.TypescriptNodeExtension(environment),
-        }
+        self._generators = jinja_extension.BaseExtension.default_generators(environment)
 
     @property
     def template(self) -> jinja2.Template:

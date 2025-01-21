@@ -4,8 +4,8 @@ from oseg.jinja_extension import BaseExtension
 
 class RubyExtension(BaseExtension):
     FILE_EXTENSION = "rb"
-    GENERATOR = "ruby"
-    TEMPLATE = "ruby.jinja2"
+    NAME = "ruby"
+    TEMPLATE = f"{NAME}.jinja2"
 
     def setter_method_name(self, name: str) -> str:
         return self.snake_case(name)
