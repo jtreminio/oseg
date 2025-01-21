@@ -14,6 +14,8 @@ const user: openapi_client.User = {
     userStatus: 1,
 };
 
+const username = "my-username";
+
 apiCaller.updateUser(
     username,
     user,

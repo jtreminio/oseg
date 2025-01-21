@@ -59,22 +59,12 @@ open("{{ parsed.value }}", "rb").read()
 {%- macro print_object_array(parsed) -%}
 [
     {% for i in parsed.values %}
-    {{ i }},
+    {{ i|snake_case }},
     {% endfor %}
 ]
 {%- endmacro -%}
 
-{%- macro parse_body_properties_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_properties(obj, parent_property_name, indent_count)) }}
-{%- endmacro -%}
-
-{%- macro parse_body_property_list_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
-{%- endmacro -%}
-
-{%- macro parse_request_properties_macro(parsed_properties, single_body_value, indent_count) -%}
-    {{- caller(parse_request_data(parsed_properties, single_body_value, indent_count)) }}
-{%- endmacro -%}
+{%- import "_macros.jinja2" as m with context -%}
 
 from pprint import pprint
 
@@ -83,42 +73,42 @@ from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiEx
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-{% for obj_name, obj in parse_body_data(parsed_properties, single_body_value).items() %}
-    {% set parent_name = obj_name if obj_name != parsed_properties.body.type else "" %}
+{% for obj_name, obj in parse_request_objects(property_container).items() %}
+    {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
     {{ obj_name|setter_property_name }} = models.{{ obj.type }}()
-        {% call(properties) parse_body_properties_macro(obj, parent_name, 4) %}
+        {% call(properties) m.parse_object_properties_macro(obj, parent_name, 4) %}
             {% for name, value in properties.items() %}
     {{ obj_name|setter_property_name }}.{{ name }} = {{ value }}
             {% endfor %}
         {% endcall %}
     {% else %}
     {{ obj_name|setter_property_name }} = {{ "" }}
-        {%- call(value) parse_body_property_list_macro(obj, parent_name, 4) %}
+        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 4) %}
             {{- value }}
         {% endcall %}
     {% endif %}
 
 {% endfor %}
     try:
-        api_caller = api.{{ api_name|pascal_case }}Api(api_client)
+        api_caller = api.{{ operation.api_name|pascal_case }}Api(api_client)
 
         {{ "" -}}
-        {% if has_response  %}response = {% endif -%}
-        api_caller.{{ operation_id|snake_case }}(
-{% call(properties) parse_request_properties_macro(parsed_properties, single_body_value, 12) %}
+        {% if operation.response and operation.response.body  %}response = {% endif -%}
+        api_caller.{{ operation.operation_id|snake_case }}(
+{% call(properties) m.parse_request_properties_macro(property_container, 12) %}
     {% for name, value in properties.items() %}
             {{ name|setter_property_name }}={{ value }},
     {% endfor %}
 {% endcall %}
         )
-    {% if has_response and not is_binary_response %}
+    {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
         pprint(response)
-    {% elif is_binary_response %}
+    {% elif operation.response and operation.response.is_binary %}
 
         open("file_response.zip", "wb").write(response.read())
     {% endif %}
     except ApiException as e:
-        print("Exception when calling {{ api_name|pascal_case }}#{{ operation_id|snake_case }}: %s\n" % e)
+        print("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|snake_case }}: %s\n" % e)
 {{ "" }}

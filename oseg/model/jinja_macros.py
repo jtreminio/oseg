@@ -3,7 +3,7 @@ from jinja2.runtime import Macro, Context
 
 class JinjaMacros:
     def __init__(self, context: Context):
-        macros = context.vars
+        macros = context.parent
 
         self._print_object: Macro = macros["print_object"]
         self._print_object_array: Macro = macros["print_object_array"]

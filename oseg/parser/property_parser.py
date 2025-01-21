@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 
 import openapi_pydantic as oa
 from oseg import model, parser
@@ -12,17 +12,61 @@ class PropertyParser:
     def parse(
         self,
         schema: oa.Schema,
+        data: dict[str, any] | list[dict[str, any]],
+    ) -> Union["model.PropertyObject", "model.PropertyObjectArray"]:
+        if parser.TypeChecker.is_array(schema):
+            assert isinstance(
+                data, list
+            ), "Body schema is list, example data should also be a list"
+
+            container: model.PropertyObjectArray | None = None
+
+            for i_data in data:
+                sub_container = self._create_property_object_container(
+                    schema.items,
+                    i_data,
+                )
+
+                if container is None:
+                    type_of = sub_container.base_type
+                    if type_of is None:
+                        type_of = sub_container.type
+
+                    container = model.PropertyObjectArray(
+                        schema=schema,
+                        _type=type_of,
+                        is_required=sub_container.is_required,
+                    )
+
+                container.properties.append(sub_container)
+
+            return container
+
+        return self._create_property_object_container(schema, data)
+
+    def _create_property_object_container(
+        self,
+        schema: oa.Schema,
         data: dict[str, any],
-    ) -> "model.PropertyContainer":
+    ) -> "model.PropertyObject":
         if data is None:
             data = {}
 
-        schema_type = self._oa_parser.get_component_name(schema)
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
         properties = merged_values.properties
+        base_type = None
+        type_of = self._oa_parser.get_component_name(schema)
 
-        property_container = model.PropertyContainer(schema, schema_type)
-        property_container.set_discriminator(merged_values.discriminator_target_type)
+        if merged_values.discriminator_target_type is not None:
+            base_type = type_of
+            type_of = merged_values.discriminator_target_type
+
+        container = model.PropertyObject(
+            schema=schema,
+            _type=type_of,
+            base_type=base_type,
+            is_required=False,
+        )
 
         processed_properties = []
 
@@ -30,7 +74,7 @@ class PropertyParser:
             value = data.get(name)
 
             if self._handle_object(
-                property_container=property_container,
+                container=container,
                 schema=property_schema,
                 name=name,
                 value=value,
@@ -40,7 +84,7 @@ class PropertyParser:
                 continue
 
             if self._handle_array_object(
-                property_container=property_container,
+                container=container,
                 schema=property_schema,
                 name=name,
                 value=value,
@@ -65,7 +109,7 @@ class PropertyParser:
                 value = data.get(name)
 
                 if self._handle_file(
-                    property_container=property_container,
+                    container=container,
                     schema=property_schema,
                     name=name,
                     value=value,
@@ -73,7 +117,7 @@ class PropertyParser:
                     continue
 
                 if self._handle_free_form(
-                    property_container=property_container,
+                    container=container,
                     schema=property_schema,
                     name=name,
                     value=value,
@@ -81,18 +125,18 @@ class PropertyParser:
                     continue
 
                 if self._handle_scalar(
-                    property_container=property_container,
+                    container=container,
                     schema=property_schema,
                     name=name,
                     value=value,
                 ):
                     continue
 
-        return property_container
+        return container
 
     def _handle_object(
         self,
-        property_container: "model.PropertyContainer",
+        container: "model.PropertyObject",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: dict[str, any] | None,
@@ -106,34 +150,33 @@ class PropertyParser:
         if not parser.TypeChecker.is_object(schema) and not schema.allOf:
             return False
 
-        is_required = self._is_required(property_container.schema, name)
+        type_of = self._oa_parser.get_component_name(schema)
+        is_required = self._is_required(container.schema, name)
 
         if not is_required and value is None:
             value = schema.default
 
-            if value is None:
-                return False
+        # this is a non-named object, use free-form.
+        # Happens with parameter objects
+        if type_of is None:
+            container.properties[name] = model.PropertyFreeForm(
+                schema=schema,
+                value=value,
+                is_required=self._is_required(container.schema, name),
+            )
 
-        parsed = self.parse(schema, value)
+            return True
 
-        property_object = model.PropertyObject(
-            name=name,
-            value=parsed,
-            schema=schema,
-            parent=property_container.schema,
-            type_of=self._oa_parser.get_component_name(schema),
-        )
+        parsed = self._create_property_object_container(schema, value)
+        parsed.is_required = is_required
 
-        if parsed.discriminator_base_type:
-            property_object.set_discriminator(parsed.type)
-
-        property_container.add(name, property_object)
+        container.properties[name] = parsed
 
         return True
 
     def _handle_array_object(
         self,
-        property_container: "model.PropertyContainer",
+        container: "model.PropertyObject",
         schema: oa.Reference | oa.Schema,
         name: str,
         value: dict[str, any] | None,
@@ -148,52 +191,50 @@ class PropertyParser:
             return False
 
         type_of = self._oa_parser.get_component_name(schema.items)
-        is_required = self._is_required(property_container.schema, name)
+        is_required = self._is_required(container.schema, name)
 
         if not is_required and value is None:
             value = schema.items.default
 
-            if value is None:
-                return False
+        # required but value still null, default to sane value
+        if value is None:
+            value = []
 
-        result = []
-
-        if property_container.schema.properties:
-            parent = property_container.schema.properties.get(name)
+        if container.schema.properties:
+            parent = container.schema.properties.get(name)
         else:
-            parent = property_container.schema
+            parent = container.schema
 
-        for example in value:
-            parsed = self.parse(schema.items, example)
-
-            property_object = model.PropertyObject(
-                name=name,
-                value=parsed,
-                schema=schema.items,
-                parent=parent,
-                type_of=type_of,
+        # this is a non-named object, use free-form.
+        # Happens with parameter objects
+        if type_of is None:
+            container.properties[name] = model.PropertyFreeForm(
+                schema=schema,
+                value=value,
+                is_required=self._is_required(parent, name),
             )
 
-            if parsed.discriminator_base_type:
-                property_object.set_discriminator(parsed.type)
+            return True
 
-            result.append(property_object)
-
-        property_object_array = model.PropertyObjectArray(
-            name=name,
-            value=result,
+        prop_obj_array = model.PropertyObjectArray(
             schema=parent,
-            parent=property_container.schema,
-            type_of=type_of,
+            _type=type_of,
+            is_required=is_required,
         )
 
-        property_container.add(name, property_object_array)
+        for example in value:
+            parsed = self._create_property_object_container(schema.items, example)
+            parsed.is_required = is_required
+
+            prop_obj_array.properties.append(parsed)
+
+        container.properties[name] = prop_obj_array
 
         return True
 
     def _handle_file(
         self,
-        property_container: "model.PropertyContainer",
+        container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
         value: any,
@@ -203,21 +244,17 @@ class PropertyParser:
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_file):
             return False
 
-        property_container.add(
-            name,
-            model.PropertyFile(
-                name=name,
-                value=value,
-                schema=schema,
-                parent=property_container.schema,
-            ),
+        container.properties[name] = model.PropertyFile(
+            schema=schema,
+            value=value,
+            is_required=self._is_required(container.schema, name),
         )
 
         return True
 
     def _handle_free_form(
         self,
-        property_container: "model.PropertyContainer",
+        container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
         value: any,
@@ -227,21 +264,17 @@ class PropertyParser:
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_free_form):
             return False
 
-        property_container.add(
-            name,
-            model.PropertyFreeForm(
-                name=name,
-                value=value,
-                schema=schema,
-                parent=property_container.schema,
-            ),
+        container.properties[name] = model.PropertyFreeForm(
+            schema=schema,
+            value=value,
+            is_required=self._is_required(container.schema, name),
         )
 
         return True
 
     def _handle_scalar(
         self,
-        property_container: "model.PropertyContainer",
+        container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
         value: any,
@@ -251,20 +284,16 @@ class PropertyParser:
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_scalar):
             return False
 
-        property_container.add(
-            name,
-            model.PropertyScalar(
-                name=name,
-                value=value,
-                schema=schema,
-                parent=property_container.schema,
-            ),
+        container.properties[name] = model.PropertyScalar(
+            schema=schema,
+            value=value,
+            is_required=self._is_required(container.schema, name),
         )
 
         return True
 
     def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
-        return schema.required and prop_name in schema.required
+        return bool(schema.required and prop_name in schema.required)
 
     def _is_resolvable_of(self, schema: oa.Schema, callback: Callable) -> bool:
         return callback(schema) or (

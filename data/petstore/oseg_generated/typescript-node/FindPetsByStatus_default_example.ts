@@ -4,6 +4,7 @@ import * as openapi_client from "openapi_client";
 const apiCaller = new openapi_client.PetApi();
 
 const status = undefined;
+
 apiCaller.findPetsByStatus(
     status,
 ).then(response => {

@@ -172,6 +172,9 @@ paths:
       tags:
         - pet
       operationId: response_named_response
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           $ref: "#/components/responses/PropRefResponse"
@@ -180,6 +183,9 @@ paths:
       tags:
         - pet
       operationId: response_inline_response_named_object
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: Successful operation
@@ -192,6 +198,9 @@ paths:
       tags:
         - pet
       operationId: response_inline_response_inline_object
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: Successful operation

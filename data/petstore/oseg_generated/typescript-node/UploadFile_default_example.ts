@@ -6,6 +6,7 @@ const apiCaller = new openapi_client.PetApi();
 const petId = 12345;
 const additionalMetadata = undefined;
 const file = fs.createReadStream("/path/to/file");
+
 apiCaller.uploadFile(
     petId,
     additionalMetadata,

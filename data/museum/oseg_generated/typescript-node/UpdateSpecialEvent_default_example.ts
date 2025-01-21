@@ -3,13 +3,15 @@ import * as openapimuseum_client from "openapimuseum_client";
 
 const apiCaller = new openapimuseum_client.EventsApi();
 
-const special_event_fields: openapimuseum_client.SpecialEventFields = {
-    name: "Pirate Coding Workshop",
-    location: "Computer Room",
-    eventDescription: "Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).",
-    price: 25,
+const specialEventFields: openapimuseum_client.SpecialEventFields = {
+    name: undefined,
+    location: "On the beach.",
+    eventDescription: undefined,
+    price: 15,
     dates: undefined,
 };
+
+const eventId = "dad4bce8-f5cb-4078-a211-995864315e39";
 
 apiCaller.updateSpecialEvent(
     eventId,

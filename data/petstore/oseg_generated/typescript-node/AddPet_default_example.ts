@@ -8,12 +8,12 @@ const category: openapi_client.Category = {
     name: "Category_Name",
 };
 
-const tags_1: openapi_client.Tag = {
+const tags1: openapi_client.Tag = {
     id: 12345,
     name: "tag_1",
 };
 
-const tags_2: openapi_client.Tag = {
+const tags2: openapi_client.Tag = {
     id: 98765,
     name: "tag_2",
 };
@@ -28,8 +28,8 @@ const pet: openapi_client.Pet = {
     status: openapi_client.Pet.StatusEnum.Available,
     category: category,
     tags: [
-        tags_1,
-        tags_2,
+        tags1,
+        tags2,
     ],
 };
 

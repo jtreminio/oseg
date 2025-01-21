@@ -6,10 +6,10 @@ configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
     special_event_fields = models.SpecialEventFields()
-    special_event_fields.name = "Pirate Coding Workshop"
-    special_event_fields.location = "Computer Room"
-    special_event_fields.eventDescription = "Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang)."
-    special_event_fields.price = 25
+    special_event_fields.name = None
+    special_event_fields.location = "On the beach."
+    special_event_fields.eventDescription = None
+    special_event_fields.price = 15
     special_event_fields.dates = None
 
     try:

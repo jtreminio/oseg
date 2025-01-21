@@ -1,7 +1,6 @@
 {
   "addPet": {
     "default_example": {
-      "parameters": {},
       "body": {
         "id": 12345,
         "name": "My pet name",
@@ -29,7 +28,6 @@
   },
   "createUser": {
     "default_example": {
-      "parameters": {},
       "body": {
         "id": 12345,
         "username": "my_user",
@@ -44,65 +42,58 @@
   },
   "createUsersWithArrayInput": {
     "default_example": {
-      "parameters": {},
-      "body": {
-        "user": [
-          {
-            "id": 12345,
-            "username": "my_user",
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "john@example.com",
-            "password": "secure_123",
-            "phone": "555-123-1234",
-            "userStatus": 1
-          },
-          {
-            "id": 12345,
-            "username": "my_user",
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "john@example.com",
-            "password": "secure_123",
-            "phone": "555-123-1234",
-            "userStatus": 1
-          }
-        ]
-      }
+      "body": [
+        {
+          "id": 12345,
+          "username": "my_user",
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "password": "secure_123",
+          "phone": "555-123-1234",
+          "userStatus": 1
+        },
+        {
+          "id": 12345,
+          "username": "my_user",
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "password": "secure_123",
+          "phone": "555-123-1234",
+          "userStatus": 1
+        }
+      ]
     }
   },
   "createUsersWithListInput": {
     "default_example": {
-      "parameters": {},
-      "body": {
-        "user": [
-          {
-            "id": 12345,
-            "username": "my_user",
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "john@example.com",
-            "password": "secure_123",
-            "phone": "555-123-1234",
-            "userStatus": 1
-          },
-          {
-            "id": 12345,
-            "username": "my_user",
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "john@example.com",
-            "password": "secure_123",
-            "phone": "555-123-1234",
-            "userStatus": 1
-          }
-        ]
-      }
+      "body": [
+        {
+          "id": 12345,
+          "username": "my_user",
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "password": "secure_123",
+          "phone": "555-123-1234",
+          "userStatus": 1
+        },
+        {
+          "id": 12345,
+          "username": "my_user",
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "password": "secure_123",
+          "phone": "555-123-1234",
+          "userStatus": 1
+        }
+      ]
     }
   },
   "placeOrder": {
     "default_example": {
-      "parameters": {},
       "body": {
         "id": 12345,
         "petId": 98765,
@@ -115,7 +106,6 @@
   },
   "updatePet": {
     "default_example": {
-      "parameters": {},
       "body": {
         "id": 12345,
         "name": "My pet name",
@@ -143,7 +133,7 @@
   },
   "updateUser": {
     "default_example": {
-      "parameters": {
+      "path": {
         "username": "my-username"
       },
       "body": {
@@ -160,7 +150,7 @@
   },
   "uploadFile": {
     "default_example": {
-      "parameters": {
+      "path": {
         "petId": 12345
       },
       "body": {

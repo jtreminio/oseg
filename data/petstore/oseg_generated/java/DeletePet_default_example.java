@@ -21,6 +21,7 @@ public class DeletePet_default_example
             var apiCaller = new PetApi(config);
 
             apiCaller.deletePet(
+                null,
                 null
             );
         } catch (ApiException e) {

@@ -4,6 +4,7 @@ import * as openapi_client from "openapi_client";
 const apiCaller = new openapi_client.StoreApi();
 
 const orderId = undefined;
+
 apiCaller.deleteOrder(
     orderId,
 ).catch(error => {

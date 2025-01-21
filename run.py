@@ -10,6 +10,7 @@ def main():
         "petstore",
         "museum",
     ]
+
     operation_id = None
 
     sdks = [

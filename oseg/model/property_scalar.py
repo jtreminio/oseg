@@ -10,16 +10,11 @@ T = Union[T_SINGLE, T_LIST, None]
 class PropertyScalar(model.PropertyProto):
     def __init__(
         self,
-        name: str,
-        value: T,
         schema: oa.Schema,
-        parent: oa.Schema | oa.Parameter,
+        value: T,
+        is_required: bool,
     ):
-        self._type = ""
-        self._format = None
-        self._is_enum = False
-
-        self._setup(name, value, schema, parent)
+        super().__init__(schema, value, is_required)
 
         self._type = self._set_type()
         self._normalize_value()

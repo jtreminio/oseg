@@ -3,16 +3,16 @@ import * as openapimuseum_client from "openapimuseum_client";
 
 const apiCaller = new openapimuseum_client.EventsApi();
 
-const special_event: openapimuseum_client.SpecialEvent = {
-    name: "Pirate Coding Workshop",
-    location: "Computer Room",
-    eventDescription: "Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).",
-    price: 25,
+const specialEvent: openapimuseum_client.SpecialEvent = {
+    name: "Mermaid Treasure Identification and Analysis",
+    location: "Under the seaaa 🦀 🎶 🌊.",
+    eventDescription: "Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.",
+    price: 0,
     dates: [
         "2023-09-05",
         "2023-09-08",
     ],
-    eventId: "3be6453c-03eb-4357-ae5a-984a0e574a54",
+    eventId: undefined,
 };
 
 apiCaller.createSpecialEvent(

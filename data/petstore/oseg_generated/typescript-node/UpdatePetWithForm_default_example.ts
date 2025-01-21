@@ -6,6 +6,7 @@ const apiCaller = new openapi_client.PetApi();
 const petId = undefined;
 const name = undefined;
 const status = undefined;
+
 apiCaller.updatePetWithForm(
     petId,
     name,

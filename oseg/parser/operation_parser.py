@@ -1,3 +1,5 @@
+from typing import Optional
+
 import openapi_pydantic as oa
 from oseg import parser, model
 
@@ -14,106 +16,110 @@ class OperationParser:
         "trace",
     ]
 
-    _FORM_DATA_CONTENT_TYPES = [
+    FORM_DATA_CONTENT_TYPES = [
         "application/x-www-form-urlencoded",
         "multipart/form-data",
     ]
 
     def __init__(
         self,
-        oa_parser: parser.OaParser,
-        operation_id: str | None = None,
+        oa_parser: "parser.OaParser",
+        example_data_parser: "parser.ExampleDataParser",
     ):
         self._oa_parser = oa_parser
-        self._request_operations: dict[str, model.RequestOperation] = {}
+        self._example_data_parser = example_data_parser
+
+    def setup_operations(
+        self,
+        operation_id: str | None,
+        example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"],
+    ) -> dict[str, "model.Operation"]:
+        example_data = example_data if example_data else {}
 
         if operation_id:
             operation_id = operation_id.lower()
 
-        self._setup_request_operations(operation_id)
+        operations: dict[str, model.Operation] = {}
 
-    @property
-    def operations(self) -> dict[str, "model.RequestOperation"]:
-        return self._request_operations
-
-    def _setup_request_operations(self, operation_id: str | None) -> None:
         for path, path_item in self._oa_parser.paths.items():
-            for method in self.HTTP_METHODS:
-                operation: oa.Operation | None = getattr(path_item, method)
+            for http_method in self.HTTP_METHODS:
+                oa_operation: oa.Operation | None = getattr(path_item, http_method)
 
-                if not operation or (
-                    operation_id and operation.operationId.lower() != operation_id
+                if not oa_operation or (
+                    operation_id and oa_operation.operationId.lower() != operation_id
                 ):
                     continue
 
-                request_operation = model.RequestOperation(
-                    operation=operation,
-                    api_name=self._get_api_name(operation),
-                    method=method,
-                    has_response=False,
-                    has_form_data=self._get_has_form_data(operation),
-                    is_binary_response=False,
-                    request_data=[],
-                )
+                custom_example_data = example_data.get(oa_operation.operationId, {})
 
-                self._set_response_data(
-                    operation,
-                    request_operation,
-                )
+                if not isinstance(custom_example_data, dict):
+                    custom_example_data = {}
 
-                self._request_operations[operation.operationId] = request_operation
+                request = self._get_request(oa_operation, custom_example_data)
 
-    def _set_response_data(
-        self,
-        operation: oa.Operation,
-        request_operation: "model.RequestOperation",
-    ) -> None:
-        """Does the current operation have a response?
+                # only care about Operations with a request
+                if not request:
+                    print(
+                        f"Skipping operation with no request data: {oa_operation.operationId}"
+                    )
 
-        Exit early as soon as we find a response
-        """
-
-        for _, response in operation.responses.items():
-            if not response.content:
-                continue
-
-            for _, media_type in response.content.items():
-                if not media_type.media_type_schema:
                     continue
 
-                request_operation.has_response = True
-                request_operation.is_binary_response = parser.TypeChecker.is_file(
-                    media_type.media_type_schema
+                operation = model.Operation(
+                    operation=oa_operation,
+                    request=request,
+                    response=self._get_response(oa_operation),
+                    api_name=self._get_api_name(oa_operation),
+                    http_method=http_method,
                 )
 
-                return
+                operations[oa_operation.operationId] = operation
+
+        return operations
+
+    def _get_request(
+        self,
+        operation: oa.Operation,
+        custom_example_data: "model.EXAMPLE_DATA_BY_NAME",
+    ) -> Optional["model.Request"]:
+        """Only want the first request, if any"""
+
+        # todo allow operations with no request data or parameters
+        if (
+            not operation.requestBody or not len(operation.requestBody.content.keys())
+        ) and not operation.parameters:
+            return None
+
+        request = model.Request(
+            oa_parser=self._oa_parser,
+            operation=operation,
+            example_data_parser=self._example_data_parser,
+        )
+
+        request.example_data = custom_example_data
+
+        return request
+
+    def _get_response(self, operation: oa.Operation) -> Optional["model.Response"]:
+        """Only want the first response, if any"""
+
+        if not operation.responses:
+            return None
+
+        for http_code, response in operation.responses.items():
+            return model.Response(
+                oa_parser=self._oa_parser,
+                response=response,
+                http_code=http_code,
+            )
+
+        return None
 
     def _get_api_name(self, operation: oa.Operation) -> str:
         if not operation.tags or not len(operation.tags):
             raise LookupError(
                 f"Operation '{operation.operationId}' has no tags "
-                f"for generating API name",
+                "for generating API name"
             )
 
         return operation.tags[0].replace(" ", "")
-
-    def _get_has_form_data(self, operation: oa.Operation) -> bool:
-        """openapi-generator will generate a different interface for an API
-        request method depending on the request's content_type.
-
-        We only want the first result, because openapi-generator only ever
-        uses the first definition. If you have multiple requestBody defined,
-        the first being application/json and second multipart/form-data,
-        openapi-generator will considered the operation as having no form
-        data.
-
-        This is a silly thing and I hate it greatly.
-        """
-
-        if not operation.requestBody:
-            return False
-
-        for content_type, body in operation.requestBody.content.items():
-            return content_type in self._FORM_DATA_CONTENT_TYPES
-
-        return False

@@ -6,27 +6,44 @@ class TemplateParser:
     def __init__(self, extension: "jinja_extension.BaseExtension"):
         self._extension: jinja_extension.BaseExtension = extension
 
-    def parse_body_data(
+    # renamed from parse_body_data
+    def parse_request_objects(
         self,
-        parsed_properties: "model.ParsedProperties",
-        single_body_value: bool,
+        property_container: "model.PropertyContainer",
     ) -> dict[str, "model.PropertyObject"]:
-        """Parses body data that is sent as instantiated Model objects.
-
-        Drills down into dependent Model objects
+        """Reads through request data and finds all PropertyObject
+        or PropertyObjectArray, so we can create explicit variables
+        in the generated SDK example.
         """
 
-        if not parsed_properties.body:
-            return {}
+        result = {}
 
-        result = self._flatten_object(parsed_properties.body, "")
+        for name, prop in property_container.properties().items():
+            if not isinstance(prop, model.PropertyObject) and not isinstance(
+                prop, model.PropertyObjectArray
+            ):
+                continue
 
-        if single_body_value:
-            result[parsed_properties.body.type] = parsed_properties.body
+            current = self._flatten_object(
+                obj=prop,
+                parent_name="",
+            )
 
+            result = {**result, **current}
+
+        """Requests without formdata will have their body content defined
+        as a single object in the request, containing all its sub data.
+        
+        See OperationParser::FORM_DATA_CONTENT_TYPES
+        """
+        if property_container.body and not property_container.request.has_formdata:
+            result[property_container.body_type] = property_container.body
+
+        # noinspection PyTypeChecker
         return result
 
-    def parse_body_properties(
+    # renamed from parse_body_properties
+    def parse_object_properties(
         self,
         macros: "model.JinjaMacros",
         parent: "model.PropertyObject",
@@ -35,11 +52,15 @@ class TemplateParser:
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
-        result = self._parse_non_objects(
-            macros=macros,
-            parent_type=parent.type,
-            properties=parent.value.non_objects(),
-        )
+        result = {}
+
+        for name, prop in parent.non_objects().items():
+            result[name] = self._parse_non_objects(
+                macros=macros,
+                parent_type=parent.type,
+                name=name,
+                prop=prop,
+            )
 
         for name, parsed in self._parse_object(parent, parent_name).items():
             if isinstance(parsed, model.ParsedObject):
@@ -49,40 +70,49 @@ class TemplateParser:
 
         return self._indent(result, indent_count)
 
-    def parse_body_property_list(
+    # renamed from parse_body_property_list
+    def parse_object_list_properties(
         self,
         macros: "model.JinjaMacros",
-        parent: "model.PropertyObject",
+        parent: "model.PropertyObjectArray",
         parent_name: str,
         indent_count: int,
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
 
-        result = self._parse_non_objects(
-            macros=macros,
-            parent_type=parent.type,
-            properties=parent.value.non_objects(),
-        )
+        parsed = model.ParsedObjectArray()
 
-        for name, parsed in self._parse_object(parent, parent_name).items():
-            if isinstance(parsed, model.ParsedObject):
-                result[name] = macros.print_object(parsed)
-            else:
-                result[name] = macros.print_object_array(parsed)
+        property_name = parent.type
 
-            return self._indent(result, indent_count)[name]
+        if parent.properties:
+            first_item = parent.properties[0]
+            parsed.target_type = first_item.type
+
+            if first_item.base_type:
+                parsed.target_type = first_item.base_type
+        else:
+            parsed.target_type = parent.type
+
+        i = 1
+        for _ in parent.properties:
+            parsed.values.append(f"{parent_name}{property_name}_{i}")
+            i += 1
+
+        result = {property_name: macros.print_object_array(parsed)}
+
+        return self._indent(result, indent_count)[property_name]
 
     def parse_request_data(
         self,
         macros: "model.JinjaMacros",
-        parsed_properties: "model.ParsedProperties",
-        single_body_value: bool,
+        property_container: "model.PropertyContainer",
         indent_count: int,
         required_flag: bool | None = None,
+        include_body: bool | None = None,
     ) -> dict[str, str]:
         """Parse data passed directly to an API object.
 
-        Can include HTTP path/query params as well as body data.
+        Can include Parameters as well as body data.
         If current request is of type "multipart/form-data" or
         "application/x-www-form-urlencoded" we will usually want to print each
         body parameter individually.
@@ -91,88 +121,74 @@ class TemplateParser:
 
         Data is always sorted as:
 
-        1) Required HTTP params
-        2) Required body params
-        3) Optional HTTP params
-        4) Optional body params
+        1) Required Parameters
+        2) Required body data
+        3) Optional Parameters
+        4) Optional body data
         """
 
-        http_required = {}
-        http_optional = {}
+        result = {}
 
-        for name, parameter in parsed_properties.http.items():
-            if parameter.is_required:
-                http_required[name] = parameter
-            else:
-                http_optional[name] = parameter
+        for name, prop in property_container.properties(required_flag).items():
+            if property_container.body and prop == property_container.body:
+                if include_body is None or include_body is True:
+                    result[name] = self._extension.setter_property_name(
+                        property_container.body.type
+                    )
 
-        params_required = self._parse_non_objects(
-            macros=macros,
-            parent_type="",
-            properties=http_required,
-        )
+                continue
 
-        params_optional = self._parse_non_objects(
-            macros=macros,
-            parent_type="",
-            properties=http_optional,
-        )
+            if isinstance(prop, model.PropertyObject) or isinstance(
+                prop, model.PropertyObjectArray
+            ):
+                result[name] = self._extension.setter_property_name(prop.type)
 
-        if parsed_properties.body and single_body_value:
-            value = self._extension.setter_property_name(parsed_properties.body.type)
+                continue
 
-            if parsed_properties.body.is_required:
-                params_required[parsed_properties.body.type] = value
-            else:
-                params_optional[parsed_properties.body.type] = value
-
-        if parsed_properties.body and not single_body_value:
-            body_params_required = self._parse_non_objects(
+            result[name] = self._parse_non_objects(
                 macros=macros,
                 parent_type="",
-                properties=parsed_properties.body.value.non_objects(True),
+                name=name,
+                prop=prop,
             )
 
-            body_params_optional = self._parse_non_objects(
-                macros=macros,
-                parent_type="",
-                properties=parsed_properties.body.value.non_objects(False),
-            )
-
-            for k, v in body_params_required.items():
-                params_required[k] = v
-
-            for k, v in body_params_optional.items():
-                params_optional[k] = v
-
-        if required_flag:
-            params_optional = {}
-        elif required_flag is not None and not required_flag:
-            params_required = {}
-
-        for k, v in params_optional.items():
-            params_required[k] = v
-
-        return self._indent(params_required, indent_count)
+        return self._indent(result, indent_count)
 
     def _flatten_object(
         self,
-        obj: "model.PropertyObject",
+        obj: "model.PROPERTY_OBJECT_TYPE",
         parent_name: str,
-    ) -> dict[str, "model.PropertyObject"]:
+    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
-        for name, sub_obj in obj.value.objects.items():
+        if isinstance(obj, model.PropertyObjectArray):
+            name = f"{parent_name}{obj.type}"
+
+            i = 1
+            for sub_obj in obj.properties:
+                sub_name = f"{name}_{i}"
+                sub_results = self._flatten_object(sub_obj, sub_name)
+                result |= sub_results
+                result[sub_name] = sub_obj
+                i += 1
+
+            result[name] = obj
+
+            return result
+
+        assert isinstance(obj, model.PropertyObject)
+
+        for name, sub_obj in obj.objects.items():
             sub_name = f"{parent_name}{name}"
 
             sub_results = self._flatten_object(sub_obj, sub_name)
             result |= sub_results
             result[sub_name] = sub_obj
 
-        for name, array_obj in obj.value.array_objects.items():
+        for name, array_obj in obj.array_objects.items():
             i = 1
-            for sub_obj in array_obj.value:
+            for sub_obj in array_obj.properties:
                 sub_name = f"{parent_name}{name}_{i}"
                 sub_results = self._flatten_object(sub_obj, sub_name)
                 result |= sub_results
@@ -185,41 +201,32 @@ class TemplateParser:
         self,
         macros: "model.JinjaMacros",
         parent_type: str,
-        properties: dict[
-            str,
-            Union[
-                "model.PropertyFile",
-                "model.PropertyFreeForm",
-                "model.PropertyScalar",
-            ],
-        ],
-    ) -> dict[str, any]:
-        result: dict[str, any] = {}
+        name: str,
+        prop: "model.PropertyProto",
+    ) -> any:
+        if isinstance(prop, model.PropertyScalar):
+            parsed = self._extension.parse_scalar(parent_type, name, prop)
 
-        for name, prop in properties.items():
-            if isinstance(prop, model.PropertyScalar):
-                parsed = self._extension.parse_scalar(parent_type, name, prop)
+            if prop.is_array:
+                return macros.print_scalar_array(parsed)
+            else:
+                return macros.print_scalar(parsed)
+        elif isinstance(prop, model.PropertyFile):
+            parsed = self._extension.parse_file(parent_type, name, prop)
 
-                if prop.is_array:
-                    result[name] = macros.print_scalar_array(parsed)
-                else:
-                    result[name] = macros.print_scalar(parsed)
-            elif isinstance(prop, model.PropertyFile):
-                parsed = self._extension.parse_file(parent_type, name, prop)
+            if prop.is_array:
+                return macros.print_file_array(parsed)
+            else:
+                return macros.print_file(parsed)
+        elif isinstance(prop, model.PropertyFreeForm):
+            parsed = self._extension.parse_free_form(name, prop)
 
-                if prop.is_array:
-                    result[name] = macros.print_file_array(parsed)
-                else:
-                    result[name] = macros.print_file(parsed)
-            elif isinstance(prop, model.PropertyFreeForm):
-                parsed = self._extension.parse_free_form(name, prop)
+            if prop.is_array:
+                return macros.print_free_form_array(parsed)
+            else:
+                return macros.print_free_form(parsed)
 
-                if prop.is_array:
-                    result[name] = macros.print_free_form_array(parsed)
-                else:
-                    result[name] = macros.print_free_form(parsed)
-
-        return result
+        return None
 
     def _parse_object(
         self,
@@ -229,14 +236,14 @@ class TemplateParser:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
-        for property_name, sub_obj in obj.value.objects.items():
+        for property_name, sub_obj in obj.objects.items():
             parsed = model.ParsedObject()
             result[property_name] = parsed
 
             parsed.value = f"{parent_name}{property_name}"
             parsed.target_type = sub_obj.type
 
-        for property_name, array_obj in obj.value.array_objects.items():
+        for property_name, array_obj in obj.array_objects.items():
             i = 1
 
             parsed = model.ParsedObjectArray()
@@ -246,28 +253,28 @@ class TemplateParser:
                 return result
 
             if not array_obj:
-                if parser.TypeChecker.is_object_array(obj.value.schema):
-                    parsed.target_type = obj.value.schema.items.ref.split("/").pop()
+                if parser.TypeChecker.is_object_array(obj.schema):
+                    parsed.target_type = obj.schema.items.ref.split("/").pop()
 
                     return result
 
-                property_schema = obj.value.schema.properties[property_name]
+                property_schema = obj.schema.properties[property_name]
 
                 if parser.TypeChecker.is_object_array(property_schema):
                     parsed.target_type = property_schema.items.ref.split("/").pop()
 
                 return result
 
-            if array_obj.value:
-                first_item = array_obj.value[0]
+            if array_obj.properties:
+                first_item = array_obj.properties[0]
                 parsed.target_type = first_item.type
 
-                if first_item.discriminator_base_type:
-                    parsed.target_type = first_item.discriminator_base_type
+                if first_item.base_type:
+                    parsed.target_type = first_item.base_type
             else:
                 parsed.target_type = array_obj.type
 
-            for _ in array_obj.value:
+            for _ in array_obj.properties:
                 parsed.values.append(f"{parent_name}{property_name}_{i}")
                 i += 1
 

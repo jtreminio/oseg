@@ -1,5 +1,5 @@
 import unittest
-from oseg import parser
+from oseg import model, parser
 from test_utils import TestUtils
 
 
@@ -22,7 +22,7 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         schema = self.oa_parser_discriminator.components.schemas.get("Dog")
-        parsed = property_parser.parse(
+        dog = property_parser.parse(
             schema=schema,
             data=data,
         )
@@ -34,18 +34,18 @@ class TestPropertyParser(unittest.TestCase):
             "group",
         ]
         expected_type = "Terrier"
-        expected_discriminator_base_type = "Dog"
+        expected_base_type = "Dog"
 
-        self.assertEqual(set(expected_properties), set(parsed.properties))
-        self.assertEqual(expected_type, parsed.type)
+        self.assertEqual(set(expected_properties), set(dog.properties))
+        self.assertEqual(expected_type, dog.type)
         self.assertEqual(
-            expected_discriminator_base_type,
-            parsed.discriminator_base_type,
+            expected_base_type,
+            dog.base_type,
         )
 
-        self.assertEqual(data["id"], parsed.scalars.get("id").value)
-        self.assertEqual(data["breed"], parsed.scalars.get("breed").value)
-        self.assertEqual(data["group"], parsed.scalars.get("group").value)
+        self.assertEqual(data["id"], dog.scalars.get("id").value)
+        self.assertEqual(data["breed"], dog.scalars.get("breed").value)
+        self.assertEqual(data["group"], dog.scalars.get("group").value)
 
     def test_discriminator_array(self):
         property_parser = parser.PropertyParser(self.oa_parser_discriminator)
@@ -66,23 +66,23 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         schema = self.oa_parser_discriminator.components.schemas.get("Dogs")
-        parsed = property_parser.parse(
+        dogs = property_parser.parse(
             schema=schema,
             data=data,
         )
 
         expected_properties = ["dogs"]
         expected_type = "Dogs"
-        expected_discriminator_base_type = None
+        expected_base_type = None
         expected_property_count = 1
 
-        self.assertEqual(set(expected_properties), set(parsed.properties))
-        self.assertEqual(expected_type, parsed.type)
+        self.assertEqual(set(expected_properties), set(dogs.properties))
+        self.assertEqual(expected_type, dogs.type)
         self.assertEqual(
-            expected_discriminator_base_type,
-            parsed.discriminator_base_type,
+            expected_base_type,
+            dogs.base_type,
         )
-        self.assertEqual(expected_property_count, len(parsed.properties))
+        self.assertEqual(expected_property_count, len(dogs.properties))
 
         expected_dog_properties = [
             "id",
@@ -94,38 +94,38 @@ class TestPropertyParser(unittest.TestCase):
         data_provider = [
             {
                 "type": "Terrier",
-                "discriminator_base_type": "Dog",
+                "base_type": "Dog",
             },
             {
                 "type": "Beagle",
-                "discriminator_base_type": "Dog",
+                "base_type": "Dog",
             },
         ]
 
         i = 0
         for datum in data_provider:
             with self.subTest(datum["type"]):
-                dog = parsed.array_objects.get("dogs").value[i]
+                dog = dogs.array_objects.get("dogs").properties[i]
                 expected = data["dogs"][i]
 
                 self.assertEqual(
                     set(expected_dog_properties),
-                    set(dog.value.properties),
+                    set(dog.properties),
                 )
                 self.assertEqual(datum["type"], dog.type)
                 self.assertEqual(
-                    datum["discriminator_base_type"],
-                    dog.discriminator_base_type,
+                    datum["base_type"],
+                    dog.base_type,
                 )
 
-                self.assertEqual(expected["id"], dog.value.scalars.get("id").value)
+                self.assertEqual(expected["id"], dog.scalars.get("id").value)
                 self.assertEqual(
                     expected["breed"],
-                    dog.value.scalars.get("breed").value,
+                    dog.scalars.get("breed").value,
                 )
                 self.assertEqual(
                     expected["group"],
-                    dog.value.scalars.get("group").value,
+                    dog.scalars.get("group").value,
                 )
 
                 i += 1
@@ -162,7 +162,7 @@ class TestPropertyParser(unittest.TestCase):
         i = 0
         for data in data_provider:
             with self.subTest(i):
-                parsed = property_parser.parse(
+                dog = property_parser.parse(
                     schema=schema,
                     data=data,
                 )
@@ -173,18 +173,18 @@ class TestPropertyParser(unittest.TestCase):
                     "mans_best_friend",
                 ]
                 expected_type = "Dog"
-                expected_discriminator_base_type = None
+                expected_base_type = None
 
-                self.assertEqual(set(expected_properties), set(parsed.properties))
-                self.assertEqual(expected_type, parsed.type)
+                self.assertEqual(set(expected_properties), set(dog.properties))
+                self.assertEqual(expected_type, dog.type)
                 self.assertEqual(
-                    expected_discriminator_base_type,
-                    parsed.discriminator_base_type,
+                    expected_base_type,
+                    dog.base_type,
                 )
 
-                self.assertEqual(data["id"], parsed.scalars.get("id").value)
+                self.assertEqual(data["id"], dog.scalars.get("id").value)
                 self.assertEqual(
-                    expected_breed_values[i], parsed.scalars.get("breed").value
+                    expected_breed_values[i], dog.scalars.get("breed").value
                 )
 
                 i += 1
@@ -201,7 +201,7 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         schema = self.oa_parser_discriminator.components.schemas.get("Terrier")
-        parsed = property_parser.parse(
+        terrier = property_parser.parse(
             schema=schema,
             data=data,
         )
@@ -213,18 +213,18 @@ class TestPropertyParser(unittest.TestCase):
             "group",
         ]
         expected_type = "Terrier"
-        expected_discriminator_base_type = None
+        expected_base_type = None
 
-        self.assertEqual(set(expected_properties), set(parsed.properties))
-        self.assertEqual(expected_type, parsed.type)
+        self.assertEqual(set(expected_properties), set(terrier.properties))
+        self.assertEqual(expected_type, terrier.type)
         self.assertEqual(
-            expected_discriminator_base_type,
-            parsed.discriminator_base_type,
+            expected_base_type,
+            terrier.base_type,
         )
 
-        self.assertEqual(data["id"], parsed.scalars.get("id").value)
-        self.assertEqual(data["breed"], parsed.scalars.get("breed").value)
-        self.assertEqual(data["group"], parsed.scalars.get("group").value)
+        self.assertEqual(data["id"], terrier.scalars.get("id").value)
+        self.assertEqual(data["breed"], terrier.scalars.get("breed").value)
+        self.assertEqual(data["group"], terrier.scalars.get("group").value)
 
     def test_all_of_array(self):
         property_parser = parser.PropertyParser(self.oa_parser_discriminator)
@@ -252,14 +252,14 @@ class TestPropertyParser(unittest.TestCase):
 
         expected_properties = ["terriers"]
         expected_type = "Terriers"
-        expected_discriminator_base_type = None
+        expected_base_type = None
         expected_property_count = 1
 
         self.assertEqual(set(expected_properties), set(parsed.properties))
         self.assertEqual(expected_type, parsed.type)
         self.assertEqual(
-            expected_discriminator_base_type,
-            parsed.discriminator_base_type,
+            expected_base_type,
+            parsed.base_type,
         )
         self.assertEqual(expected_property_count, len(parsed.properties))
 
@@ -273,38 +273,38 @@ class TestPropertyParser(unittest.TestCase):
         data_provider = [
             {
                 "type": "Terrier",
-                "discriminator_base_type": None,
+                "base_type": None,
             },
             {
                 "type": "Terrier",
-                "discriminator_base_type": None,
+                "base_type": None,
             },
         ]
 
         i = 0
         for datum in data_provider:
             with self.subTest(datum["type"]):
-                terrier = parsed.array_objects.get("terriers").value[i]
+                terrier = parsed.array_objects.get("terriers").properties[i]
                 expected = data["terriers"][i]
 
                 self.assertEqual(
                     set(expected_terrier_properties),
-                    set(terrier.value.properties),
+                    set(terrier.properties),
                 )
                 self.assertEqual(datum["type"], terrier.type)
                 self.assertEqual(
-                    datum["discriminator_base_type"],
-                    terrier.discriminator_base_type,
+                    datum["base_type"],
+                    terrier.base_type,
                 )
 
-                self.assertEqual(expected["id"], terrier.value.scalars.get("id").value)
+                self.assertEqual(expected["id"], terrier.scalars.get("id").value)
                 self.assertEqual(
                     expected["breed"],
-                    terrier.value.scalars.get("breed").value,
+                    terrier.scalars.get("breed").value,
                 )
                 self.assertEqual(
                     expected["group"],
-                    terrier.value.scalars.get("group").value,
+                    terrier.scalars.get("group").value,
                 )
 
                 i += 1
@@ -361,12 +361,12 @@ class TestPropertyParser(unittest.TestCase):
         }
 
         schema = self.oa_parser_properties.components.schemas.get("Pet")
-        parsed = property_parser.parse(
+        pet = property_parser.parse(
             schema=schema,
             data=data,
         )
 
-        self.assertEqual(set(data), set(parsed.properties))
+        self.assertEqual(set(data), set(pet.properties))
 
         non_object_props = [
             "prop_string",
@@ -399,87 +399,103 @@ class TestPropertyParser(unittest.TestCase):
             with self.subTest(name):
                 value = data[name]
 
-                self.assertEqual(value, parsed.properties.get(name).value)
+                self.assertEqual(value, pet.properties.get(name).value)
 
-        prop_object = parsed.objects.get("prop_object")
+        prop_object = pet.objects.get("prop_object")
         self.assertEqual("Pet_prop_object", prop_object.type)
         self.assertEqual(
-            prop_object.value.scalars.get("key_1").value,
+            prop_object.scalars.get("key_1").value,
             val_object["key_1"],
         )
 
-        prop_ref_object = parsed.objects.get("prop_ref_object")
+        prop_ref_object = pet.objects.get("prop_ref_object")
         self.assertEqual("PropRefObject", prop_ref_object.type)
         self.assertEqual(
-            prop_ref_object.value.scalars.get("key_1").value,
+            prop_ref_object.scalars.get("key_1").value,
             val_object["key_1"],
         )
 
-        prop_array_ref_object_1 = parsed.array_objects.get(
+        prop_array_ref_object_1 = pet.array_objects.get(
             "prop_array_ref_object"
-        ).value[0]
+        ).properties[0]
         self.assertEqual("PropRefObject", prop_array_ref_object_1.type)
         self.assertEqual(
-            prop_array_ref_object_1.value.scalars.get("key_1").value,
+            prop_array_ref_object_1.scalars.get("key_1").value,
             val_array_object[0]["key_1"],
         )
 
-        prop_array_ref_object_2 = parsed.array_objects.get(
+        prop_array_ref_object_2 = pet.array_objects.get(
             "prop_array_ref_object"
-        ).value[1]
+        ).properties[1]
         self.assertEqual("PropRefObject", prop_array_ref_object_2.type)
         self.assertEqual(
-            prop_array_ref_object_2.value.scalars.get("key_1").value,
+            prop_array_ref_object_2.scalars.get("key_1").value,
             val_array_object[1]["key_1"],
         )
 
-        prop_nested_object = parsed.objects.get("prop_nested_object")
+        prop_nested_object = pet.objects.get("prop_nested_object")
         self.assertEqual("Pet_prop_nested_object", prop_nested_object.type)
-        prop_nested_object_key_1 = prop_nested_object.value.objects.get("key_1")
+        prop_nested_object_key_1 = prop_nested_object.objects.get("key_1")
         self.assertEqual("Pet_prop_nested_object_key_1", prop_nested_object_key_1.type)
         self.assertEqual(
-            prop_nested_object_key_1.value.scalars.get("key_2").value,
+            prop_nested_object_key_1.scalars.get("key_2").value,
             val_nested_object["key_1"]["key_2"],
         )
 
-        prop_ref_nested_object = parsed.objects.get("prop_ref_nested_object")
+        prop_ref_nested_object = pet.objects.get("prop_ref_nested_object")
         self.assertEqual("PropRefNestedObject", prop_ref_nested_object.type)
-        prop_ref_nested_object_key_1 = prop_ref_nested_object.value.objects.get("key_1")
+        prop_ref_nested_object_key_1 = prop_ref_nested_object.objects.get("key_1")
         self.assertEqual("PropRefNestedObject_key_1", prop_ref_nested_object_key_1.type)
         self.assertEqual(
-            prop_ref_nested_object_key_1.value.scalars.get("key_2").value,
+            prop_ref_nested_object_key_1.scalars.get("key_2").value,
             val_nested_object["key_1"]["key_2"],
         )
 
-        prop_array_ref_nested_object_1 = parsed.array_objects.get(
+        prop_array_ref_nested_object_1 = pet.array_objects.get(
             "prop_array_ref_nested_object"
-        ).value[0]
+        ).properties[0]
         self.assertEqual("PropRefNestedObject", prop_array_ref_nested_object_1.type)
         prop_array_ref_nested_object_1_key_1 = (
-            prop_array_ref_nested_object_1.value.objects.get("key_1")
+            prop_array_ref_nested_object_1.objects.get("key_1")
         )
         self.assertEqual(
             "PropRefNestedObject_key_1", prop_array_ref_nested_object_1_key_1.type
         )
         self.assertEqual(
-            prop_array_ref_nested_object_1_key_1.value.scalars.get("key_2").value,
+            prop_array_ref_nested_object_1_key_1.scalars.get("key_2").value,
             val_array_nested_object[0]["key_1"]["key_2"],
         )
 
-        prop_array_ref_nested_object_2 = parsed.array_objects.get(
+        prop_array_ref_nested_object_2 = pet.array_objects.get(
             "prop_array_ref_nested_object"
-        ).value[1]
+        ).properties[1]
         self.assertEqual("PropRefNestedObject", prop_array_ref_nested_object_2.type)
         prop_array_ref_nested_object_2_key_1 = (
-            prop_array_ref_nested_object_2.value.objects.get("key_1")
+            prop_array_ref_nested_object_2.objects.get("key_1")
         )
         self.assertEqual(
             "PropRefNestedObject_key_1", prop_array_ref_nested_object_2_key_1.type
         )
         self.assertEqual(
-            prop_array_ref_nested_object_2_key_1.value.scalars.get("key_2").value,
+            prop_array_ref_nested_object_2_key_1.scalars.get("key_2").value,
             val_array_nested_object[1]["key_1"]["key_2"],
         )
+
+    def test_non_named_parameter_object(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        operation = self.oa_parser_properties.operations["default"]
+        example_data = operation.request.example_data[example_name]
+
+        free_form_obj = example_data.query.free_forms["paramComponentObject"]
+        array_free_form_obj = example_data.query.array_free_forms[
+            "paramComponentArrayObject"
+        ]
+
+        self.assertIsInstance(free_form_obj, model.PropertyFreeForm)
+        self.assertIsInstance(array_free_form_obj, model.PropertyFreeForm)
+
+        self.assertFalse(free_form_obj.is_array)
+        self.assertTrue(array_free_form_obj.is_array)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ paths:
       tags:
         - pet
       operationId: default
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: Successful operation

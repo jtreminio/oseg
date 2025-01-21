@@ -5,17 +5,23 @@ from oseg import parser
 
 
 class PropertyProto(Protocol):
-    _name: str
     _value: any
     _schema: oa.Schema
-    _parent: oa.Schema | oa.Parameter | None
     _is_array: bool
     _is_required: bool
     _is_nullable: bool
 
-    @property
-    def name(self) -> str:
-        return self._name
+    def __init__(
+        self,
+        schema: oa.Schema,
+        value: any,
+        is_required: bool,
+    ):
+        self._schema = schema
+        self._value = value
+        self._is_array = parser.TypeChecker.is_array(self._schema)
+        self._is_required = is_required
+        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
 
     @property
     def schema(self) -> oa.Schema:
@@ -37,30 +43,3 @@ class PropertyProto(Protocol):
     @property
     def is_nullable(self) -> bool:
         return self._is_nullable
-
-    def _setup(
-        self,
-        name: str,
-        value: any,
-        schema: oa.Schema,
-        parent: oa.Schema | oa.Parameter | None,
-    ) -> None:
-        self._name = name
-        self._value = value
-        self._schema = schema
-        self._parent = parent
-        self._is_array = parser.TypeChecker.is_array(self._schema)
-        self._is_required = self._set_is_required()
-        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
-
-    def _set_is_required(self) -> bool:
-        if self._parent is None:
-            return False
-
-        if self._parent.required is None:
-            return False
-
-        if isinstance(self._parent.required, bool):
-            return self._parent.required
-
-        return self._name in self._parent.required

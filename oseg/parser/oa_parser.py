@@ -1,6 +1,6 @@
 import openapi_pydantic as oa
-from typing import Union
-from oseg import parser
+from typing import Union, Optional
+from oseg import model, parser
 
 
 RESOLVABLE = Union[
@@ -13,11 +13,30 @@ RESOLVABLE = Union[
 
 
 class OaParser:
-    def __init__(self, oas_file: str):
+    def __init__(
+        self,
+        oas_file: str,
+        operation_id: str | None = None,
+        example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
+    ):
         self._file_loader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
         self._setup_oas()
+
         self._component_resolver = parser.ComponentResolver(self)
+        example_data_parser = parser.ExampleDataParser(self)
+        operation_parser = parser.OperationParser(self, example_data_parser)
+
+        self._operations: dict[str, model.Operation] = (
+            operation_parser.setup_operations(
+                operation_id=operation_id,
+                example_data=example_data,
+            )
+        )
+
+    @property
+    def operations(self) -> dict[str, "model.Operation"]:
+        return self._operations
 
     @property
     def file_loader(self) -> "parser.FileLoader":
@@ -112,7 +131,18 @@ class OaParser:
         schema: RESOLVABLE,
         components: dict[str, RESOLVABLE],
     ):
-        if not parser.TypeChecker.is_ref(schema):
+        name = None
+
+        # Example schema may use "$ref" for external file
+        if isinstance(schema, dict) and "ref" in schema:
+            name = schema.get("ref").split("/").pop()
+        elif isinstance(schema, dict) and "$ref" in schema:
+            name = schema.get("$ref").split("/").pop()
+
+        if name is not None:
+            return components.get(name)
+
+        if name is None and not parser.TypeChecker.is_ref(schema):
             return schema
 
         if isinstance(schema, str):

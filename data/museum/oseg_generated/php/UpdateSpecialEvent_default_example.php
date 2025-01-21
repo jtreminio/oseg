@@ -5,10 +5,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPIMuseum\Client\Configuration::getDefaultConfiguration();
 
 $special_event_fields = (new OpenAPIMuseum\Client\Model\SpecialEventFields())
-    ->setName("Pirate Coding Workshop")
-    ->setLocation("Computer Room")
-    ->setEventDescription("Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).")
-    ->setPrice(25)
+    ->setName(null)
+    ->setLocation("On the beach.")
+    ->setEventDescription(null)
+    ->setPrice(15)
     ->setDates(null);
 
 try {

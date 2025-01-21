@@ -11,7 +11,7 @@ class TypescriptNodeExtension(BaseExtension):
         return self.camel_case(name)
 
     def setter_property_name(self, name: str) -> str:
-        return self.snake_case(name)
+        return self.camel_case(name)
 
     def parse_scalar(
         self,

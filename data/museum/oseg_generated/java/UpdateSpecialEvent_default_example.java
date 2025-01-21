@@ -17,10 +17,10 @@ public class UpdateSpecialEvent_default_example
         var config = Configuration.getDefaultApiClient();
 
         var specialEventFields = new SpecialEventFields()
-            .name("Pirate Coding Workshop")
-            .location("Computer Room")
-            .eventDescription("Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).")
-            .price(25F)
+            .name(null)
+            .location("On the beach.")
+            .eventDescription(null)
+            .price(15F)
             .dates(null);
 
         try

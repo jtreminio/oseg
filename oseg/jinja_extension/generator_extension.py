@@ -1,6 +1,6 @@
 import jinja2
 from jinja2 import ext, pass_context
-from jinja2.runtime import Context
+from jinja2.runtime import Context, Undefined
 from typing import Callable
 from oseg import jinja_extension, model
 
@@ -39,10 +39,12 @@ class GeneratorExtension(jinja2.ext.Extension):
         environment.filters["setter_property_name"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.setter_property_name(name)
         )
-        environment.globals.update(parse_body_data=self._parse_body_data)
-        environment.globals.update(parse_body_properties=self._parse_body_properties)
+        environment.globals.update(parse_request_objects=self._parse_request_objects)
         environment.globals.update(
-            parse_body_property_list=self._parse_body_property_list
+            parse_object_properties=self._parse_object_properties
+        )
+        environment.globals.update(
+            parse_object_list_properties=self._parse_object_list_properties
         )
         environment.globals.update(parse_request_data=self._parse_request_data)
 
@@ -81,25 +83,23 @@ class GeneratorExtension(jinja2.ext.Extension):
     ) -> None:
         self._generators[name] = generator
 
-    def _parse_body_data(
+    def _parse_request_objects(
         self,
-        parsed_properties: model.ParsedProperties,
-        single_body_value: bool,
-    ) -> dict[str, model.PropertyObject]:
-        return self._sdk_generator.template_parser.parse_body_data(
-            parsed_properties,
-            single_body_value,
+        property_container: "model.PropertyContainer",
+    ) -> dict[str, "model.PropertyObject"]:
+        return self._sdk_generator.template_parser.parse_request_objects(
+            property_container,
         )
 
     @pass_context
-    def _parse_body_properties(
+    def _parse_object_properties(
         self,
         context: Context,
         parent: model.PropertyObject,
         parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
-        return self._sdk_generator.template_parser.parse_body_properties(
+        return self._sdk_generator.template_parser.parse_object_properties(
             macros=model.JinjaMacros(context),
             parent=parent,
             parent_name=parent_name,
@@ -107,14 +107,14 @@ class GeneratorExtension(jinja2.ext.Extension):
         )
 
     @pass_context
-    def _parse_body_property_list(
+    def _parse_object_list_properties(
         self,
         context: Context,
-        parent: model.PropertyObject,
+        parent: model.PropertyObjectArray,
         parent_name: str,
         indent_count: int,
     ) -> str:
-        return self._sdk_generator.template_parser.parse_body_property_list(
+        return self._sdk_generator.template_parser.parse_object_list_properties(
             macros=model.JinjaMacros(context),
             parent=parent,
             parent_name=parent_name,
@@ -125,15 +125,21 @@ class GeneratorExtension(jinja2.ext.Extension):
     def _parse_request_data(
         self,
         context: Context,
-        parsed_properties: model.ParsedProperties,
-        single_body_value: bool,
+        property_container: "model.PropertyContainer",
         indent_count: int,
         required_flag: bool | None = None,
+        include_body: bool | None = None,
     ) -> dict[str, str]:
+        if isinstance(required_flag, Undefined):
+            required_flag = None
+
+        if isinstance(include_body, Undefined):
+            include_body = None
+
         return self._sdk_generator.template_parser.parse_request_data(
             macros=model.JinjaMacros(context),
-            parsed_properties=parsed_properties,
-            single_body_value=single_body_value,
+            property_container=property_container,
             indent_count=indent_count,
             required_flag=required_flag,
+            include_body=include_body,
         )

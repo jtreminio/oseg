@@ -1,140 +1,213 @@
 import openapi_pydantic as oa
-from typing import Union, TypeVar, Generic
+from typing import Union, Optional
 from oseg import model
 
-
-T_PROPERTIES = dict[str, model.PropertyProto]
-TYPE = TypeVar("TYPE", bound=type)
-T_NON_OBJECTS = Union[
-    "model.PropertyFile",
-    "model.PropertyFreeForm",
-    "model.PropertyScalar",
-]
+T_PROPERTIES = dict[str, Union["model.PropertyProto", "model.PROPERTY_OBJECT_TYPE"]]
+T_PARAMETER = Union["model.PropertyProto", "model.PropertyObject"]
 
 
 class PropertyContainer:
-    def __init__(self, schema: oa.Schema, type: str | None):
-        self._schema = schema
-        self._type = type
-        self._properties: T_PROPERTIES = {}
-        self._discriminator_base_type: str | None = None
+    def __init__(self, request: "model.Request"):
+        self._body: Optional["model.PROPERTY_OBJECT_TYPE"] = None
+        self._path: Optional["model.PropertyObject"] = None
+        self._query: Optional["model.PropertyObject"] = None
+        self._header: Optional["model.PropertyObject"] = None
+        self._cookie: Optional["model.PropertyObject"] = None
+
+        self._request = request
+        self._parameters = request.parameters
+        self._is_body_required = request.is_required
+        self._required_properties: Optional[T_PROPERTIES] = None
+        self._optional_properties: Optional[T_PROPERTIES] = None
 
     @property
-    def schema(self) -> oa.Schema:
-        return self._schema
+    def request(self) -> "model.Request":
+        return self._request
 
     @property
-    def type(self) -> str:
-        return self._type
+    def path(self) -> Optional["model.PropertyObject"]:
+        return self._path
 
-    @type.setter
-    def type(self, value: str):
-        self._type = value
+    @property
+    def query(self) -> Optional["model.PropertyObject"]:
+        return self._query
 
-    def get(self, name: str) -> model.PropertyProto:
-        return self.properties[name]
+    @property
+    def header(self) -> Optional["model.PropertyObject"]:
+        return self._header
 
-    def add(
+    @property
+    def cookie(self) -> Optional["model.PropertyObject"]:
+        return self._cookie
+
+    @property
+    def body(self) -> Optional["model.PROPERTY_OBJECT_TYPE"]:
+        return self._body
+
+    @body.setter
+    def body(self, data: Optional["model.PROPERTY_OBJECT_TYPE"]):
+        self._clear_sorted_properties()
+        self._body = data
+
+    @property
+    def body_type(self) -> str | None:
+        body = self.body
+
+        if body is None:
+            return None
+
+        if isinstance(body, model.PropertyObjectArray):
+            return body.properties[0].type
+
+        return body.type
+
+    @property
+    def is_body_required(self) -> bool:
+        return self._request.is_required
+
+    def set_parameters(
         self,
-        name: str,
-        value: model.PropertyProto,
+        data: "model.PropertyObject",
+        param_in: oa.ParameterLocation,
     ) -> None:
-        self._properties[name] = value
+        self._clear_sorted_properties()
 
-    def has(self, name: str) -> bool:
-        return name in self.properties
+        if param_in.value == oa.ParameterLocation.PATH.value:
+            self._path = data
 
-    @property
-    def properties(self) -> T_PROPERTIES:
-        return self._properties
+        if param_in.value == oa.ParameterLocation.QUERY.value:
+            self._query = data
 
-    @property
-    def discriminator_base_type(self) -> str | None:
-        return self._discriminator_base_type
+        if param_in.value == oa.ParameterLocation.HEADER.value:
+            self._header = data
 
-    def set_discriminator(self, discriminator: str | None) -> None:
-        if discriminator is None:
-            self._discriminator_base_type = None
+        if param_in.value == oa.ParameterLocation.COOKIE.value:
+            self._cookie = data
 
-            return
+    def properties(self, required_flag: bool | None = None) -> T_PROPERTIES:
+        # properties have not yet been sorted
+        if self._required_properties is None or self._optional_properties is None:
+            self._sort_properties(required_flag)
 
-        self._discriminator_base_type = self._type
-        self._type = discriminator
+        if required_flag is True:
+            return self._required_properties
 
-    @property
-    def objects(self) -> dict[str, "model.PropertyObject"]:
-        return self._get_properties_of_type(model.PropertyObject, False)
+        if required_flag is False:
+            return self._optional_properties
 
-    @property
-    def array_objects(self) -> dict[str, "model.PropertyObjectArray"]:
-        return self._get_properties_of_type(model.PropertyObjectArray, True)
+        return {**self._required_properties, **self._optional_properties}
 
-    @property
-    def scalars(self) -> dict[str, "model.PropertyScalar"]:
-        return self._get_properties_of_type(model.PropertyScalar, False)
+    def _clear_sorted_properties(self):
+        self._required_properties = None
+        self._optional_properties = None
 
-    @property
-    def array_scalars(self) -> dict[str, "model.PropertyScalar"]:
-        return self._get_properties_of_type(model.PropertyScalar, True)
+    def _sort_properties(self, required_flag: bool | None = None) -> None:
+        self._required_properties = {}
+        self._optional_properties = {}
+        used_property_names = {}
 
-    @property
-    def files(self) -> dict[str, "model.PropertyFile"]:
-        return self._get_properties_of_type(model.PropertyFile, False)
+        required_parameters = self._parameters_by_required(True)
+        optional_parameters = self._parameters_by_required(False)
+        required_body = self._body_params_by_required(True)
+        optional_body = self._body_params_by_required(False)
 
-    @property
-    def array_files(self) -> dict[str, "model.PropertyFile"]:
-        return self._get_properties_of_type(model.PropertyFile, True)
+        # we only want required
+        if required_flag is True:
+            optional_parameters = []
+            optional_body = {}
 
-    @property
-    def free_forms(self) -> dict[str, "model.PropertyFreeForm"]:
-        return self._get_properties_of_type(model.PropertyFreeForm, False)
+        # we only want optional
+        if required_flag is False:
+            required_parameters = []
+            required_body = {}
 
-    @property
-    def array_free_forms(self) -> dict[str, "model.PropertyFreeForm"]:
-        return self._get_properties_of_type(model.PropertyFreeForm, True)
+        # todo check new name isn't already explicitly set for a property
+        for parameter in required_parameters:
+            name = self._generate_name(parameter.name, used_property_names)
+            self._required_properties[name] = self._parameter_object(parameter)
 
-    def non_objects(self, required: bool | None = None) -> dict[str, T_NON_OBJECTS]:
-        all_props = (
-            self.scalars
-            | self.array_scalars
-            | self.files
-            | self.array_files
-            | self.free_forms
-            | self.array_free_forms
-        )
-        ordered = {}
+        for name, prop in required_body.items():
+            name = self._generate_name(name, used_property_names)
+            self._required_properties[name] = prop
 
-        for prop_name, prop in all_props.items():
-            if (required is None or required is True) and prop.is_required:
-                ordered[prop_name] = prop
+        for parameter in optional_parameters:
+            name = self._generate_name(parameter.name, used_property_names)
+            self._optional_properties[name] = self._parameter_object(parameter)
 
-        for prop_name, prop in all_props.items():
-            if (required is None or required is False) and not prop.is_required:
-                ordered[prop_name] = prop
+        for name, prop in optional_body.items():
+            name = self._generate_name(name, used_property_names)
+            self._optional_properties[name] = prop
 
-        return ordered
+    def _parameters_by_required(self, required_flag: bool) -> list[oa.Parameter]:
+        required_parameters = []
+        optional_parameters = []
 
-    @property
-    def required_param_names(self) -> list[str]:
-        result = []
+        for param in self._parameters:
+            if param.required:
+                required_parameters.append(param)
+            else:
+                optional_parameters.append(param)
 
-        for prop_name, prop in self.properties.items():
-            if prop.is_required:
-                result.append(prop_name)
+        if required_flag:
+            return required_parameters
 
-        return result
+        return optional_parameters
 
-    def _get_properties_of_type(
+    def _parameter_object(self, param: oa.Parameter) -> T_PARAMETER:
+        """Returns the PropertyObject for a given oa.Parameter regardless
+        of what its param_in value is: path, query, header, cookie"""
+
+        if param.param_in.value == oa.ParameterLocation.PATH.value:
+            return self.path.properties.get(param.name)
+
+        if param.param_in == oa.ParameterLocation.QUERY.value:
+            return self.query.properties.get(param.name)
+
+        if param.param_in == oa.ParameterLocation.HEADER.value:
+            return self.header.properties.get(param.name)
+
+        if param.param_in == oa.ParameterLocation.COOKIE.value:
+            return self.cookie.properties.get(param.name)
+
+    def _body_params_by_required(
         self,
-        type_of: Generic[TYPE],
-        is_array: bool,
-    ) -> dict[str, Generic[TYPE]]:
-        result = {}
+        required: bool,
+    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+        if not self.body:
+            return {}
 
-        for name, prop in self.properties.items():
-            if not isinstance(prop, type_of) or prop.is_array != is_array:
-                continue
+        # single body property
+        if not self._request.has_formdata or isinstance(self.body, list):
+            if (required and self._request.is_required) or (
+                not required and not self._request.is_required
+            ):
+                return {self.body_type: self.body}
 
-            result[name] = prop
+            return {}
 
-        return result
+        results = {}
+
+        # list each body property individually
+        for name, prop in self.body.properties.items():
+            if (required and prop.is_required) or (
+                not required and not prop.is_required
+            ):
+                results[name] = prop
+
+        return results
+
+    def _generate_name(self, name: str, used_property_names: dict[str, int]) -> str:
+        """Keeps track of what property names have already been used"""
+
+        name_lower = name.lower()
+
+        if name_lower in used_property_names:
+            count = used_property_names[name_lower] + 1
+            name = f"{name}_{count}"
+            used_property_names[name_lower] = count
+
+            return name
+
+        used_property_names[name_lower] = 1
+
+        return name

@@ -18,6 +18,9 @@ paths:
           schema:
             type: string
           example: value_1
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -35,6 +38,9 @@ paths:
             type: string
           default: value_2
           example: value_1
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -51,6 +57,9 @@ paths:
           schema:
             type: string
             default: value_2
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -67,6 +76,9 @@ paths:
           schema:
             type: string
             default: value_2
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -82,6 +94,9 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -97,6 +112,9 @@ paths:
           required: false
           schema:
             type: string
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -117,6 +135,9 @@ paths:
           example:
             - value_1
             - value_2
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -135,7 +156,7 @@ paths:
           example: value_1
         -
           name: param_with_example_with_default
-          in: path
+          in: query
           required: false
           schema:
             type: string
@@ -150,7 +171,7 @@ paths:
             default: value_2
         -
           name: param_without_example_with_default_not_required
-          in: path
+          in: query
           required: false
           schema:
             type: string
@@ -163,7 +184,7 @@ paths:
             type: string
         -
           name: param_without_example_without_default_not_required
-          in: path
+          in: query
           required: false
           schema:
             type: string
@@ -178,6 +199,9 @@ paths:
           example:
             - value_1
             - value_2
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation
@@ -189,18 +213,54 @@ paths:
       parameters:
         -
           name: param_name_1
-          in: query
-          required: false
-          schema:
-            type: string
-          example: value_1
-        -
-          name: param_name_2
           in: header
           required: false
           schema:
             type: string
-          example: api_key_value
+          example: value_1
+      requestBody:
+        content:
+          application/json: {}
+      responses:
+        '200':
+          description: successful operation
+  /different_param_in:
+    get:
+      tags:
+        - tag_1
+      operationId: different_param_in
+      parameters:
+        -
+          name: param_name_1
+          in: path
+          required: true
+          schema:
+            type: string
+          example: path_value
+        -
+          name: param_name_1
+          in: query
+          required: false
+          schema:
+            type: string
+          example: query_value
+        -
+          name: param_name_1
+          in: header
+          required: false
+          schema:
+            type: string
+          example: header_value
+        -
+          name: param_name_1
+          in: cookie
+          required: false
+          schema:
+            type: string
+          example: cookie_value
+      requestBody:
+        content:
+          application/json: {}
       responses:
         '200':
           description: successful operation

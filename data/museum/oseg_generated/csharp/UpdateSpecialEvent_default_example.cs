@@ -13,10 +13,10 @@ public class UpdateSpecialEventDefaultExample
         var config = new Configuration();
 
         var specialEventFields = new SpecialEventFields(
-            name: "Pirate Coding Workshop",
-            location: "Computer Room",
-            eventDescription: "Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).",
-            price: 25,
+            name: null,
+            location: "On the beach.",
+            eventDescription: null,
+            price: 15,
             dates: null
         );
 

@@ -1,6 +1,18 @@
 from .property_proto import PropertyProto
 
-from .parsed_properties import ParsedProperties
+from .operation import Operation
+from .response import Response
+from .request import Request
+
+from .example_data import (
+    EXAMPLE_DATA_BODY,
+    EXAMPLE_DATA_BY_OPERATION,
+    EXAMPLE_DATA_BY_NAME,
+    ExampleDataDef,
+    ExampleDataParamDef,
+    ExampleData,
+    ExampleDataParams,
+)
 from .jinja_macros import JinjaMacros
 from .parsed_free_form import ParsedFreeForm
 from .parsed_free_form_array import ParsedFreeFormArray
@@ -11,10 +23,10 @@ from .parsed_scalar_array import ParsedScalarArray
 from .property_container import PropertyContainer
 from .property_file import PropertyFile
 from .property_free_form import PropertyFreeForm
-from .property_object import PropertyObject
-from .property_object_array import PropertyObjectArray
+from .property_object import (
+    PROPERTY_OBJECT_TYPE,
+    PropertyObject,
+    PropertyObjectArray,
+)
 from .property_scalar import PropertyScalar
-from .request_body_content import RequestBodyContent
-from .request_operation import RequestOperation
-from .request_parameter import RequestParameter
 from .sdk_options import SdkOptions

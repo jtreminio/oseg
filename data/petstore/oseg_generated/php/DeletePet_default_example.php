@@ -9,6 +9,7 @@ try {
 
     $api_caller->deletePet(
         pet_id: null,
+        api_key: null,
     );
 } catch (OpenAPI\Client\ApiException $e) {
     echo 'Exception when calling Pet#deletePet: '

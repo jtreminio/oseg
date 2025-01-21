@@ -10,6 +10,7 @@ with ApiClient(configuration) as api_client:
 
         api_caller.delete_pet(
             pet_id=None,
+            api_key=None,
         )
     except ApiException as e:
         print("Exception when calling Pet#delete_pet: %s\n" % e)

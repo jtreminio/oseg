@@ -1,381 +1,342 @@
 import openapi_pydantic as oa
-from dataclasses import dataclass, field
 from typing import Optional
 from oseg import parser, model
 
 
-@dataclass
-class RequestExampleData:
-    name: str
-    http: dict[str, "model.PropertyScalar"] = field(default_factory=dict)
-    body: dict[str, dict[str, any]] = field(default_factory=dict)
-
-
 class ExampleDataParser:
-    _INLINE_REQUEST_BODY_NAME = "__INLINE_REQUEST_BODY_NAME__"
-    _DEFAULT_EXAMPLE_NAME = "default_example"
+    DEFAULT_EXAMPLE_NAME = "default_example"
 
-    def __init__(
-        self,
-        oa_parser: "parser.OaParser",
-        property_parser: "parser.PropertyParser",
-        example_data: dict[str, any] | None = None,
-    ):
+    def __init__(self, oa_parser: "parser.OaParser"):
         self._oa_parser = oa_parser
-        self._property_parser = property_parser
-        self._example_data = example_data
+        self._property_parser = parser.PropertyParser(oa_parser)
 
-    def set_custom_example_data(self, example_data: dict[str, any] | None = None):
-        self._example_data = example_data
-
-    def build_examples(
+    def from_oas_data(
         self,
-        request_operations: dict[str, "model.RequestOperation"],
-    ) -> None:
-        for _, request_operation in request_operations.items():
-            request_operation.request_data = []
-            request_body_content = self._get_request_body_content(
-                request_operation.operation
-            )
-            examples = self._build_example_data(
-                request_operation.operation,
-                request_body_content,
-            )
-
-            for example in examples:
-                property_container = self._parse_property_container(
-                    request_body_content,
-                    example,
-                )
-
-                request_operation.request_data.append(
-                    model.ParsedProperties(
-                        name=example.name,
-                        http=example.http,
-                        body=property_container,
-                    )
-                )
-
-    def _get_request_body_content(
-        self,
+        request: "model.Request",
         operation: oa.Operation,
-    ) -> Optional["model.RequestBodyContent"]:
-        if not operation.requestBody or not self._has_content(operation):
-            return
+    ) -> dict[str, "model.PropertyContainer"]:
+        """Parse example data embedded in OAS file.
 
-        content: oa.MediaType | None = None
-
-        # we only want the first result
-        for _, body in operation.requestBody.content.items():
-            content = body
-
-            break
-
-        if content is None:
-            return
-
-        schema = content.media_type_schema
-        name = self._oa_parser.get_component_name(schema)
-
-        if parser.TypeChecker.is_array(schema):
-            name = self._oa_parser.get_component_name(schema.items)
-
-        return model.RequestBodyContent(
-            name=name,
-            content=content,
-            schema=schema,
-            required=operation.requestBody.required,
-        )
-
-    def _build_example_data(
-        self,
-        operation: oa.Operation,
-        request_body_content: Optional["model.RequestBodyContent"],
-    ) -> list[RequestExampleData]:
-        # example data comes from passed JSON blob or custom file
-        data = self._get_custom_example_data(operation)
-        if data is not None and len(data):
-            return data
-
-        # current operation has body data
-        data = self._get_body_data(operation, request_body_content)
-        if data is not None and len(data):
-            return data
-
-        # no body data but maybe has only http parameters
-        return [
-            RequestExampleData(
-                name=self._DEFAULT_EXAMPLE_NAME,
-                http=self._get_http_data(operation),
-            )
-        ]
-
-    def _get_custom_example_data(
-        self,
-        operation: oa.Operation,
-    ) -> Optional[list[RequestExampleData]]:
-        """Returns example data either from data passed to OSEG as a JSON blob,
-        or reads a file from custom example data directory, if it exists.
+        Only needs done once per Request.
         """
 
-        example_data = None
+        """Operation has "examples" defined in OAS file"""
+        operation_examples = self._get_operation_example_data(operation)
 
-        if self._example_data and operation.operationId in self._example_data:
-            example_data = self._example_data[operation.operationId]
+        if len(operation_examples.keys()):
+            results = {}
 
-        if not isinstance(example_data, dict) or not len(example_data.keys()):
-            return None
-
-        results = []
-
-        for fullname, data in example_data.items():
-            if not data or not isinstance(data, dict):
-                continue
-
-            if "parameters" not in data and "body" not in data:
-                continue
-
-            http = self._get_http_data(operation, data.get("parameters", {}))
-
-            example_name = fullname.replace(
-                f"{operation.operationId}__",
-                "",
-            )
-
-            if not example_name or example_name == "":
-                example_name = self._DEFAULT_EXAMPLE_NAME
-
-            results.append(
-                RequestExampleData(
-                    name=example_name,
-                    http=http,
-                    body=data.get("body", {}),
+            for example_name, example in operation_examples.items():
+                results[example_name] = self._parse_example(
+                    request=request,
+                    example_data=model.ExampleData(
+                        body=example.get("body", {}),
+                        parameters=model.ExampleDataParams(example),
+                    ),
                 )
+
+            return results
+
+        """Read parameter example data from OAS file.
+
+        We will only ever want a single set of example data for parameters.
+
+        We will copy the same set of parameter example data for all body data
+        in this request.
+
+        To have different example data for any given request
+        use custom example data.
+        """
+        example_data_params = model.ExampleDataParams(
+            self._get_parameter_example_data(request),
+        )
+        example_data_body = self._get_body_example_data(request)
+
+        # no example data found, anywhere
+        if not example_data_params.has_data and not len(example_data_body.keys()):
+            return {}
+
+        # only parameter data found
+        if not len(example_data_body.keys()):
+            return {
+                self.DEFAULT_EXAMPLE_NAME: self._parse_example(
+                    request=request,
+                    example_data=model.ExampleData(
+                        body={},
+                        parameters=example_data_params,
+                    ),
+                )
+            }
+
+        # copy the same set of parameter example data to all
+        results = {}
+
+        for name, body_example in example_data_body.items():
+            results[name] = self._parse_example(
+                request=request,
+                example_data=model.ExampleData(
+                    body=body_example,
+                    parameters=example_data_params,
+                ),
             )
 
         return results
 
-    def _get_body_data(
+    def from_custom_data(
+        self,
+        request: "model.Request",
+        example_data: Optional["model.EXAMPLE_DATA_BY_NAME"],
+    ) -> dict[str, "model.PropertyContainer"]:
+        """Custom example data provided outside of OAS file"""
+
+        if example_data is None:
+            return {}
+
+        results = {}
+
+        for name, example in example_data.items():
+            if not isinstance(example, dict):
+                continue
+
+            example_data = model.ExampleData(
+                body=example.get("body", {}),
+                parameters=model.ExampleDataParams(example),
+            )
+
+            if not example_data.has_body_data and not example_data.has_parameter_data:
+                continue
+
+            results[name] = self._parse_example(
+                request=request,
+                example_data=example_data,
+            )
+
+        return results
+
+    def _get_operation_example_data(
         self,
         operation: oa.Operation,
-        request_body_content: Optional["model.RequestBodyContent"],
-    ) -> Optional[list[RequestExampleData]]:
-        """Grab example data from requestBody schema.
+    ) -> "model.EXAMPLE_DATA_BY_NAME":
+        """Read operation example data from OAS file.
 
-        Will read data directly from requestBody.content.example[s], or $ref:
-        1) "properties.example"
-        2) "example[s]"
-        3) external file
-
-        "externalValue" (URL file) is not currently supported
-
-        If a custom example file is present on local filesystem, it will use
-        that file's contents for generating example data. If an "http" object
-        exists in this file then HTTP example data will also be returned.
-
-        The data returned by this method includes only body data, not http data
+        Each operation can have multiple examples containing body and parameters.
         """
 
-        if not request_body_content:
-            return None
+        if not operation.model_extra or "examples" not in operation.model_extra:
+            return {}
 
-        content = request_body_content.content
+        operation_examples = operation.model_extra.get("examples")
+
+        if not isinstance(operation_examples, dict):
+            return {}
+
+        # multiple examples from operation schema
+        data = {}
+
+        for example_name, example in operation_examples.items():
+            file_data = self._oa_parser.file_loader.get_example_data(example)
+
+            if file_data:
+                data[example_name] = file_data
+
+        return data
+
+    def _get_parameter_example_data(
+        self,
+        request: "model.Request",
+    ) -> "model.ExampleDataParamDef":
+        result = {
+            oa.ParameterLocation.PATH.value: {},
+            oa.ParameterLocation.QUERY.value: {},
+            oa.ParameterLocation.HEADER.value: {},
+            oa.ParameterLocation.COOKIE.value: {},
+        }
+
+        if not request.parameters:
+            return result
+
+        for parameter in request.parameters:
+            value = None
+
+            if parameter.example:
+                value = parameter.example
+            elif parameter.examples:
+                for k, v in parameter.examples.items():
+                    value = v.value
+                    break
+            elif parameter.param_schema.example:
+                value = parameter.param_schema.example
+            elif parameter.param_schema.examples:
+                value = parameter.param_schema.examples[0]
+            elif parameter.param_schema.default is not None:
+                value = parameter.param_schema.default
+
+            result[parameter.param_in][parameter.name] = value
+
+        return result
+
+    def _get_body_example_data(
+        self,
+        request: "model.Request",
+    ) -> dict[str, "model.EXAMPLE_DATA_BODY"]:
+        """Read body example data from OAS file.
+
+        Each request can have multiple body examples.
+        """
+
+        # Data from content schema wins out over property-specific data
+        content_examples = self._example_data_from_content(request.content)
+
+        if len(content_examples.keys()):
+            return content_examples
+
+        # no body, nothing further to check
+        if not request.body:
+            return {}
+
+        return {
+            self.DEFAULT_EXAMPLE_NAME: self._example_data_from_properties(request.body),
+        }
+
+    def _example_data_from_content(
+        self,
+        content: oa.MediaType | None,
+    ) -> dict[str, any]:
+        # todo tests for data from content
 
         if not content:
-            return None
+            return {}
 
-        http = self._get_http_data(operation)
-        results = []
-
-        # only a single example
+        # only a single example from content schema
         if (
             content.example
             and isinstance(content.example, dict)
             and len(content.example.keys())
         ):
-            results.append(
-                RequestExampleData(
-                    name=self._DEFAULT_EXAMPLE_NAME,
-                    http=http,
-                    body=content.example,
-                )
-            )
-        # multiple examples
-        elif content.examples and len(content.examples.keys()):
-            for example_name, schema in content.examples.items():
-                if hasattr(schema, "externalValue") and schema.externalValue:
-                    raise LookupError(
-                        f"externalValue for components.examples not supported,"
-                        f" schema {operation.operationId}.{example_name}"
-                    )
+            return {self.DEFAULT_EXAMPLE_NAME: content.example}
 
-                file_data = self._oa_parser.file_loader.get_example_data(schema)
-
-                if file_data:
-                    results.append(
-                        RequestExampleData(
-                            name=example_name,
-                            http=http,
-                            body=file_data,
-                        )
-                    )
-
-                    continue
-
-                inline_data = schema.value if hasattr(schema, "value") else None
-
-                if inline_data is not None and isinstance(inline_data, dict):
-                    results.append(
-                        RequestExampleData(
-                            name=example_name,
-                            http=http,
-                            body=inline_data,
-                        )
-                    )
-
-        # merge data from components
-        if content.media_type_schema:
-            component_examples = self._example_data_from_schema(
-                content.media_type_schema
-            )
-            component_examples_valid = bool(
-                component_examples and isinstance(component_examples, dict)
-            )
-
-            # no results so far, use whatever came from component examples
-            if component_examples_valid and not len(results):
-                results.append(
-                    RequestExampleData(
-                        name=self._DEFAULT_EXAMPLE_NAME,
-                        http=http,
-                        body=component_examples,
-                    )
-                )
-            # apply component example data to existing example data
-            elif component_examples_valid:
-                for result in results:
-                    result.body = {
-                        **result.body,
-                        **component_examples,
-                    }
-
-        return results
-
-    def _get_http_data(
-        self,
-        operation: oa.Operation,
-        custom_data: dict[str, any] | None = None,
-    ) -> dict[str, "model.PropertyScalar"]:
-        """Add path and query parameter examples to request operation.
-
-        Only parameters that have example or default data will be included.
-        Will only ever read the first example of any parameter.
-        """
-
-        results = {}
-
-        allowed_param_in = [
-            oa.ParameterLocation.QUERY,
-            oa.ParameterLocation.PATH,
-        ]
-
-        parameters = operation.parameters if operation.parameters else []
-
-        for parameter in parameters:
-            if parameter.param_in not in allowed_param_in:
-                continue
-
-            schema = parameter.param_schema
-            value = None
-
-            # http data already fetched as custom data
-            if custom_data and parameter.name in custom_data:
-                value = custom_data[parameter.name]
-            elif parameter.example:
-                value = parameter.example
-            elif schema and schema.example:
-                value = schema.example
-            elif parameter.examples:
-                for k, v in parameter.examples.items():
-                    if v.value is not None:
-                        value = v.value
-
-                        # only want the first value
-                        break
-
-            results[parameter.name] = model.PropertyScalar(
-                name=parameter.name,
-                value=value,
-                schema=schema,
-                parent=parameter,
-            )
-
-        return results
-
-    def _parse_property_container(
-        self,
-        request_body_content: "model.RequestBodyContent",
-        example: RequestExampleData,
-    ) -> Optional["model.PropertyObject"]:
-        if not request_body_content:
-            return
-
-        container = self._property_parser.parse(
-            schema=request_body_content.schema,
-            data=example.body,
-        )
-
-        property_ref = model.PropertyObject(
-            name="",
-            value=container,
-            schema=request_body_content.schema,
-            # todo figure out where parent comes from
-            parent=request_body_content.schema,
-            type_of=request_body_content.name,
-        )
-        property_ref.is_required = request_body_content.required
-
-        return property_ref
-
-    def _example_data_from_schema(self, schema: oa.Schema) -> dict[str, any]:
-        if not parser.TypeChecker.is_object(
-            schema
-        ) or parser.TypeChecker.is_object_array(schema):
+        if not content.examples or not len(content.examples.keys()):
             return {}
 
-        result: dict[str, any] = {}
+        # multiple examples from content schema
+        data = {}
 
-        value = self._get_property_schema_example(schema)
+        for example_name, example in content.examples.items():
+            file_data = self._oa_parser.file_loader.get_example_data(example)
 
-        if value is not None and isinstance(value, dict):
-            result = value
+            if file_data:
+                data[example_name] = file_data
 
-        if not hasattr(schema, "properties") or not schema.properties:
-            return result
+                continue
 
-        for property_name, property_schema in schema.properties.items():
-            value = self._get_property_schema_example(property_schema)
+            if isinstance(example.value, dict):
+                data[example_name] = example.value
 
-            if value is not None:
-                result[property_name] = value
+        return data
 
-        return result
-
-    def _get_property_schema_example(
+    def _example_data_from_properties(
         self,
         schema: oa.Schema,
-    ) -> any:
-        if hasattr(schema, "example") and schema.example:
+    ) -> Optional["model.EXAMPLE_DATA_BODY"]:
+        # example/s data wins out over everything
+        if schema.example is not None:
             return schema.example
-        elif hasattr(schema, "examples") and schema.examples:
-            for example in schema.examples:
-                return example
 
-        return None
+        if schema.examples is not None:
+            return schema.examples
 
-    def _has_content(self, operation: oa.Operation) -> bool:
-        return (
-            operation.requestBody
-            and hasattr(operation.requestBody, "content")
-            and operation.requestBody.content
-        )
+        # if property is nullable and default value is null, use it
+        if schema.default is None and parser.TypeChecker.is_nullable(schema):
+            return None
+
+        if schema.default is not None:
+            return schema.default
+
+        if schema.allOf:
+            for all_of_schema in schema.allOf:
+                all_of_data = self._example_data_from_properties(all_of_schema)
+
+                return all_of_data if all_of_data is not None else {}
+
+        if parser.TypeChecker.is_array(schema):
+            items_data = self._example_data_from_properties(schema.items)
+
+            if items_data is not None:
+                return [items_data]
+
+            return []
+
+        data = {}
+
+        if parser.TypeChecker.is_object(schema):
+            for prop_name, prop_schema in schema.properties.items():
+                data[prop_name] = self._example_data_from_properties(prop_schema)
+
+        return data if len(data.keys()) else None
+
+    def _parse_example(
+        self,
+        request: "model.Request",
+        example_data: "model.ExampleData",
+    ) -> "model.PropertyContainer":
+        container = model.PropertyContainer(request)
+
+        if example_data.has_parameter_data:
+            loop_data = {
+                oa.ParameterLocation.PATH: example_data.path,
+                oa.ParameterLocation.QUERY: example_data.query,
+                oa.ParameterLocation.HEADER: example_data.header,
+                oa.ParameterLocation.COOKIE: example_data.cookie,
+            }
+
+            for param_in, param_data in loop_data.items():
+                schema = self._schema_for_params_in(
+                    parameters=request.parameters,
+                    param_in=param_in,
+                )
+
+                if schema:
+                    container.set_parameters(
+                        data=self._property_parser.parse(
+                            schema=schema,
+                            data=param_data,
+                        ),
+                        param_in=param_in,
+                    )
+
+        if request.body:
+            parsed = self._property_parser.parse(
+                schema=request.body,
+                data=example_data.body,
+            )
+
+            parsed.is_required = request.is_required
+            container.body = parsed
+
+        return container
+
+    def _schema_for_params_in(
+        self,
+        parameters: list[oa.Parameter],
+        param_in: oa.ParameterLocation,
+    ) -> oa.Schema | None:
+        """Generates a temporary Schema for parsing by PropertyParser"""
+
+        properties = {}
+        required = []
+
+        for parameter in parameters:
+            if parameter.param_in.value == param_in.value:
+                properties[parameter.name] = parameter.param_schema
+
+                if parameter.required:
+                    required.append(parameter.name)
+
+        if not len(properties.keys()):
+            return None
+
+        schema = oa.Schema()
+        schema.properties = properties
+        schema.required = required
+
+        return schema

@@ -3,7 +3,7 @@ import * as openapi_client from "openapi_client";
 
 const apiCaller = new openapi_client.UserApi();
 
-const user_1: openapi_client.User = {
+const user1: openapi_client.User = {
     id: 12345,
     username: "my_user",
     firstName: "John",
@@ -14,7 +14,7 @@ const user_1: openapi_client.User = {
     userStatus: 1,
 };
 
-const user_2: openapi_client.User = {
+const user2: openapi_client.User = {
     id: 12345,
     username: "my_user",
     firstName: "John",
@@ -26,8 +26,8 @@ const user_2: openapi_client.User = {
 };
 
 const user = [
-    user_1,
-    user_2,
+    user1,
+    user2,
 ];
 
 apiCaller.createUsersWithListInput(

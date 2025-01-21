@@ -7,6 +7,7 @@ const startDate = "2023-02-23";
 const endDate = "2023-04-18";
 const page = 2;
 const limit = 15;
+
 apiCaller.listSpecialEvents(
     startDate,
     endDate,

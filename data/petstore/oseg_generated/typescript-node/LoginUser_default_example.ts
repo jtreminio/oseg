@@ -5,6 +5,7 @@ const apiCaller = new openapi_client.UserApi();
 
 const username = undefined;
 const password = undefined;
+
 apiCaller.loginUser(
     username,
     password,

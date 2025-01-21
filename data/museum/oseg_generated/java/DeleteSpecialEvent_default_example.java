@@ -20,11 +20,9 @@ public class DeleteSpecialEvent_default_example
         {
             var apiCaller = new EventsApi(config);
 
-            var response = apiCaller.deleteSpecialEvent(
+            apiCaller.deleteSpecialEvent(
                 "dad4bce8-f5cb-4078-a211-995864315e39"
             );
-
-            System.out.println(response);
         } catch (ApiException e) {
             System.err.println("Exception when calling Events#deleteSpecialEvent");
             System.err.println("Status code: " + e.getCode());

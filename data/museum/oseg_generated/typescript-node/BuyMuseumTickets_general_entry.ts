@@ -3,7 +3,7 @@ import * as openapimuseum_client from "openapimuseum_client";
 
 const apiCaller = new openapimuseum_client.TicketsApi();
 
-const buy_museum_tickets: openapimuseum_client.BuyMuseumTickets = {
+const buyMuseumTickets: openapimuseum_client.BuyMuseumTickets = {
     email: "todd@example.com",
     ticketId: undefined,
     ticketDate: "2023-09-07",

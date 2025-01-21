@@ -45,8 +45,6 @@ class ComponentResolver:
     classes, but the name of these classes is dynamically generated
     by combining information from the parent Schema. We will still want
     to keep track of this name.
-
-    todo: Support for named Operation Parameters
     """
 
     def __init__(self, oa_parser: "parser.OaParser"):
@@ -154,6 +152,7 @@ class ComponentResolver:
                     continue
 
                 self._parameters(operation)
+                self._operation_examples(operation)
 
                 if operation.requestBody:
                     operation.requestBody = self._oa_parser.resolve_request_body(
@@ -303,6 +302,23 @@ class ComponentResolver:
             schema = self._oa_parser.resolve_component(parameter.param_schema)
             parameter.param_schema = schema
             operation.parameters[i] = parameter
+
+    def _operation_examples(self, operation: oa.Operation) -> None:
+        if not operation.model_extra or "examples" not in operation.model_extra:
+            return
+
+        operation_examples = operation.model_extra.get("examples")
+
+        for example_name, example in operation_examples.items():
+            if not isinstance(example, dict):
+                continue
+
+            if "$ref" not in example:
+                continue
+
+            example: oa.Example
+
+            operation_examples[example_name] = self._oa_parser.resolve_example(example)
 
     def _all_of(self, schema: oa.Schema) -> None:
         if not schema.allOf:

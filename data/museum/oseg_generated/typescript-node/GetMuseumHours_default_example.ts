@@ -6,6 +6,7 @@ const apiCaller = new openapimuseum_client.OperationsApi();
 const startDate = "2023-02-23";
 const page = 2;
 const limit = 15;
+
 apiCaller.getMuseumHours(
     startDate,
     page,

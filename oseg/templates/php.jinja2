@@ -62,23 +62,13 @@ ${{ parsed.value }}
     {% if parsed.value == None %}null{% else %}
 [
     {% for i in parsed.values %}
-    ${{ i }},
+    ${{ i|snake_case }},
     {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro parse_body_properties_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_properties(obj, parent_property_name, indent_count)) }}
-{%- endmacro -%}
-
-{%- macro parse_body_property_list_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_body_property_list(obj, parent_property_name, indent_count)) }}
-{%- endmacro -%}
-
-{%- macro parse_request_properties_macro(parsed_properties, single_body_value, indent_count) -%}
-    {{- caller(parse_request_data(parsed_properties, single_body_value, indent_count)) }}
-{%- endmacro -%}
+{%- import "_macros.jinja2" as m with context -%}
 
 <?php
 
@@ -86,10 +76,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
 
-{% for obj_name, obj in parse_body_data(parsed_properties, single_body_value).items() %}
-    {% set parent_name = obj_name if obj_name != parsed_properties.body.type else "" %}
+{% for obj_name, obj in parse_request_objects(property_container).items() %}
+    {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-        {% call(properties) parse_body_properties_macro(obj, parent_name, 4) %}
+        {% call(properties) m.parse_object_properties_macro(obj, parent_name, 4) %}
 {{ obj_name|setter_property_name }} = (new {{ sdk_options.additional_properties.invokerPackage }}\Model\{{ obj.type }}()){% if not properties %};{% endif %}
 
             {% for name, value in properties.items() %}
@@ -99,33 +89,33 @@ $config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::
         {% endcall %}
     {% else %}
 {{ obj_name|setter_property_name }} = {{ "" }}
-        {%- call(value) parse_body_property_list_macro(obj, parent_name, 0) %}
+        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 0) %}
 {{- value }};
         {% endcall %}
     {% endif %}
 
 {% endfor %}
 try {
-    $api_caller = new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ api_name|pascal_case }}Api(config: $config);
+    $api_caller = new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config);
 
     {{ "" -}}
-    {% if has_response  %}$response = {% endif -%}
-    $api_caller->{{ operation_id|camel_case }}(
-{% call(properties) parse_request_properties_macro(parsed_properties, single_body_value, 8) %}
+    {% if operation.response and operation.response.body  %}$response = {% endif -%}
+    $api_caller->{{ operation.operation_id|camel_case }}(
+{% call(properties) m.parse_request_properties_macro(property_container, 8) %}
     {% for name, value in properties.items() %}
         {{ name|snake_case }}: {% if value != "null" %}{% endif %}{{ value }},
     {% endfor %}
 {% endcall %}
     );
-{% if has_response and not is_binary_response %}
+{% if operation.response and operation.response.body and not operation.response.is_binary %}
 
     print_r($response);
-{% elif is_binary_response %}
+{% elif operation.response and operation.response.is_binary %}
 
     copy($response->getRealPath(), __DIR__ . '/file_response.zip');
 {% endif %}
 } catch ({{ sdk_options.additional_properties.invokerPackage }}\ApiException $e) {
-    echo 'Exception when calling {{ api_name|pascal_case }}#{{ operation_id|camel_case }}: '
+    echo 'Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}: '
         . print_r($e->getResponseObject());
 }
 {{ "" }}
