@@ -14,12 +14,11 @@ from .example_data import (
     ExampleDataParams,
 )
 from .jinja_macros import JinjaMacros
-from .parsed_free_form import ParsedFreeForm
-from .parsed_free_form_array import ParsedFreeFormArray
-from .parsed_object import ParsedObject
-from .parsed_object_array import ParsedObjectArray
-from .parsed_scalar import ParsedScalar
-from .parsed_scalar_array import ParsedScalarArray
+from .printable import (
+    PrintableFreeForm,
+    PrintableObject,
+    PrintableScalar,
+)
 from .property_container import PropertyContainer
 from .property_file import PropertyFile
 from .property_free_form import PropertyFreeForm

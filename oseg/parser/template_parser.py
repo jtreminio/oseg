@@ -1,4 +1,3 @@
-from typing import Union
 from oseg import jinja_extension, model, parser
 
 
@@ -63,7 +62,7 @@ class TemplateParser:
             )
 
         for name, parsed in self._parse_object(parent, parent_name).items():
-            if isinstance(parsed, model.ParsedObject):
+            if not parsed.is_array:
                 result[name] = macros.print_object(parsed)
             else:
                 result[name] = macros.print_object_array(parsed)
@@ -80,25 +79,27 @@ class TemplateParser:
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
 
-        parsed = model.ParsedObjectArray()
+        printable = model.PrintableObject()
+        printable.is_array = True
+        printable.value = []
 
         property_name = parent.type
 
         if parent.properties:
             first_item = parent.properties[0]
-            parsed.target_type = first_item.type
+            printable.target_type = first_item.type
 
             if first_item.base_type:
-                parsed.target_type = first_item.base_type
+                printable.target_type = first_item.base_type
         else:
-            parsed.target_type = parent.type
+            printable.target_type = parent.type
 
         i = 1
         for _ in parent.properties:
-            parsed.values.append(f"{parent_name}{property_name}_{i}")
+            printable.value.append(f"{parent_name}{property_name}_{i}")
             i += 1
 
-        result = {property_name: macros.print_object_array(parsed)}
+        result = {property_name: macros.print_object_array(printable)}
 
         return self._indent(result, indent_count)[property_name]
 
@@ -205,26 +206,26 @@ class TemplateParser:
         prop: "model.PropertyProto",
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
-            parsed = self._extension.parse_scalar(parent_type, name, prop)
+            printable = self._extension.print_scalar(parent_type, name, prop)
 
-            if prop.is_array:
-                return macros.print_scalar_array(parsed)
-            else:
-                return macros.print_scalar(parsed)
+            if printable.is_array:
+                return macros.print_scalar_array(printable)
+
+            return macros.print_scalar(printable)
         elif isinstance(prop, model.PropertyFile):
-            parsed = self._extension.parse_file(parent_type, name, prop)
+            printable = self._extension.print_file(prop)
 
-            if prop.is_array:
-                return macros.print_file_array(parsed)
-            else:
-                return macros.print_file(parsed)
+            if printable.is_array:
+                return macros.print_file_array(printable)
+
+            return macros.print_file(printable)
         elif isinstance(prop, model.PropertyFreeForm):
-            parsed = self._extension.parse_free_form(name, prop)
+            printable = self._extension.print_free_form(prop)
 
-            if prop.is_array:
-                return macros.print_free_form_array(parsed)
-            else:
-                return macros.print_free_form(parsed)
+            if printable.is_array:
+                return macros.print_free_form_array(printable)
+
+            return macros.print_free_form(printable)
 
         return None
 
@@ -232,50 +233,53 @@ class TemplateParser:
         self,
         obj: "model.PropertyObject",
         parent_name: str,
-    ) -> dict[str, Union["model.ParsedObject", "model.ParsedObjectArray"]]:
+    ) -> dict[str, "model.PrintableObject"]:
         result = {}
         parent_name = f"{parent_name}_" if parent_name else ""
 
         for property_name, sub_obj in obj.objects.items():
-            parsed = model.ParsedObject()
-            result[property_name] = parsed
+            printable = model.PrintableObject()
+            result[property_name] = printable
 
-            parsed.value = f"{parent_name}{property_name}"
-            parsed.target_type = sub_obj.type
+            printable.value = f"{parent_name}{property_name}"
+            printable.target_type = sub_obj.type
 
         for property_name, array_obj in obj.array_objects.items():
             i = 1
 
-            parsed = model.ParsedObjectArray()
-            result[property_name] = parsed
+            printable = model.PrintableObject()
+            printable.is_array = True
+            result[property_name] = printable
 
             if array_obj is None:
                 return result
 
             if not array_obj:
                 if parser.TypeChecker.is_object_array(obj.schema):
-                    parsed.target_type = obj.schema.items.ref.split("/").pop()
+                    printable.target_type = obj.schema.items.ref.split("/").pop()
 
                     return result
 
                 property_schema = obj.schema.properties[property_name]
 
                 if parser.TypeChecker.is_object_array(property_schema):
-                    parsed.target_type = property_schema.items.ref.split("/").pop()
+                    printable.target_type = property_schema.items.ref.split("/").pop()
 
                 return result
 
             if array_obj.properties:
                 first_item = array_obj.properties[0]
-                parsed.target_type = first_item.type
+                printable.target_type = first_item.type
 
                 if first_item.base_type:
-                    parsed.target_type = first_item.base_type
+                    printable.target_type = first_item.base_type
             else:
-                parsed.target_type = array_obj.type
+                printable.target_type = array_obj.type
+
+            printable.value = []
 
             for _ in array_obj.properties:
-                parsed.values.append(f"{parent_name}{property_name}_{i}")
+                printable.value.append(f"{parent_name}{property_name}_{i}")
                 i += 1
 
         return result

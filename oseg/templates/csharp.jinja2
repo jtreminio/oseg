@@ -1,13 +1,13 @@
-{%- macro print_scalar(parsed) -%}
-{{ parsed.value }}
+{%- macro print_scalar(printable) -%}
+{{ printable.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
-new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
+{%- macro print_scalar_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
 
 {
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     {{ i }}{% if not loop.last %},{% endif %}
 
         {% endfor %}
@@ -15,21 +15,21 @@ new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
+{%- macro print_file(printable) -%}
+    {% if printable.value == None %}null{% else %}
 new FileStream(
-    path: "{{ parsed.value }}",
+    path: "{{ printable.value }}",
     mode: FileMode.Open
 )
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
-new List<Stream>{% if not parsed.values %}(){% else %}
+{%- macro print_file_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new List<Stream>{% if not printable.value %}(){% else %}
 
 {
-    {% for i in parsed.values %}
+    {% for i in printable.value %}
     new FileStream(
         path: "{{ i }}",
         mode: FileMode.Open
@@ -40,12 +40,12 @@ new List<Stream>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form(parsed) -%}
-    {% if parsed.value == None %}null{% else %}
-new Dictionary<string, object>{% if not parsed.value %}(){% else %}
+{%- macro print_free_form(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new Dictionary<string, object>{% if not printable.value %}(){% else %}
 
 {
-        {% for k, v in parsed.value.items() %}
+        {% for k, v in printable.value.items() %}
     ["{{ k }}"]: {{ v }}{% if not loop.last %},{% endif %}
 
         {% endfor %}
@@ -53,12 +53,12 @@ new Dictionary<string, object>{% if not parsed.value %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
-new List<Dictionary<string, object>>{% if not parsed.values %}(){% else %}
+{%- macro print_free_form_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
 
 {
-        {% for obj in parsed.values %}
+        {% for obj in printable.value %}
     new Dictionary<string, object>
     {
             {% for k, v in obj.items() %}
@@ -71,16 +71,16 @@ new List<Dictionary<string, object>>{% if not parsed.values %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object(parsed) -%}
-{{ parsed.value }}
+{%- macro print_object(printable) -%}
+{{ printable.value }}
 {%- endmacro -%}
 
-{%- macro print_object_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
-new List<{{ parsed.target_type }}>{% if not parsed.values %}(){% else %}
+{%- macro print_object_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
 
 {
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     {{ i|camel_case }}{% if not loop.last %},{% endif %}
 
         {% endfor %}

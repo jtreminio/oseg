@@ -1,47 +1,47 @@
-{%- macro print_scalar(parsed) -%}
-{{ parsed.value }}
+{%- macro print_scalar(printable) -%}
+{{ printable.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array(parsed) -%}
-    {% if parsed.values == None %}nil{% else %}
+{%- macro print_scalar_array(printable) -%}
+    {% if printable.value == None %}nil{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     {{ i }},
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file(parsed) -%}
-    {% if parsed.values == None %}nil{% else %}
-File.new("{{ parsed.value }}", "r")
+{%- macro print_file(printable) -%}
+    {% if printable.value == None %}nil{% else %}
+File.new("{{ printable.value }}", "r")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array(parsed) -%}
-    {% if parsed.values == None %}nil{% else %}
+{%- macro print_file_array(printable) -%}
+    {% if printable.value == None %}nil{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     File.new("{{ i }}", "r"),
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form(parsed) -%}
-    {% if parsed.value == None %}nil{% else %}
+{%- macro print_free_form(printable) -%}
+    {% if printable.value == None %}nil{% else %}
 {
-        {% for k, v in parsed.value.items() %}
+        {% for k, v in printable.value.items() %}
     "{{ k }}": {{ v }},
         {% endfor %}
 }
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array(parsed) -%}
-    {% if parsed.values == None %}nil{% else %}
+{%- macro print_free_form_array(printable) -%}
+    {% if printable.value == None %}nil{% else %}
 [
-        {% for obj in parsed.values %}
+        {% for obj in printable.value %}
     {
             {% for k, v in obj.items() %}
         "{{ k }}": {{ v }},
@@ -52,13 +52,13 @@ File.new("{{ parsed.value }}", "r")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object(parsed) -%}
-{{ parsed.value }}
+{%- macro print_object(printable) -%}
+{{ printable.value }}
 {%- endmacro -%}
 
-{%- macro print_object_array(parsed) -%}
+{%- macro print_object_array(printable) -%}
 [
-    {% for i in parsed.values %}
+    {% for i in printable.value %}
     {{ i|snake_case }},
     {% endfor %}
 ]

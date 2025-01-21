@@ -98,121 +98,65 @@ class CSharpExtension(BaseExtension):
 
         return name
 
-    def parse_scalar(
+    def print_scalar(
         self,
         parent_type: str,
         name: str,
         item: model.PropertyScalar,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
+    ) -> model.PrintableScalar:
+        printable = model.PrintableScalar()
+        printable.value = None
+
         if item.is_array:
-            parsed = model.ParsedScalarArray()
+            printable.is_array = True
 
             if item.value is None:
-                parsed.values = None
+                return printable
 
-                return parsed
+            printable.value = []
 
             if item.type == "string":
                 if item.is_enum:
-                    parsed.is_enum = True
-                    parsed.target_type = f"{parent_type}.{self.pascal_case(name)}Enum"
+                    printable.is_enum = True
+                    printable.target_type = (
+                        f"{parent_type}.{self.pascal_case(name)}Enum"
+                    )
                 else:
-                    parsed.target_type = "string"
+                    printable.target_type = "string"
             elif item.type == "integer":
-                parsed.target_type = "int"
+                printable.target_type = "int"
             elif item.type == "number":
                 if item.format in ["float", "double"]:
-                    parsed.target_type = item.format
+                    printable.target_type = item.format
                 elif item.format == "int64":
-                    parsed.target_type = "long"
+                    printable.target_type = "long"
                 else:
-                    parsed.target_type = "int"
+                    printable.target_type = "int"
 
             for i in item.value:
-                if parsed.is_enum:
+                if printable.is_enum:
                     if i == "":
-                        parsed.values.append("Empty")
+                        printable.value.append("Empty")
                     else:
-                        parsed.values.append(self._get_enum_name(item, i))
+                        printable.value.append(self._get_enum_name(item, i))
                 else:
-                    parsed.values.append(self._to_json(i))
+                    printable.value.append(self._to_json(i))
 
-            return parsed
-
-        parsed = model.ParsedScalar()
+            return printable
 
         if item.type == "string" and item.is_enum:
-            parsed.is_enum = True
+            printable.is_enum = True
             enum_name = self._get_enum_name(item, item.value)
 
             if enum_name is None:
-                parsed.value = "null"
+                printable.value = "null"
             else:
                 target_type = f"{parent_type}.{self.pascal_case(name)}Enum"
-                parsed.value = f"{target_type}.{enum_name}"
+                printable.value = f"{target_type}.{enum_name}"
         else:
-            parsed.value = self._to_json(item.value)
+            printable.value = self._to_json(item.value)
 
-        return parsed
-
-    def parse_file(
-        self,
-        parent_type: str,
-        name: str,
-        item: model.PropertyFile,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
-        if item.is_array:
-            parsed = model.ParsedScalarArray()
-
-            if item.value is None:
-                parsed.values = None
-
-                return parsed
-
-            for i in item.value:
-                parsed.values.append(i)
-
-            return parsed
-
-        parsed = model.ParsedScalar()
-        parsed.value = item.value
-
-        return parsed
-
-    def parse_free_form(
-        self,
-        name: str,
-        item: model.PropertyFreeForm,
-    ) -> model.ParsedFreeForm | model.ParsedFreeFormArray:
-        if item.is_array:
-            parsed = model.ParsedFreeFormArray()
-
-            if item.value is None:
-                parsed.values = None
-
-                return parsed
-
-            for obj in item.value:
-                result = {}
-
-                for k, v in obj.items():
-                    result[k] = self._to_json(v)
-
-                parsed.values.append(result)
-
-            return parsed
-
-        parsed = model.ParsedFreeForm()
-
-        if item.value is None:
-            parsed.value = None
-
-            return parsed
-
-        for k, v in item.value.items():
-            parsed.value[k] = self._to_json(v)
-
-        return parsed
+        return printable
 
     def _get_enum_name(
         self,

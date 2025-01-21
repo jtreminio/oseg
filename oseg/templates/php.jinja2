@@ -1,47 +1,47 @@
-{%- macro print_scalar(parsed) -%}
-{{ parsed.value }}
+{%- macro print_scalar(printable) -%}
+{{ printable.value }}
 {%- endmacro -%}
 
-{%- macro print_scalar_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
+{%- macro print_scalar_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     {{ i }},
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
-new SplFileObject("{{ parsed.value }}")
+{%- macro print_file(printable) -%}
+    {% if printable.value == None %}null{% else %}
+new SplFileObject("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
+{%- macro print_file_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.values %}
     new SplFileObject("{{ i }}"),
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form(parsed) -%}
-    {% if parsed.value == None %}null{% else %}
+{%- macro print_free_form(printable) -%}
+    {% if printable.value == None %}null{% else %}
 [
-        {% for k, v in parsed.value.items() %}
+        {% for k, v in printable.value.items() %}
     "{{ k }}": {{ v }},
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array(parsed) -%}
-    {% if parsed.values == None %}null{% else %}
+{%- macro print_free_form_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
 [
-        {% for obj in parsed.values %}
+        {% for obj in printable.value %}
     [
             {% for k, v in obj.items() %}
         "{{ k }}": {{ v }},
@@ -52,16 +52,16 @@ new SplFileObject("{{ parsed.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object(parsed) -%}
-    {% if parsed.value == None %}null{% else %}
-${{ parsed.value }}
+{%- macro print_object(printable) -%}
+    {% if printable.value == None %}null{% else %}
+${{ printable.value }}
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_array(parsed) -%}
-    {% if parsed.value == None %}null{% else %}
+{%- macro print_object_array(printable) -%}
+    {% if printable.value == None %}null{% else %}
 [
-    {% for i in parsed.values %}
+    {% for i in printable.value %}
     ${{ i|snake_case }},
     {% endfor %}
 ]

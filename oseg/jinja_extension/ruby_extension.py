@@ -13,89 +13,31 @@ class RubyExtension(BaseExtension):
     def setter_property_name(self, name: str) -> str:
         return self.snake_case(name)
 
-    def parse_scalar(
+    def print_scalar(
         self,
         parent_type: str,
         name: str,
         item: model.PropertyScalar,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
+    ) -> model.PrintableScalar:
+        printable = model.PrintableScalar()
+        printable.value = None
+
         if item.is_array:
-            parsed = model.ParsedScalarArray()
+            printable.is_array = True
 
             if item.value is None:
-                parsed.values = None
+                return printable
 
-                return parsed
+            printable.value = []
 
             for i in item.value:
-                parsed.values.append(self._to_json(i))
+                printable.value.append(self._to_json(i))
 
-            return parsed
-
-        parsed = model.ParsedScalar()
+            return printable
 
         if item.value is None:
-            parsed.value = "nil"
+            printable.value = "nil"
         else:
-            parsed.value = self._to_json(item.value)
+            printable.value = self._to_json(item.value)
 
-        return parsed
-
-    def parse_file(
-        self,
-        parent_type: str,
-        name: str,
-        item: model.PropertyFile,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
-        if item.is_array:
-            parsed = model.ParsedScalarArray()
-
-            if item.value is None:
-                parsed.values = None
-
-                return parsed
-
-            for i in item.value:
-                parsed.values.append(i)
-
-            return parsed
-
-        parsed = model.ParsedScalar()
-        parsed.value = item.value
-
-        return parsed
-
-    def parse_free_form(
-        self,
-        name: str,
-        item: model.PropertyFreeForm,
-    ) -> model.ParsedFreeForm | model.ParsedFreeFormArray:
-        if item.is_array:
-            parsed = model.ParsedFreeFormArray()
-
-            if item.value is None:
-                parsed.values = None
-
-                return parsed
-
-            for obj in item.value:
-                result = {}
-
-                for k, v in obj.items():
-                    result[k] = self._to_json(v)
-
-                parsed.values.append(result)
-
-            return parsed
-
-        parsed = model.ParsedFreeForm()
-
-        if item.value is None:
-            parsed.value = None
-
-            return parsed
-
-        for k, v in item.value.items():
-            parsed.value[k] = self._to_json(v)
-
-        return parsed
+        return printable

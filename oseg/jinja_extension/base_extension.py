@@ -55,30 +55,65 @@ class BaseExtension(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def parse_scalar(
+    def print_scalar(
         self,
         parent_type: str,
         name: str,
         item: model.PropertyScalar,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
+    ) -> model.PrintableScalar:
         raise NotImplementedError
 
-    @abstractmethod
-    def parse_file(
-        self,
-        parent_type: str,
-        name: str,
-        item: model.PropertyFile,
-    ) -> model.ParsedScalar | model.ParsedScalarArray:
-        raise NotImplementedError
+    def print_file(self, item: model.PropertyFile) -> model.PrintableScalar:
+        printable = model.PrintableScalar()
+        printable.value = None
 
-    @abstractmethod
-    def parse_free_form(
-        self,
-        name: str,
-        item: model.PropertyFreeForm,
-    ) -> model.ParsedFreeForm | model.ParsedFreeFormArray:
-        raise NotImplementedError
+        if item.is_array:
+            printable.is_array = True
+
+            if item.value is None:
+                return printable
+
+            printable.value = []
+
+            for i in item.value:
+                printable.value.append(i)
+
+            return printable
+
+        if item.value is None:
+            return printable
+
+        printable.value = item.value
+
+        return printable
+
+    def print_free_form(self, item: model.PropertyFreeForm) -> model.PrintableFreeForm:
+        printable = model.PrintableFreeForm()
+        printable.value = None
+
+        if item.is_array:
+            printable.is_array = True
+
+            if item.value is None:
+                return printable
+
+            printable.value = []
+
+            for obj in item.value:
+                for k, v in obj.items():
+                    printable.value.append({k: self._to_json(v)})
+
+            return printable
+
+        if item.value is None:
+            return printable
+
+        printable.value = {}
+
+        for k, v in item.value.items():
+            printable.value[k] = self._to_json(v)
+
+        return printable
 
     def camel_case(self, value: str) -> str:
         return caseconverter.camelcase(value)

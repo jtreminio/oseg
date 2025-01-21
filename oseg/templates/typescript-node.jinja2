@@ -1,49 +1,49 @@
-{%- macro print_scalar(parsed) -%}
-{% if parsed.value == "null" %}undefined{% else %}
-{{ parsed.value }}
+{%- macro print_scalar(printable) -%}
+{% if printable.value == "null" %}undefined{% else %}
+{{ printable.value }}
 {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_scalar_array(parsed) -%}
-    {% if parsed.values == None %}undefined{% else %}
+{%- macro print_scalar_array(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     {{ i }},
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file(parsed) -%}
-    {% if parsed.values == None %}undefined{% else %}
-fs.createReadStream("{{ parsed.value }}")
+{%- macro print_file(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
+fs.createReadStream("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_file_array(parsed) -%}
-    {% if parsed.values == None %}undefined{% else %}
+{%- macro print_file_array(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
 [
-        {% for i in parsed.values %}
+        {% for i in printable.value %}
     fs.createReadStream("{{ i }}"),
         {% endfor %}
 ]
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form(parsed) -%}
-    {% if parsed.value == None %}undefined{% else %}
+{%- macro print_free_form(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
 {
-        {% for k, v in parsed.value.items() %}
+        {% for k, v in printable.value.items() %}
     "{{ k }}": {{ v }},
         {% endfor %}
 }
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_free_form_array(parsed) -%}
-    {% if parsed.values == None %}undefined{% else %}
+{%- macro print_free_form_array(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
 [
-        {% for obj in parsed.values %}
+        {% for obj in printable.value %}
     {
             {% for k, v in obj.items() %}
         "{{ k }}": {{ v }},
@@ -54,16 +54,16 @@ fs.createReadStream("{{ parsed.value }}")
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object(parsed) -%}
-    {% if parsed.value == None %}undefined{% else %}
-{{ parsed.value }}
+{%- macro print_object(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
+{{ printable.value }}
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro print_object_array(parsed) -%}
-    {% if parsed.value == None %}undefined{% else %}
+{%- macro print_object_array(printable) -%}
+    {% if printable.value == None %}undefined{% else %}
 [
-    {% for i in parsed.values %}
+    {% for i in printable.value %}
     {{ i|camel_case }},
     {% endfor %}
 ]
