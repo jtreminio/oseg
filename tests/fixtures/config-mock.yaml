@@ -1,0 +1,9 @@
+generatorName: mock
+additionalProperties:
+  packageName: openapi_client
+  projectName: openapi-client
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

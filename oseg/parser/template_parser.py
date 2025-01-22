@@ -5,14 +5,21 @@ class TemplateParser:
     def __init__(self, extension: "jinja_extension.BaseExtension"):
         self._extension: jinja_extension.BaseExtension = extension
 
-    # renamed from parse_body_data
-    def parse_request_objects(
+    def flatten_objects(
         self,
         property_container: "model.PropertyContainer",
     ) -> dict[str, "model.PropertyObject"]:
-        """Reads through request data and finds all PropertyObject
-        or PropertyObjectArray, so we can create explicit variables
-        in the generated SDK example.
+        """Reads through request parameters and body data to recursively find all
+        PropertyObject and PropertyObjectArray objects, returned in a flat
+        dict.
+
+        Any object dependencies (sub-objects) of a given object will
+        be found and appended to the list before the object itself.
+        In this way sub-objects can be parsed in a Jinja template as
+        variables before the object variable that references them is parsed.
+
+        Non-objects are not included as they can be defined inline as an
+        object's property.
         """
 
         result = {}
@@ -103,7 +110,7 @@ class TemplateParser:
 
         return self._indent(result, indent_count)[property_name]
 
-    def parse_request_data(
+    def parse_api_call_properties(
         self,
         macros: "model.JinjaMacros",
         property_container: "model.PropertyContainer",
@@ -126,6 +133,9 @@ class TemplateParser:
         2) Required body data
         3) Optional Parameters
         4) Optional body data
+
+        todo: Fix names for variables that run into a generator's reserved keywords
+              and when request has formdata
         """
 
         result = {}
@@ -133,7 +143,7 @@ class TemplateParser:
         for name, prop in property_container.properties(required_flag).items():
             if property_container.body and prop == property_container.body:
                 if include_body is None or include_body is True:
-                    result[name] = self._extension.setter_property_name(
+                    result[name] = self._extension.print_variable(
                         property_container.body.type
                     )
 
@@ -142,7 +152,7 @@ class TemplateParser:
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray
             ):
-                result[name] = self._extension.setter_property_name(prop.type)
+                result[name] = self._extension.print_variable(prop.type)
 
                 continue
 
