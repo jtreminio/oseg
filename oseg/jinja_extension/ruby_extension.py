@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class RubyExtension(BaseExtension):
+class RubyExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "rb"
     NAME = "ruby"
     TEMPLATE = f"{NAME}.jinja2"

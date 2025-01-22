@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class PhpExtension(BaseExtension):
+class PhpExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "php"
     NAME = "php"
     TEMPLATE = f"{NAME}.jinja2"

@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class MockExtension(BaseExtension):
+class MockExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "mock"
     NAME = "mock"
     TEMPLATE = f"{NAME}.jinja2"
@@ -15,8 +14,7 @@ class MockExtension(BaseExtension):
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()

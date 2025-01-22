@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class CSharpExtension(BaseExtension):
+class CSharpExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "cs"
     NAME = "csharp"
     TEMPLATE = f"{NAME}.jinja2"

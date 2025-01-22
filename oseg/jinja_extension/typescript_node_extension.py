@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class TypescriptNodeExtension(BaseExtension):
+class TypescriptNodeExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "ts"
     NAME = "typescript-node"
     TEMPLATE = f"{NAME}.jinja2"

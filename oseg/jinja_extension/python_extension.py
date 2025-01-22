@@ -1,8 +1,7 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class PythonExtension(BaseExtension):
+class PythonExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "py"
     NAME = "python"
     TEMPLATE = f"{NAME}.jinja2"
