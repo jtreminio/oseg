@@ -4,10 +4,10 @@ OpenapiMuseumClient.configure do |config|
 end
 
 buy_museum_tickets = OpenapiMuseumClient::BuyMuseumTickets.new
+buy_museum_tickets.ticket_type = "event"
+buy_museum_tickets.ticket_date = "2023-09-05"
 buy_museum_tickets.email = "todd@example.com"
 buy_museum_tickets.ticket_id = nil
-buy_museum_tickets.ticket_date = "2023-09-05"
-buy_museum_tickets.ticket_type = "event"
 buy_museum_tickets.event_id = "dad4bce8-f5cb-4078-a211-995864315e39"
 
 begin
