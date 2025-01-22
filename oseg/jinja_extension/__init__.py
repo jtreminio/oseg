@@ -1,5 +1,5 @@
-from .jinja_extension import JinjaExtension
 from .base_extension import BaseExtension
+from .jinja_ext import JinjaExt
 from .csharp_extension import CSharpExtension
 from .java_extension import JavaExtension
 from .php_extension import PhpExtension

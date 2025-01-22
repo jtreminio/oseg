@@ -5,19 +5,19 @@ from typing import Callable
 from oseg import jinja_extension, model
 
 
-class JinjaExtension(jinja2.ext.Extension):
+class JinjaExt(jinja2.ext.Extension):
     _sdk_generator: "jinja_extension.BaseExtension"
 
     @staticmethod
-    def factory() -> "JinjaExtension":
+    def factory() -> "JinjaExt":
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,
             lstrip_blocks=True,
-            extensions=[JinjaExtension],
+            extensions=[JinjaExt],
         )
 
-        return env.extensions.get("oseg.jinja_extension.jinja_extension.JinjaExtension")
+        return env.extensions.get("oseg.jinja_extension.jinja_extension.JinjaExt")
 
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)
