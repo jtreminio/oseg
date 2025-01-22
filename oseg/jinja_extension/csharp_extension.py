@@ -87,21 +87,20 @@ class CSharpExtension(BaseExtension):
         "while",
     ]
 
-    def setter_method_name(self, name: str) -> str:
+    def print_setter(self, name: str) -> str:
         return self.pascal_case(name)
 
-    def setter_property_name(self, name: str) -> str:
+    def print_variable(self, name: str) -> str:
         name = self.camel_case(name)
 
-        if name in CSharpExtension.RESERVED_KEYWORDS:
-            return f"var{name[:1].upper()}{name[1:]}"
+        if name in self.RESERVED_KEYWORDS:
+            return f"var{self.uc_first(name)}"
 
         return name
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -119,7 +118,7 @@ class CSharpExtension(BaseExtension):
                 if item.is_enum:
                     printable.is_enum = True
                     printable.target_type = (
-                        f"{parent_type}.{self.pascal_case(name)}Enum"
+                        f"{parent.type}.{self.pascal_case(item.name)}Enum"
                     )
                 else:
                     printable.target_type = "string"
@@ -151,7 +150,7 @@ class CSharpExtension(BaseExtension):
             if enum_name is None:
                 printable.value = "null"
             else:
-                target_type = f"{parent_type}.{self.pascal_case(name)}Enum"
+                target_type = f"{parent.type}.{self.pascal_case(item.name)}Enum"
                 printable.value = f"{target_type}.{enum_name}"
         else:
             printable.value = self._to_json(item.value)

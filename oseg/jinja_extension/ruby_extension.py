@@ -7,16 +7,15 @@ class RubyExtension(BaseExtension):
     NAME = "ruby"
     TEMPLATE = f"{NAME}.jinja2"
 
-    def setter_method_name(self, name: str) -> str:
+    def print_setter(self, name: str) -> str:
         return self.snake_case(name)
 
-    def setter_property_name(self, name: str) -> str:
+    def print_variable(self, name: str) -> str:
         return self.snake_case(name)
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()

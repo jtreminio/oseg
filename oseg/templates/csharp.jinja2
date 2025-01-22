@@ -104,20 +104,20 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {
         var config = new Configuration();
 
-{% for obj_name, obj in parse_request_objects(property_container).items() %}
+{% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-        var {{ obj_name|setter_property_name }} = new {{ obj.type }}(
-        {% call(properties) m.parse_object_properties_macro(obj, parent_name, 12) %}
+        var {{ obj_name|print_variable }} = new {{ obj.type }}(
+        {% call(properties) m.parse_object_properties_macro(obj, 12) %}
             {% for name, value in properties.items() %}
-            {{ name|setter_property_name }}: {{ value }}{% if not loop.last %},{% endif %}
+            {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
 
             {% endfor %}
         {% endcall %}
         );
     {% else %}
-        var {{ obj_name|setter_property_name }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 8) %}
+        var {{ obj_name|print_variable }} = {{ "" }}
+        {%- call(value) m.parse_object_list_properties_macro(obj, 8) %}
         {{- value }};
         {% endcall %}
     {% endif %}
@@ -130,9 +130,9 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
             apiCaller.{{ operation.operation_id|pascal_case }}(
-{% call(properties) m.parse_request_properties_macro(property_container, 16) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
     {% for name, value in properties.items() %}
-                {{ name|setter_property_name }}: {{ value }}{% if not loop.last %},{% endif %}
+                {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
 
     {% endfor %}
 {% endcall %}

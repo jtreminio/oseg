@@ -15,6 +15,11 @@ tags_2 = OpenapiClient::Tag.new
 tags_2.id = 98765
 tags_2.name = "tag_2"
 
+tags = [
+    tags_1,
+    tags_2,
+]
+
 pet = OpenapiClient::Pet.new
 pet.name = "My pet name"
 pet.photo_urls = [
@@ -24,10 +29,7 @@ pet.photo_urls = [
 pet.id = 12345
 pet.status = "available"
 pet.category = category
-pet.tags = [
-    tags_1,
-    tags_2,
-]
+pet.tags = tags
 
 begin
     api_caller = OpenapiClient::PetApi.new

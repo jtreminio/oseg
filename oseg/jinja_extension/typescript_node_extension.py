@@ -7,16 +7,15 @@ class TypescriptNodeExtension(BaseExtension):
     NAME = "typescript-node"
     TEMPLATE = f"{NAME}.jinja2"
 
-    def setter_method_name(self, name: str) -> str:
+    def print_setter(self, name: str) -> str:
         return self.camel_case(name)
 
-    def setter_property_name(self, name: str) -> str:
+    def print_variable(self, name: str) -> str:
         return self.camel_case(name)
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -36,7 +35,7 @@ class TypescriptNodeExtension(BaseExtension):
             for i in item.value:
                 if is_enum:
                     enum_name = self._get_enum_name(item, i)
-                    printable.value.append(f"{namespace}.{parent_type}.{enum_name}")
+                    printable.value.append(f"{namespace}.{parent.type}.{enum_name}")
                 else:
                     printable.value.append(self._to_json(i))
 
@@ -50,8 +49,8 @@ class TypescriptNodeExtension(BaseExtension):
             if enum_name is None:
                 printable.value = "undefined"
             else:
-                base = f"{self.pascal_case(name)}Enum"
-                printable.value = f"{namespace}.{parent_type}.{base}.{enum_name}"
+                base = f"{self.pascal_case(item.name)}Enum"
+                printable.value = f"{namespace}.{parent.type}.{base}.{enum_name}"
         else:
             printable.value = self._to_json(item.value)
 

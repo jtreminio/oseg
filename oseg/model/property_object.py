@@ -25,6 +25,7 @@ class PropertyObjectInterface(Protocol):
     _base_type: str | None
     _is_nullable: bool
     _is_required: bool
+    _name: str
 
     @property
     def schema(self) -> oa.Schema:
@@ -37,6 +38,14 @@ class PropertyObjectInterface(Protocol):
     @property
     def base_type(self) -> str | None:
         return self._base_type
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        self._name = name
 
     @property
     @abstractmethod
@@ -76,6 +85,7 @@ class PropertyObject(PropertyObjectInterface):
         self._is_required = is_required
         self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
         self._properties: dict[str, T_PROPERTIES] = {}
+        self._name = self._type
 
     @property
     def properties(self) -> dict[str, T_PROPERTIES]:
@@ -177,6 +187,7 @@ class PropertyObjectArray(PropertyObjectInterface):
         self._is_required = is_required
         self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
         self._properties: list[PROPERTY_OBJECT_TYPE] = []
+        self._name = self._type
 
     @property
     def properties(self) -> list[PROPERTY_OBJECT_TYPE]:

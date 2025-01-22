@@ -161,6 +161,7 @@ class PropertyParser:
         if type_of is None:
             container.properties[name] = model.PropertyFreeForm(
                 schema=schema,
+                name=name,
                 value=value,
                 is_required=self._is_required(container.schema, name),
             )
@@ -210,6 +211,7 @@ class PropertyParser:
         if type_of is None:
             container.properties[name] = model.PropertyFreeForm(
                 schema=schema,
+                name=name,
                 value=value,
                 is_required=self._is_required(parent, name),
             )
@@ -246,6 +248,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyFile(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )
@@ -266,6 +269,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyFreeForm(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )
@@ -286,6 +290,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyScalar(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )

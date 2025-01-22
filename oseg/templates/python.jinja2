@@ -73,18 +73,18 @@ from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiEx
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-{% for obj_name, obj in flatten_objects(property_container).items() %}
+{% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
     {{ obj_name|print_variable }} = models.{{ obj.type }}()
-        {% call(properties) m.parse_object_properties_macro(obj, parent_name, 4) %}
+        {% call(properties) m.parse_object_properties_macro(obj, 4) %}
             {% for name, value in properties.items() %}
     {{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }}
             {% endfor %}
         {% endcall %}
     {% else %}
     {{ obj_name|print_variable }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 4) %}
+        {%- call(value) m.parse_object_list_properties_macro(obj, 4) %}
             {{- value }}
         {% endcall %}
     {% endif %}

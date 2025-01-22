@@ -7,16 +7,15 @@ class JavaExtension(BaseExtension):
     NAME = "java"
     TEMPLATE = f"{NAME}.jinja2"
 
-    def setter_method_name(self, name: str) -> str:
+    def print_setter(self, name: str) -> str:
         return self.pascal_case(name)
 
-    def setter_property_name(self, name: str) -> str:
+    def print_variable(self, name: str) -> str:
         return self.camel_case(name)
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -34,7 +33,7 @@ class JavaExtension(BaseExtension):
                 if item.is_enum:
                     printable.is_enum = True
                     printable.target_type = (
-                        f"{parent_type}.{self.pascal_case(name)}Enum"
+                        f"{parent.type}.{self.pascal_case(item.name)}Enum"
                     )
 
             for i in item.value:
@@ -58,7 +57,7 @@ class JavaExtension(BaseExtension):
             if enum_name is None:
                 printable.value = "null"
             else:
-                target_type = f"{parent_type}.{self.pascal_case(name)}Enum"
+                target_type = f"{parent.type}.{self.pascal_case(item.name)}Enum"
                 printable.value = f"{target_type}.{enum_name}"
         else:
             value = self._fix_ints(item, item.value)

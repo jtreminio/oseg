@@ -28,6 +28,11 @@ public class AddPet_default_example
             .id(98765L)
             .name("tag_2");
 
+        var tags = List.of (
+            tags1,
+            tags2
+        );
+
         var pet = new Pet()
             .name("My pet name")
             .photoUrls(List.of (
@@ -37,10 +42,7 @@ public class AddPet_default_example
             .id(12345L)
             .status(Pet.StatusEnum.AVAILABLE)
             .category(category)
-            .tags(List.of (
-                tags1,
-                tags2
-            ));
+            .tags(tags);
 
         try
         {

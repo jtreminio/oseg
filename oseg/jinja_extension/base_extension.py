@@ -53,8 +53,7 @@ class BaseExtension(Protocol):
     @abstractmethod
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         raise NotImplementedError

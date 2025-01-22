@@ -18,6 +18,11 @@ const tags2: openapi_client.Tag = {
     name: "tag_2",
 };
 
+const tags = [
+    tags1,
+    tags2,
+];
+
 const pet: openapi_client.Pet = {
     name: "My pet name",
     photoUrls: [
@@ -27,10 +32,7 @@ const pet: openapi_client.Pet = {
     id: 12345,
     status: openapi_client.Pet.StatusEnum.Available,
     category: category,
-    tags: [
-        tags1,
-        tags2,
-    ],
+    tags: tags,
 };
 
 apiCaller.addPet(

@@ -82,8 +82,7 @@ class PythonExtension(BaseExtension):
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()

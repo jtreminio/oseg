@@ -25,8 +25,10 @@ class PropertyContainer:
         self._request = request
         self._parameters = request.parameters
         self._is_body_required = request.is_required
-        self._required_properties: Optional[T_PROPERTIES] = None
-        self._optional_properties: Optional[T_PROPERTIES] = None
+        self._is_sorted = False
+        self._required_properties: Optional[T_PROPERTIES] = {}
+        self._optional_properties: Optional[T_PROPERTIES] = {}
+        self._flattened_objects: dict[str, "model.PropertyObject"] = {}
 
     @property
     def request(self) -> "model.Request":
@@ -94,8 +96,9 @@ class PropertyContainer:
 
     def properties(self, required_flag: bool | None = None) -> T_PROPERTIES:
         # properties have not yet been sorted
-        if self._required_properties is None or self._optional_properties is None:
+        if not self._is_sorted:
             self._sort_properties(required_flag)
+            self._flatten_objects()
 
         if required_flag is True:
             return self._required_properties
@@ -105,13 +108,22 @@ class PropertyContainer:
 
         return {**self._required_properties, **self._optional_properties}
 
-    def _clear_sorted_properties(self):
-        self._required_properties = None
-        self._optional_properties = None
+    def flattened_objects(self) -> dict[str, "model.PropertyObject"]:
+        # properties have not yet been sorted
+        if not self._is_sorted:
+            self._sort_properties()
+            self._flatten_objects()
 
-    def _sort_properties(self, required_flag: bool | None = None) -> None:
+        return self._flattened_objects
+
+    def _clear_sorted_properties(self):
         self._required_properties = {}
         self._optional_properties = {}
+        self._flattened_objects = {}
+        self._is_sorted = False
+
+    def _sort_properties(self, required_flag: bool | None = None) -> None:
+        self._is_sorted = True
         used_property_names = {}
 
         required_parameters = self._parameters_by_required(True)
@@ -132,18 +144,24 @@ class PropertyContainer:
         # todo check new name isn't already explicitly set for a property
         for parameter in required_parameters:
             name = self._generate_name(parameter.name, used_property_names)
-            self._required_properties[name] = self._parameter_object(parameter)
+            obj = self._parameter_object(parameter)
+            obj.name = name
+            self._required_properties[name] = obj
 
         for name, prop in required_body.items():
             name = self._generate_name(name, used_property_names)
+            prop.name = name
             self._required_properties[name] = prop
 
         for parameter in optional_parameters:
             name = self._generate_name(parameter.name, used_property_names)
-            self._optional_properties[name] = self._parameter_object(parameter)
+            obj = self._parameter_object(parameter)
+            obj.name = name
+            self._optional_properties[name] = obj
 
         for name, prop in optional_body.items():
             name = self._generate_name(name, used_property_names)
+            prop.name = name
             self._optional_properties[name] = prop
 
     def _parameters_by_required(self, required_flag: bool) -> list[oa.Parameter]:
@@ -219,3 +237,95 @@ class PropertyContainer:
         used_property_names[name_lower] = 1
 
         return name
+
+    def _flatten_objects(self) -> None:
+        """Reads through request parameters and body data to recursively find all
+        PropertyObject and PropertyObjectArray objects, returned in a flat
+        dict.
+
+        Any object dependencies (sub-objects) of a given object will
+        be found and appended to the list before the object itself.
+        In this way sub-objects can be parsed in a Jinja template as
+        variables before the object variable that references them is parsed.
+
+        Non-objects are not included as they can be defined inline as an
+        object's property.
+        """
+
+        result = {}
+
+        for name, prop in self.properties().items():
+            if not isinstance(prop, model.PropertyObject) and not isinstance(
+                prop, model.PropertyObjectArray
+            ):
+                continue
+
+            sub_results = self._flatten_object(
+                obj=prop,
+                parent_name="",
+            )
+
+            result = {**result, **sub_results}
+
+            """If formdata then we are dealing with each body property
+            individually so we must add the object to the result list
+            """
+            if self.body and self.request.has_formdata:
+                current = {prop.name: prop}
+                result = {**result, **current}
+
+        """Requests without formdata will have their body content defined
+        as a single object in the request, containing all its sub data.
+        
+        See OperationParser::FORM_DATA_CONTENT_TYPES
+        """
+        if self.body and not self.request.has_formdata:
+            result[self.body_type] = self.body
+
+        self._flattened_objects = result
+
+    def _flatten_object(
+        self,
+        obj: "model.PROPERTY_OBJECT_TYPE",
+        parent_name: str,
+    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+        result = {}
+        parent_name = f"{parent_name}_" if parent_name else ""
+
+        if isinstance(obj, model.PropertyObjectArray):
+            name = f"{parent_name}{obj.name}"
+
+            i = 1
+            for sub_obj in obj.properties:
+                sub_name = f"{name}_{i}"
+                sub_results = self._flatten_object(sub_obj, sub_name)
+                result |= sub_results
+                result[sub_name] = sub_obj
+                sub_obj.name = sub_name
+                i += 1
+
+            return result
+
+        assert isinstance(obj, model.PropertyObject)
+
+        for obj_name, sub_obj in obj.objects.items():
+            sub_name = f"{parent_name}{obj_name}"
+
+            sub_results = self._flatten_object(sub_obj, sub_name)
+            result |= sub_results
+            result[sub_name] = sub_obj
+            sub_obj.name = sub_name
+
+        for obj_name, array_obj in obj.array_objects.items():
+            i = 1
+            for sub_obj in array_obj.properties:
+                sub_name = f"{parent_name}{obj_name}_{i}"
+                sub_results = self._flatten_object(sub_obj, sub_name)
+                result |= sub_results
+                result[sub_name] = sub_obj
+                sub_obj.name = sub_name
+                i += 1
+
+            result[obj_name] = array_obj
+
+        return result
