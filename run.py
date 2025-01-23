@@ -23,8 +23,8 @@ def main():
     ]
 
     for project in projects:
-        oas_file = f"{__DIR}/data/{project}/openapi.yaml"
-        example_data_file = f"{__DIR}/data/{project}/example_data.json"
+        oas_file = f"{__DIR}/examples/{project}/openapi.yaml"
+        example_data_file = f"{__DIR}/examples/{project}/example_data.json"
         example_data = None
 
         if os.path.isfile(example_data_file):
@@ -38,11 +38,11 @@ def main():
         )
 
         for sdk in sdks:
-            config_file = f"{__DIR}/data/{project}/config-{sdk}.yaml"
+            config_file = f"{__DIR}/examples/{project}/config-{sdk}.yaml"
 
             generator.generate(
                 config_file=config_file,
-                output_dir=f"{__DIR}/data/{project}/oseg_generated/{sdk}",
+                output_dir=f"{__DIR}/examples/{project}/oseg_generated/{sdk}",
             )
 
 
