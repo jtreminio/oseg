@@ -57,14 +57,6 @@ class OperationParser:
 
                 request = self._get_request(oa_operation, custom_example_data)
 
-                # only care about Operations with a request
-                if not request:
-                    print(
-                        f"Skipping operation with no request data: {oa_operation.operationId}"
-                    )
-
-                    continue
-
                 operation = model.Operation(
                     operation=oa_operation,
                     request=request,
@@ -83,12 +75,6 @@ class OperationParser:
         custom_example_data: "model.EXAMPLE_DATA_BY_NAME",
     ) -> Optional["model.Request"]:
         """Only want the first request, if any"""
-
-        # todo allow operations with no request data or parameters
-        if (
-            not operation.requestBody or not len(operation.requestBody.content.keys())
-        ) and not operation.parameters:
-            return None
 
         request = model.Request(
             oa_parser=self._oa_parser,

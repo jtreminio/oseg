@@ -53,10 +53,6 @@ class ExampleDataParser:
         )
         example_data_body = self._get_body_example_data(request)
 
-        # no example data found, anywhere
-        if not example_data_params.has_data and not len(example_data_body.keys()):
-            return {}
-
         # only parameter data found
         if not len(example_data_body.keys()):
             return {

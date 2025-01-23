@@ -129,7 +129,9 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
 
             {{ "" -}}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            apiCaller.{{ operation.operation_id|pascal_case }}(
+            apiCaller.{{ operation.operation_id|pascal_case }}({%- if not property_container.has_data %});
+{% else %}
+
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
     {% for name, value in properties.items() %}
                 {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
@@ -137,6 +139,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {% endfor %}
 {% endcall %}
             );
+{% endif %}
     {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
             Console.WriteLine(response);

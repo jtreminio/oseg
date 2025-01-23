@@ -7,8 +7,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 try {
     $api_caller = new OpenAPI\Client\Api\StoreApi(config: $config);
 
-    $response = $api_caller->getInventory(
-    );
+    $response = $api_caller->getInventory();
 
     print_r($response);
 } catch (OpenAPI\Client\ApiException $e) {

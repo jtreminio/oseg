@@ -33,6 +33,16 @@ class PropertyContainer:
         self._flattener = parser.PropertyFlattener(self)
 
     @property
+    def has_data(self) -> bool:
+        return bool(
+            (self._body is not None and len(list(self._body.properties)))
+            or (self._path is not None and len(list(self._path.properties)))
+            or (self._query is not None and len(list(self._query.properties)))
+            or (self._header is not None and len(list(self._header.properties)))
+            or (self._cookie is not None and len(list(self._cookie.properties)))
+        )
+
+    @property
     def request(self) -> "model.Request":
         return self._request
 

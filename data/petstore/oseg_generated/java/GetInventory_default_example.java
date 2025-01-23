@@ -20,8 +20,7 @@ public class GetInventory_default_example
         {
             var apiCaller = new StoreApi(config);
 
-            var response = apiCaller.getInventory(
-            );
+            var response = apiCaller.getInventory();
 
             System.out.println(response);
         } catch (ApiException e) {

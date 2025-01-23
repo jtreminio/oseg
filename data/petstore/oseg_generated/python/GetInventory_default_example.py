@@ -8,8 +8,7 @@ with ApiClient(configuration) as api_client:
     try:
         api_caller = api.StoreApi(api_client)
 
-        response = api_caller.get_inventory(
-        )
+        response = api_caller.get_inventory()
 
         pprint(response)
     except ApiException as e:

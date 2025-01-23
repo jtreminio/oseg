@@ -10,9 +10,6 @@ paths:
       tags:
         - pet
       operationId: single_response
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           description: 'successful operation'
@@ -25,9 +22,6 @@ paths:
       tags:
         - pet
       operationId: single_response_with_error
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           description: 'successful operation'
@@ -42,9 +36,6 @@ paths:
       tags:
         - pet
       operationId: single_response_with_error_first
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '400':
           description: Invalid ID supplied
@@ -59,9 +50,6 @@ paths:
       tags:
         - pet
       operationId: multi_response
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           description: 'successful operation'
@@ -77,9 +65,6 @@ paths:
       tags:
         - pet
       operationId: only_400_response
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '400':
           description: Invalid ID supplied
@@ -88,9 +73,6 @@ paths:
       tags:
         - pet
       operationId: binary_response
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           description: 'successful operation'
@@ -104,17 +86,11 @@ paths:
       tags:
         - pet
       operationId: no_response
-      requestBody:
-        content:
-          application/json: {}
   /response_ref_1:
     get:
       tags:
         - pet
       operationId: response_ref_1
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           $ref: '#/components/responses/ResponseRef1'
@@ -123,9 +99,6 @@ paths:
       tags:
         - pet
       operationId: response_ref_2
-      requestBody:
-        content:
-          application/json: {}
       responses:
         '200':
           $ref: '#/components/responses/ResponseRef2'

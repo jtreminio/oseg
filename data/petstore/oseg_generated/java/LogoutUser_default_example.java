@@ -20,8 +20,7 @@ public class LogoutUser_default_example
         {
             var apiCaller = new UserApi(config);
 
-            apiCaller.logoutUser(
-            );
+            apiCaller.logoutUser();
         } catch (ApiException e) {
             System.err.println("Exception when calling User#logoutUser");
             System.err.println("Status code: " + e.getCode());

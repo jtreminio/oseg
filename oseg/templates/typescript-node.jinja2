@@ -103,13 +103,15 @@ const {{ name|print_variable }} = {{ value }};
     {% endcall %}
 
 {% endif %}
-apiCaller.{{ operation.operation_id|camel_case }}(
+apiCaller.{{ operation.operation_id|camel_case }}({% if not property_container.has_data %})
+{%- else %}
+
 {% call(properties) m.parse_api_call_properties_macro(property_container, 4) %}
     {% for name, value in properties.items() %}
     {{ name|print_variable }},
     {% endfor %}
 {% endcall %}
-){% if operation.response and operation.response.body  %}.then(response => {
+){% endif %}{%- if operation.response and operation.response.body  %}.then(response => {
 {% if not operation.response.is_binary %}
   console.log(response.body);
 {% elif operation.response.is_binary %}

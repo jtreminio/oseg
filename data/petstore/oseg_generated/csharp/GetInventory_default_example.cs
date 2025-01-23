@@ -16,8 +16,7 @@ public class GetInventoryDefaultExample
         {
             var apiCaller = new StoreApi(config);
 
-            var response = apiCaller.GetInventory(
-            );
+            var response = apiCaller.GetInventory();
 
             Console.WriteLine(response);
         }

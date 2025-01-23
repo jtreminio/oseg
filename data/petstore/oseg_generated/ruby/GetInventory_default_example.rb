@@ -6,8 +6,7 @@ end
 begin
     api_caller = OpenapiClient::StoreApi.new
 
-    response = api_caller.get_inventory(
-    )
+    response = api_caller.get_inventory()
 
     p response
 rescue OpenapiClient::ApiError => e

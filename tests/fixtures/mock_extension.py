@@ -18,6 +18,12 @@ class MockExtension(jinja_extension.BaseExtension):
     def is_reserved_keyword(self, name: str) -> bool:
         return self.snake_case(name) in self.RESERVED_KEYWORDS
 
+    def unreserve_keyword(self, name: str) -> str:
+        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
+            return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
+
+        return name
+
     def print_setter(self, name: str) -> str:
         name = self.snake_case(name)
 
