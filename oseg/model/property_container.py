@@ -107,6 +107,7 @@ class PropertyContainer:
 
         return {**self._sorted.required, **self._sorted.optional}
 
+    @property
     def flattened_objects(self) -> dict[str, "model.PropertyObject"]:
         self._sort()
 

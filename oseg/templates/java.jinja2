@@ -97,7 +97,7 @@ public class {{ operation.operation_id|pascal_case }}_{{ example_name|snake_case
     {
         var config = Configuration.getDefaultApiClient();
 
-{% for obj_name, obj in property_container.flattened_objects().items() %}
+{% for obj_name, obj in property_container.flattened_objects.items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
         {% call(properties) m.parse_object_properties_macro(obj, 12) %}

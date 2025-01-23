@@ -17,7 +17,7 @@ class JinjaExt(jinja2.ext.Extension):
             extensions=[JinjaExt],
         )
 
-        return env.extensions.get("oseg.jinja_extension.jinja_extension.JinjaExt")
+        return env.extensions.get("oseg.jinja_extension.jinja_ext.JinjaExt")
 
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)

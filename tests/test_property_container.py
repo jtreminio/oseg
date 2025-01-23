@@ -1,4 +1,6 @@
 import unittest
+from random import randrange
+
 from oseg import model, parser
 from test_utils import TestUtils
 
@@ -9,6 +11,7 @@ class TestPropertyContainer(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.oa_parser = TestUtils.oa_parser("property_container")
+        cls.oa_parser_flatten = TestUtils.oa_parser("property_container-flatten")
 
     def test_unique_names_all_required(self):
         operation_id = "unique_names_all_required"
@@ -119,4 +122,82 @@ class TestPropertyContainer(unittest.TestCase):
         self.assertIsInstance(
             properties.get("Pet_2"),
             model.PropertyObject,
+        )
+
+    def test_flatten_objects(self):
+        example_data = {
+            "example_1": {
+                "body": {
+                    "id": randrange(1, 100),
+                    "name": "My pet name",
+                    "status": "available",
+                    "photoUrls": [
+                        "https://example.com/picture_1.jpg",
+                        "https://example.com/picture_2.jpg",
+                    ],
+                    "category": {"id": randrange(1, 100), "name": "Category_Name"},
+                    "tags": [
+                        {"id": randrange(1, 100), "name": "tag_1"},
+                        {"id": randrange(1, 100), "name": "tag_2"},
+                    ],
+                }
+            },
+            "example_2": {
+                "body": {
+                    "id": randrange(1, 100),
+                    "name": "My pet name",
+                    "status": "available",
+                    "photoUrls": [
+                        "https://example.com/picture_1.jpg",
+                        "https://example.com/picture_2.jpg",
+                    ],
+                    "category": {"id": randrange(1, 100), "name": "Category_Name"},
+                }
+            },
+        }
+
+        operation = self.oa_parser_flatten.operations["default"]
+        operation.request.example_data = example_data
+
+        container_1 = operation.request.example_data.get("example_1")
+        container_2 = operation.request.example_data.get("example_2")
+
+        parsed_request_objects_1 = container_1.flattened_objects
+        parsed_request_objects_2 = container_2.flattened_objects
+
+        expected_properties_1 = [
+            "category",
+            "tags_1",
+            "tags_2",
+            "tags",
+            "Pet",
+        ]
+
+        expected_properties_2 = [
+            "category",
+            "tags",
+            "Pet",
+        ]
+
+        self.assertListEqual(expected_properties_1, list(parsed_request_objects_1))
+        self.assertListEqual(expected_properties_2, list(parsed_request_objects_2))
+
+        self.assertEqual(
+            example_data["example_1"]["body"]["category"]["id"],
+            parsed_request_objects_1.get("category").scalars.get("id").value,
+        )
+
+        self.assertEqual(
+            example_data["example_1"]["body"]["tags"][0]["id"],
+            parsed_request_objects_1.get("tags_1").scalars.get("id").value,
+        )
+
+        self.assertEqual(
+            example_data["example_1"]["body"]["tags"][1]["id"],
+            parsed_request_objects_1.get("tags_2").scalars.get("id").value,
+        )
+
+        self.assertEqual(
+            example_data["example_2"]["body"]["category"]["id"],
+            parsed_request_objects_2.get("category").scalars.get("id").value,
         )

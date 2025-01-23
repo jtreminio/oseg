@@ -71,7 +71,7 @@ require "{{ sdk_options.additional_properties.gemName }}"
 {{ sdk_options.additional_properties.moduleName }}.configure do |config|
 end
 
-{% for obj_name, obj in property_container.flattened_objects().items() %}
+{% for obj_name, obj in property_container.flattened_objects.items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
 {{ obj_name|print_variable }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|pascal_case }}.new

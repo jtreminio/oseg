@@ -76,7 +76,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
 
-{% for obj_name, obj in property_container.flattened_objects().items() %}
+{% for obj_name, obj in property_container.flattened_objects.items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
         {% call(properties) m.parse_object_properties_macro(obj, 4) %}
