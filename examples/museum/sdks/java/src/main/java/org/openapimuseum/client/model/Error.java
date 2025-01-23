@@ -48,20 +48,22 @@ import org.openapimuseum.client.JSON;
 /**
  * Error
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class Error {
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
+  @javax.annotation.Nullable
   private String type;
 
   public static final String SERIALIZED_NAME_TITLE = "title";
   @SerializedName(SERIALIZED_NAME_TITLE)
+  @javax.annotation.Nullable
   private String title;
 
   public Error() {
   }
 
-  public Error type(String type) {
+  public Error type(@javax.annotation.Nullable String type) {
     this.type = type;
     return this;
   }
@@ -75,12 +77,12 @@ public class Error {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(@javax.annotation.Nullable String type) {
     this.type = type;
   }
 
 
-  public Error title(String title) {
+  public Error title(@javax.annotation.Nullable String title) {
     this.title = title;
     return this;
   }
@@ -94,7 +96,7 @@ public class Error {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@javax.annotation.Nullable String title) {
     this.title = title;
   }
 

@@ -80,7 +80,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Identifier for a special event.
         /// </summary>
         /// <value>Identifier for a special event.</value>
-        /// <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        /*
+        <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        */
         [DataMember(Name = "eventId", EmitDefaultValue = false)]
         public Guid EventId { get; set; }
 
@@ -88,7 +90,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Name of the special event.
         /// </summary>
         /// <value>Name of the special event.</value>
-        /// <example>Pirate Coding Workshop</example>
+        /*
+        <example>Pirate Coding Workshop</example>
+        */
         [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
         public string Name { get; set; }
 
@@ -96,7 +100,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Location where the special event is held.
         /// </summary>
         /// <value>Location where the special event is held.</value>
-        /// <example>Computer Room</example>
+        /*
+        <example>Computer Room</example>
+        */
         [DataMember(Name = "location", IsRequired = true, EmitDefaultValue = true)]
         public string Location { get; set; }
 
@@ -104,7 +110,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Description of the special event.
         /// </summary>
         /// <value>Description of the special event.</value>
-        /// <example>Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).</example>
+        /*
+        <example>Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).</example>
+        */
         [DataMember(Name = "eventDescription", IsRequired = true, EmitDefaultValue = true)]
         public string EventDescription { get; set; }
 
@@ -119,7 +127,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Price of a ticket for the special event.
         /// </summary>
         /// <value>Price of a ticket for the special event.</value>
-        /// <example>25</example>
+        /*
+        <example>25</example>
+        */
         [DataMember(Name = "price", IsRequired = true, EmitDefaultValue = true)]
         public float Price { get; set; }
 

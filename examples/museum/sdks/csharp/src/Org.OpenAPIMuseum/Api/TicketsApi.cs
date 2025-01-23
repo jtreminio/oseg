@@ -293,6 +293,7 @@ namespace Org.OpenAPIMuseum.Api
             };
 
             var localVarContentType = Org.OpenAPIMuseum.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarMultipartFormData = localVarContentType == "multipart/form-data";
             if (localVarContentType != null)
             {
                 localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
@@ -446,6 +447,7 @@ namespace Org.OpenAPIMuseum.Api
             };
 
             var localVarContentType = Org.OpenAPIMuseum.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarMultipartFormData = localVarContentType == "multipart/form-data";
             if (localVarContentType != null)
             {
                 localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);

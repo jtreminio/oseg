@@ -83,11 +83,12 @@ public class TicketsApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 201 </td><td> Created. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call buyMuseumTicketsCall(BuyMuseumTickets buyMuseumTickets, final ApiCallback _callback) throws ApiException {
@@ -154,11 +155,12 @@ public class TicketsApi {
      * @return MuseumTicketsConfirmation
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 201 </td><td> Created. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public MuseumTicketsConfirmation buyMuseumTickets(BuyMuseumTickets buyMuseumTickets) throws ApiException {
@@ -173,11 +175,12 @@ public class TicketsApi {
      * @return ApiResponse&lt;MuseumTicketsConfirmation&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 201 </td><td> Created. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<MuseumTicketsConfirmation> buyMuseumTicketsWithHttpInfo(BuyMuseumTickets buyMuseumTickets) throws ApiException {
@@ -194,11 +197,12 @@ public class TicketsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 201 </td><td> Created. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call buyMuseumTicketsAsync(BuyMuseumTickets buyMuseumTickets, final ApiCallback<MuseumTicketsConfirmation> _callback) throws ApiException {
@@ -215,11 +219,12 @@ public class TicketsApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Scannable event ticket in image format. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getTicketCodeCall(UUID ticketId, final ApiCallback _callback) throws ApiException {
@@ -286,11 +291,12 @@ public class TicketsApi {
      * @return File
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Scannable event ticket in image format. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public File getTicketCode(UUID ticketId) throws ApiException {
@@ -305,11 +311,12 @@ public class TicketsApi {
      * @return ApiResponse&lt;File&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Scannable event ticket in image format. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<File> getTicketCodeWithHttpInfo(UUID ticketId) throws ApiException {
@@ -326,11 +333,12 @@ public class TicketsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Scannable event ticket in image format. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getTicketCodeAsync(UUID ticketId, final ApiCallback<File> _callback) throws ApiException {

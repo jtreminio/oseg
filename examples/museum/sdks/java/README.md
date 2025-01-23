@@ -2,7 +2,7 @@
 
 Redocly Museum API
 - API version: 1.2.1
-  - Generator version: 7.8.0
+  - Generator version: 7.11.0
 
 Imaginary, but delightful Museum API for interacting with museum services and information. Built with love by Redocly.
 
@@ -85,7 +85,7 @@ import org.openapimuseum.client.ApiClient;
 import org.openapimuseum.client.ApiException;
 import org.openapimuseum.client.Configuration;
 import org.openapimuseum.client.auth.*;
-import org.openapimuseum.client.models.*;
+import org.openapimuseum.client.model.*;
 import org.openapimuseum.client.api.EventsApi;
 
 public class Example {

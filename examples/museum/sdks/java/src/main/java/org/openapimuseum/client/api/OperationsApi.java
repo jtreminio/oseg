@@ -83,11 +83,12 @@ public class OperationsApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Success. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getMuseumHoursCall(LocalDate startDate, Integer page, Integer limit, final ApiCallback _callback) throws ApiException {
@@ -162,11 +163,12 @@ public class OperationsApi {
      * @return List&lt;MuseumDailyHours&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Success. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public List<MuseumDailyHours> getMuseumHours(LocalDate startDate, Integer page, Integer limit) throws ApiException {
@@ -183,11 +185,12 @@ public class OperationsApi {
      * @return ApiResponse&lt;List&lt;MuseumDailyHours&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Success. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<List<MuseumDailyHours>> getMuseumHoursWithHttpInfo(LocalDate startDate, Integer page, Integer limit) throws ApiException {
@@ -206,11 +209,12 @@ public class OperationsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      * @http.response.details
-     <table summary="Response Details" border="1">
+     <table border="1">
+       <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Success. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td>  </td><td>  -  </td></tr>
-        <tr><td> 404 </td><td>  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Not found. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getMuseumHoursAsync(LocalDate startDate, Integer page, Integer limit, final ApiCallback<List<MuseumDailyHours>> _callback) throws ApiException {

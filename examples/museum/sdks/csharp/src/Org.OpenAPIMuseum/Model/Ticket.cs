@@ -52,11 +52,6 @@ namespace Org.OpenAPIMuseum.Model
         /// <param name="eventId">Identifier for a special event..</param>
         public Ticket(Guid ticketId = default(Guid), DateOnly ticketDate = default(DateOnly), TicketType ticketType = default(TicketType), Guid eventId = default(Guid))
         {
-            // to ensure "ticketDate" is required (not null)
-            if (ticketDate == null)
-            {
-                throw new ArgumentNullException("ticketDate is a required property for Ticket and cannot be null");
-            }
             this.TicketDate = ticketDate;
             this.TicketType = ticketType;
             this.TicketId = ticketId;
@@ -67,14 +62,18 @@ namespace Org.OpenAPIMuseum.Model
         /// Unique identifier for museum ticket. Generated when purchased.
         /// </summary>
         /// <value>Unique identifier for museum ticket. Generated when purchased.</value>
-        /// <example>a54a57ca-36f8-421b-a6b4-2e8f26858a4c</example>
+        /*
+        <example>a54a57ca-36f8-421b-a6b4-2e8f26858a4c</example>
+        */
         [DataMember(Name = "ticketId", EmitDefaultValue = false)]
         public Guid TicketId { get; set; }
 
         /// <summary>
         /// Gets or Sets TicketDate
         /// </summary>
-        /// <example>2023-10-29</example>
+        /*
+        <example>2023-10-29</example>
+        */
         [DataMember(Name = "ticketDate", IsRequired = true, EmitDefaultValue = true)]
         public DateOnly TicketDate { get; set; }
 
@@ -82,7 +81,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Identifier for a special event.
         /// </summary>
         /// <value>Identifier for a special event.</value>
-        /// <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        /*
+        <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        */
         [DataMember(Name = "eventId", EmitDefaultValue = false)]
         public Guid EventId { get; set; }
 

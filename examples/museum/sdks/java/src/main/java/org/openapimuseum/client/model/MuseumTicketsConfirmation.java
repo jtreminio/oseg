@@ -51,36 +51,42 @@ import org.openapimuseum.client.JSON;
 /**
  * Details for a museum ticket after a successful purchase.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class MuseumTicketsConfirmation {
   public static final String SERIALIZED_NAME_TICKET_ID = "ticketId";
   @SerializedName(SERIALIZED_NAME_TICKET_ID)
+  @javax.annotation.Nullable
   private UUID ticketId;
 
   public static final String SERIALIZED_NAME_TICKET_DATE = "ticketDate";
   @SerializedName(SERIALIZED_NAME_TICKET_DATE)
+  @javax.annotation.Nonnull
   private LocalDate ticketDate;
 
   public static final String SERIALIZED_NAME_TICKET_TYPE = "ticketType";
   @SerializedName(SERIALIZED_NAME_TICKET_TYPE)
+  @javax.annotation.Nonnull
   private TicketType ticketType;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "eventId";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
+  @javax.annotation.Nullable
   private UUID eventId;
 
   public static final String SERIALIZED_NAME_MESSAGE = "message";
   @SerializedName(SERIALIZED_NAME_MESSAGE)
+  @javax.annotation.Nonnull
   private String message;
 
   public static final String SERIALIZED_NAME_CONFIRMATION_CODE = "confirmationCode";
   @SerializedName(SERIALIZED_NAME_CONFIRMATION_CODE)
+  @javax.annotation.Nonnull
   private String confirmationCode;
 
   public MuseumTicketsConfirmation() {
   }
 
-  public MuseumTicketsConfirmation ticketId(UUID ticketId) {
+  public MuseumTicketsConfirmation ticketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
     return this;
   }
@@ -94,12 +100,12 @@ public class MuseumTicketsConfirmation {
     return ticketId;
   }
 
-  public void setTicketId(UUID ticketId) {
+  public void setTicketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
   }
 
 
-  public MuseumTicketsConfirmation ticketDate(LocalDate ticketDate) {
+  public MuseumTicketsConfirmation ticketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
     return this;
   }
@@ -113,12 +119,12 @@ public class MuseumTicketsConfirmation {
     return ticketDate;
   }
 
-  public void setTicketDate(LocalDate ticketDate) {
+  public void setTicketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
   }
 
 
-  public MuseumTicketsConfirmation ticketType(TicketType ticketType) {
+  public MuseumTicketsConfirmation ticketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
     return this;
   }
@@ -132,12 +138,12 @@ public class MuseumTicketsConfirmation {
     return ticketType;
   }
 
-  public void setTicketType(TicketType ticketType) {
+  public void setTicketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
   }
 
 
-  public MuseumTicketsConfirmation eventId(UUID eventId) {
+  public MuseumTicketsConfirmation eventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
     return this;
   }
@@ -151,12 +157,12 @@ public class MuseumTicketsConfirmation {
     return eventId;
   }
 
-  public void setEventId(UUID eventId) {
+  public void setEventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
   }
 
 
-  public MuseumTicketsConfirmation message(String message) {
+  public MuseumTicketsConfirmation message(@javax.annotation.Nonnull String message) {
     this.message = message;
     return this;
   }
@@ -170,12 +176,12 @@ public class MuseumTicketsConfirmation {
     return message;
   }
 
-  public void setMessage(String message) {
+  public void setMessage(@javax.annotation.Nonnull String message) {
     this.message = message;
   }
 
 
-  public MuseumTicketsConfirmation confirmationCode(String confirmationCode) {
+  public MuseumTicketsConfirmation confirmationCode(@javax.annotation.Nonnull String confirmationCode) {
     this.confirmationCode = confirmationCode;
     return this;
   }
@@ -189,7 +195,7 @@ public class MuseumTicketsConfirmation {
     return confirmationCode;
   }
 
-  public void setConfirmationCode(String confirmationCode) {
+  public void setConfirmationCode(@javax.annotation.Nonnull String confirmationCode) {
     this.confirmationCode = confirmationCode;
   }
 

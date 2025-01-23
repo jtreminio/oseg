@@ -45,11 +45,6 @@ namespace Org.OpenAPIMuseum.Model
         /// <param name="timeClose">Time the museum closes on a specific date. Uses 24 hour time format (&#x60;HH:mm&#x60;). (required).</param>
         public MuseumDailyHours(DateOnly date = default(DateOnly), string timeOpen = default(string), string timeClose = default(string))
         {
-            // to ensure "date" is required (not null)
-            if (date == null)
-            {
-                throw new ArgumentNullException("date is a required property for MuseumDailyHours and cannot be null");
-            }
             this.Date = date;
             // to ensure "timeOpen" is required (not null)
             if (timeOpen == null)
@@ -68,7 +63,9 @@ namespace Org.OpenAPIMuseum.Model
         /// <summary>
         /// Gets or Sets Date
         /// </summary>
-        /// <example>2023-10-29</example>
+        /*
+        <example>2023-10-29</example>
+        */
         [DataMember(Name = "date", IsRequired = true, EmitDefaultValue = true)]
         public DateOnly Date { get; set; }
 
@@ -76,7 +73,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Time the museum opens on a specific date. Uses 24 hour time format (&#x60;HH:mm&#x60;).
         /// </summary>
         /// <value>Time the museum opens on a specific date. Uses 24 hour time format (&#x60;HH:mm&#x60;).</value>
-        /// <example>09:00</example>
+        /*
+        <example>09:00</example>
+        */
         [DataMember(Name = "timeOpen", IsRequired = true, EmitDefaultValue = true)]
         public string TimeOpen { get; set; }
 
@@ -84,7 +83,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Time the museum closes on a specific date. Uses 24 hour time format (&#x60;HH:mm&#x60;).
         /// </summary>
         /// <value>Time the museum closes on a specific date. Uses 24 hour time format (&#x60;HH:mm&#x60;).</value>
-        /// <example>18:00</example>
+        /*
+        <example>18:00</example>
+        */
         [DataMember(Name = "timeClose", IsRequired = true, EmitDefaultValue = true)]
         public string TimeClose { get; set; }
 

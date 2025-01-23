@@ -51,28 +51,32 @@ import org.openapimuseum.client.JSON;
 /**
  * Ticket for museum entry, can be general admission or special event.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class Ticket {
   public static final String SERIALIZED_NAME_TICKET_ID = "ticketId";
   @SerializedName(SERIALIZED_NAME_TICKET_ID)
+  @javax.annotation.Nullable
   private UUID ticketId;
 
   public static final String SERIALIZED_NAME_TICKET_DATE = "ticketDate";
   @SerializedName(SERIALIZED_NAME_TICKET_DATE)
+  @javax.annotation.Nonnull
   private LocalDate ticketDate;
 
   public static final String SERIALIZED_NAME_TICKET_TYPE = "ticketType";
   @SerializedName(SERIALIZED_NAME_TICKET_TYPE)
+  @javax.annotation.Nonnull
   private TicketType ticketType;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "eventId";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
+  @javax.annotation.Nullable
   private UUID eventId;
 
   public Ticket() {
   }
 
-  public Ticket ticketId(UUID ticketId) {
+  public Ticket ticketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
     return this;
   }
@@ -86,12 +90,12 @@ public class Ticket {
     return ticketId;
   }
 
-  public void setTicketId(UUID ticketId) {
+  public void setTicketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
   }
 
 
-  public Ticket ticketDate(LocalDate ticketDate) {
+  public Ticket ticketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
     return this;
   }
@@ -105,12 +109,12 @@ public class Ticket {
     return ticketDate;
   }
 
-  public void setTicketDate(LocalDate ticketDate) {
+  public void setTicketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
   }
 
 
-  public Ticket ticketType(TicketType ticketType) {
+  public Ticket ticketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
     return this;
   }
@@ -124,12 +128,12 @@ public class Ticket {
     return ticketType;
   }
 
-  public void setTicketType(TicketType ticketType) {
+  public void setTicketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
   }
 
 
-  public Ticket eventId(UUID eventId) {
+  public Ticket eventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
     return this;
   }
@@ -143,7 +147,7 @@ public class Ticket {
     return eventId;
   }
 
-  public void setEventId(UUID eventId) {
+  public void setEventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
   }
 

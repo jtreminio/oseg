@@ -49,24 +49,27 @@ import org.openapimuseum.client.JSON;
 /**
  * Daily operating hours for the museum.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class MuseumDailyHours {
   public static final String SERIALIZED_NAME_DATE = "date";
   @SerializedName(SERIALIZED_NAME_DATE)
+  @javax.annotation.Nonnull
   private LocalDate date;
 
   public static final String SERIALIZED_NAME_TIME_OPEN = "timeOpen";
   @SerializedName(SERIALIZED_NAME_TIME_OPEN)
+  @javax.annotation.Nonnull
   private String timeOpen;
 
   public static final String SERIALIZED_NAME_TIME_CLOSE = "timeClose";
   @SerializedName(SERIALIZED_NAME_TIME_CLOSE)
+  @javax.annotation.Nonnull
   private String timeClose;
 
   public MuseumDailyHours() {
   }
 
-  public MuseumDailyHours date(LocalDate date) {
+  public MuseumDailyHours date(@javax.annotation.Nonnull LocalDate date) {
     this.date = date;
     return this;
   }
@@ -80,12 +83,12 @@ public class MuseumDailyHours {
     return date;
   }
 
-  public void setDate(LocalDate date) {
+  public void setDate(@javax.annotation.Nonnull LocalDate date) {
     this.date = date;
   }
 
 
-  public MuseumDailyHours timeOpen(String timeOpen) {
+  public MuseumDailyHours timeOpen(@javax.annotation.Nonnull String timeOpen) {
     this.timeOpen = timeOpen;
     return this;
   }
@@ -99,12 +102,12 @@ public class MuseumDailyHours {
     return timeOpen;
   }
 
-  public void setTimeOpen(String timeOpen) {
+  public void setTimeOpen(@javax.annotation.Nonnull String timeOpen) {
     this.timeOpen = timeOpen;
   }
 
 
-  public MuseumDailyHours timeClose(String timeClose) {
+  public MuseumDailyHours timeClose(@javax.annotation.Nonnull String timeClose) {
     this.timeClose = timeClose;
     return this;
   }
@@ -118,7 +121,7 @@ public class MuseumDailyHours {
     return timeClose;
   }
 
-  public void setTimeClose(String timeClose) {
+  public void setTimeClose(@javax.annotation.Nonnull String timeClose) {
     this.timeClose = timeClose;
   }
 

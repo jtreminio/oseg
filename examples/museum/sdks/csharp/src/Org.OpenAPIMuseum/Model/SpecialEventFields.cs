@@ -53,7 +53,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Name of the special event.
         /// </summary>
         /// <value>Name of the special event.</value>
-        /// <example>Pirate Coding Workshop</example>
+        /*
+        <example>Pirate Coding Workshop</example>
+        */
         [DataMember(Name = "name", EmitDefaultValue = false)]
         public string Name { get; set; }
 
@@ -61,7 +63,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Location where the special event is held.
         /// </summary>
         /// <value>Location where the special event is held.</value>
-        /// <example>Computer Room</example>
+        /*
+        <example>Computer Room</example>
+        */
         [DataMember(Name = "location", EmitDefaultValue = false)]
         public string Location { get; set; }
 
@@ -69,7 +73,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Description of the special event.
         /// </summary>
         /// <value>Description of the special event.</value>
-        /// <example>Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).</example>
+        /*
+        <example>Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).</example>
+        */
         [DataMember(Name = "eventDescription", EmitDefaultValue = false)]
         public string EventDescription { get; set; }
 
@@ -84,7 +90,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Price of a ticket for the special event.
         /// </summary>
         /// <value>Price of a ticket for the special event.</value>
-        /// <example>25</example>
+        /*
+        <example>25</example>
+        */
         [DataMember(Name = "price", EmitDefaultValue = false)]
         public float Price { get; set; }
 

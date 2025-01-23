@@ -46,14 +46,18 @@ namespace Org.OpenAPIMuseum.Model
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
-        /// <example>object</example>
+        /*
+        <example>object</example>
+        */
         [DataMember(Name = "type", EmitDefaultValue = false)]
         public string Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Title
         /// </summary>
-        /// <example>Validation failed</example>
+        /*
+        <example>Validation failed</example>
+        */
         [DataMember(Name = "title", EmitDefaultValue = false)]
         public string Title { get; set; }
 

@@ -51,32 +51,37 @@ import org.openapimuseum.client.JSON;
 /**
  * SpecialEventFields
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class SpecialEventFields {
   public static final String SERIALIZED_NAME_NAME = "name";
   @SerializedName(SERIALIZED_NAME_NAME)
+  @javax.annotation.Nullable
   private String name;
 
   public static final String SERIALIZED_NAME_LOCATION = "location";
   @SerializedName(SERIALIZED_NAME_LOCATION)
+  @javax.annotation.Nullable
   private String location;
 
   public static final String SERIALIZED_NAME_EVENT_DESCRIPTION = "eventDescription";
   @SerializedName(SERIALIZED_NAME_EVENT_DESCRIPTION)
+  @javax.annotation.Nullable
   private String eventDescription;
 
   public static final String SERIALIZED_NAME_DATES = "dates";
   @SerializedName(SERIALIZED_NAME_DATES)
+  @javax.annotation.Nullable
   private List<LocalDate> dates = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_PRICE = "price";
   @SerializedName(SERIALIZED_NAME_PRICE)
+  @javax.annotation.Nullable
   private Float price;
 
   public SpecialEventFields() {
   }
 
-  public SpecialEventFields name(String name) {
+  public SpecialEventFields name(@javax.annotation.Nullable String name) {
     this.name = name;
     return this;
   }
@@ -90,12 +95,12 @@ public class SpecialEventFields {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@javax.annotation.Nullable String name) {
     this.name = name;
   }
 
 
-  public SpecialEventFields location(String location) {
+  public SpecialEventFields location(@javax.annotation.Nullable String location) {
     this.location = location;
     return this;
   }
@@ -109,12 +114,12 @@ public class SpecialEventFields {
     return location;
   }
 
-  public void setLocation(String location) {
+  public void setLocation(@javax.annotation.Nullable String location) {
     this.location = location;
   }
 
 
-  public SpecialEventFields eventDescription(String eventDescription) {
+  public SpecialEventFields eventDescription(@javax.annotation.Nullable String eventDescription) {
     this.eventDescription = eventDescription;
     return this;
   }
@@ -128,12 +133,12 @@ public class SpecialEventFields {
     return eventDescription;
   }
 
-  public void setEventDescription(String eventDescription) {
+  public void setEventDescription(@javax.annotation.Nullable String eventDescription) {
     this.eventDescription = eventDescription;
   }
 
 
-  public SpecialEventFields dates(List<LocalDate> dates) {
+  public SpecialEventFields dates(@javax.annotation.Nullable List<LocalDate> dates) {
     this.dates = dates;
     return this;
   }
@@ -155,12 +160,12 @@ public class SpecialEventFields {
     return dates;
   }
 
-  public void setDates(List<LocalDate> dates) {
+  public void setDates(@javax.annotation.Nullable List<LocalDate> dates) {
     this.dates = dates;
   }
 
 
-  public SpecialEventFields price(Float price) {
+  public SpecialEventFields price(@javax.annotation.Nullable Float price) {
     this.price = price;
     return this;
   }
@@ -174,7 +179,7 @@ public class SpecialEventFields {
     return price;
   }
 
-  public void setPrice(Float price) {
+  public void setPrice(@javax.annotation.Nullable Float price) {
     this.price = price;
   }
 

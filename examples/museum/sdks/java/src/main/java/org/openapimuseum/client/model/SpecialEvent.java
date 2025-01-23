@@ -52,36 +52,42 @@ import org.openapimuseum.client.JSON;
 /**
  * SpecialEvent
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class SpecialEvent {
   public static final String SERIALIZED_NAME_EVENT_ID = "eventId";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
+  @javax.annotation.Nullable
   private UUID eventId;
 
   public static final String SERIALIZED_NAME_NAME = "name";
   @SerializedName(SERIALIZED_NAME_NAME)
+  @javax.annotation.Nonnull
   private String name;
 
   public static final String SERIALIZED_NAME_LOCATION = "location";
   @SerializedName(SERIALIZED_NAME_LOCATION)
+  @javax.annotation.Nonnull
   private String location;
 
   public static final String SERIALIZED_NAME_EVENT_DESCRIPTION = "eventDescription";
   @SerializedName(SERIALIZED_NAME_EVENT_DESCRIPTION)
+  @javax.annotation.Nonnull
   private String eventDescription;
 
   public static final String SERIALIZED_NAME_DATES = "dates";
   @SerializedName(SERIALIZED_NAME_DATES)
+  @javax.annotation.Nonnull
   private List<LocalDate> dates = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_PRICE = "price";
   @SerializedName(SERIALIZED_NAME_PRICE)
+  @javax.annotation.Nonnull
   private Float price;
 
   public SpecialEvent() {
   }
 
-  public SpecialEvent eventId(UUID eventId) {
+  public SpecialEvent eventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
     return this;
   }
@@ -95,12 +101,12 @@ public class SpecialEvent {
     return eventId;
   }
 
-  public void setEventId(UUID eventId) {
+  public void setEventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
   }
 
 
-  public SpecialEvent name(String name) {
+  public SpecialEvent name(@javax.annotation.Nonnull String name) {
     this.name = name;
     return this;
   }
@@ -114,12 +120,12 @@ public class SpecialEvent {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@javax.annotation.Nonnull String name) {
     this.name = name;
   }
 
 
-  public SpecialEvent location(String location) {
+  public SpecialEvent location(@javax.annotation.Nonnull String location) {
     this.location = location;
     return this;
   }
@@ -133,12 +139,12 @@ public class SpecialEvent {
     return location;
   }
 
-  public void setLocation(String location) {
+  public void setLocation(@javax.annotation.Nonnull String location) {
     this.location = location;
   }
 
 
-  public SpecialEvent eventDescription(String eventDescription) {
+  public SpecialEvent eventDescription(@javax.annotation.Nonnull String eventDescription) {
     this.eventDescription = eventDescription;
     return this;
   }
@@ -152,12 +158,12 @@ public class SpecialEvent {
     return eventDescription;
   }
 
-  public void setEventDescription(String eventDescription) {
+  public void setEventDescription(@javax.annotation.Nonnull String eventDescription) {
     this.eventDescription = eventDescription;
   }
 
 
-  public SpecialEvent dates(List<LocalDate> dates) {
+  public SpecialEvent dates(@javax.annotation.Nonnull List<LocalDate> dates) {
     this.dates = dates;
     return this;
   }
@@ -179,12 +185,12 @@ public class SpecialEvent {
     return dates;
   }
 
-  public void setDates(List<LocalDate> dates) {
+  public void setDates(@javax.annotation.Nonnull List<LocalDate> dates) {
     this.dates = dates;
   }
 
 
-  public SpecialEvent price(Float price) {
+  public SpecialEvent price(@javax.annotation.Nonnull Float price) {
     this.price = price;
     return this;
   }
@@ -198,7 +204,7 @@ public class SpecialEvent {
     return price;
   }
 
-  public void setPrice(Float price) {
+  public void setPrice(@javax.annotation.Nonnull Float price) {
     this.price = price;
   }
 

@@ -51,32 +51,37 @@ import org.openapimuseum.client.JSON;
 /**
  * Data to purchase a ticket.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.8.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.11.0")
 public class BuyMuseumTickets {
   public static final String SERIALIZED_NAME_TICKET_ID = "ticketId";
   @SerializedName(SERIALIZED_NAME_TICKET_ID)
+  @javax.annotation.Nullable
   private UUID ticketId;
 
   public static final String SERIALIZED_NAME_TICKET_DATE = "ticketDate";
   @SerializedName(SERIALIZED_NAME_TICKET_DATE)
+  @javax.annotation.Nonnull
   private LocalDate ticketDate;
 
   public static final String SERIALIZED_NAME_TICKET_TYPE = "ticketType";
   @SerializedName(SERIALIZED_NAME_TICKET_TYPE)
+  @javax.annotation.Nonnull
   private TicketType ticketType;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "eventId";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
+  @javax.annotation.Nullable
   private UUID eventId;
 
   public static final String SERIALIZED_NAME_EMAIL = "email";
   @SerializedName(SERIALIZED_NAME_EMAIL)
+  @javax.annotation.Nullable
   private String email;
 
   public BuyMuseumTickets() {
   }
 
-  public BuyMuseumTickets ticketId(UUID ticketId) {
+  public BuyMuseumTickets ticketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
     return this;
   }
@@ -90,12 +95,12 @@ public class BuyMuseumTickets {
     return ticketId;
   }
 
-  public void setTicketId(UUID ticketId) {
+  public void setTicketId(@javax.annotation.Nullable UUID ticketId) {
     this.ticketId = ticketId;
   }
 
 
-  public BuyMuseumTickets ticketDate(LocalDate ticketDate) {
+  public BuyMuseumTickets ticketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
     return this;
   }
@@ -109,12 +114,12 @@ public class BuyMuseumTickets {
     return ticketDate;
   }
 
-  public void setTicketDate(LocalDate ticketDate) {
+  public void setTicketDate(@javax.annotation.Nonnull LocalDate ticketDate) {
     this.ticketDate = ticketDate;
   }
 
 
-  public BuyMuseumTickets ticketType(TicketType ticketType) {
+  public BuyMuseumTickets ticketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
     return this;
   }
@@ -128,12 +133,12 @@ public class BuyMuseumTickets {
     return ticketType;
   }
 
-  public void setTicketType(TicketType ticketType) {
+  public void setTicketType(@javax.annotation.Nonnull TicketType ticketType) {
     this.ticketType = ticketType;
   }
 
 
-  public BuyMuseumTickets eventId(UUID eventId) {
+  public BuyMuseumTickets eventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
     return this;
   }
@@ -147,12 +152,12 @@ public class BuyMuseumTickets {
     return eventId;
   }
 
-  public void setEventId(UUID eventId) {
+  public void setEventId(@javax.annotation.Nullable UUID eventId) {
     this.eventId = eventId;
   }
 
 
-  public BuyMuseumTickets email(String email) {
+  public BuyMuseumTickets email(@javax.annotation.Nullable String email) {
     this.email = email;
     return this;
   }
@@ -166,7 +171,7 @@ public class BuyMuseumTickets {
     return email;
   }
 
-  public void setEmail(String email) {
+  public void setEmail(@javax.annotation.Nullable String email) {
     this.email = email;
   }
 

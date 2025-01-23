@@ -54,11 +54,6 @@ namespace Org.OpenAPIMuseum.Model
         /// <param name="confirmationCode">Unique confirmation code used to verify ticket purchase. (required).</param>
         public MuseumTicketsConfirmation(Guid ticketId = default(Guid), DateOnly ticketDate = default(DateOnly), TicketType ticketType = default(TicketType), Guid eventId = default(Guid), string message = default(string), string confirmationCode = default(string))
         {
-            // to ensure "ticketDate" is required (not null)
-            if (ticketDate == null)
-            {
-                throw new ArgumentNullException("ticketDate is a required property for MuseumTicketsConfirmation and cannot be null");
-            }
             this.TicketDate = ticketDate;
             this.TicketType = ticketType;
             // to ensure "message" is required (not null)
@@ -81,14 +76,18 @@ namespace Org.OpenAPIMuseum.Model
         /// Unique identifier for museum ticket. Generated when purchased.
         /// </summary>
         /// <value>Unique identifier for museum ticket. Generated when purchased.</value>
-        /// <example>a54a57ca-36f8-421b-a6b4-2e8f26858a4c</example>
+        /*
+        <example>a54a57ca-36f8-421b-a6b4-2e8f26858a4c</example>
+        */
         [DataMember(Name = "ticketId", EmitDefaultValue = false)]
         public Guid TicketId { get; set; }
 
         /// <summary>
         /// Gets or Sets TicketDate
         /// </summary>
-        /// <example>2023-10-29</example>
+        /*
+        <example>2023-10-29</example>
+        */
         [DataMember(Name = "ticketDate", IsRequired = true, EmitDefaultValue = true)]
         public DateOnly TicketDate { get; set; }
 
@@ -96,7 +95,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Identifier for a special event.
         /// </summary>
         /// <value>Identifier for a special event.</value>
-        /// <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        /*
+        <example>3be6453c-03eb-4357-ae5a-984a0e574a54</example>
+        */
         [DataMember(Name = "eventId", EmitDefaultValue = false)]
         public Guid EventId { get; set; }
 
@@ -104,7 +105,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Confirmation message after a ticket purchase.
         /// </summary>
         /// <value>Confirmation message after a ticket purchase.</value>
-        /// <example>Museum general entry ticket purchased</example>
+        /*
+        <example>Museum general entry ticket purchased</example>
+        */
         [DataMember(Name = "message", IsRequired = true, EmitDefaultValue = true)]
         public string Message { get; set; }
 
@@ -112,7 +115,9 @@ namespace Org.OpenAPIMuseum.Model
         /// Unique confirmation code used to verify ticket purchase.
         /// </summary>
         /// <value>Unique confirmation code used to verify ticket purchase.</value>
-        /// <example>ticket-event-a98c8f-7eb12</example>
+        /*
+        <example>ticket-event-a98c8f-7eb12</example>
+        */
         [DataMember(Name = "confirmationCode", IsRequired = true, EmitDefaultValue = true)]
         public string ConfirmationCode { get; set; }
 
