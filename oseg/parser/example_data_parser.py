@@ -163,7 +163,10 @@ class ExampleDataParser:
                     break
             elif parameter.param_schema.example:
                 value = parameter.param_schema.example
-            elif parameter.param_schema.examples:
+            elif (
+                hasattr(parameter.param_schema, "examples")
+                and parameter.param_schema.examples
+            ):
                 value = parameter.param_schema.examples[0]
             elif parameter.param_schema.default is not None:
                 value = parameter.param_schema.default
@@ -239,7 +242,7 @@ class ExampleDataParser:
         if schema.example is not None:
             return schema.example
 
-        if schema.examples is not None:
+        if hasattr(schema, "examples") and schema.examples is not None:
             return schema.examples
 
         # if property is nullable and default value is null, use it

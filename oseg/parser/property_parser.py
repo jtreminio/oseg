@@ -68,8 +68,6 @@ class PropertyParser:
             is_required=False,
         )
 
-        processed_properties = []
-
         for name, property_schema in properties.items():
             for current_schema in merged_values.schemas:
                 non_object_property_schema = self._oa_parser.resolve_property(
@@ -85,8 +83,6 @@ class PropertyParser:
                     name=name,
                     value=value,
                 ):
-                    processed_properties.append(name)
-
                     break
 
                 if self._handle_array_object(
@@ -95,8 +91,6 @@ class PropertyParser:
                     name=name,
                     value=value,
                 ):
-                    processed_properties.append(name)
-
                     break
 
                 if non_object_property_schema and self._handle_file(

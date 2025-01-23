@@ -52,6 +52,8 @@ class Generator:
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_name}"
         print(f"Begin parsing for {filename}")
 
+        filename = filename.replace("/", "_")
+
         rendered = self._jinja.template.render(
             operation=operation,
             property_container=property_container,

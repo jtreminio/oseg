@@ -257,7 +257,10 @@ class ComponentResolver:
             # if body data is an array, use the name of the items schema
             if parser.TypeChecker.is_array(schema):
                 schema.items = self._oa_parser.resolve_component(schema.items)
-                name = self.name(schema.items)
+                array_name = self.name(schema.items)
+
+                if array_name is None and name:
+                    self._add(schema.items, name)
 
             if name is None and operation:
                 name = f"{operation.operationId}_request"
