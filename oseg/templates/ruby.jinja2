@@ -71,18 +71,18 @@ require "{{ sdk_options.additional_properties.gemName }}"
 {{ sdk_options.additional_properties.moduleName }}.configure do |config|
 end
 
-{% for obj_name, obj in parse_request_objects(property_container).items() %}
+{% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-{{ obj_name|setter_property_name }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|pascal_case }}.new
-        {% call(properties) m.parse_object_properties_macro(obj, parent_name, 0) %}
+{{ obj_name|print_variable }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|pascal_case }}.new
+        {% call(properties) m.parse_object_properties_macro(obj, 0) %}
             {% for name, value in properties.items() %}
-{{ obj_name|setter_property_name }}.{{ name|setter_property_name }} = {{ value }}
+{{ obj_name|print_variable }}.{{ name|print_variable }} = {{ value }}
             {% endfor %}
         {% endcall %}
     {% else %}
-{{ obj_name|setter_property_name }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 0) %}
+{{ obj_name|print_variable }} = {{ "" }}
+        {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
     {{- value }}
         {% endcall %}
     {% endif %}
@@ -94,16 +94,16 @@ begin
     {{ "" -}}
     {% if operation.response and operation.response.body  %}response = {% endif -%}
     api_caller.{{ operation.operation_id|snake_case }}(
-{% call(properties) m.parse_request_properties_macro(property_container, 4, True) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 4, True) %}
     {% for name, value in properties.items() %}
         {{ value }},
     {% endfor %}
 {% endcall %}
-{% call(properties) m.parse_request_properties_macro(property_container, 4, False) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 4, False) %}
     {% if properties %}
         {
         {% for name, value in properties.items() %}
-            {{ name|setter_property_name }}: {{ value }},
+            {{ name|print_variable }}: {{ value }},
         {% endfor %}
         },
     {% endif %}

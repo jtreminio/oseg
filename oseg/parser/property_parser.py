@@ -71,62 +71,53 @@ class PropertyParser:
         processed_properties = []
 
         for name, property_schema in properties.items():
-            value = data.get(name)
-
-            if self._handle_object(
-                container=container,
-                schema=property_schema,
-                name=name,
-                value=value,
-            ):
-                processed_properties.append(name)
-
-                continue
-
-            if self._handle_array_object(
-                container=container,
-                schema=property_schema,
-                name=name,
-                value=value,
-            ):
-                processed_properties.append(name)
-
-                continue
-
-        for name, property_schema in properties.items():
-            if name in processed_properties:
-                continue
-
             for current_schema in merged_values.schemas:
-                property_schema = self._oa_parser.resolve_property(
+                non_object_property_schema = self._oa_parser.resolve_property(
                     schema=current_schema,
                     property_name=name,
                 )
 
-                if not property_schema:
-                    continue
-
                 value = data.get(name)
 
-                if self._handle_file(
+                if self._handle_object(
                     container=container,
                     schema=property_schema,
                     name=name,
                     value=value,
                 ):
-                    continue
+                    processed_properties.append(name)
 
-                if self._handle_free_form(
+                    break
+
+                if self._handle_array_object(
                     container=container,
                     schema=property_schema,
                     name=name,
                     value=value,
                 ):
+                    processed_properties.append(name)
+
+                    break
+
+                if non_object_property_schema and self._handle_file(
+                    container=container,
+                    schema=non_object_property_schema,
+                    name=name,
+                    value=value,
+                ):
                     continue
 
-                if self._handle_scalar(
+                if non_object_property_schema and self._handle_free_form(
                     container=container,
-                    schema=property_schema,
+                    schema=non_object_property_schema,
+                    name=name,
+                    value=value,
+                ):
+                    continue
+
+                if non_object_property_schema and self._handle_scalar(
+                    container=container,
+                    schema=non_object_property_schema,
                     name=name,
                     value=value,
                 ):
@@ -161,6 +152,7 @@ class PropertyParser:
         if type_of is None:
             container.properties[name] = model.PropertyFreeForm(
                 schema=schema,
+                name=name,
                 value=value,
                 is_required=self._is_required(container.schema, name),
             )
@@ -210,6 +202,7 @@ class PropertyParser:
         if type_of is None:
             container.properties[name] = model.PropertyFreeForm(
                 schema=schema,
+                name=name,
                 value=value,
                 is_required=self._is_required(parent, name),
             )
@@ -246,6 +239,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyFile(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )
@@ -266,6 +260,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyFreeForm(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )
@@ -286,6 +281,7 @@ class PropertyParser:
 
         container.properties[name] = model.PropertyScalar(
             schema=schema,
+            name=name,
             value=value,
             is_required=self._is_required(container.schema, name),
         )

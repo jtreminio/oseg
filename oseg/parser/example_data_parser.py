@@ -9,6 +9,7 @@ class ExampleDataParser:
     def __init__(self, oa_parser: "parser.OaParser"):
         self._oa_parser = oa_parser
         self._property_parser = parser.PropertyParser(oa_parser)
+        self._schema_joiner = parser.SchemaJoiner(oa_parser)
 
     def from_oas_data(
         self,
@@ -252,12 +253,6 @@ class ExampleDataParser:
         if schema.default is not None:
             return schema.default
 
-        if schema.allOf:
-            for all_of_schema in schema.allOf:
-                all_of_data = self._example_data_from_properties(all_of_schema)
-
-                return all_of_data if all_of_data is not None else {}
-
         if parser.TypeChecker.is_array(schema):
             items_data = self._example_data_from_properties(schema.items)
 
@@ -272,6 +267,15 @@ class ExampleDataParser:
             for prop_name, prop_schema in schema.properties.items():
                 data[prop_name] = self._example_data_from_properties(prop_schema)
 
+        """Once we have base object default data built see if we are dealing
+        with a discriminator or allOf
+        """
+        if parser.TypeChecker.is_object(schema) or schema.allOf:
+            merged = self._schema_joiner.merge_schemas_and_properties(schema, data)
+
+            for prop_name, prop_schema in merged.properties.items():
+                data[prop_name] = self._example_data_from_properties(prop_schema)
+
         return data if len(data.keys()) else None
 
     def _parse_example(
@@ -281,28 +285,27 @@ class ExampleDataParser:
     ) -> "model.PropertyContainer":
         container = model.PropertyContainer(request)
 
-        if example_data.has_parameter_data:
-            loop_data = {
-                oa.ParameterLocation.PATH: example_data.path,
-                oa.ParameterLocation.QUERY: example_data.query,
-                oa.ParameterLocation.HEADER: example_data.header,
-                oa.ParameterLocation.COOKIE: example_data.cookie,
-            }
+        loop_data = {
+            oa.ParameterLocation.PATH: example_data.path,
+            oa.ParameterLocation.QUERY: example_data.query,
+            oa.ParameterLocation.HEADER: example_data.header,
+            oa.ParameterLocation.COOKIE: example_data.cookie,
+        }
 
-            for param_in, param_data in loop_data.items():
-                schema = self._schema_for_params_in(
-                    parameters=request.parameters,
+        for param_in, param_data in loop_data.items():
+            schema = self._schema_for_params_in(
+                parameters=request.parameters,
+                param_in=param_in,
+            )
+
+            if schema:
+                container.set_parameters(
+                    data=self._property_parser.parse(
+                        schema=schema,
+                        data=param_data,
+                    ),
                     param_in=param_in,
                 )
-
-                if schema:
-                    container.set_parameters(
-                        data=self._property_parser.parse(
-                            schema=schema,
-                            data=param_data,
-                        ),
-                        param_in=param_in,
-                    )
 
         if request.body:
             parsed = self._property_parser.parse(

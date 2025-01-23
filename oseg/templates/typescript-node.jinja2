@@ -77,36 +77,36 @@ import * as {{ sdk_options.additional_properties.npmName|snake_case }} from "{{ 
 
 const apiCaller = new {{ sdk_options.additional_properties.npmName|snake_case }}.{{ operation.api_name|pascal_case }}Api();
 
-{% for obj_name, obj in parse_request_objects(property_container).items() %}
+{% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-const {{ obj_name|setter_property_name }}: {{ sdk_options.additional_properties.npmName|snake_case }}.{{ obj.type }} = {
-    {% call(properties) m.parse_object_properties_macro(obj, parent_name, 4) %}
+const {{ obj_name|print_variable }}: {{ sdk_options.additional_properties.npmName|snake_case }}.{{ obj.type }} = {
+    {% call(properties) m.parse_object_properties_macro(obj, 4) %}
         {% for name, value in properties.items() %}
-    {{ name|setter_method_name }}: {{ value }},
+    {{ name|print_setter }}: {{ value }},
         {% endfor %}
     {% endcall %}
 };
     {% else %}
-const {{ obj_name|setter_property_name }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, parent_name, 0) %}
+const {{ obj_name|print_variable }} = {{ "" }}
+        {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
     {{- value }};
         {% endcall %}
     {% endif %}
 
 {% endfor %}
 {% if operation.request.parameters or operation.request.has_formdata %}
-    {% call(properties) m.parse_request_properties_macro(property_container, 4, null, False) %}
+    {% call(properties) m.parse_api_call_properties_macro(property_container, 4, null, False) %}
         {% for name, value in properties.items() %}
-const {{ name|camel_case }} = {{ value }};
+const {{ name|print_variable }} = {{ value }};
         {% endfor %}
     {% endcall %}
 
 {% endif %}
 apiCaller.{{ operation.operation_id|camel_case }}(
-{% call(properties) m.parse_request_properties_macro(property_container, 4) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 4) %}
     {% for name, value in properties.items() %}
-    {{ name|camel_case }},
+    {{ name|print_variable }},
     {% endfor %}
 {% endcall %}
 ){% if operation.response and operation.response.body  %}.then(response => {

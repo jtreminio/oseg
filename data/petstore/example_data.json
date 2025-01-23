@@ -100,7 +100,7 @@
         "quantity": 5,
         "shipDate": "2025-01-01T17:32:28Z",
         "status": "approved",
-        "completed": false
+        "complete": false
       }
     }
   },

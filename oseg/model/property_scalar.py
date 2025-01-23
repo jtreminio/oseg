@@ -11,12 +11,13 @@ class PropertyScalar(model.PropertyProto):
     def __init__(
         self,
         schema: oa.Schema,
+        name: str,
         value: T,
         is_required: bool,
     ):
-        super().__init__(schema, value, is_required)
+        super().__init__(schema, name, value, is_required)
 
-        self._type = self._set_type()
+        self._type = self._get_type()
         self._normalize_value()
         self._format = self._set_string_format()
         self._is_enum = self._set_is_enum()
@@ -37,27 +38,7 @@ class PropertyScalar(model.PropertyProto):
     def is_enum(self) -> bool:
         return self._is_enum
 
-    # todo currently only support single type, not list of types
-    def _set_type(self) -> str:
-        if self._is_array:
-            type_value = self._schema.items.type.value
-
-            assert isinstance(
-                type_value, str
-            ), f"'{self._schema}' has invalid array items type"
-
-            return type_value
-
-        type_value = self._schema.type.value
-
-        assert isinstance(type_value, str), f"'{self._schema}' has invalid item type"
-
-        return type_value
-
     def _normalize_value(self) -> None:
-        if self._value is None and self._schema.default is not None:
-            self._value = self._schema.default
-
         if self._value is None:
             return
 

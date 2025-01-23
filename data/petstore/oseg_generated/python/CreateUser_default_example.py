@@ -8,12 +8,12 @@ with ApiClient(configuration) as api_client:
     user = models.User()
     user.id = 12345
     user.username = "my_user"
-    user.firstName = "John"
-    user.lastName = "Doe"
+    user.first_name = "John"
+    user.last_name = "Doe"
     user.email = "john@example.com"
     user.password = "secure_123"
     user.phone = "555-123-1234"
-    user.userStatus = 1
+    user.user_status = 1
 
     try:
         api_caller = api.UserApi(api_client)

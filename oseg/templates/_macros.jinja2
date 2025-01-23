@@ -1,11 +1,11 @@
-{%- macro parse_object_properties_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_object_properties(obj, parent_property_name, indent_count)) }}
+{%- macro parse_object_properties_macro(obj, indent_count) -%}
+    {{- caller(parse_object_properties(obj, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_object_list_properties_macro(obj, parent_property_name, indent_count) -%}
-    {{- caller(parse_object_list_properties(obj, parent_property_name, indent_count)) }}
+{%- macro parse_object_list_properties_macro(obj, indent_count) -%}
+    {{- caller(parse_object_list_properties(obj, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_request_properties_macro(property_container, indent_count, required_flag, include_body) -%}
-    {{- caller(parse_request_data(property_container, indent_count, required_flag, include_body)) }}
+{%- macro parse_api_call_properties_macro(property_container, indent_count, required_flag, include_body) -%}
+    {{- caller(parse_api_call_properties(property_container, indent_count, required_flag, include_body)) }}
 {%- endmacro -%}

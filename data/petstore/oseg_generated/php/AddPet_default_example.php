@@ -16,6 +16,11 @@ $tags_2 = (new OpenAPI\Client\Model\Tag())
     ->setId(98765)
     ->setName("tag_2");
 
+$tags = [
+    $tags_1,
+    $tags_2,
+];
+
 $pet = (new OpenAPI\Client\Model\Pet())
     ->setName("My pet name")
     ->setPhotoUrls([
@@ -25,10 +30,7 @@ $pet = (new OpenAPI\Client\Model\Pet())
     ->setId(12345)
     ->setStatus(OpenAPI\Client\Model\Pet::STATUS_AVAILABLE)
     ->setCategory($category)
-    ->setTags([
-        $tags_1,
-        $tags_2,
-    ]);
+    ->setTags($tags);
 
 try {
     $api_caller = new OpenAPI\Client\Api\PetApi(config: $config);

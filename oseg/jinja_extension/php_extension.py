@@ -1,22 +1,29 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class PhpExtension(BaseExtension):
+class PhpExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "php"
     NAME = "php"
     TEMPLATE = f"{NAME}.jinja2"
 
-    def setter_method_name(self, name: str) -> str:
+    RESERVED_KEYWORD_PREPEND = ""
+    RESERVED_KEYWORDS = []
+
+    def is_reserved_keyword(self, name: str) -> bool:
+        return False
+
+    def unreserve_keyword(self, name: str) -> str:
+        return name
+
+    def print_setter(self, name: str) -> str:
         return self.pascal_case(name)
 
-    def setter_property_name(self, name: str) -> str:
+    def print_variable(self, name: str) -> str:
         return f"${self.snake_case(name)}"
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -35,9 +42,9 @@ class PhpExtension(BaseExtension):
 
             for i in item.value:
                 if is_enum:
-                    enum_name = self._get_enum_name(item, name, i)
+                    enum_name = self._get_enum_name(item, item.name, i)
                     printable.value.append(
-                        f"{namespace}\\Model\\{parent_type}::{enum_name}"
+                        f"{namespace}\\Model\\{parent.type}::{enum_name}"
                     )
                     printable.is_enum = True
                 else:
@@ -47,8 +54,8 @@ class PhpExtension(BaseExtension):
 
         if item.type == "string" and item.is_enum:
             namespace = self._sdk_options.additional_properties.get("invokerPackage")
-            enum_name = self._get_enum_name(item, name, item.value)
-            printable.value = f"{namespace}\\Model\\{parent_type}::{enum_name}"
+            enum_name = self._get_enum_name(item, item.name, item.value)
+            printable.value = f"{namespace}\\Model\\{parent.type}::{enum_name}"
             printable.is_enum = True
         else:
             printable.value = self._to_json(item.value)

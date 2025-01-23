@@ -1,5 +1,4 @@
 import caseconverter
-import jinja2
 import json
 import openapi_pydantic as oa
 from abc import abstractmethod
@@ -17,21 +16,18 @@ class BaseExtension(Protocol):
     _sdk_options: "model.SdkOptions"
     _template_parser: "parser.TemplateParser"
 
-    def __init__(self, environment: jinja2.Environment):
-        self._environment = environment
+    def __init__(self):
         self._template_parser = parser.TemplateParser(self)
 
     @staticmethod
-    def default_generators(
-        environment: jinja2.Environment,
-    ) -> dict[str, "BaseExtension"]:
+    def default_generators() -> dict[str, "BaseExtension"]:
         return {
-            j.CSharpExtension.NAME: j.CSharpExtension(environment),
-            j.JavaExtension.NAME: j.JavaExtension(environment),
-            j.PhpExtension.NAME: j.PhpExtension(environment),
-            j.PythonExtension.NAME: j.PythonExtension(environment),
-            j.RubyExtension.NAME: j.RubyExtension(environment),
-            j.TypescriptNodeExtension.NAME: j.TypescriptNodeExtension(environment),
+            j.CSharpExtension.NAME: j.CSharpExtension(),
+            j.JavaExtension.NAME: j.JavaExtension(),
+            j.PhpExtension.NAME: j.PhpExtension(),
+            j.PythonExtension.NAME: j.PythonExtension(),
+            j.RubyExtension.NAME: j.RubyExtension(),
+            j.TypescriptNodeExtension.NAME: j.TypescriptNodeExtension(),
         }
 
     @property
@@ -47,18 +43,25 @@ class BaseExtension(Protocol):
         return self._template_parser
 
     @abstractmethod
-    def setter_method_name(self, name: str) -> str:
+    def is_reserved_keyword(self, name: str) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def setter_property_name(self, name: str) -> str:
+    def unreserve_keyword(self, name: str) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_setter(self, name: str) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_variable(self, name: str) -> str:
         raise NotImplementedError
 
     @abstractmethod
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         raise NotImplementedError
@@ -126,6 +129,9 @@ class BaseExtension(Protocol):
 
     def upper_case(self, value: str) -> str:
         return value.upper()
+
+    def uc_first(self, value: str) -> str:
+        return f"{value[:1].upper()}{value[1:]}"
 
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)

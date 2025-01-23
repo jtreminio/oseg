@@ -1,67 +1,32 @@
-from oseg import jinja_extension, model, parser
+from typing import Optional
+
+from oseg import jinja_extension, model
 
 
 class TemplateParser:
     def __init__(self, extension: "jinja_extension.BaseExtension"):
         self._extension: jinja_extension.BaseExtension = extension
 
-    # renamed from parse_body_data
-    def parse_request_objects(
-        self,
-        property_container: "model.PropertyContainer",
-    ) -> dict[str, "model.PropertyObject"]:
-        """Reads through request data and finds all PropertyObject
-        or PropertyObjectArray, so we can create explicit variables
-        in the generated SDK example.
-        """
-
-        result = {}
-
-        for name, prop in property_container.properties().items():
-            if not isinstance(prop, model.PropertyObject) and not isinstance(
-                prop, model.PropertyObjectArray
-            ):
-                continue
-
-            current = self._flatten_object(
-                obj=prop,
-                parent_name="",
-            )
-
-            result = {**result, **current}
-
-        """Requests without formdata will have their body content defined
-        as a single object in the request, containing all its sub data.
-        
-        See OperationParser::FORM_DATA_CONTENT_TYPES
-        """
-        if property_container.body and not property_container.request.has_formdata:
-            result[property_container.body_type] = property_container.body
-
-        # noinspection PyTypeChecker
-        return result
-
-    # renamed from parse_body_properties
     def parse_object_properties(
         self,
         macros: "model.JinjaMacros",
         parent: "model.PropertyObject",
-        parent_name: str,
         indent_count: int,
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
         result = {}
 
-        for name, prop in parent.non_objects().items():
-            result[name] = self._parse_non_objects(
+        for _, prop in parent.non_objects().items():
+            prop_name = self._resolve_keyword(prop.name, prop.original_name)
+
+            result[prop_name] = self._parse_non_objects(
                 macros=macros,
-                parent_type=parent.type,
-                name=name,
+                parent=parent,
                 prop=prop,
             )
 
-        for name, parsed in self._parse_object(parent, parent_name).items():
+        for name, parsed in self._parse_object(parent).items():
             if not parsed.is_array:
                 result[name] = macros.print_object(parsed)
             else:
@@ -69,12 +34,10 @@ class TemplateParser:
 
         return self._indent(result, indent_count)
 
-    # renamed from parse_body_property_list
     def parse_object_list_properties(
         self,
         macros: "model.JinjaMacros",
         parent: "model.PropertyObjectArray",
-        parent_name: str,
         indent_count: int,
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
@@ -82,8 +45,6 @@ class TemplateParser:
         printable = model.PrintableObject()
         printable.is_array = True
         printable.value = []
-
-        property_name = parent.type
 
         if parent.properties:
             first_item = parent.properties[0]
@@ -95,15 +56,17 @@ class TemplateParser:
             printable.target_type = parent.type
 
         i = 1
-        for _ in parent.properties:
-            printable.value.append(f"{parent_name}{property_name}_{i}")
+        for prop in parent.properties:
+            printable.value.append(prop.name)
             i += 1
 
-        result = {property_name: macros.print_object_array(printable)}
+        parent_name = self._resolve_keyword(parent.name, parent.original_name)
 
-        return self._indent(result, indent_count)[property_name]
+        result = {parent_name: macros.print_object_array(printable)}
 
-    def parse_request_data(
+        return self._indent(result, indent_count)[parent_name]
+
+    def parse_api_call_properties(
         self,
         macros: "model.JinjaMacros",
         property_container: "model.PropertyContainer",
@@ -130,10 +93,12 @@ class TemplateParser:
 
         result = {}
 
-        for name, prop in property_container.properties(required_flag).items():
+        for _, prop in property_container.properties(required_flag).items():
+            prop_name = self._resolve_keyword(prop.name, prop.original_name)
+
             if property_container.body and prop == property_container.body:
                 if include_body is None or include_body is True:
-                    result[name] = self._extension.setter_property_name(
+                    result[prop_name] = self._extension.print_variable(
                         property_container.body.type
                     )
 
@@ -142,71 +107,26 @@ class TemplateParser:
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray
             ):
-                result[name] = self._extension.setter_property_name(prop.type)
+                result[prop_name] = self._extension.print_variable(prop_name)
 
                 continue
 
-            result[name] = self._parse_non_objects(
+            result[prop_name] = self._parse_non_objects(
                 macros=macros,
-                parent_type="",
-                name=name,
+                parent=property_container.body,
                 prop=prop,
             )
 
         return self._indent(result, indent_count)
 
-    def _flatten_object(
-        self,
-        obj: "model.PROPERTY_OBJECT_TYPE",
-        parent_name: str,
-    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
-        result = {}
-        parent_name = f"{parent_name}_" if parent_name else ""
-
-        if isinstance(obj, model.PropertyObjectArray):
-            name = f"{parent_name}{obj.type}"
-
-            i = 1
-            for sub_obj in obj.properties:
-                sub_name = f"{name}_{i}"
-                sub_results = self._flatten_object(sub_obj, sub_name)
-                result |= sub_results
-                result[sub_name] = sub_obj
-                i += 1
-
-            result[name] = obj
-
-            return result
-
-        assert isinstance(obj, model.PropertyObject)
-
-        for name, sub_obj in obj.objects.items():
-            sub_name = f"{parent_name}{name}"
-
-            sub_results = self._flatten_object(sub_obj, sub_name)
-            result |= sub_results
-            result[sub_name] = sub_obj
-
-        for name, array_obj in obj.array_objects.items():
-            i = 1
-            for sub_obj in array_obj.properties:
-                sub_name = f"{parent_name}{name}_{i}"
-                sub_results = self._flatten_object(sub_obj, sub_name)
-                result |= sub_results
-                result[sub_name] = sub_obj
-                i += 1
-
-        return result
-
     def _parse_non_objects(
         self,
         macros: "model.JinjaMacros",
-        parent_type: str,
-        name: str,
+        parent: Optional["model.PropertyObject"],
         prop: "model.PropertyProto",
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
-            printable = self._extension.print_scalar(parent_type, name, prop)
+            printable = self._extension.print_scalar(parent, prop)
 
             if printable.is_array:
                 return macros.print_scalar_array(printable)
@@ -232,55 +152,23 @@ class TemplateParser:
     def _parse_object(
         self,
         obj: "model.PropertyObject",
-        parent_name: str,
     ) -> dict[str, "model.PrintableObject"]:
         result = {}
-        parent_name = f"{parent_name}_" if parent_name else ""
-
         for property_name, sub_obj in obj.objects.items():
+            prop_name = self._resolve_keyword(property_name, sub_obj.original_name)
             printable = model.PrintableObject()
-            result[property_name] = printable
+            result[prop_name] = printable
 
-            printable.value = f"{parent_name}{property_name}"
+            printable.value = sub_obj.name
             printable.target_type = sub_obj.type
 
         for property_name, array_obj in obj.array_objects.items():
-            i = 1
-
+            prop_name = self._resolve_keyword(property_name, array_obj.original_name)
             printable = model.PrintableObject()
-            printable.is_array = True
-            result[property_name] = printable
+            result[prop_name] = printable
 
-            if array_obj is None:
-                return result
-
-            if not array_obj:
-                if parser.TypeChecker.is_object_array(obj.schema):
-                    printable.target_type = obj.schema.items.ref.split("/").pop()
-
-                    return result
-
-                property_schema = obj.schema.properties[property_name]
-
-                if parser.TypeChecker.is_object_array(property_schema):
-                    printable.target_type = property_schema.items.ref.split("/").pop()
-
-                return result
-
-            if array_obj.properties:
-                first_item = array_obj.properties[0]
-                printable.target_type = first_item.type
-
-                if first_item.base_type:
-                    printable.target_type = first_item.base_type
-            else:
-                printable.target_type = array_obj.type
-
-            printable.value = []
-
-            for _ in array_obj.properties:
-                printable.value.append(f"{parent_name}{property_name}_{i}")
-                i += 1
+            printable.value = prop_name
+            printable.target_type = array_obj.name
 
         return result
 
@@ -298,3 +186,39 @@ class TemplateParser:
             property_values[name] = value.replace("\n", f"\n{indent}")
 
         return property_values
+
+    def _resolve_keyword(self, name: str, original_name: str):
+        """When two properties have identical names and will be listed
+        at the same level (parameters + root-level body properties) we
+        automatically append an increasing integer to the name to avoid
+        conflicts.
+
+        For example:
+        - "property_name"
+        - "property_name2"
+        - "property_name3"
+
+        This runs into the problem where the original name might have been
+        one of the target language's reserved keywords, but the updated
+        name will not match due to the appended integer.
+
+        For example Python has "for" as a reserved keyword. Property names
+        will have "var_" prepended by openapi-generator to avoid using the
+        reserved keyword.
+
+        "for" -> "val_for"
+
+        However, if an integer has been appended to the property name then
+        it would no longer match, but openapi-generator will still have
+        prepended "var_" to the name.
+
+        We must check against the original unchanged property name to decide
+        if the name is a reserved keyword.
+        """
+
+        name = self._extension.print_variable(name)
+
+        if self._extension.is_reserved_keyword(original_name):
+            name = self._extension.unreserve_keyword(name)
+
+        return name

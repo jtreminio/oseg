@@ -497,6 +497,46 @@ class TestPropertyParser(unittest.TestCase):
         self.assertFalse(free_form_obj.is_array)
         self.assertTrue(array_free_form_obj.is_array)
 
+    def test_property_sorting(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        operation = self.oa_parser_properties.operations["sorted"]
+        example_data = operation.request.example_data[example_name]
+
+        expected_properties_1 = [
+            "petId",
+            "queryParam",
+            "try",
+            "while",
+            "with",
+            "Dog",
+        ]
+
+        self.assertListEqual(expected_properties_1, list(example_data.properties()))
+
+    def test_property_sorting_formdata(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        operation = self.oa_parser_properties.operations["sorted_formdata"]
+        example_data = operation.request.example_data[example_name]
+
+        expected_properties_1 = [
+            "petId",
+            "name",
+            "photoUrls",
+            "queryParam",
+            "try",
+            "while",
+            "with",
+            "id",
+            "category",
+            "tags",
+            "status",
+            "try2",
+            "while2",
+            "with2",
+        ]
+
+        self.assertListEqual(expected_properties_1, list(example_data.properties()))
+
 
 if __name__ == "__main__":
     unittest.main()

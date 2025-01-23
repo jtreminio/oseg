@@ -13,10 +13,10 @@ public class BuyMuseumTicketsGeneralEntry
         var config = new Configuration();
 
         var buyMuseumTickets = new BuyMuseumTickets(
+            ticketType: BuyMuseumTickets.TicketTypeEnum.General,
+            ticketDate: "2023-09-07",
             email: "todd@example.com",
             ticketId: null,
-            ticketDate: "2023-09-07",
-            ticketType: BuyMuseumTickets.TicketTypeEnum.General,
             eventId: null
         );
 

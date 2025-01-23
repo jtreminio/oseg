@@ -29,7 +29,7 @@ setup(
         "PyYAML>=6.0",
     ],
     extras_require={
-        "dev": [],
+        "dev": ["mock~=5.1.0"],
         "test": [],
     },
     entry_points={

@@ -1,12 +1,12 @@
-from oseg import model
-from oseg.jinja_extension import BaseExtension
+from oseg import jinja_extension, model
 
 
-class CSharpExtension(BaseExtension):
+class CSharpExtension(jinja_extension.BaseExtension):
     FILE_EXTENSION = "cs"
     NAME = "csharp"
     TEMPLATE = f"{NAME}.jinja2"
 
+    RESERVED_KEYWORD_PREPEND = "var"
     RESERVED_KEYWORDS = [
         "abstract",
         "as",
@@ -87,21 +87,34 @@ class CSharpExtension(BaseExtension):
         "while",
     ]
 
-    def setter_method_name(self, name: str) -> str:
-        return self.pascal_case(name)
+    def is_reserved_keyword(self, name: str) -> bool:
+        return name.lower() in self.RESERVED_KEYWORDS
 
-    def setter_property_name(self, name: str) -> str:
+    def unreserve_keyword(self, name: str) -> str:
+        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
+            return f"{self.RESERVED_KEYWORD_PREPEND}{self.uc_first(name)}"
+
+        return name
+
+    def print_setter(self, name: str) -> str:
+        name = self.pascal_case(name)
+
+        if self.is_reserved_keyword(name):
+            return self.unreserve_keyword(name)
+
+        return name
+
+    def print_variable(self, name: str) -> str:
         name = self.camel_case(name)
 
-        if name in CSharpExtension.RESERVED_KEYWORDS:
-            return f"var{name[:1].upper()}{name[1:]}"
+        if self.is_reserved_keyword(name):
+            return self.unreserve_keyword(name)
 
         return name
 
     def print_scalar(
         self,
-        parent_type: str,
-        name: str,
+        parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -119,7 +132,7 @@ class CSharpExtension(BaseExtension):
                 if item.is_enum:
                     printable.is_enum = True
                     printable.target_type = (
-                        f"{parent_type}.{self.pascal_case(name)}Enum"
+                        f"{parent.type}.{self.pascal_case(item.name)}Enum"
                     )
                 else:
                     printable.target_type = "string"
@@ -151,7 +164,7 @@ class CSharpExtension(BaseExtension):
             if enum_name is None:
                 printable.value = "null"
             else:
-                target_type = f"{parent_type}.{self.pascal_case(name)}Enum"
+                target_type = f"{parent.type}.{self.pascal_case(item.name)}Enum"
                 printable.value = f"{target_type}.{enum_name}"
         else:
             printable.value = self._to_json(item.value)

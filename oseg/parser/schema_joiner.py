@@ -99,21 +99,32 @@ class SchemaJoiner:
         schemas: list[oa.Schema],
     ) -> dict[str, oa.Reference | oa.Schema]:
         result = {}
+        required = []
 
         for schema in schemas:
+            if schema.required:
+                required = required + schema.required
+
             if parser.TypeChecker.is_array(schema):
                 body_name = self._oa_parser.get_component_name(schema.items).lower()
 
-                if body_name not in result:
-                    result[body_name] = schema
+                if body_name in result:
+                    del result[body_name]
 
-                    continue
+                result[body_name] = schema
 
             if not hasattr(schema, "properties") or schema.properties is None:
                 continue
 
             for property_name, property_schema in schema.properties.items():
-                if property_name not in result:
-                    result[property_name] = property_schema
+                if property_name in result:
+                    del result[property_name]
 
-        return result
+                result[property_name] = property_schema
+
+        sorted_results = {}
+        for name in required:
+            sorted_results[name] = result[name]
+            del result[name]
+
+        return {**sorted_results, **result}

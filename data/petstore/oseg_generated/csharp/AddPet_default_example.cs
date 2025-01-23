@@ -27,6 +27,12 @@ public class AddPetDefaultExample
             name: "tag_2"
         );
 
+        var tags = new List<Tag>
+        {
+            tags1,
+            tags2
+        };
+
         var pet = new Pet(
             name: "My pet name",
             photoUrls: new List<string>
@@ -37,11 +43,7 @@ public class AddPetDefaultExample
             id: 12345,
             status: Pet.StatusEnum.Available,
             category: category,
-            tags: new List<Tag>
-            {
-                tags1,
-                tags2
-            }
+            tags: tags
         );
 
         try
