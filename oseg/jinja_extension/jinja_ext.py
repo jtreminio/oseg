@@ -86,7 +86,7 @@ class JinjaExt(jinja2.ext.Extension):
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_object_properties(
-            macros=model.JinjaMacros(context),
+            macros=model.JinjaMacros(context.parent),
             parent=parent,
             indent_count=indent_count,
         )
@@ -99,7 +99,7 @@ class JinjaExt(jinja2.ext.Extension):
         indent_count: int,
     ) -> str:
         return self._sdk_generator.template_parser.parse_object_list_properties(
-            macros=model.JinjaMacros(context),
+            macros=model.JinjaMacros(context.parent),
             parent=parent,
             indent_count=indent_count,
         )
@@ -120,7 +120,7 @@ class JinjaExt(jinja2.ext.Extension):
             include_body = None
 
         return self._sdk_generator.template_parser.parse_api_call_properties(
-            macros=model.JinjaMacros(context),
+            macros=model.JinjaMacros(context.parent),
             property_container=property_container,
             indent_count=indent_count,
             required_flag=required_flag,

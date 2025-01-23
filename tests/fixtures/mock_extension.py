@@ -1,3 +1,5 @@
+from jinja2.runtime import Macro
+from mock import mock
 from oseg import jinja_extension, model
 
 
@@ -36,3 +38,54 @@ class MockExtension(jinja_extension.BaseExtension):
         printable.value = item.value
 
         return printable
+
+
+def scalar_macro_callback(printable: model.PrintableScalar) -> str | None:
+    if printable.value is None:
+        return None
+
+    if printable.is_array:
+        return "[" + ",".join(printable.value) + "]"
+
+    return str(printable.value)
+
+
+def freeform_macro_callback(printable: model.PrintableFreeForm) -> str | None:
+    if printable.value is None:
+        return None
+
+    if printable.is_array:
+        return "[" + ",".join(printable.value) + "]"
+
+    return str(printable.value)
+
+
+def object_macro_callback(printable: model.PrintableObject) -> str | None:
+    if printable.value is None:
+        return None
+
+    if printable.is_array:
+        return ("[" + ",".join(printable.value) + "]").lower()
+
+    return str(printable.value).lower()
+
+
+scalar_mock = mock.MagicMock(spec="__call__")
+scalar_mock.side_effect = scalar_macro_callback
+
+freeform_mock = mock.MagicMock(spec="__call__")
+freeform_mock.side_effect = freeform_macro_callback
+
+object_mock = mock.MagicMock(spec="__call__")
+object_mock.side_effect = object_macro_callback
+
+JINJA_MACROS: dict[str, Macro] = {
+    "print_object": object_mock,
+    "print_object_array": object_mock,
+    "print_scalar": scalar_mock,
+    "print_scalar_array": scalar_mock,
+    "print_file": scalar_mock,
+    "print_file_array": scalar_mock,
+    "print_free_form": freeform_mock,
+    "print_free_form_array": freeform_mock,
+}

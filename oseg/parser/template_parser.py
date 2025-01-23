@@ -1,6 +1,6 @@
 from typing import Optional
 
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model
 
 
 class TemplateParser:

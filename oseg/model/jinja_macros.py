@@ -1,10 +1,8 @@
-from jinja2.runtime import Macro, Context
+from jinja2.runtime import Macro
 
 
 class JinjaMacros:
-    def __init__(self, context: Context):
-        macros = context.parent
-
+    def __init__(self, macros: dict[str, Macro]):
         self._print_object: Macro = macros["print_object"]
         self._print_object_array: Macro = macros["print_object_array"]
         self._print_scalar: Macro = macros["print_scalar"]
