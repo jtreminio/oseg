@@ -132,7 +132,9 @@ class PropertyParser:
             return False
 
         # allOf to be handled recursively
-        if not parser.TypeChecker.is_object(schema) and not schema.allOf:
+        if not parser.TypeChecker.is_object(
+            schema
+        ) and not parser.TypeChecker.is_all_of(schema):
             return False
 
         type_of = self._oa_parser.get_component_name(schema)
@@ -173,7 +175,9 @@ class PropertyParser:
             return False
 
         # allOf to be handled recursively
-        if not parser.TypeChecker.is_object(schema.items) and not schema.items.allOf:
+        if not parser.TypeChecker.is_object(
+            schema.items
+        ) and not parser.TypeChecker.is_all_of(schema.items):
             return False
 
         type_of = self._oa_parser.get_component_name(schema.items)

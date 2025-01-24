@@ -22,6 +22,12 @@ class TypeChecker:
         return cls._is_of_type(schema, oa.DataType.ARRAY)
 
     @classmethod
+    def is_all_of(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+        return bool(
+            hasattr(schema, "allOf") and schema.allOf is not None and len(schema.allOf)
+        )
+
+    @classmethod
     def is_discriminator(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
         return bool(
             cls.is_object(schema)

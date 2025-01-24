@@ -65,7 +65,10 @@ class PropertyProto(Protocol):
     # todo currently only support single type, not list of types
     def _get_type(self) -> str:
         if self._is_array:
-            type_value = self._schema.items.type.value
+            if isinstance(self._schema.items.type, list):
+                type_value = self._schema.items.type[0].value
+            else:
+                type_value = self._schema.items.type.value
 
             assert isinstance(
                 type_value, str
@@ -73,7 +76,10 @@ class PropertyProto(Protocol):
 
             return type_value
 
-        type_value = self._schema.type.value
+        if isinstance(self._schema.type, list):
+            type_value = self._schema.type[0].value
+        else:
+            type_value = self._schema.type.value
 
         assert isinstance(type_value, str), f"'{self._schema}' has invalid item type"
 

@@ -171,8 +171,14 @@ class ComponentResolver:
             schema.example = self._oa_parser.resolve_example(schema.example)
 
         if hasattr(schema, "examples") and schema.examples:
-            for example_name, example in schema.examples.items():
-                schema.examples[example_name] = self._oa_parser.resolve_example(example)
+            if isinstance(schema.examples, list):
+                for index, example in enumerate(schema.examples):
+                    schema.examples[index] = self._oa_parser.resolve_example(example)
+            else:
+                for example_name, example in schema.examples.items():
+                    schema.examples[example_name] = self._oa_parser.resolve_example(
+                        example
+                    )
 
     def _schema_properties(
         self,
