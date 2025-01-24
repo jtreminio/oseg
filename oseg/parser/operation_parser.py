@@ -102,10 +102,7 @@ class OperationParser:
         return None
 
     def _get_api_name(self, operation: oa.Operation) -> str:
-        if not operation.tags or not len(operation.tags):
-            raise LookupError(
-                f"Operation '{operation.operationId}' has no tags "
-                "for generating API name"
-            )
+        if operation.tags and len(operation.tags):
+            return operation.tags[0].replace(" ", "")
 
-        return operation.tags[0].replace(" ", "")
+        return "default"

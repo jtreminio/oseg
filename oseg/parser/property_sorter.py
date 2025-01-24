@@ -34,6 +34,12 @@ class PropertySorter:
         for parameter in required_parameters:
             name = self._generate_name(parameter.name, used_property_names)
             obj = self._parameter_object(parameter)
+
+            # todo this happens with anyOf schema
+            if obj is None:
+                print(f"Skipping {name}@{parameter.param_in.value}, unsupported")
+                continue
+
             obj.name = name
             result.required[name] = obj
 
@@ -45,6 +51,12 @@ class PropertySorter:
         for parameter in optional_parameters:
             name = self._generate_name(parameter.name, used_property_names)
             obj = self._parameter_object(parameter)
+
+            # todo this happens with anyOf schema
+            if obj is None:
+                print(f"Skipping {name}@{parameter.param_in.value}, unsupported")
+                continue
+
             obj.name = name
             result.optional[name] = obj
 
