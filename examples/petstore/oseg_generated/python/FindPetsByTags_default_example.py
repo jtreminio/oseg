@@ -8,7 +8,10 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.PetApi(api_client).find_pets_by_tags(
-            tags=None,
+            tags=[
+                "tag_1",
+                "tag_2",
+            ],
         )
 
         pprint(response)

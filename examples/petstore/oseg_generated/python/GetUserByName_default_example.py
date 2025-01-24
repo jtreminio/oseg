@@ -8,7 +8,7 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.UserApi(api_client).get_user_by_name(
-            username=None,
+            username="my_username",
         )
 
         pprint(response)

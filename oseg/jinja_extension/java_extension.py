@@ -182,6 +182,9 @@ class JavaExtension(jinja_extension.BaseExtension):
             if enum_name is None:
                 return "null"
 
+            if parent is None:
+                return self._to_json(value)
+
             parent_type_prepend = f"{parent.type}." if parent else ""
             target_type = f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
 

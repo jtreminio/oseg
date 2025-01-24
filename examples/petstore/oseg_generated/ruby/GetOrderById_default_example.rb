@@ -5,7 +5,7 @@ end
 
 begin
     response = OpenapiClient::StoreApi.new.get_order_by_id(
-        nil,
+        3,
     )
 
     p response

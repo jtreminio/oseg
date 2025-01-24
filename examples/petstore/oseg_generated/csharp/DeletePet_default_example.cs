@@ -15,8 +15,8 @@ public class DeletePetDefaultExample
         try
         {
             new PetApi(config).DeletePet(
-                petId: null,
-                apiKey: null
+                petId: 12345,
+                apiKey: "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a"
             );
         }
         catch (ApiException e)

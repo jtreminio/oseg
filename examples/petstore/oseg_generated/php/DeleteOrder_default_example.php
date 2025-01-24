@@ -6,7 +6,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     (new OpenAPI\Client\Api\StoreApi($config))->deleteOrder(
-        order_id: null,
+        order_id: "12345",
     );
 } catch (OpenAPI\Client\ApiException $e) {
     echo 'Exception when calling Store#deleteOrder: '

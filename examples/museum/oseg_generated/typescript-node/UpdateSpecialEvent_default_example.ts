@@ -1,15 +1,15 @@
 import * as fs from 'fs';
-import * as openapimuseum_client from "openapimuseum_client";
+import * as apis from "openapimuseum_client/api/apis"
+import * as models from "openapimuseum_client/model/models"
 
-const apiCaller = new openapimuseum_client.EventsApi();
+const apiCaller = new apis.EventsApi();
 
-const specialEventFields: openapimuseum_client.SpecialEventFields = {
-    name: undefined,
-    location: "On the beach.",
-    eventDescription: undefined,
-    price: 15,
-    dates: undefined,
-};
+const specialEventFields = new models.SpecialEventFields();
+specialEventFields.name = undefined;
+specialEventFields.location = "On the beach.";
+specialEventFields.eventDescription = undefined;
+specialEventFields.price = 15;
+specialEventFields.dates = undefined;
 
 const eventId = "dad4bce8-f5cb-4078-a211-995864315e39";
 

@@ -25,7 +25,7 @@ $pet = (new OpenAPI\Client\Model\Pet())
     ->setName("My pet name")
     ->setPhotoUrls([
         "https://example.com/picture_1.jpg",
-        "https://example.com/picture_1.jpg",
+        "https://example.com/picture_2.jpg",
     ])
     ->setId(12345)
     ->setStatus(OpenAPI\Client\Model\Pet::STATUS_AVAILABLE)

@@ -1,9 +1,10 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.UserApi();
+const apiCaller = new apis.UserApi();
 
-const username = undefined;
+const username = "my_username";
 
 apiCaller.deleteUser(
     username,

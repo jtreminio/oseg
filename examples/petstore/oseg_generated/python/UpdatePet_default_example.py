@@ -30,7 +30,7 @@ with ApiClient(configuration) as api_client:
         name="My pet name",
         photo_urls=[
             "https://example.com/picture_1.jpg",
-            "https://example.com/picture_1.jpg",
+            "https://example.com/picture_2.jpg",
         ],
         id=12345,
         status="available",

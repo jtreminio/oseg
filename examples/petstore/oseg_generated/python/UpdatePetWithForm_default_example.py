@@ -8,9 +8,9 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         api.PetApi(api_client).update_pet_with_form(
-            pet_id=None,
-            name=None,
-            status=None,
+            pet_id=12345,
+            name="Pet's new name",
+            status="sold",
         )
     except ApiException as e:
         print("Exception when calling Pet#update_pet_with_form: %s\n" % e)

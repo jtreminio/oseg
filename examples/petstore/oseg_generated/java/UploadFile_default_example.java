@@ -22,7 +22,7 @@ public class UploadFile_default_example
         {
             var response = new PetApi(config).uploadFile(
                 12345L,
-                null,
+                "Additional data to pass to server",
                 new File("/path/to/file")
             );
 

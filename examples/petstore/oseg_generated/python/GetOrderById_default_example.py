@@ -8,7 +8,7 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.StoreApi(api_client).get_order_by_id(
-            order_id=None,
+            order_id=3,
         )
 
         pprint(response)

@@ -8,7 +8,7 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         api.UserApi(api_client).delete_user(
-            username=None,
+            username="my_username",
         )
     except ApiException as e:
         print("Exception when calling User#delete_user: %s\n" % e)

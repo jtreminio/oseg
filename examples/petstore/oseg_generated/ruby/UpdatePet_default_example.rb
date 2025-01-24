@@ -24,7 +24,7 @@ pet = OpenapiClient::Pet.new
 pet.name = "My pet name"
 pet.photo_urls = [
     "https://example.com/picture_1.jpg",
-    "https://example.com/picture_1.jpg",
+    "https://example.com/picture_2.jpg",
 ]
 pet.id = 12345
 pet.status = "available"

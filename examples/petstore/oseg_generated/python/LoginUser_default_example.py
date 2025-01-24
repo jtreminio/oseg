@@ -8,8 +8,8 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.UserApi(api_client).login_user(
-            username=None,
-            password=None,
+            username="my_username",
+            password="my_secret_password",
         )
 
         pprint(response)

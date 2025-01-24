@@ -21,9 +21,9 @@ public class UpdatePetWithForm_default_example
         try
         {
             new PetApi(config).updatePetWithForm(
-                null,
-                null,
-                null
+                12345L,
+                "Pet's new name",
+                "sold"
             );
         } catch (ApiException e) {
             System.err.println("Exception when calling Pet#updatePetWithForm");

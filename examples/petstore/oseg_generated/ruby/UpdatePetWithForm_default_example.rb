@@ -5,10 +5,10 @@ end
 
 begin
     OpenapiClient::PetApi.new.update_pet_with_form(
-        nil,
+        12345,
         {
-            name: nil,
-            status: nil,
+            name: "Pet's new name",
+            status: "sold",
         },
     )
 rescue OpenapiClient::ApiError => e

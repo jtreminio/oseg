@@ -1,10 +1,11 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.PetApi();
+const apiCaller = new apis.PetApi();
 
-const petId = undefined;
-const apiKey = undefined;
+const petId = 12345;
+const apiKey = "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a";
 
 apiCaller.deletePet(
     petId,

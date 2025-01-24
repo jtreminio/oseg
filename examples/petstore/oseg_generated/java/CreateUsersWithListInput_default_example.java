@@ -20,7 +20,7 @@ public class CreateUsersWithListInput_default_example
 
         var user1 = new User()
             .id(12345L)
-            .username("my_user")
+            .username("my_user_1")
             .firstName("John")
             .lastName("Doe")
             .email("john@example.com")
@@ -29,14 +29,14 @@ public class CreateUsersWithListInput_default_example
             .userStatus(1);
 
         var user2 = new User()
-            .id(12345L)
-            .username("my_user")
-            .firstName("John")
+            .id(67890L)
+            .username("my_user_2")
+            .firstName("Jane")
             .lastName("Doe")
-            .email("john@example.com")
-            .password("secure_123")
-            .phone("555-123-1234")
-            .userStatus(1);
+            .email("jane@example.com")
+            .password("secure_456")
+            .phone("555-123-5678")
+            .userStatus(2);
 
         var user = List.of (
             user1,

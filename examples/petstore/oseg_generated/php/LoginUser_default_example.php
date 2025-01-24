@@ -6,8 +6,8 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\UserApi($config))->loginUser(
-        username: null,
-        password: null,
+        username: "my_username",
+        password: "my_secret_password",
     );
 
     print_r($response);

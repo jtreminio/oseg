@@ -8,7 +8,7 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.PetApi(api_client).get_pet_by_id(
-            pet_id=None,
+            pet_id=12345,
         )
 
         pprint(response)

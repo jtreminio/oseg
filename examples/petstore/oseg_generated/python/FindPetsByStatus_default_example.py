@@ -8,7 +8,10 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         response = api.PetApi(api_client).find_pets_by_status(
-            status=None,
+            status=[
+                "available",
+                "pending",
+            ],
         )
 
         pprint(response)

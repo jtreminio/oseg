@@ -6,7 +6,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     (new OpenAPI\Client\Api\UserApi($config))->deleteUser(
-        username: null,
+        username: "my_username",
     );
 } catch (OpenAPI\Client\ApiException $e) {
     echo 'Exception when calling User#deleteUser: '

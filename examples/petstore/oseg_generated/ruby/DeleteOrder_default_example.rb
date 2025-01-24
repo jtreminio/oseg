@@ -5,7 +5,7 @@ end
 
 begin
     OpenapiClient::StoreApi.new.delete_order(
-        nil,
+        "12345",
     )
 rescue OpenapiClient::ApiError => e
     puts "Exception when calling Store#delete_order: #{e}"

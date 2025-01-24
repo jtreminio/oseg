@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import * as openapimuseum_client from "openapimuseum_client";
+import * as apis from "openapimuseum_client/api/apis"
+import * as models from "openapimuseum_client/model/models"
 
-const apiCaller = new openapimuseum_client.TicketsApi();
+const apiCaller = new apis.TicketsApi();
 
 const ticketId = "a54a57ca-36f8-421b-a6b4-2e8f26858a4c";
 

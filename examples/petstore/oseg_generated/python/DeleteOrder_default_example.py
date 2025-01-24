@@ -8,7 +8,7 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     try:
         api.StoreApi(api_client).delete_order(
-            order_id=None,
+            order_id="12345",
         )
     except ApiException as e:
         print("Exception when calling Store#delete_order: %s\n" % e)

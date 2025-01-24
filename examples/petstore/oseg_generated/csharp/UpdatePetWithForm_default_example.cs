@@ -15,9 +15,9 @@ public class UpdatePetWithFormDefaultExample
         try
         {
             new PetApi(config).UpdatePetWithForm(
-                petId: null,
-                name: null,
-                status: null
+                petId: 12345,
+                name: "Pet's new name",
+                status: "sold"
             );
         }
         catch (ApiException e)

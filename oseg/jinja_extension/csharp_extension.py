@@ -172,6 +172,9 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
         if item.type == "string":
             if item.is_enum:
+                if parent is None:
+                    return "string"
+
                 parent_type_prepend = f"{parent.type}." if parent else ""
 
                 return f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
@@ -209,6 +212,9 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
             if enum_name is None:
                 return "null"
+
+            if parent is None:
+                return self._to_json(value)
 
             parent_type_prepend = f"{parent.type}." if parent else ""
             target_type = f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"

@@ -5,7 +5,10 @@ end
 
 begin
     response = OpenapiClient::PetApi.new.find_pets_by_status(
-        nil,
+        [
+            "available",
+            "pending",
+        ],
     )
 
     p response

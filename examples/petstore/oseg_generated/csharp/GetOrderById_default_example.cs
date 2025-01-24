@@ -15,7 +15,7 @@ public class GetOrderByIdDefaultExample
         try
         {
             var response = new StoreApi(config).GetOrderById(
-                orderId: null
+                orderId: 3
             );
 
             Console.WriteLine(response);

@@ -6,7 +6,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\UserApi($config))->getUserByName(
-        username: null,
+        username: "my_username",
     );
 
     print_r($response);

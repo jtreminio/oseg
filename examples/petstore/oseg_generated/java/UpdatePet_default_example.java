@@ -39,7 +39,7 @@ public class UpdatePet_default_example
             .name("My pet name")
             .photoUrls(List.of (
                 "https://example.com/picture_1.jpg",
-                "https://example.com/picture_1.jpg"
+                "https://example.com/picture_2.jpg"
             ))
             .id(12345L)
             .status(Pet.StatusEnum.AVAILABLE)

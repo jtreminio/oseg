@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import * as openapimuseum_client from "openapimuseum_client";
+import * as apis from "openapimuseum_client/api/apis"
+import * as models from "openapimuseum_client/model/models"
 
-const apiCaller = new openapimuseum_client.EventsApi();
+const apiCaller = new apis.EventsApi();
 
 const startDate = "2023-02-23";
 const endDate = "2023-04-18";

@@ -6,7 +6,10 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\PetApi($config))->findPetsByTags(
-        tags: null,
+        tags: [
+            "tag_1",
+            "tag_2",
+        ],
     );
 
     print_r($response);

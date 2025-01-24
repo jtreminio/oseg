@@ -21,7 +21,7 @@ public class DeleteUser_default_example
         try
         {
             new UserApi(config).deleteUser(
-                null
+                "my_username"
             );
         } catch (ApiException e) {
             System.err.println("Exception when calling User#deleteUser");

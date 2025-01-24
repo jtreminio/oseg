@@ -5,7 +5,7 @@ end
 
 begin
     response = OpenapiClient::PetApi.new.get_pet_by_id(
-        nil,
+        12345,
     )
 
     p response

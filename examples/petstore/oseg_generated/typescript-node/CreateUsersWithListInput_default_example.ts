@@ -1,29 +1,28 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.UserApi();
+const apiCaller = new apis.UserApi();
 
-const user1: openapi_client.User = {
-    id: 12345,
-    username: "my_user",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    password: "secure_123",
-    phone: "555-123-1234",
-    userStatus: 1,
-};
+const user1 = new models.User();
+user1.id = 12345;
+user1.username = "my_user_1";
+user1.firstName = "John";
+user1.lastName = "Doe";
+user1.email = "john@example.com";
+user1.password = "secure_123";
+user1.phone = "555-123-1234";
+user1.userStatus = 1;
 
-const user2: openapi_client.User = {
-    id: 12345,
-    username: "my_user",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    password: "secure_123",
-    phone: "555-123-1234",
-    userStatus: 1,
-};
+const user2 = new models.User();
+user2.id = 67890;
+user2.username = "my_user_2";
+user2.firstName = "Jane";
+user2.lastName = "Doe";
+user2.email = "jane@example.com";
+user2.password = "secure_456";
+user2.phone = "555-123-5678";
+user2.userStatus = 2;
 
 const user = [
     user1,

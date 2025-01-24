@@ -16,7 +16,7 @@ public class UploadFileDefaultExample
         {
             var response = new PetApi(config).UploadFile(
                 petId: 12345,
-                additionalMetadata: null,
+                additionalMetadata: "Additional data to pass to server",
                 file: new FileStream(
                     path: "/path/to/file",
                     mode: FileMode.Open

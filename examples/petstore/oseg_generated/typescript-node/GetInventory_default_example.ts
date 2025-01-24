@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.StoreApi();
+const apiCaller = new apis.StoreApi();
 
 apiCaller.getInventory().then(response => {
   console.log(response.body);

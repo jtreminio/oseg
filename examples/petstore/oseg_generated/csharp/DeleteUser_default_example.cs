@@ -15,7 +15,7 @@ public class DeleteUserDefaultExample
         try
         {
             new UserApi(config).DeleteUser(
-                username: null
+                username: "my_username"
             );
         }
         catch (ApiException e)

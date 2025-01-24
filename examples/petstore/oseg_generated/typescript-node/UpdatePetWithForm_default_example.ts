@@ -1,11 +1,12 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.PetApi();
+const apiCaller = new apis.PetApi();
 
-const petId = undefined;
-const name = undefined;
-const status = undefined;
+const petId = 12345;
+const name = "Pet's new name";
+const status = "sold";
 
 apiCaller.updatePetWithForm(
     petId,

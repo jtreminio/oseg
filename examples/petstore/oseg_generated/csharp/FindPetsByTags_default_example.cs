@@ -15,7 +15,10 @@ public class FindPetsByTagsDefaultExample
         try
         {
             var response = new PetApi(config).FindPetsByTags(
-                tags: null
+                tags: [
+                    "tag_1",
+                    "tag_2",
+                ]
             );
 
             Console.WriteLine(response);

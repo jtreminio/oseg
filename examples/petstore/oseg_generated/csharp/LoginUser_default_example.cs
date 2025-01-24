@@ -15,8 +15,8 @@ public class LoginUserDefaultExample
         try
         {
             var response = new UserApi(config).LoginUser(
-                username: null,
-                password: null
+                username: "my_username",
+                password: "my_secret_password"
             );
 
             Console.WriteLine(response);

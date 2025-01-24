@@ -1,10 +1,11 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.PetApi();
+const apiCaller = new apis.PetApi();
 
 const petId = 12345;
-const additionalMetadata = undefined;
+const additionalMetadata = "Additional data to pass to server";
 const file = fs.createReadStream("/path/to/file");
 
 apiCaller.uploadFile(

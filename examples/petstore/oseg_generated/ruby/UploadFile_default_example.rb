@@ -7,7 +7,7 @@ begin
     response = OpenapiClient::PetApi.new.upload_file(
         12345,
         {
-            additional_metadata: nil,
+            additional_metadata: "Additional data to pass to server",
             file: File.new("/path/to/file", "r"),
         },
     )

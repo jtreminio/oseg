@@ -14,7 +14,7 @@ public class CreateUsersWithArrayInputDefaultExample
 
         var user1 = new User(
             id: 12345,
-            username: "my_user",
+            username: "my_user_1",
             firstName: "John",
             lastName: "Doe",
             email: "john@example.com",
@@ -24,20 +24,20 @@ public class CreateUsersWithArrayInputDefaultExample
         );
 
         var user2 = new User(
-            id: 12345,
-            username: "my_user",
-            firstName: "John",
+            id: 67890,
+            username: "my_user_2",
+            firstName: "Jane",
             lastName: "Doe",
-            email: "john@example.com",
-            password: "secure_123",
-            phone: "555-123-1234",
-            userStatus: 1
+            email: "jane@example.com",
+            password: "secure_456",
+            phone: "555-123-5678",
+            userStatus: 2
         );
 
         var user = new List<User>
         {
             user1,
-            user2
+            user2,
         };
 
         try

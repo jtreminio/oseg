@@ -4,15 +4,12 @@
 
 {%- macro print_scalar_array(printable) -%}
     {% if printable.value == None %}null{% else %}
-new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
-
-{
+[
         {% for i in printable.value %}
-    {{ i }}{% if not loop.last %},{% endif %}
-
+    {{ i }},
         {% endfor %}
-}
-    {%- endif %}{%- endif %}
+]
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_file(printable) -%}
@@ -33,8 +30,7 @@ new List<Stream>{% if not printable.value %}(){% else %}
     new FileStream(
         path: "{{ i }}",
         mode: FileMode.Open
-    ){% if not loop.last %},{% endif %}
-
+    ),
     {% endfor %}
 }
     {%- endif %}{%- endif %}
@@ -46,8 +42,7 @@ new Dictionary<string, object>{% if not printable.value %}(){% else %}
 
 {
         {% for k, v in printable.value.items() %}
-    ["{{ k }}"]: {{ v }}{% if not loop.last %},{% endif %}
-
+    ["{{ k }}"] = {{ v }},
         {% endfor %}
 }
     {%- endif %}{%- endif %}
@@ -62,10 +57,9 @@ new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
     new Dictionary<string, object>
     {
             {% for k, v in obj.items() %}
-        "{{ k }}": {{ v }},
+        ["{{ k }}"] = {{ v }},
             {% endfor %}
-    }{% if not loop.last %},{% endif %}
-
+    },
         {% endfor %}
 }
     {%- endif %}{%- endif %}
@@ -81,8 +75,7 @@ new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
 
 {
         {% for i in printable.value %}
-    {{ i|camel_case }}{% if not loop.last %},{% endif %}
-
+    {{ i|camel_case }},
         {% endfor %}
 }
     {%- endif %}{%- endif %}

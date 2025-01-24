@@ -3,16 +3,15 @@
     "default_example": {
       "body": {
         "id": 12345,
-        "name": "My pet name",
-        "status": "available",
-        "photoUrls": [
-          "https://example.com/picture_1.jpg",
-          "https://example.com/picture_2.jpg"
-        ],
         "category": {
           "id": 12345,
           "name": "Category_Name"
         },
+        "name": "My pet name",
+        "photoUrls": [
+          "https://example.com/picture_1.jpg",
+          "https://example.com/picture_2.jpg"
+        ],
         "tags": [
           {
             "id": 12345,
@@ -22,7 +21,8 @@
             "id": 98765,
             "name": "tag_2"
           }
-        ]
+        ],
+        "status": "available"
       }
     }
   },
@@ -45,7 +45,7 @@
       "body": [
         {
           "id": 12345,
-          "username": "my_user",
+          "username": "my_user_1",
           "firstName": "John",
           "lastName": "Doe",
           "email": "john@example.com",
@@ -54,14 +54,14 @@
           "userStatus": 1
         },
         {
-          "id": 12345,
-          "username": "my_user",
-          "firstName": "John",
+          "id": 67890,
+          "username": "my_user_2",
+          "firstName": "Jane",
           "lastName": "Doe",
-          "email": "john@example.com",
-          "password": "secure_123",
-          "phone": "555-123-1234",
-          "userStatus": 1
+          "email": "jane@example.com",
+          "password": "secure_456",
+          "phone": "555-123-5678",
+          "userStatus": 2
         }
       ]
     }
@@ -71,7 +71,7 @@
       "body": [
         {
           "id": 12345,
-          "username": "my_user",
+          "username": "my_user_1",
           "firstName": "John",
           "lastName": "Doe",
           "email": "john@example.com",
@@ -80,17 +80,96 @@
           "userStatus": 1
         },
         {
-          "id": 12345,
-          "username": "my_user",
-          "firstName": "John",
+          "id": 67890,
+          "username": "my_user_2",
+          "firstName": "Jane",
           "lastName": "Doe",
-          "email": "john@example.com",
-          "password": "secure_123",
-          "phone": "555-123-1234",
-          "userStatus": 1
+          "email": "jane@example.com",
+          "password": "secure_456",
+          "phone": "555-123-5678",
+          "userStatus": 2
         }
       ]
     }
+  },
+  "deleteOrder": {
+    "default_example": {
+      "path": {
+        "orderId": 12345
+      }
+    }
+  },
+  "deletePet": {
+    "default_example": {
+      "header": {
+        "api_key": "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a"
+      },
+      "path": {
+        "petId": 12345
+      }
+    }
+  },
+  "deleteUser": {
+    "default_example": {
+      "path": {
+        "username": "my_username"
+      }
+    }
+  },
+  "findPetsByStatus": {
+    "default_example": {
+      "query": {
+        "status": [
+          "available",
+          "pending"
+        ]
+      }
+    }
+  },
+  "findPetsByTags": {
+    "default_example": {
+      "query": {
+        "tags": [
+          "tag_1",
+          "tag_2"
+        ]
+      }
+    }
+  },
+  "getInventory": {
+    "default_example": {}
+  },
+  "getOrderById": {
+    "default_example": {
+      "path": {
+        "orderId": 3
+      }
+    }
+  },
+  "getPetById": {
+    "default_example": {
+      "path": {
+        "petId": 12345
+      }
+    }
+  },
+  "getUserByName": {
+    "default_example": {
+      "path": {
+        "username": "my_username"
+      }
+    }
+  },
+  "loginUser": {
+    "default_example": {
+      "query": {
+        "username": "my_username",
+        "password": "my_secret_password"
+      }
+    }
+  },
+  "logoutUser": {
+    "default_example": {}
   },
   "placeOrder": {
     "default_example": {
@@ -108,16 +187,15 @@
     "default_example": {
       "body": {
         "id": 12345,
-        "name": "My pet name",
-        "status": "available",
-        "photoUrls": [
-          "https://example.com/picture_1.jpg",
-          "https://example.com/picture_1.jpg"
-        ],
         "category": {
           "id": 12345,
           "name": "Category_Name"
         },
+        "name": "My pet name",
+        "photoUrls": [
+          "https://example.com/picture_1.jpg",
+          "https://example.com/picture_2.jpg"
+        ],
         "tags": [
           {
             "id": 12345,
@@ -127,7 +205,19 @@
             "id": 98765,
             "name": "tag_2"
           }
-        ]
+        ],
+        "status": "available"
+      }
+    }
+  },
+  "updatePetWithForm": {
+    "default_example": {
+      "path": {
+        "petId": 12345
+      },
+      "body": {
+        "name": "Pet's new name",
+        "status": "sold"
       }
     }
   },
@@ -154,6 +244,7 @@
         "petId": 12345
       },
       "body": {
+        "additionalMetadata": "Additional data to pass to server",
         "file": "/path/to/file"
       }
     }

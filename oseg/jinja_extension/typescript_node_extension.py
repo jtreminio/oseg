@@ -113,6 +113,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         printable = model.PrintableScalar()
         printable.value = None
         printable.is_enum = item.is_enum
+        printable.target_type = self._get_target_type(item=item, parent=parent)
 
         if item.is_array:
             printable.is_array = True
@@ -131,6 +132,22 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
 
         return printable
 
+    def _get_target_type(
+        self,
+        item: model.PropertyScalar,
+        parent: model.PropertyObject | None,
+    ) -> str | None:
+        if item.type == "string":
+            if item.is_enum:
+                if parent is None:
+                    return None
+
+                parent_type_prepend = f"{parent.type}." if parent else ""
+
+                return f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+
+        return None
+
     def _handle_value(
         self,
         item: model.PropertyScalar,
@@ -138,16 +155,18 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         parent: model.PropertyObject | None,
     ) -> any:
         if item.type == "string" and item.is_enum:
-            namespace = self._sdk_options.additional_properties.get("npmName")
             enum_name = self._get_enum_name(item, value)
 
             if enum_name is None:
                 return "undefined"
 
+            if parent is None:
+                return self._to_json(value)
+
             base = f"{self.pascal_case(item.name)}Enum"
             parent_type_prepend = f"{parent.type}." if parent else ""
 
-            return f"{namespace}.{parent_type_prepend}{base}.{enum_name}"
+            return f"models.{parent_type_prepend}{base}.{enum_name}"
 
         if item.type == "string" and item.format == "date-time":
             return f'new Date("{value}")'

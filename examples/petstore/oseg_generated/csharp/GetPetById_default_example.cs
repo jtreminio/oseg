@@ -15,7 +15,7 @@ public class GetPetByIdDefaultExample
         try
         {
             var response = new PetApi(config).GetPetById(
-                petId: null
+                petId: 12345
             );
 
             Console.WriteLine(response);

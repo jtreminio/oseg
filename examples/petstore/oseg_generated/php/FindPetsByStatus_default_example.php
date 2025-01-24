@@ -6,7 +6,10 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\PetApi($config))->findPetsByStatus(
-        status: null,
+        status: [
+            OpenAPI\Client\Model::STATUS_AVAILABLE,
+            OpenAPI\Client\Model::STATUS_PENDING,
+        ],
     );
 
     print_r($response);

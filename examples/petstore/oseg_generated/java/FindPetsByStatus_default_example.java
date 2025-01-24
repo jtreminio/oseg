@@ -21,7 +21,10 @@ public class FindPetsByStatus_default_example
         try
         {
             var response = new PetApi(config).findPetsByStatus(
-                null
+                List.of (
+                    "available",
+                    "pending"
+                )
             );
 
             System.out.println(response);

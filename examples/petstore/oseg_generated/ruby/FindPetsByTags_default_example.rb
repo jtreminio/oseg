@@ -5,7 +5,10 @@ end
 
 begin
     response = OpenapiClient::PetApi.new.find_pets_by_tags(
-        nil,
+        [
+            "tag_1",
+            "tag_2",
+        ],
     )
 
     p response

@@ -30,16 +30,15 @@ public class AddPetDefaultExample
         var tags = new List<Tag>
         {
             tags1,
-            tags2
+            tags2,
         };
 
         var pet = new Pet(
             name: "My pet name",
-            photoUrls: new List<string>
-            {
+            photoUrls: [
                 "https://example.com/picture_1.jpg",
-                "https://example.com/picture_2.jpg"
-            },
+                "https://example.com/picture_2.jpg",
+            ],
             id: 12345,
             status: Pet.StatusEnum.Available,
             category: category,

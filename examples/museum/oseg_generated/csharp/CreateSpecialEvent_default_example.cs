@@ -17,11 +17,10 @@ public class CreateSpecialEventDefaultExample
             location: "Under the seaaa 🦀 🎶 🌊.",
             eventDescription: "Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.",
             price: 0,
-            dates: new List<DateOnly>
-            {
+            dates: [
                 DateOnly.Parse("2023-09-05"),
-                DateOnly.Parse("2023-09-08")
-            },
+                DateOnly.Parse("2023-09-08"),
+            ],
             eventId: null
         );
 

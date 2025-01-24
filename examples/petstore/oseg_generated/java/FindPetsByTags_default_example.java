@@ -21,7 +21,10 @@ public class FindPetsByTags_default_example
         try
         {
             var response = new PetApi(config).findPetsByTags(
-                null
+                List.of (
+                    "tag_1",
+                    "tag_2"
+                )
             );
 
             System.out.println(response);

@@ -15,7 +15,7 @@ public class GetUserByNameDefaultExample
         try
         {
             var response = new UserApi(config).GetUserByName(
-                username: null
+                username: "my_username"
             );
 
             Console.WriteLine(response);

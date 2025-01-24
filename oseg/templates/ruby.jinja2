@@ -94,12 +94,12 @@ begin
     {{ sdk_options.additional_properties.moduleName }}::{{ operation.api_name|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not property_container.has_data %}
 
 {% else %}(
-{% call(properties) m.parse_api_call_properties_macro(property_container, 4, True) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 8, True) %}
     {% for name, value in properties.items() %}
         {{ value }},
     {% endfor %}
 {% endcall %}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 4, False) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 8, False) %}
     {% if properties %}
         {
         {% for name, value in properties.items() %}

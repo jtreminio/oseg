@@ -6,7 +6,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\StoreApi($config))->getOrderById(
-        order_id: null,
+        order_id: 3,
     );
 
     print_r($response);

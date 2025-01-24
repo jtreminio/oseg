@@ -9,7 +9,7 @@ with ApiClient(configuration) as api_client:
     try:
         response = api.PetApi(api_client).upload_file(
             pet_id=12345,
-            additional_metadata=None,
+            additional_metadata="Additional data to pass to server",
             file=open("/path/to/file", "rb").read(),
         )
 

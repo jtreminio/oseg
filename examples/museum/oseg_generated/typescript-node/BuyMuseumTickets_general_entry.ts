@@ -1,15 +1,15 @@
 import * as fs from 'fs';
-import * as openapimuseum_client from "openapimuseum_client";
+import * as apis from "openapimuseum_client/api/apis"
+import * as models from "openapimuseum_client/model/models"
 
-const apiCaller = new openapimuseum_client.TicketsApi();
+const apiCaller = new apis.TicketsApi();
 
-const buyMuseumTickets: openapimuseum_client.BuyMuseumTickets = {
-    ticketType: openapimuseum_client.BuyMuseumTickets.TicketTypeEnum.General,
-    ticketDate: "2023-09-07",
-    email: "todd@example.com",
-    ticketId: undefined,
-    eventId: undefined,
-};
+const buyMuseumTickets = new models.BuyMuseumTickets();
+buyMuseumTickets.ticketType = models.BuyMuseumTickets.TicketTypeEnum.General;
+buyMuseumTickets.ticketDate = "2023-09-07";
+buyMuseumTickets.email = "todd@example.com";
+buyMuseumTickets.ticketId = undefined;
+buyMuseumTickets.eventId = undefined;
 
 apiCaller.buyMuseumTickets(
     buyMuseumTickets,

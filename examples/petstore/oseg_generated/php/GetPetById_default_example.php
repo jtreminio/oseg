@@ -6,7 +6,7 @@ $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
     $response = (new OpenAPI\Client\Api\PetApi($config))->getPetById(
-        pet_id: null,
+        pet_id: 12345,
     );
 
     print_r($response);

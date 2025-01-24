@@ -15,7 +15,10 @@ public class FindPetsByStatusDefaultExample
         try
         {
             var response = new PetApi(config).FindPetsByStatus(
-                status: null
+                status: [
+                    "available",
+                    "pending",
+                ]
             );
 
             Console.WriteLine(response);

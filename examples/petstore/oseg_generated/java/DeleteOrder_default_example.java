@@ -21,7 +21,7 @@ public class DeleteOrder_default_example
         try
         {
             new StoreApi(config).deleteOrder(
-                null
+                "12345"
             );
         } catch (ApiException e) {
             System.err.println("Exception when calling Store#deleteOrder");

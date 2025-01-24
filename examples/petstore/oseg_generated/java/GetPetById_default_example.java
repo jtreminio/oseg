@@ -21,7 +21,7 @@ public class GetPetById_default_example
         try
         {
             var response = new PetApi(config).getPetById(
-                null
+                12345L
             );
 
             System.out.println(response);

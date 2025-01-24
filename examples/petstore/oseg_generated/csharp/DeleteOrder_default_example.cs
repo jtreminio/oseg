@@ -15,7 +15,7 @@ public class DeleteOrderDefaultExample
         try
         {
             new StoreApi(config).DeleteOrder(
-                orderId: null
+                orderId: "12345"
             );
         }
         catch (ApiException e)

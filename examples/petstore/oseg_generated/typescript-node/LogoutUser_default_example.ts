@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.UserApi();
+const apiCaller = new apis.UserApi();
 
 apiCaller.logoutUser().catch(error => {
   console.log("Exception when calling User#logoutUser:");
