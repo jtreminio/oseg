@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from pprint import pprint
 
 from openapimuseum_client import ApiClient, ApiException, Configuration, api, models
@@ -6,9 +7,7 @@ configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
     try:
-        api_caller = api.EventsApi(api_client)
-
-        response = api_caller.get_special_event(
+        response = api.EventsApi(api_client).get_special_event(
             event_id="dad4bce8-f5cb-4078-a211-995864315e39",
         )
 

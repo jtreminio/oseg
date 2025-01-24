@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,15 +22,13 @@ public class PlaceOrder_default_example
             .id(12345L)
             .petId(98765L)
             .quantity(5)
-            .shipDate("2025-01-01T17:32:28Z")
+            .shipDate(OffsetDateTime.parse("2025-01-01T17:32:28Z"))
             .status(Order.StatusEnum.APPROVED)
             .complete(false);
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            var response = apiCaller.placeOrder(
+            var response = new StoreApi(config).placeOrder(
                 order
             );
 

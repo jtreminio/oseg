@@ -14,9 +14,7 @@ public class DeleteUserDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.DeleteUser(
+            new UserApi(config).DeleteUser(
                 username: null
             );
         }

@@ -14,9 +14,7 @@ public class DeletePetDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            apiCaller.DeletePet(
+            new PetApi(config).DeletePet(
                 petId: null,
                 apiKey: null
             );

@@ -5,9 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $api_caller = new OpenAPI\Client\Api\StoreApi(config: $config);
-
-    $response = $api_caller->getInventory();
+    $response = (new OpenAPI\Client\Api\StoreApi($config))->getInventory();
 
     print_r($response);
 } catch (OpenAPI\Client\ApiException $e) {

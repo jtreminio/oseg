@@ -25,9 +25,7 @@ public class UpdateUserDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.UpdateUser(
+            new UserApi(config).UpdateUser(
                 username: "my-username",
                 user: user
             );

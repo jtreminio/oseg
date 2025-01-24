@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +20,9 @@ public class ListSpecialEvents_default_example
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.listSpecialEvents(
-                "2023-02-23",
-                "2023-04-18",
+            var response = new EventsApi(config).listSpecialEvents(
+                LocalDate.parse("2023-02-23"),
+                LocalDate.parse("2023-04-18"),
                 2,
                 15
             );

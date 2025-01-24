@@ -15,9 +15,7 @@ $user = (new OpenAPI\Client\Model\User())
     ->setUserStatus(1);
 
 try {
-    $api_caller = new OpenAPI\Client\Api\UserApi(config: $config);
-
-    $api_caller->createUser(
+    (new OpenAPI\Client\Api\UserApi($config))->createUser(
         user: $user,
     );
 } catch (OpenAPI\Client\ApiException $e) {

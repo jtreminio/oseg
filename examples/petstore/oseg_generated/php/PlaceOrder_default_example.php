@@ -8,14 +8,12 @@ $order = (new OpenAPI\Client\Model\Order())
     ->setId(12345)
     ->setPetId(98765)
     ->setQuantity(5)
-    ->setShipDate("2025-01-01T17:32:28Z")
+    ->setShipDate(new \DateTime("2025-01-01T17:32:28Z"))
     ->setStatus(OpenAPI\Client\Model\Order::STATUS_APPROVED)
     ->setComplete(false);
 
 try {
-    $api_caller = new OpenAPI\Client\Api\StoreApi(config: $config);
-
-    $response = $api_caller->placeOrder(
+    $response = (new OpenAPI\Client\Api\StoreApi($config))->placeOrder(
         order: $order,
     );
 

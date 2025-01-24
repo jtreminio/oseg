@@ -14,9 +14,7 @@ public class GetTicketCodeDefaultExample
 
         try
         {
-            var apiCaller = new TicketsApi(config);
-
-            var response = apiCaller.GetTicketCode(
+            var response = new TicketsApi(config).GetTicketCode(
                 ticketId: "a54a57ca-36f8-421b-a6b4-2e8f26858a4c"
             );
             var fileStream = File.Create("file_response.zip");

@@ -91,11 +91,12 @@ class PythonExtension(jinja_extension.BaseExtension):
 
     def print_scalar(
         self,
-        parent: model.PropertyObject,
+        parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
         printable.value = None
+        printable.is_enum = item.is_enum
 
         if item.is_array:
             printable.is_array = True
@@ -106,13 +107,22 @@ class PythonExtension(jinja_extension.BaseExtension):
             printable.value = []
 
             for i in item.value:
-                printable.value.append(self._to_json(i))
+                printable.value.append(self._handle_value(item, i))
 
             return printable
 
-        if item.type == "boolean" or item.value is None:
-            printable.value = item.value
-        else:
-            printable.value = self._to_json(item.value)
+        printable.value = self._handle_value(item, item.value)
 
         return printable
+
+    def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
+        if item.type == "boolean" or value is None:
+            return value
+
+        if item.type == "string" and item.format == "date-time":
+            return f'datetime.fromisoformat("{value}")'
+
+        if item.type == "string" and item.format == "date":
+            return f'date.fromisoformat("{value}")'
+
+        return self._to_json(value)

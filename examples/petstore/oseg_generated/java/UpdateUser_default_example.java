@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +30,7 @@ public class UpdateUser_default_example
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.updateUser(
+            new UserApi(config).updateUser(
                 "my-username",
                 user
             );

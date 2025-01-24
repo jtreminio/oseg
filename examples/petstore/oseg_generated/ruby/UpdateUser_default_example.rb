@@ -14,9 +14,7 @@ user.phone = "555-867-5309"
 user.user_status = 1
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    api_caller.update_user(
+    OpenapiClient::UserApi.new.update_user(
         "my-username",
         user,
     )

@@ -1,20 +1,18 @@
 require "openapimuseum_client"
 
-OpenapiMuseumClient.configure do |config|
+OpenApiMuseumClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiMuseumClient::OperationsApi.new
-
-    response = api_caller.get_museum_hours(
+    response = OpenApiMuseumClient::OperationsApi.new.get_museum_hours(
         {
-            start_date: "2023-02-23",
+            start_date: Date.parse("2023-02-23").to_date,
             page: 2,
             limit: 15,
         },
     )
 
     p response
-rescue OpenapiMuseumClient::ApiError => e
+rescue OpenApiMuseumClient::ApiError => e
     puts "Exception when calling Operations#get_museum_hours: #{e}"
 end

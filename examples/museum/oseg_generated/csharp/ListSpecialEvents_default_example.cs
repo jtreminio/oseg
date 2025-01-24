@@ -14,11 +14,9 @@ public class ListSpecialEventsDefaultExample
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.ListSpecialEvents(
-                startDate: "2023-02-23",
-                endDate: "2023-04-18",
+            var response = new EventsApi(config).ListSpecialEvents(
+                startDate: DateOnly.Parse("2023-02-23"),
+                endDate: DateOnly.Parse("2023-04-18"),
                 page: 2,
                 limit: 15
             );

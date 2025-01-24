@@ -7,14 +7,12 @@ order = OpenapiClient::Order.new
 order.id = 12345
 order.pet_id = 98765
 order.quantity = 5
-order.ship_date = "2025-01-01T17:32:28Z"
+order.ship_date = Date.parse("2025-01-01T17:32:28Z").to_time
 order.status = "approved"
 order.complete = false
 
 begin
-    api_caller = OpenapiClient::StoreApi.new
-
-    response = api_caller.place_order(
+    response = OpenapiClient::StoreApi.new.place_order(
         order,
     )
 

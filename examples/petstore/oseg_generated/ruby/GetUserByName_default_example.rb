@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    response = api_caller.get_user_by_name(
+    response = OpenapiClient::UserApi.new.get_user_by_name(
         nil,
     )
 

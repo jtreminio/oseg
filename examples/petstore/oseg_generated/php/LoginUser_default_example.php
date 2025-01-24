@@ -5,9 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $api_caller = new OpenAPI\Client\Api\UserApi(config: $config);
-
-    $response = $api_caller->loginUser(
+    $response = (new OpenAPI\Client\Api\UserApi($config))->loginUser(
         username: null,
         password: null,
     );

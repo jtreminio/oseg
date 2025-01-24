@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,7 @@ public class UploadFile_default_example
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.uploadFile(
+            var response = new PetApi(config).uploadFile(
                 12345L,
                 null,
                 new File("/path/to/file")

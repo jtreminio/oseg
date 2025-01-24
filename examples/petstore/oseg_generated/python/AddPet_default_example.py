@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from pprint import pprint
 
 from openapi_client import ApiClient, ApiException, Configuration, api, models
@@ -5,38 +6,40 @@ from openapi_client import ApiClient, ApiException, Configuration, api, models
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-    category = models.Category()
-    category.id = 12345
-    category.name = "Category_Name"
+    category = models.Category(
+        id=12345,
+        name="Category_Name",
+    )
 
-    tags_1 = models.Tag()
-    tags_1.id = 12345
-    tags_1.name = "tag_1"
+    tags_1 = models.Tag(
+        id=12345,
+        name="tag_1",
+    )
 
-    tags_2 = models.Tag()
-    tags_2.id = 98765
-    tags_2.name = "tag_2"
+    tags_2 = models.Tag(
+        id=98765,
+        name="tag_2",
+    )
 
     tags = [
         tags_1,
         tags_2,
     ]
 
-    pet = models.Pet()
-    pet.name = "My pet name"
-    pet.photo_urls = [
-        "https://example.com/picture_1.jpg",
-        "https://example.com/picture_2.jpg",
-    ]
-    pet.id = 12345
-    pet.status = "available"
-    pet.category = category
-    pet.tags = tags
+    pet = models.Pet(
+        name="My pet name",
+        photo_urls=[
+            "https://example.com/picture_1.jpg",
+            "https://example.com/picture_2.jpg",
+        ],
+        id=12345,
+        status="available",
+        category=category,
+        tags=tags,
+    )
 
     try:
-        api_caller = api.PetApi(api_client)
-
-        response = api_caller.add_pet(
+        response = api.PetApi(api_client).add_pet(
             pet=pet,
         )
 

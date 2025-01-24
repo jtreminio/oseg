@@ -14,9 +14,7 @@ public class LogoutUserDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.LogoutUser();
+            new UserApi(config).LogoutUser();
         }
         catch (ApiException e)
         {

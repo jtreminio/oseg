@@ -22,9 +22,7 @@ public class UpdateSpecialEventDefaultExample
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.UpdateSpecialEvent(
+            var response = new EventsApi(config).UpdateSpecialEvent(
                 eventId: "dad4bce8-f5cb-4078-a211-995864315e39",
                 specialEventFields: specialEventFields
             );

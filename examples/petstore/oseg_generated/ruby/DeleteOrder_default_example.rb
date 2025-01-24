@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::StoreApi.new
-
-    api_caller.delete_order(
+    OpenapiClient::StoreApi.new.delete_order(
         nil,
     )
 rescue OpenapiClient::ApiError => e

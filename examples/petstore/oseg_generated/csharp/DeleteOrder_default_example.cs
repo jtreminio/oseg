@@ -14,9 +14,7 @@ public class DeleteOrderDefaultExample
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            apiCaller.DeleteOrder(
+            new StoreApi(config).DeleteOrder(
                 orderId: null
             );
         }

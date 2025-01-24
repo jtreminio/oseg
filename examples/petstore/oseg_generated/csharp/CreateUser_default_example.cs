@@ -25,9 +25,7 @@ public class CreateUserDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.CreateUser(
+            new UserApi(config).CreateUser(
                 user: user
             );
         }

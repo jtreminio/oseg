@@ -42,9 +42,7 @@ public class CreateUsersWithListInputDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.CreateUsersWithListInput(
+            new UserApi(config).CreateUsersWithListInput(
                 user: user
             );
         }

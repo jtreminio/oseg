@@ -14,9 +14,7 @@ public class UploadFileDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.UploadFile(
+            var response = new PetApi(config).UploadFile(
                 petId: 12345,
                 additionalMetadata: null,
                 file: new FileStream(

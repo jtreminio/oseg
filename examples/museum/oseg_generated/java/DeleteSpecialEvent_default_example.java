@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,7 @@ public class DeleteSpecialEvent_default_example
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            apiCaller.deleteSpecialEvent(
+            new EventsApi(config).deleteSpecialEvent(
                 "dad4bce8-f5cb-4078-a211-995864315e39"
             );
         } catch (ApiException e) {

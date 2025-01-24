@@ -14,9 +14,7 @@ user.phone = "555-123-1234"
 user.user_status = 1
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    api_caller.create_user(
+    OpenapiClient::UserApi.new.create_user(
         user,
     )
 rescue OpenapiClient::ApiError => e

@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,7 @@ public class GetTicketCode_default_example
 
         try
         {
-            var apiCaller = new TicketsApi(config);
-
-            var response = apiCaller.getTicketCode(
+            var response = new TicketsApi(config).getTicketCode(
                 "a54a57ca-36f8-421b-a6b4-2e8f26858a4c"
             );
             var fileStream = File.Create("file_response.zip");

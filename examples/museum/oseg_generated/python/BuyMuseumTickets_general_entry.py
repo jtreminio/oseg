@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from pprint import pprint
 
 from openapimuseum_client import ApiClient, ApiException, Configuration, api, models
@@ -5,17 +6,16 @@ from openapimuseum_client import ApiClient, ApiException, Configuration, api, mo
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-    buy_museum_tickets = models.BuyMuseumTickets()
-    buy_museum_tickets.ticket_type = "general"
-    buy_museum_tickets.ticket_date = "2023-09-07"
-    buy_museum_tickets.email = "todd@example.com"
-    buy_museum_tickets.ticket_id = None
-    buy_museum_tickets.event_id = None
+    buy_museum_tickets = models.BuyMuseumTickets(
+        ticket_type="general",
+        ticket_date=date.fromisoformat("2023-09-07"),
+        email="todd@example.com",
+        ticket_id=None,
+        event_id=None,
+    )
 
     try:
-        api_caller = api.TicketsApi(api_client)
-
-        response = api_caller.buy_museum_tickets(
+        response = api.TicketsApi(api_client).buy_museum_tickets(
             buy_museum_tickets=buy_museum_tickets,
         )
 

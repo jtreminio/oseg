@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -43,9 +45,7 @@ public class CreateUsersWithListInput_default_example
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.createUsersWithListInput(
+            new UserApi(config).createUsersWithListInput(
                 user
             );
         } catch (ApiException e) {

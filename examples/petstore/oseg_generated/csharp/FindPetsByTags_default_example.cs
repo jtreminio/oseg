@@ -14,9 +14,7 @@ public class FindPetsByTagsDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.FindPetsByTags(
+            var response = new PetApi(config).FindPetsByTags(
                 tags: null
             );
 

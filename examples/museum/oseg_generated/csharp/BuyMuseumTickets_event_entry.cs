@@ -14,7 +14,7 @@ public class BuyMuseumTicketsEventEntry
 
         var buyMuseumTickets = new BuyMuseumTickets(
             ticketType: BuyMuseumTickets.TicketTypeEnum.Event,
-            ticketDate: "2023-09-05",
+            ticketDate: DateOnly.Parse("2023-09-05"),
             email: "todd@example.com",
             ticketId: null,
             eventId: "dad4bce8-f5cb-4078-a211-995864315e39"
@@ -22,9 +22,7 @@ public class BuyMuseumTicketsEventEntry
 
         try
         {
-            var apiCaller = new TicketsApi(config);
-
-            var response = apiCaller.BuyMuseumTickets(
+            var response = new TicketsApi(config).BuyMuseumTickets(
                 buyMuseumTickets: buyMuseumTickets
             );
 

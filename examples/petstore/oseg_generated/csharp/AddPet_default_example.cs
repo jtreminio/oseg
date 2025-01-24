@@ -48,9 +48,7 @@ public class AddPetDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.AddPet(
+            var response = new PetApi(config).AddPet(
                 pet: pet
             );
 

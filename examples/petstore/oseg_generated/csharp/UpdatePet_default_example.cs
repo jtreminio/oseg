@@ -48,9 +48,7 @@ public class UpdatePetDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.UpdatePet(
+            var response = new PetApi(config).UpdatePet(
                 pet: pet
             );
 

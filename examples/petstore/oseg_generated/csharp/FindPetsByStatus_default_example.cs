@@ -14,9 +14,7 @@ public class FindPetsByStatusDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.FindPetsByStatus(
+            var response = new PetApi(config).FindPetsByStatus(
                 status: null
             );
 

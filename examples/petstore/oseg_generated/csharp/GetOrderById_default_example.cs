@@ -14,9 +14,7 @@ public class GetOrderByIdDefaultExample
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            var response = apiCaller.GetOrderById(
+            var response = new StoreApi(config).GetOrderById(
                 orderId: null
             );
 

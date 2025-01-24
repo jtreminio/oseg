@@ -16,16 +16,14 @@ public class PlaceOrderDefaultExample
             id: 12345,
             petId: 98765,
             quantity: 5,
-            shipDate: "2025-01-01T17:32:28Z",
+            shipDate: DateTime.Parse("2025-01-01T17:32:28Z"),
             status: Order.StatusEnum.Approved,
             complete: false
         );
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            var response = apiCaller.PlaceOrder(
+            var response = new StoreApi(config).PlaceOrder(
                 order: order
             );
 

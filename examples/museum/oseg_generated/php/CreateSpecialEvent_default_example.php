@@ -10,15 +10,13 @@ $special_event = (new OpenAPIMuseum\Client\Model\SpecialEvent())
     ->setEventDescription("Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.")
     ->setPrice(0)
     ->setDates([
-        "2023-09-05",
-        "2023-09-08",
+        new \DateTime("2023-09-05"),
+        new \DateTime("2023-09-08"),
     ])
     ->setEventId(null);
 
 try {
-    $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);
-
-    $response = $api_caller->createSpecialEvent(
+    $response = (new OpenAPIMuseum\Client\Api\EventsApi($config))->createSpecialEvent(
         special_event: $special_event,
     );
 

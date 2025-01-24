@@ -14,9 +14,7 @@ public class UpdatePetWithFormDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            apiCaller.UpdatePetWithForm(
+            new PetApi(config).UpdatePetWithForm(
                 petId: null,
                 name: null,
                 status: null

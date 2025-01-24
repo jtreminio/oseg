@@ -125,11 +125,9 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
 {% endfor %}
         try
         {
-            var apiCaller = new {{ operation.api_name|pascal_case }}Api(config);
-
             {{ "" -}}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            apiCaller.{{ operation.operation_id|pascal_case }}({%- if not property_container.has_data %});
+            new {{ operation.api_name|pascal_case }}Api(config).{{ operation.operation_id|pascal_case }}({%- if not property_container.has_data %});
 {% else %}
 
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}

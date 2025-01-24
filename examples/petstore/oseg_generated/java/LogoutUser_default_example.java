@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,7 @@ public class LogoutUser_default_example
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.logoutUser();
+            new UserApi(config).logoutUser();
         } catch (ApiException e) {
             System.err.println("Exception when calling User#logoutUser");
             System.err.println("Status code: " + e.getCode());

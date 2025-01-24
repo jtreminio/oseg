@@ -7,6 +7,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,7 @@ public class GetInventory_default_example
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            var response = apiCaller.getInventory();
+            var response = new StoreApi(config).getInventory();
 
             System.out.println(response);
         } catch (ApiException e) {

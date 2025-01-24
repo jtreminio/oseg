@@ -23,11 +23,12 @@ class PhpExtension(jinja_extension.BaseExtension):
 
     def print_scalar(
         self,
-        parent: model.PropertyObject,
+        parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
         printable.value = None
+        printable.is_enum = item.is_enum
 
         if item.is_array:
             printable.is_array = True
@@ -37,30 +38,35 @@ class PhpExtension(jinja_extension.BaseExtension):
 
             printable.value = []
 
-            is_enum = item.type == "string" and item.is_enum
-            namespace = self._sdk_options.additional_properties.get("invokerPackage")
-
             for i in item.value:
-                if is_enum:
-                    enum_name = self._get_enum_name(item, item.name, i)
-                    printable.value.append(
-                        f"{namespace}\\Model\\{parent.type}::{enum_name}"
-                    )
-                    printable.is_enum = True
-                else:
-                    printable.value.append(self._to_json(i))
+                printable.value.append(self._handle_value(item, i, parent))
 
             return printable
 
-        if item.type == "string" and item.is_enum:
-            namespace = self._sdk_options.additional_properties.get("invokerPackage")
-            enum_name = self._get_enum_name(item, item.name, item.value)
-            printable.value = f"{namespace}\\Model\\{parent.type}::{enum_name}"
-            printable.is_enum = True
-        else:
-            printable.value = self._to_json(item.value)
+        printable.value = self._handle_value(item, item.value, parent)
 
         return printable
+
+    def _handle_value(
+        self,
+        item: model.PropertyScalar,
+        value: any,
+        parent: model.PropertyObject | None,
+    ) -> any:
+        if item.value is None:
+            return self._to_json(value)
+
+        if item.type == "string" and item.is_enum:
+            namespace = self._sdk_options.additional_properties.get("invokerPackage")
+            enum_name = self._get_enum_name(item, item.name, value)
+            parent_type_prepend = f"\\{parent.type}" if parent else ""
+
+            return f"{namespace}\\Model{parent_type_prepend}::{enum_name}"
+
+        if item.type == "string" and item.format in ["date-time", "date"]:
+            return f'new \\DateTime("{value}")'
+
+        return self._to_json(value)
 
     def _get_enum_name(
         self,

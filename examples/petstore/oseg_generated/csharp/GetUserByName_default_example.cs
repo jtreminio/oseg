@@ -14,9 +14,7 @@ public class GetUserByNameDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            var response = apiCaller.GetUserByName(
+            var response = new UserApi(config).GetUserByName(
                 username: null
             );
 

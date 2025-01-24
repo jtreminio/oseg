@@ -5,9 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $api_caller = new OpenAPI\Client\Api\PetApi(config: $config);
-
-    $api_caller->updatePetWithForm(
+    (new OpenAPI\Client\Api\PetApi($config))->updatePetWithForm(
         pet_id: null,
         name: null,
         status: null,

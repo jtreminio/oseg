@@ -7,7 +7,7 @@ const order: openapi_client.Order = {
     id: 12345,
     petId: 98765,
     quantity: 5,
-    shipDate: "2025-01-01T17:32:28Z",
+    shipDate: new Date("2025-01-01T17:32:28Z"),
     status: openapi_client.Order.StatusEnum.Approved,
     complete: false,
 };

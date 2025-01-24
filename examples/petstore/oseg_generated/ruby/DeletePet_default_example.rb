@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    api_caller.delete_pet(
+    OpenapiClient::PetApi.new.delete_pet(
         nil,
         {
             api_key: nil,

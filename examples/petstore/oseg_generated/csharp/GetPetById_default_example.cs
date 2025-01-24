@@ -14,9 +14,7 @@ public class GetPetByIdDefaultExample
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.GetPetById(
+            var response = new PetApi(config).GetPetById(
                 petId: null
             );
 

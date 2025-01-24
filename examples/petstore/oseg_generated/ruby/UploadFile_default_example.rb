@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    response = api_caller.upload_file(
+    response = OpenapiClient::PetApi.new.upload_file(
         12345,
         {
             additional_metadata: nil,

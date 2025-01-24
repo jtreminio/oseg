@@ -10,8 +10,6 @@ python run.py examples/petstore/openapi.yaml \
     --example_data_file=examples/petstore/example_data.json
 """
 
-__DIR = os.path.dirname(os.path.abspath(__file__))
-
 parser = argparse.ArgumentParser(description="OpenApi SDK Example Generator")
 parser.add_argument("oas_file", type=str, help="Path to OpenAPI file")
 parser.add_argument(

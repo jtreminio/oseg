@@ -14,10 +14,8 @@ public class GetMuseumHoursDefaultExample
 
         try
         {
-            var apiCaller = new OperationsApi(config);
-
-            var response = apiCaller.GetMuseumHours(
-                startDate: "2023-02-23",
+            var response = new OperationsApi(config).GetMuseumHours(
+                startDate: DateOnly.Parse("2023-02-23"),
                 page: 2,
                 limit: 15
             );

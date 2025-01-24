@@ -89,13 +89,11 @@ end
 
 {% endfor %}
 begin
-    api_caller = {{ sdk_options.additional_properties.moduleName }}::{{ operation.api_name|pascal_case }}Api.new
-
     {{ "" -}}
     {% if operation.response and operation.response.body  %}response = {% endif -%}
-    api_caller.{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
-{% else %}
+    {{ sdk_options.additional_properties.moduleName }}::{{ operation.api_name|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not property_container.has_data %}
 
+{% else %}(
 {% call(properties) m.parse_api_call_properties_macro(property_container, 4, True) %}
     {% for name, value in properties.items() %}
         {{ value }},

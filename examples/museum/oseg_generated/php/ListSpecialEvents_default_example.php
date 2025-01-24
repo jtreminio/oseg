@@ -5,11 +5,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPIMuseum\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);
-
-    $response = $api_caller->listSpecialEvents(
-        start_date: "2023-02-23",
-        end_date: "2023-04-18",
+    $response = (new OpenAPIMuseum\Client\Api\EventsApi($config))->listSpecialEvents(
+        start_date: new \DateTime("2023-02-23"),
+        end_date: new \DateTime("2023-04-18"),
         page: 2,
         limit: 15,
     );

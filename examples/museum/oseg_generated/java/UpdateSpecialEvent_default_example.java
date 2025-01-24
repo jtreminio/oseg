@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +27,7 @@ public class UpdateSpecialEvent_default_example
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.updateSpecialEvent(
+            var response = new EventsApi(config).updateSpecialEvent(
                 "dad4bce8-f5cb-4078-a211-995864315e39",
                 specialEventFields
             );

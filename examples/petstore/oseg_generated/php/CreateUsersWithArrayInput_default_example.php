@@ -30,9 +30,7 @@ $user = [
 ];
 
 try {
-    $api_caller = new OpenAPI\Client\Api\UserApi(config: $config);
-
-    $api_caller->createUsersWithArrayInput(
+    (new OpenAPI\Client\Api\UserApi($config))->createUsersWithArrayInput(
         user: $user,
     );
 } catch (OpenAPI\Client\ApiException $e) {

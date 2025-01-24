@@ -96,11 +96,9 @@ $config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::
 
 {% endfor %}
 try {
-    $api_caller = new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config);
-
     {{ "" -}}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
-    $api_caller->{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
+    (new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ operation.api_name|pascal_case }}Api($config))->{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
 {% else %}
 
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8) %}

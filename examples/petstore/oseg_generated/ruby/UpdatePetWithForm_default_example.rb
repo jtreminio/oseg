@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    api_caller.update_pet_with_form(
+    OpenapiClient::PetApi.new.update_pet_with_form(
         nil,
         {
             name: nil,

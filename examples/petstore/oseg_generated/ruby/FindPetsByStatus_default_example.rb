@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    response = api_caller.find_pets_by_status(
+    response = OpenapiClient::PetApi.new.find_pets_by_status(
         nil,
     )
 

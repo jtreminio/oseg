@@ -114,11 +114,13 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
     def print_scalar(
         self,
-        parent: model.PropertyObject,
+        parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
         printable.value = None
+        printable.is_enum = item.is_enum
+        printable.target_type = self._get_target_type(item=item, parent=parent)
 
         if item.is_array:
             printable.is_array = True
@@ -128,46 +130,12 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
             printable.value = []
 
-            if item.type == "string":
-                if item.is_enum:
-                    printable.is_enum = True
-                    printable.target_type = (
-                        f"{parent.type}.{self.pascal_case(item.name)}Enum"
-                    )
-                else:
-                    printable.target_type = "string"
-            elif item.type == "integer":
-                printable.target_type = "int"
-            elif item.type == "number":
-                if item.format in ["float", "double"]:
-                    printable.target_type = item.format
-                elif item.format == "int64":
-                    printable.target_type = "long"
-                else:
-                    printable.target_type = "int"
-
             for i in item.value:
-                if printable.is_enum:
-                    if i == "":
-                        printable.value.append("Empty")
-                    else:
-                        printable.value.append(self._get_enum_name(item, i))
-                else:
-                    printable.value.append(self._to_json(i))
+                printable.value.append(self._handle_value(item, i, parent))
 
             return printable
 
-        if item.type == "string" and item.is_enum:
-            printable.is_enum = True
-            enum_name = self._get_enum_name(item, item.value)
-
-            if enum_name is None:
-                printable.value = "null"
-            else:
-                target_type = f"{parent.type}.{self.pascal_case(item.name)}Enum"
-                printable.value = f"{target_type}.{enum_name}"
-        else:
-            printable.value = self._to_json(item.value)
+        printable.value = self._handle_value(item, item.value, parent)
 
         return printable
 
@@ -193,3 +161,64 @@ class CSharpExtension(jinja_extension.BaseExtension):
             return None
 
         return self.pascal_case(value)
+
+    def _get_target_type(
+        self,
+        item: model.PropertyScalar,
+        parent: model.PropertyObject | None,
+    ) -> str:
+        if item.type == "boolean":
+            return "bool"
+
+        if item.type == "string":
+            if item.is_enum:
+                parent_type_prepend = f"{parent.type}." if parent else ""
+
+                return f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+
+            if item.format == "date-time":
+                return "DateTime"
+
+            if item.format == "date":
+                return "DateOnly"
+
+            return "string"
+
+        if item.type == "integer":
+            return "int"
+
+        if item.type == "number":
+            if item.format in ["float", "double"]:
+                return item.format
+
+            if item.format == "int64":
+                return "long"
+
+            return "int"
+
+        return ""
+
+    def _handle_value(
+        self,
+        item: model.PropertyScalar,
+        value: any,
+        parent: model.PropertyObject | None,
+    ) -> any:
+        if item.is_enum:
+            enum_name = self._get_enum_name(item, value)
+
+            if enum_name is None:
+                return "null"
+
+            parent_type_prepend = f"{parent.type}." if parent else ""
+            target_type = f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+
+            return f"{target_type}.{enum_name}"
+
+        if item.type == "string" and item.format == "date-time":
+            return f'DateTime.Parse("{value}")'
+
+        if item.type == "string" and item.format == "date":
+            return f'DateOnly.Parse("{value}")'
+
+        return self._to_json(value)

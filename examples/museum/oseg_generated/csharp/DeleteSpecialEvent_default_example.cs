@@ -14,9 +14,7 @@ public class DeleteSpecialEventDefaultExample
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            apiCaller.DeleteSpecialEvent(
+            new EventsApi(config).DeleteSpecialEvent(
                 eventId: "dad4bce8-f5cb-4078-a211-995864315e39"
             );
         }

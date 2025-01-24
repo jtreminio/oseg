@@ -42,9 +42,7 @@ public class CreateUsersWithArrayInputDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            apiCaller.CreateUsersWithArrayInput(
+            new UserApi(config).CreateUsersWithArrayInput(
                 user: user
             );
         }

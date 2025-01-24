@@ -12,9 +12,7 @@ $special_event_fields = (new OpenAPIMuseum\Client\Model\SpecialEventFields())
     ->setDates(null);
 
 try {
-    $api_caller = new OpenAPIMuseum\Client\Api\EventsApi(config: $config);
-
-    $response = $api_caller->updateSpecialEvent(
+    $response = (new OpenAPIMuseum\Client\Api\EventsApi($config))->updateSpecialEvent(
         event_id: "dad4bce8-f5cb-4078-a211-995864315e39",
         special_event_fields: $special_event_fields,
     );

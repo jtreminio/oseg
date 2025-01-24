@@ -29,9 +29,7 @@ user = [
 ]
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    api_caller.create_users_with_list_input(
+    OpenapiClient::UserApi.new.create_users_with_list_input(
         user,
     )
 rescue OpenapiClient::ApiError => e

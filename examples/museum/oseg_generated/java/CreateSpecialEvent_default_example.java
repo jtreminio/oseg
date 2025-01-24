@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -22,16 +24,14 @@ public class CreateSpecialEvent_default_example
             .eventDescription("Join us as we review and classify a rare collection of 20 thingamabobs, gadgets, gizmos, whoosits, and whatsits, kindly donated by Ariel.")
             .price(0F)
             .dates(List.of (
-                "2023-09-05",
-                "2023-09-08"
+                LocalDate.parse("2023-09-05"),
+                LocalDate.parse("2023-09-08")
             ))
             .eventId(null);
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.createSpecialEvent(
+            var response = new EventsApi(config).createSpecialEvent(
                 specialEvent
             );
 

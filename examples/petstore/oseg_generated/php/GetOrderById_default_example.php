@@ -5,9 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $api_caller = new OpenAPI\Client\Api\StoreApi(config: $config);
-
-    $response = $api_caller->getOrderById(
+    $response = (new OpenAPI\Client\Api\StoreApi($config))->getOrderById(
         order_id: null,
     );
 

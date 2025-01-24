@@ -14,9 +14,7 @@ public class LoginUserDefaultExample
 
         try
         {
-            var apiCaller = new UserApi(config);
-
-            var response = apiCaller.LoginUser(
+            var response = new UserApi(config).LoginUser(
                 username: null,
                 password: null
             );

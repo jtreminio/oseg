@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    api_caller.delete_user(
+    OpenapiClient::UserApi.new.delete_user(
         nil,
     )
 rescue OpenapiClient::ApiError => e

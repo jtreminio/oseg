@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::StoreApi.new
-
-    response = api_caller.get_order_by_id(
+    response = OpenapiClient::StoreApi.new.get_order_by_id(
         nil,
     )
 

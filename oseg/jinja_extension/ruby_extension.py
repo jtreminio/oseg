@@ -90,6 +90,7 @@ class RubyExtension(jinja_extension.BaseExtension):
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
         printable.value = None
+        printable.is_enum = item.is_enum
 
         if item.is_array:
             printable.is_array = True
@@ -100,13 +101,22 @@ class RubyExtension(jinja_extension.BaseExtension):
             printable.value = []
 
             for i in item.value:
-                printable.value.append(self._to_json(i))
+                printable.value.append(self._handle_value(item, i))
 
             return printable
 
-        if item.value is None:
-            printable.value = "nil"
-        else:
-            printable.value = self._to_json(item.value)
+        printable.value = self._handle_value(item, item.value)
 
         return printable
+
+    def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
+        if value is None:
+            return "nil"
+
+        if item.type == "string" and item.format == "date-time":
+            return f'Date.parse("{value}").to_time'
+
+        if item.type == "string" and item.format == "date":
+            return f'Date.parse("{value}").to_date'
+
+        return self._to_json(value)

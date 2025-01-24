@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from pprint import pprint
 
 from openapimuseum_client import ApiClient, ApiException, Configuration, api, models
@@ -5,17 +6,16 @@ from openapimuseum_client import ApiClient, ApiException, Configuration, api, mo
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-    special_event_fields = models.SpecialEventFields()
-    special_event_fields.name = None
-    special_event_fields.location = "On the beach."
-    special_event_fields.event_description = None
-    special_event_fields.price = 15
-    special_event_fields.dates = None
+    special_event_fields = models.SpecialEventFields(
+        name=None,
+        location="On the beach.",
+        event_description=None,
+        price=15,
+        dates=None,
+    )
 
     try:
-        api_caller = api.EventsApi(api_client)
-
-        response = api_caller.update_special_event(
+        response = api.EventsApi(api_client).update_special_event(
             event_id="dad4bce8-f5cb-4078-a211-995864315e39",
             special_event_fields=special_event_fields,
         )

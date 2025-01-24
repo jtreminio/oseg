@@ -14,9 +14,7 @@ public class GetInventoryDefaultExample
 
         try
         {
-            var apiCaller = new StoreApi(config);
-
-            var response = apiCaller.GetInventory();
+            var response = new StoreApi(config).GetInventory();
 
             Console.WriteLine(response);
         }

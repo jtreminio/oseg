@@ -4,9 +4,7 @@ OpenapiClient.configure do |config|
 end
 
 begin
-    api_caller = OpenapiClient::UserApi.new
-
-    response = api_caller.login_user(
+    response = OpenapiClient::UserApi.new.login_user(
         nil,
         nil,
     )

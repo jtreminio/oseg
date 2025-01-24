@@ -7,6 +7,8 @@ import org.openapimuseum.client.auth.*;
 import org.openapimuseum.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,16 +20,14 @@ public class BuyMuseumTickets_event_entry
 
         var buyMuseumTickets = new BuyMuseumTickets()
             .ticketType(BuyMuseumTickets.TicketTypeEnum.EVENT)
-            .ticketDate("2023-09-05")
+            .ticketDate(LocalDate.parse("2023-09-05"))
             .email("todd@example.com")
             .ticketId(null)
             .eventId("dad4bce8-f5cb-4078-a211-995864315e39");
 
         try
         {
-            var apiCaller = new TicketsApi(config);
-
-            var response = apiCaller.buyMuseumTickets(
+            var response = new TicketsApi(config).buyMuseumTickets(
                 buyMuseumTickets
             );
 

@@ -14,9 +14,7 @@ public class GetSpecialEventDefaultExample
 
         try
         {
-            var apiCaller = new EventsApi(config);
-
-            var response = apiCaller.GetSpecialEvent(
+            var response = new EventsApi(config).GetSpecialEvent(
                 eventId: "dad4bce8-f5cb-4078-a211-995864315e39"
             );
 

@@ -32,9 +32,7 @@ pet.category = category
 pet.tags = tags
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    response = api_caller.update_pet(
+    response = OpenapiClient::PetApi.new.update_pet(
         pet,
     )
 

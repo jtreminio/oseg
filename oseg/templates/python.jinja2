@@ -66,6 +66,7 @@ open("{{ printable.value }}", "rb").read()
 
 {%- import "_macros.jinja2" as m with context -%}
 
+from datetime import date, datetime
 from pprint import pprint
 
 from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiException, Configuration, api, models
@@ -76,12 +77,13 @@ with ApiClient(configuration) as api_client:
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-    {{ obj_name|print_variable }} = models.{{ obj.type }}()
-        {% call(properties) m.parse_object_properties_macro(obj, 4) %}
+    {{ obj_name|print_variable }} = models.{{ obj.type }}(
+        {% call(properties) m.parse_object_properties_macro(obj, 8) %}
             {% for name, value in properties.items() %}
-    {{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }}
+        {{ name|print_setter }}={{ value }},
             {% endfor %}
         {% endcall %}
+    )
     {% else %}
     {{ obj_name|print_variable }} = {{ "" }}
         {%- call(value) m.parse_object_list_properties_macro(obj, 4) %}
@@ -91,11 +93,9 @@ with ApiClient(configuration) as api_client:
 
 {% endfor %}
     try:
-        api_caller = api.{{ operation.api_name|pascal_case }}Api(api_client)
-
         {{ "" -}}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-        api_caller.{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
+        api.{{ operation.api_name|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
 {% else %}
 
 {% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}
