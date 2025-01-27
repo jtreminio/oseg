@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPI\Client\Api\PetApi($config))->getPetById(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->getPetById(
         pet_id: 12345,
     );
 

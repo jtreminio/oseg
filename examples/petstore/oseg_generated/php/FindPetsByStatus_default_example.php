@@ -5,10 +5,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPI\Client\Api\PetApi($config))->findPetsByStatus(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->findPetsByStatus(
         status: [
-            OpenAPI\Client\Model::STATUS_AVAILABLE,
-            OpenAPI\Client\Model::STATUS_PENDING,
+            "available",
+            "pending",
         ],
     );
 

@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPI\Client\Api\PetApi($config))->findPetsByTags(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->findPetsByTags(
         tags: [
             "tag_1",
             "tag_2",

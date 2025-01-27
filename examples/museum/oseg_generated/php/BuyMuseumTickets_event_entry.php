@@ -12,7 +12,7 @@ $buy_museum_tickets = (new OpenAPIMuseum\Client\Model\BuyMuseumTickets())
     ->setEventId("dad4bce8-f5cb-4078-a211-995864315e39");
 
 try {
-    $response = (new OpenAPIMuseum\Client\Api\TicketsApi($config))->buyMuseumTickets(
+    $response = (new OpenAPIMuseum\Client\Api\TicketsApi(config: $config))->buyMuseumTickets(
         buy_museum_tickets: $buy_museum_tickets,
     );
 

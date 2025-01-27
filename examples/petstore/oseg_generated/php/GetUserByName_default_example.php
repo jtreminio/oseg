@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPI\Client\Api\UserApi($config))->getUserByName(
+    $response = (new OpenAPI\Client\Api\UserApi(config: $config))->getUserByName(
         username: "my_username",
     );
 

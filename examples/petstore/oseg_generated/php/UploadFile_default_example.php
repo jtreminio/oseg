@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPI\Client\Api\PetApi($config))->uploadFile(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->uploadFile(
         pet_id: 12345,
         additional_metadata: "Additional data to pass to server",
         file: new SplFileObject("/path/to/file"),

@@ -5,7 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = OpenAPIMuseum\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new OpenAPIMuseum\Client\Api\OperationsApi($config))->getMuseumHours(
+    $response = (new OpenAPIMuseum\Client\Api\OperationsApi(config: $config))->getMuseumHours(
         start_date: new \DateTime("2023-02-23"),
         page: 2,
         limit: 15,

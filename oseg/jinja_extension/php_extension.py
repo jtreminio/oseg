@@ -56,6 +56,7 @@ class PhpExtension(jinja_extension.BaseExtension):
         if item.value is None:
             return self._to_json(value)
 
+        # if enum but no parent, use the literal value
         if item.type == "string" and item.is_enum and parent is not None:
             namespace = self._sdk_options.additional_properties.get("invokerPackage")
             enum_name = self._get_enum_name(item, item.name, value)

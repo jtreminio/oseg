@@ -13,7 +13,7 @@ $order = (new OpenAPI\Client\Model\Order())
     ->setComplete(false);
 
 try {
-    $response = (new OpenAPI\Client\Api\StoreApi($config))->placeOrder(
+    $response = (new OpenAPI\Client\Api\StoreApi(config: $config))->placeOrder(
         order: $order,
     );
 

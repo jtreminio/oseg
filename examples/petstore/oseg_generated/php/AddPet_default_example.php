@@ -33,7 +33,7 @@ $pet = (new OpenAPI\Client\Model\Pet())
     ->setTags($tags);
 
 try {
-    $response = (new OpenAPI\Client\Api\PetApi($config))->addPet(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->addPet(
         pet: $pet,
     );
 

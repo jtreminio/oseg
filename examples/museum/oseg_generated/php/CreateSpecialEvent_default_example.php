@@ -16,7 +16,7 @@ $special_event = (new OpenAPIMuseum\Client\Model\SpecialEvent())
     ->setEventId(null);
 
 try {
-    $response = (new OpenAPIMuseum\Client\Api\EventsApi($config))->createSpecialEvent(
+    $response = (new OpenAPIMuseum\Client\Api\EventsApi(config: $config))->createSpecialEvent(
         special_event: $special_event,
     );
 

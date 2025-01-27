@@ -15,7 +15,7 @@ $user = (new OpenAPI\Client\Model\User())
     ->setUserStatus(1);
 
 try {
-    (new OpenAPI\Client\Api\UserApi($config))->updateUser(
+    (new OpenAPI\Client\Api\UserApi(config: $config))->updateUser(
         username: "my-username",
         user: $user,
     );
