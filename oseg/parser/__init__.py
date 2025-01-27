@@ -1,6 +1,7 @@
 from .example_data_parser import ExampleDataParser
 from .file_loader import FileLoader
 from .component_resolver import ComponentResolver
+from .normalize_str import NormalizeStr
 from .oa_parser import OaParser
 from .operation_parser import OperationParser
 from .property_flattener import PropertyFlattener

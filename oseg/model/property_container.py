@@ -79,9 +79,9 @@ class PropertyContainer:
             return None
 
         if isinstance(body, model.PropertyObjectArray):
-            return body.properties[0].type
+            return parser.NormalizeStr.normalize(body.properties[0].type)
 
-        return body.type
+        return parser.NormalizeStr.normalize(body.type)
 
     @property
     def is_body_required(self) -> bool:

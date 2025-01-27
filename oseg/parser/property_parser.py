@@ -34,7 +34,7 @@ class PropertyParser:
 
                     container = model.PropertyObjectArray(
                         schema=schema,
-                        _type=type_of,
+                        _type=parser.NormalizeStr.normalize(type_of),
                         is_required=sub_container.is_required,
                     )
 
@@ -63,12 +63,14 @@ class PropertyParser:
 
         container = model.PropertyObject(
             schema=schema,
-            _type=type_of,
-            base_type=base_type,
+            _type=parser.NormalizeStr.normalize(type_of),
+            base_type=parser.NormalizeStr.normalize(base_type),
             is_required=False,
         )
 
         for name, property_schema in properties.items():
+            name = parser.NormalizeStr.normalize(name)
+
             for current_schema in merged_values.schemas:
                 non_object_property_schema = self._oa_parser.resolve_property(
                     schema=current_schema,
