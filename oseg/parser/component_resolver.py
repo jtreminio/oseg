@@ -224,7 +224,11 @@ class ComponentResolver:
             return
 
         if not parser.TypeChecker.is_array(schema):
-            final_name = f"{parent_name}_{name}"
+            if schema.title is not None:
+                final_name = schema.title
+            else:
+                final_name = f"{parent_name}_{name}"
+
             self._add(schema, final_name)
 
             if parser.TypeChecker.is_object(schema):
@@ -269,7 +273,11 @@ class ComponentResolver:
                     self._add(schema.items, name)
 
             if name is None and operation:
-                name = f"{operation.operationId}_request"
+                if schema.title is not None:
+                    name = schema.title
+                else:
+                    name = f"{operation.operationId}_request"
+
                 self._add(schema, name)
 
             self._schema_properties(schema, name)
@@ -305,7 +313,11 @@ class ComponentResolver:
             parameter = self._oa_parser.resolve_parameter(parameter)
 
             if self.name(parameter) is None and self._is_nameable(parameter):
-                name = f"{operation.operationId}_{parameter.name}_parameter"
+                if parameter.param_schema.title is not None:
+                    name = parameter.param_schema.title
+                else:
+                    name = f"{operation.operationId}_{parameter.name}_parameter"
+
                 self._add(parameter, name)
 
             schema = self._oa_parser.resolve_component(parameter.param_schema)

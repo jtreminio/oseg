@@ -294,6 +294,99 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Dog'
+  /using_title:
+    post:
+      tags:
+        - pet
+      operationId: using_title
+      parameters:
+        # generates class, expected name using_title_paramObject_parameter
+        - name: paramObject
+          in: path
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+        # generates class using title
+        - name: paramObjectCustom
+          in: path
+          required: true
+          schema:
+            title: custom_paramObject_parameter
+            type: object
+            properties:
+              id:
+                type: integer
+        # generates class using title
+        - name: paramArrayObject
+          in: path
+          required: true
+          schema:
+            title: custom_paramArrayObject_parameter
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+        # does not generate class, ignores title
+        - name: paramString
+          in: query
+          schema:
+            title: custom_paramString_parameter
+            type: string
+        - $ref: "#/components/parameters/ParamComponentObject"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              title: "MyCustomRequestBodyClass"
+              properties:
+                # MyCustomRequestBodyClass_prop_object
+                prop_object:
+                  type: object
+                  properties:
+                    key_1:
+                      type: string
+                prop_object_2:
+                  title: "CustomPropObjectName"
+                  type: object
+                  properties:
+                    key_1:
+                      type: string
+      responses:
+        '200':
+          description: Successful operation
+  /using_title_formdata:
+    post:
+      tags:
+        - pet
+      operationId: using_title_formdata
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              title: "MyCustomRequestBodyClass" # used but endpoint does not use it
+              properties:
+                # MyCustomRequestBodyClass_prop_object
+                prop_object:
+                  type: object
+                  properties:
+                    key_1:
+                      type: string
+                prop_object_2:
+                  title: "CustomPropObjectName"
+                  type: object
+                  properties:
+                    key_1:
+                      type: string
+      responses:
+        '200':
+          description: Successful operation
 components:
   schemas:
     Pet:
@@ -495,6 +588,43 @@ components:
         name:
           type: string
           pattern: '^[a-zA-Z0-9]+[a-zA-Z0-9\.\-_]*[a-zA-Z0-9]+$'
+    PropertyForFormData:
+      title: a dog
+      type: object
+      required:
+        - name
+        - photoUrls
+      properties:
+        id:
+          type: integer
+          format: int64
+        category:
+          $ref: '#/components/schemas/Category'
+        name:
+          type: string
+          example: doggie
+        photoUrls:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        status:
+          type: string
+          description: pet status in the store
+          deprecated: true
+          enum:
+            - available
+            - pending
+            - sold
+        try:
+          type: string
+        while:
+          type: string
+        with:
+          type: string
   parameters:
     ParamString:
       name: paramString
@@ -505,6 +635,7 @@ components:
       name: paramComponentObject
       in: query
       schema:
+        title: "title is ignored"
         type: object
         properties:
           id:

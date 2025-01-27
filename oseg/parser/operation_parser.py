@@ -21,6 +21,8 @@ class OperationParser:
         "multipart/form-data",
     ]
 
+    DEFAULT_API_NAME = "default"
+
     def __init__(
         self,
         oa_parser: "parser.OaParser",
@@ -105,4 +107,4 @@ class OperationParser:
         if operation.tags and len(operation.tags):
             return operation.tags[0].replace(" ", "")
 
-        return "default"
+        return self.DEFAULT_API_NAME

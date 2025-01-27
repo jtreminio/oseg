@@ -11,6 +11,7 @@ class TestOperationParser(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.oa_parser_requests = TestUtils.oa_parser("requests")
         cls.oa_parser_responses = TestUtils.oa_parser("responses")
+        cls.oa_parser_operation = TestUtils.oa_parser("operation")
 
     def test_has_form_data(self):
         data = [
@@ -96,6 +97,23 @@ class TestOperationParser(unittest.TestCase):
                     bool(operation.response) and bool(operation.response.is_binary),
                     expected["is_binary_response"],
                 )
+
+    def test_tags(self):
+        operation = self.oa_parser_operation.operations["no_tags"]
+        self.assertEqual(parser.OperationParser.DEFAULT_API_NAME, operation.api_name)
+
+        expected = "pet"
+        operation = self.oa_parser_operation.operations["with_tags"]
+        self.assertEqual(expected, operation.api_name)
+
+    def test_operation_id_with_special_chars(self):
+        operation = self.oa_parser_operation.operations[
+            "security-advisories/list-global-advisories/some_value"
+        ]
+
+        expected = "security_advisories_list_global_advisories_some_value"
+
+        self.assertEqual(expected, operation.operation_id)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
-from typing import Optional
+import caseconverter
 import openapi_pydantic as oa
+from typing import Optional
 from oseg import model
 
 
@@ -18,9 +19,13 @@ class Operation:
         self._api_name = api_name
         self._http_method = http_method
 
+        self._operation_id = caseconverter.snakecase(
+            operation.operationId.replace("/", "_")
+        )
+
     @property
     def operation_id(self) -> str:
-        return self._operation.operationId
+        return self._operation_id
 
     @property
     def api_name(self) -> str:

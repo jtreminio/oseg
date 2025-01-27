@@ -402,6 +402,82 @@ class TestComponentResolver(unittest.TestCase):
                     self.oa_parser.get_component_name(response.body),
                 )
 
+    def test_title_used(self):
+        operation = self.oa_parser.operations["using_title"]
+        body = operation.request.body
+
+        data = [
+            {
+                "property": "paramObject",
+                "type": "using_title_paramObject_parameter",
+                "schema": operation.request.parameters[0],
+            },
+            {
+                "property": "paramObjectCustom",
+                "type": "custom_paramObject_parameter",
+                "schema": operation.request.parameters[1],
+            },
+            {
+                "property": "paramArrayObject",
+                "type": "custom_paramArrayObject_parameter",
+                "schema": operation.request.parameters[2],
+            },
+            {
+                "property": "paramString",
+                "type": None,
+                "schema": operation.request.parameters[3],
+            },
+            {
+                "property": "paramComponentObject",
+                "type": "",
+                "schema": operation.request.parameters[4],
+            },
+        ]
+
+        for expected in data:
+            with self.subTest(expected["property"]):
+                parameter: oa.Parameter = expected["schema"]
+
+                self.assertEqual(expected["property"], parameter.name)
+                self.assertEqual(
+                    expected["type"],
+                    self.oa_parser.get_component_name(parameter),
+                )
+
+        expected_body_type = "MyCustomRequestBodyClass"
+        self.assertEqual(
+            expected_body_type,
+            self.oa_parser.get_component_name(body),
+        )
+
+        expected_prop_1_type = "MyCustomRequestBodyClass_prop_object"
+        self.assertEqual(
+            expected_prop_1_type,
+            self.oa_parser.get_component_name(body.properties.get("prop_object")),
+        )
+
+        expected_prop_2_type = "CustomPropObjectName"
+        self.assertEqual(
+            expected_prop_2_type,
+            self.oa_parser.get_component_name(body.properties.get("prop_object_2")),
+        )
+
+    def test_title_used_formdata(self):
+        operation = self.oa_parser.operations["using_title_formdata"]
+        body = operation.request.body
+
+        expected_prop_1_type = "MyCustomRequestBodyClass_prop_object"
+        self.assertEqual(
+            expected_prop_1_type,
+            self.oa_parser.get_component_name(body.properties.get("prop_object")),
+        )
+
+        expected_prop_2_type = "CustomPropObjectName"
+        self.assertEqual(
+            expected_prop_2_type,
+            self.oa_parser.get_component_name(body.properties.get("prop_object_2")),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
