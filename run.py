@@ -4,7 +4,8 @@ from oseg import Generator
 import argparse
 
 """Example:
-python run.py examples/petstore/openapi.yaml \
+python run.py \
+    examples/petstore/openapi.yaml \
     examples/petstore/config-php.yaml \
     examples/petstore/generated/php \
     --example_data_file=examples/petstore/example_data.json

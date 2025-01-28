@@ -1,4 +1,4 @@
-# OSEG - (O)penAPI (S)DK (E)xample (G)enerator
+# OSEG - OpenAPI SDK Example Generator
 
 Create (almost) ready to use SDK snippets for SDKs generated using [openapi-generator](https://openapi-generator.tech/) using example data from your OpenAPI spec.
 
@@ -71,28 +71,27 @@ public class AddPetDefaultExample
             name: "tag_2"
         );
 
+        var tags = new List<Tag>
+        {
+            tags1,
+            tags2,
+        };
+
         var pet = new Pet(
-            name: "doggie",
-            photoUrls: new List<string>
-            {
+            name: "My pet name",
+            photoUrls: [
                 "https://example.com/picture_1.jpg",
-                "https://example.com/picture_2.jpg"
-            },
+                "https://example.com/picture_2.jpg",
+            ],
             id: 12345,
             status: Pet.StatusEnum.Available,
             category: category,
-            tags: new List<Tag>
-            {
-                tags1,
-                tags2
-            }
+            tags: tags
         );
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.AddPet(
+            var response = new PetApi(config).AddPet(
                 pet: pet
             );
 
@@ -120,6 +119,8 @@ import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -141,8 +142,13 @@ public class AddPet_default_example
             .id(98765L)
             .name("tag_2");
 
+        var tags = List.of (
+            tags1,
+            tags2
+        );
+
         var pet = new Pet()
-            .name("doggie")
+            .name("My pet name")
             .photoUrls(List.of (
                 "https://example.com/picture_1.jpg",
                 "https://example.com/picture_2.jpg"
@@ -150,16 +156,11 @@ public class AddPet_default_example
             .id(12345L)
             .status(Pet.StatusEnum.AVAILABLE)
             .category(category)
-            .tags(List.of (
-                tags1,
-                tags2
-            ));
+            .tags(tags);
 
         try
         {
-            var apiCaller = new PetApi(config);
-
-            var response = apiCaller.addPet(
+            var response = new PetApi(config).addPet(
                 pet
             );
 
@@ -196,8 +197,13 @@ $tags_2 = (new OpenAPI\Client\Model\Tag())
     ->setId(98765)
     ->setName("tag_2");
 
+$tags = [
+    $tags_1,
+    $tags_2,
+];
+
 $pet = (new OpenAPI\Client\Model\Pet())
-    ->setName("doggie")
+    ->setName("My pet name")
     ->setPhotoUrls([
         "https://example.com/picture_1.jpg",
         "https://example.com/picture_2.jpg",
@@ -205,15 +211,10 @@ $pet = (new OpenAPI\Client\Model\Pet())
     ->setId(12345)
     ->setStatus(OpenAPI\Client\Model\Pet::STATUS_AVAILABLE)
     ->setCategory($category)
-    ->setTags([
-        $tags_1,
-        $tags_2,
-    ]);
+    ->setTags($tags);
 
 try {
-    $api_caller = new OpenAPI\Client\Api\PetApi(config: $config);
-
-    $response = $api_caller->addPet(
+    $response = (new OpenAPI\Client\Api\PetApi(config: $config))->addPet(
         pet: $pet,
     );
 
@@ -227,6 +228,7 @@ try {
 ### [python](https://openapi-generator.tech/docs/generators/python/)
 
 ```python
+from datetime import date, datetime
 from pprint import pprint
 
 from openapi_client import ApiClient, ApiException, Configuration, api, models
@@ -234,36 +236,40 @@ from openapi_client import ApiClient, ApiException, Configuration, api, models
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-    category = models.Category()
-    category.id = 12345
-    category.name = "Category_Name"
+    category = models.Category(
+        id=12345,
+        name="Category_Name",
+    )
 
-    tags_1 = models.Tag()
-    tags_1.id = 12345
-    tags_1.name = "tag_1"
+    tags_1 = models.Tag(
+        id=12345,
+        name="tag_1",
+    )
 
-    tags_2 = models.Tag()
-    tags_2.id = 98765
-    tags_2.name = "tag_2"
+    tags_2 = models.Tag(
+        id=98765,
+        name="tag_2",
+    )
 
-    pet = models.Pet()
-    pet.name = "doggie"
-    pet.photoUrls = [
-        "https://example.com/picture_1.jpg",
-        "https://example.com/picture_2.jpg",
-    ]
-    pet.id = 12345
-    pet.status = "available"
-    pet.category = category
-    pet.tags = [
+    tags = [
         tags_1,
         tags_2,
     ]
 
-    try:
-        api_caller = api.PetApi(api_client)
+    pet = models.Pet(
+        name="My pet name",
+        photo_urls=[
+            "https://example.com/picture_1.jpg",
+            "https://example.com/picture_2.jpg",
+        ],
+        id=12345,
+        status="available",
+        category=category,
+        tags=tags,
+    )
 
-        response = api_caller.add_pet(
+    try:
+        response = api.PetApi(api_client).add_pet(
             pet=pet,
         )
 
@@ -292,8 +298,13 @@ tags_2 = OpenapiClient::Tag.new
 tags_2.id = 98765
 tags_2.name = "tag_2"
 
+tags = [
+    tags_1,
+    tags_2,
+]
+
 pet = OpenapiClient::Pet.new
-pet.name = "doggie"
+pet.name = "My pet name"
 pet.photo_urls = [
     "https://example.com/picture_1.jpg",
     "https://example.com/picture_2.jpg",
@@ -301,15 +312,10 @@ pet.photo_urls = [
 pet.id = 12345
 pet.status = "available"
 pet.category = category
-pet.tags = [
-    tags_1,
-    tags_2,
-]
+pet.tags = tags
 
 begin
-    api_caller = OpenapiClient::PetApi.new
-
-    response = api_caller.add_pet(
+    response = OpenapiClient::PetApi.new.add_pet(
         pet,
     )
 
@@ -323,42 +329,41 @@ end
 
 ```typescript
 import * as fs from 'fs';
-import * as openapi_client from "openapi_client";
+import * as apis from "openapi_client/api/apis"
+import * as models from "openapi_client/model/models"
 
-const apiCaller = new openapi_client.PetApi();
+const apiCaller = new apis.PetApi();
 
-const category: openapi_client.Category = {
-    id: 12345,
-    name: "Category_Name",
-};
+const category = new models.Category();
+category.id = 12345;
+category.name = "Category_Name";
 
-const tags_1: openapi_client.Tag = {
-    id: 12345,
-    name: "tag_1",
-};
+const tags1 = new models.Tag();
+tags1.id = 12345;
+tags1.name = "tag_1";
 
-const tags_2: openapi_client.Tag = {
-    id: 98765,
-    name: "tag_2",
-};
+const tags2 = new models.Tag();
+tags2.id = 98765;
+tags2.name = "tag_2";
 
-const pet: openapi_client.Pet = {
-    name: "doggie",
-    photoUrls: [
-        "https://example.com/picture_1.jpg",
-        "https://example.com/picture_2.jpg",
-    ],
-    id: 12345,
-    status: openapi_client.Pet.StatusEnum.Available,
-    category: category,
-    tags: [
-        tags_1,
-        tags_2,
-    ],
-};
+const tags = [
+  tags1,
+  tags2,
+];
+
+const pet = new models.Pet();
+pet.name = "My pet name";
+pet.photoUrls = [
+  "https://example.com/picture_1.jpg",
+  "https://example.com/picture_2.jpg",
+];
+pet.id = 12345;
+pet.status = models.Pet.StatusEnum.Available;
+pet.category = category;
+pet.tags = tags;
 
 apiCaller.addPet(
-    pet,
+  pet,
 ).then(response => {
   console.log(response.body);
 }).catch(error => {
@@ -369,21 +374,24 @@ apiCaller.addPet(
 
 ## Where does the example data come from?
 
-Example data embedded into the snippets above is read from a number of places, almost all embedded within the OpenAPI definition itself:
+Example data used to generate the code snippets can come from a number of places:
 
-1) `example` or `examples` definition among operation or parameter definitions
-2) Externally referenced JSON files
-3) You can also create custom JSON payloads for any given endpoint. Right now the directory for this is hard-coded as `custom_examples` within your OpenAPI SDK config file's directory. See [custom_examples](./data/petstore/custom_examples)
+* [example or examples values](https://github.com/jtreminio/oseg/blob/9f720fc462ba5d1a8b8f90fa349a675dbd76c610/examples/petstore/openapi.yaml#L705) in schema
+* [default values](https://github.com/jtreminio/oseg/blob/9f720fc462ba5d1a8b8f90fa349a675dbd76c610/examples/petstore/openapi.yaml#L100) in schema
+* [Externally referenced JSON files](https://github.com/jtreminio/oseg/blob/51e26de23b812f22887d0ccc867b09dff825fbf9/tests/fixtures/example_data_parser-external_example.yaml#L78-L82) defined in schema
+* You can also create a [JSON file with examples for all the endpoints you want](https://github.com/jtreminio/oseg/blob/90ec8364fdfd202557543a00caaa49ddb47ed249/examples/petstore/example_data.json)
 
-OSEG currently generates one example file per `requestBody` definition, but only a single example per `parameters` definition.
+OSEG currently generates one code snippet file per `requestBody` definition, but only a single example per `parameters` definition.
 
-In other words, you can generate multiple examples of the same operation/endpoint by having multiple `requestBody` definitions (`application/json` and `application/x-www-form-urlencoded`). Each generate example will have different data embedded within it. However, since [parameters](https://github.com/jtreminio/oseg/blob/main/data/petstore/openapi.yaml#L84-L100) is tied to a single operation, the same data will apply to any and all `requestBody` definitions.
+In other words, you can generate multiple examples of the same operation/endpoint by having multiple `requestBody` definitions. Each generate example will have different data embedded within it. However, since [parameters](https://github.com/jtreminio/oseg/blob/main/examples/petstore/openapi.yaml#L84-L100) is tied to a single operation, the same data will apply to any and all `requestBody` definitions.
+
+If you use a custom JSON file with examples you can define as many examples per endpoint as you want, since you can define each data source separately (`query`, `path`, `header`, `cookie`, and `body`) per endpoint.
 
 ## Adding more SDKs
 
 Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/). Adding a new SDK requires a few steps:
 
-1) Create the OpenAPI config file ([Python example](./data/petstore/config-python.yaml))
+1) Create the OpenAPI config file ([Python example](./examples/petstore/config-python.yaml))
 2) Create the Jinja extension class that handles language-specific parameter and method naming, and some other things ([Python example](./oseg/jinja_extension/python_extension.py))
 3) Create the Jinja template ([Python example](./oseg/templates/python.jinja2))
 
@@ -391,20 +399,48 @@ Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/
 
 This project is in its infancy, for now to run it you simply run [run.py](./run.py)
 
-Generated examples are output in [./data/petstore/oseg_generated/{sdk}](./data/petstore/oseg_generated).
+Generated examples are output in [./examples/petstore/oseg_generated/{sdk}](./examples/petstore/oseg_generated).
 
 ## Tests
 
-Tests are being written!
+See [tests directory](./tests).
 
 ## Feature support
 
 The aim of this project is to cover the most common use-cases in an OpenAPI spec. 
 
-Things like discriminators and `allOf` will be supported.
+### Supported 
 
-Things like `oneOf` will not be supported (this does not translate very well to generated SDKs).
+* Requests with and without formdata: `openapi-generator` will create a different interface if an endpoint's `content-type` has formdata (`multipart/form-data` or `application/x-www-form-urlencoded`) and everything else
+* Discriminators with `allOf`
 
-Currently only languages I know are supported. I will continue adding more language as the project matures and test coverage increases.
+### Issues
 
-OSEG does not currently embed authentication/security examples or anything unrelated to data not available from `example`/`examples`. More feature support is coming.
+The following are issues with the SDK code generated by `openapi-generator`.
+
+* `allOf` without a discriminator: Depending on the `openapi-generator` generator used, the generated SDK may be completely broken
+  * `typescript-node` SDK code is generated broken by `openapi-generator` 
+  * Other SDKs currently supported by OSEG will usually just use a generic `object` type
+* `anyOf`
+  * `typescript-node` generated SDK does not set data
+  * `php` generated SDK does not set data
+  * Other SDKs currently supported by OSEG generate a class
+* `oneOf`
+  * `typescript-node` generated SDK does not set data
+  * `php` generated SDK does not set data
+  * Other SDKs currently supported by OSEG generate a class
+* Multiple values in `type` definition. New in OpenAPI 3.1 `type` can now be an array of supported types
+  * `c#`, `java`, `ruby` Generate a class
+  * `python` generates a class but does not use it, types property as the first value in `type`
+  * `php` generates a class, data not set
+  * `typescript-node` generates a class, data not set
+* `openapi-generator` generates a class for inline schema with `type=object`. If two or more Operations share identical inline schema definitions, `openapi-generator` will only generate a class for one of the Operations, and all Operations will reference this class. The name of the class depends on which Operation is read first by `openapi-generator`, but it may not reflect the first definition within the OAS file and thus is impossible for OSEG to know the name of the class ahead of time.
+
+## How to Run
+
+```bash
+python run.py examples/petstore/openapi.yaml \
+    examples/petstore/config-php.yaml \
+    examples/petstore/generated/php \
+    --example_data_file=examples/petstore/example_data.json
+```
