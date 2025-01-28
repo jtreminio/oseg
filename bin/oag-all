@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+## example: ./bin/oag-all petstore
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+SOURCE_DIR=$1
+
+bash "${DIR}/run-oag" "${SOURCE_DIR}" csharp
+bash "${DIR}/run-oag" "${SOURCE_DIR}" java
+bash "${DIR}/run-oag" "${SOURCE_DIR}" php
+bash "${DIR}/run-oag" "${SOURCE_DIR}" python
+bash "${DIR}/run-oag" "${SOURCE_DIR}" ruby
+bash "${DIR}/run-oag" "${SOURCE_DIR}" typescript-node
