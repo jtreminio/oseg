@@ -1,0 +1,2 @@
+# ignore directories but not config files
+**/
