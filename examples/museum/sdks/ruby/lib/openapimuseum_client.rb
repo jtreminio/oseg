@@ -31,10 +31,10 @@ require 'openapimuseum_client/api/events_api'
 require 'openapimuseum_client/api/operations_api'
 require 'openapimuseum_client/api/tickets_api'
 
-module OpenapiMuseumClient
+module OpenApiMuseumClient
   class << self
     # Customize default settings for the SDK using block.
-    #   OpenapiMuseumClient.configure do |config|
+    #   OpenApiMuseumClient.configure do |config|
     #     config.username = "xxx"
     #     config.password = "xxx"
     #   end

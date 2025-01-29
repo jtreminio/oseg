@@ -12,7 +12,7 @@ Generator version: 7.11.0
 
 require 'cgi'
 
-module OpenapiMuseumClient
+module OpenApiMuseumClient
   class EventsApi
     attr_accessor :api_client
 

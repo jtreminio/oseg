@@ -13,7 +13,7 @@ Generator version: 7.11.0
 require 'date'
 require 'time'
 
-module OpenapiMuseumClient
+module OpenApiMuseumClient
   class TicketType
     EVENT = "event".freeze
     GENERAL = "general".freeze
