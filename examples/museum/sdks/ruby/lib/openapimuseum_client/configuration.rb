@@ -10,7 +10,7 @@ Generator version: 7.11.0
 
 =end
 
-module OpenapiMuseumClient
+module OpenApiMuseumClient
   class Configuration
     # Defines url scheme
     attr_accessor :scheme

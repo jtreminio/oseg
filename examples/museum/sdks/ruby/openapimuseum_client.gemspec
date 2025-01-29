@@ -17,7 +17,7 @@ require "openapimuseum_client/version"
 
 Gem::Specification.new do |s|
   s.name        = "openapimuseum_client"
-  s.version     = OpenapiMuseumClient::VERSION
+  s.version     = OpenApiMuseumClient::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["OpenAPI-Generator"]
   s.email       = ["team@redocly.com"]

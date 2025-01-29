@@ -10,6 +10,6 @@ Generator version: 7.11.0
 
 =end
 
-module OpenapiMuseumClient
+module OpenApiMuseumClient
   VERSION = '1.0.0'
 end

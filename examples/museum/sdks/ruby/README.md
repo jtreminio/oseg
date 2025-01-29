@@ -1,6 +1,6 @@
 # openapimuseum_client
 
-OpenapiMuseumClient - the Ruby gem for the Redocly Museum API
+OpenApiMuseumClient - the Ruby gem for the Redocly Museum API
 
 Imaginary, but delightful Museum API for interacting with museum services and information. Built with love by Redocly.
 
@@ -59,20 +59,20 @@ Please follow the [installation](#installation) procedure and then run the follo
 require 'openapimuseum_client'
 
 # Setup authorization
-OpenapiMuseumClient.configure do |config|
+OpenApiMuseumClient.configure do |config|
   # Configure HTTP basic authorization: MuseumPlaceholderAuth
   config.username = 'YOUR_USERNAME'
   config.password = 'YOUR_PASSWORD'
 end
 
-api_instance = OpenapiMuseumClient::EventsApi.new
-special_event = OpenapiMuseumClient::SpecialEvent.new({name: 'Pirate Coding Workshop', location: 'Computer Room', event_description: 'Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).', dates: [Date.parse('2023-10-29')], price: 25}) # SpecialEvent | 
+api_instance = OpenApiMuseumClient::EventsApi.new
+special_event = OpenApiMuseumClient::SpecialEvent.new({name: 'Pirate Coding Workshop', location: 'Computer Room', event_description: 'Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).', dates: [Date.parse('2023-10-29')], price: 25}) # SpecialEvent | 
 
 begin
   #Create special events
   result = api_instance.create_special_event(special_event)
   p result
-rescue OpenapiMuseumClient::ApiError => e
+rescue OpenApiMuseumClient::ApiError => e
   puts "Exception when calling EventsApi->create_special_event: #{e}"
 end
 
@@ -84,26 +84,26 @@ All URIs are relative to *https://redocly.com/_mock/docs/openapi/museum-api*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*OpenapiMuseumClient::EventsApi* | [**create_special_event**](docs/EventsApi.md#create_special_event) | **POST** /special-events | Create special events
-*OpenapiMuseumClient::EventsApi* | [**delete_special_event**](docs/EventsApi.md#delete_special_event) | **DELETE** /special-events/{eventId} | Delete special event
-*OpenapiMuseumClient::EventsApi* | [**get_special_event**](docs/EventsApi.md#get_special_event) | **GET** /special-events/{eventId} | Get special event
-*OpenapiMuseumClient::EventsApi* | [**list_special_events**](docs/EventsApi.md#list_special_events) | **GET** /special-events | List special events
-*OpenapiMuseumClient::EventsApi* | [**update_special_event**](docs/EventsApi.md#update_special_event) | **PATCH** /special-events/{eventId} | Update special event
-*OpenapiMuseumClient::OperationsApi* | [**get_museum_hours**](docs/OperationsApi.md#get_museum_hours) | **GET** /museum-hours | Get museum hours
-*OpenapiMuseumClient::TicketsApi* | [**buy_museum_tickets**](docs/TicketsApi.md#buy_museum_tickets) | **POST** /tickets | Buy museum tickets
-*OpenapiMuseumClient::TicketsApi* | [**get_ticket_code**](docs/TicketsApi.md#get_ticket_code) | **GET** /tickets/{ticketId}/qr | Get ticket QR code
+*OpenApiMuseumClient::EventsApi* | [**create_special_event**](docs/EventsApi.md#create_special_event) | **POST** /special-events | Create special events
+*OpenApiMuseumClient::EventsApi* | [**delete_special_event**](docs/EventsApi.md#delete_special_event) | **DELETE** /special-events/{eventId} | Delete special event
+*OpenApiMuseumClient::EventsApi* | [**get_special_event**](docs/EventsApi.md#get_special_event) | **GET** /special-events/{eventId} | Get special event
+*OpenApiMuseumClient::EventsApi* | [**list_special_events**](docs/EventsApi.md#list_special_events) | **GET** /special-events | List special events
+*OpenApiMuseumClient::EventsApi* | [**update_special_event**](docs/EventsApi.md#update_special_event) | **PATCH** /special-events/{eventId} | Update special event
+*OpenApiMuseumClient::OperationsApi* | [**get_museum_hours**](docs/OperationsApi.md#get_museum_hours) | **GET** /museum-hours | Get museum hours
+*OpenApiMuseumClient::TicketsApi* | [**buy_museum_tickets**](docs/TicketsApi.md#buy_museum_tickets) | **POST** /tickets | Buy museum tickets
+*OpenApiMuseumClient::TicketsApi* | [**get_ticket_code**](docs/TicketsApi.md#get_ticket_code) | **GET** /tickets/{ticketId}/qr | Get ticket QR code
 
 
 ## Documentation for Models
 
- - [OpenapiMuseumClient::BuyMuseumTickets](docs/BuyMuseumTickets.md)
- - [OpenapiMuseumClient::Error](docs/Error.md)
- - [OpenapiMuseumClient::MuseumDailyHours](docs/MuseumDailyHours.md)
- - [OpenapiMuseumClient::MuseumTicketsConfirmation](docs/MuseumTicketsConfirmation.md)
- - [OpenapiMuseumClient::SpecialEvent](docs/SpecialEvent.md)
- - [OpenapiMuseumClient::SpecialEventFields](docs/SpecialEventFields.md)
- - [OpenapiMuseumClient::Ticket](docs/Ticket.md)
- - [OpenapiMuseumClient::TicketType](docs/TicketType.md)
+ - [OpenApiMuseumClient::BuyMuseumTickets](docs/BuyMuseumTickets.md)
+ - [OpenApiMuseumClient::Error](docs/Error.md)
+ - [OpenApiMuseumClient::MuseumDailyHours](docs/MuseumDailyHours.md)
+ - [OpenApiMuseumClient::MuseumTicketsConfirmation](docs/MuseumTicketsConfirmation.md)
+ - [OpenApiMuseumClient::SpecialEvent](docs/SpecialEvent.md)
+ - [OpenApiMuseumClient::SpecialEventFields](docs/SpecialEventFields.md)
+ - [OpenApiMuseumClient::Ticket](docs/Ticket.md)
+ - [OpenApiMuseumClient::TicketType](docs/TicketType.md)
 
 
 ## Documentation for Authorization
