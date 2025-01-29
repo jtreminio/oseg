@@ -1,3 +1,4 @@
+import caseconverter
 import os
 from typing import Optional
 
@@ -52,7 +53,7 @@ class Generator:
         filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_name}"
         print(f"Begin parsing for {filename}")
 
-        filename = filename.replace("/", "_")
+        filename = caseconverter.pascalcase(parser.NormalizeStr.normalize(filename))
 
         rendered = self._jinja.template.render(
             operation=operation,

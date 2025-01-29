@@ -44,7 +44,8 @@ docker run --rm \
   openapitools/openapi-generator-cli:v7.11.0 generate \
     ${CONFIG_PARAM} \
     -i "/local/openapi.yaml" \
-    -o "/local/sdks/${SDK}"
+    -o "/local/sdks/${SDK}" \
+    --skip-validate-spec
 
 if [[ "${SOURCE_DIR}" == "petstore" ]] && [[ -d "${BASE_DIR}/oseg_generated/${SDK}" ]]; then
   if [[ "${SDK}" == "csharp" ]]; then
