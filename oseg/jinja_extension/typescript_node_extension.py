@@ -83,8 +83,6 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
 
     def unreserve_keyword(self, name: str) -> str:
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            foo = f"{self.RESERVED_KEYWORD_PREPEND}{name}"
-
             return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
         return name

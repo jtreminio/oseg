@@ -73,10 +73,10 @@ fs.createReadStream("{{ printable.value }}")
 {%- import "_macros.jinja2" as m with context -%}
 
 import * as fs from 'fs';
-import * as apis from "{{ sdk_options.additional_properties.npmName }}/api/apis"
-import * as models from "{{ sdk_options.additional_properties.npmName }}/model/models"
+import api from "{{ sdk_options.additional_properties.npmName }}"
+import models from "{{ sdk_options.additional_properties.npmName }}"
 
-const apiCaller = new apis.{{ operation.api_name|pascal_case }}Api();
+const apiCaller = new api.{{ operation.api_name|pascal_case }}Api();
 
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
