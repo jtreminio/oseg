@@ -1,0 +1,19 @@
+{
+    "name": "oseg/petstore",
+    "autoload": {
+        "psr-4": {
+            "OSEG\\PetStore\\": ""
+        }
+    },
+    "require": {
+        "openapi/client": "*",
+        "ext-json": "*"
+    },
+    "repositories": [
+      {
+        "type": "artifact",
+        "url": "./artifacts"
+      }
+    ],
+  "minimum-stability": "dev"
+}
