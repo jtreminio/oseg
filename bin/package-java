@@ -18,6 +18,6 @@ docker run --rm -it \
   -v "oseg-java-gradle-cache:/home/gradle/.gradle" \
   -w "${WORKING_DIR}" \
   -e GEN_DIR=/app \
-  gradle:jdk21 ./gradlew clean jar
+  gradle:8-jdk21 ./gradlew clean jar
 
 cp "${SDK_DIR}/build/libs/"openapi-java-client-*.jar "${ARTIFACTS_DIR}/openapi-java-client.jar"
