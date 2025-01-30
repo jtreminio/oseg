@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>OSEG.PetStore</PackageId>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OSEG.PetStore</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Nullable>annotations</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Org.OpenAPITools" Version="1.0.0" />
+  </ItemGroup>
+</Project>

@@ -62,7 +62,7 @@ class PhpExtension(jinja_extension.BaseExtension):
             enum_name = self._get_enum_name(item, item.name, value)
             parent_type_prepend = f"\\{self.pascal_case(parent.type)}"
 
-            return f"{namespace}\\Model{parent_type_prepend}::{enum_name}"
+            return f"\\{namespace}\\Model{parent_type_prepend}::{enum_name}"
 
         if item.type == "string" and item.format in ["date-time", "date"]:
             return f'new \\DateTime("{value}")'

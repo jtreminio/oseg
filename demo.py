@@ -8,21 +8,20 @@ def main():
 
     projects = [
         "petstore",
-        "museum",
     ]
 
     operation_id = None
 
-    sdks = [
-        "csharp",
-        "java",
-        "php",
-        "python",
-        "ruby",
-        "typescript-node",
-    ]
-
     for project in projects:
+        sdks = {
+            "csharp": f"{__DIR}/examples/{project}/generated/csharp/src/OSEG.PetStore/Examples",
+            "java": f"{__DIR}/examples/{project}/generated/java/src/main/java/oseg/petstore/examples",
+            "php": f"{__DIR}/examples/{project}/generated/php/src",
+            "python": f"{__DIR}/examples/{project}/generated/python/src",
+            "ruby": f"{__DIR}/examples/{project}/generated/ruby/src",
+            "typescript-node": f"{__DIR}/examples/{project}/generated/typescript-node/src",
+        }
+
         oas_file = f"{__DIR}/examples/{project}/openapi.yaml"
         example_data_file = f"{__DIR}/examples/{project}/example_data.json"
         example_data = None
@@ -37,12 +36,12 @@ def main():
             example_data=example_data,
         )
 
-        for sdk in sdks:
-            config_file = f"{__DIR}/examples/{project}/config-{sdk}.yaml"
+        for sdk_name, output_dir in sdks.items():
+            config_file = f"{__DIR}/examples/{project}/sdks/config-{sdk_name}.yaml"
 
             generator.generate(
                 config_file=config_file,
-                output_dir=f"{__DIR}/examples/{project}/oseg_generated/{sdk}",
+                output_dir=output_dir,
             )
 
 

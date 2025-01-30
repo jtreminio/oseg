@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+WORKING_DIR="/app/openapi"
+PETSTORE_DIR="${DIR}/../examples/petstore"
+SDK_DIR="${PETSTORE_DIR}/sdks/php"
+TARGET_DIR="${PETSTORE_DIR}/generated/php"
+ARTIFACTS_DIR="${PETSTORE_DIR}/generated/php/artifacts"
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}"
+rm -f "${TARGET_DIR}/composer.lock"
+rm -rf "${TARGET_DIR}/vendor"
+
+cp -r "${SDK_DIR}" "${ARTIFACTS_DIR}/package"
+cd "${ARTIFACTS_DIR}/package"
+
+zip -9 -r "${ARTIFACTS_DIR}/openapi-client.zip" \
+  ./ \
+  -x "./.DS_Store" \
+     "./.gitmodules" \
+     "./.git/*" \
+     "./vendor/*"
+
+rm -rf "${ARTIFACTS_DIR}/package"

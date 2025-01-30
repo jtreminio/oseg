@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+WORKING_DIR="/app/openapi"
+PETSTORE_DIR="${DIR}/../examples/petstore"
+SDK_DIR="${PETSTORE_DIR}/sdks/csharp"
+TARGET_DIR="${PETSTORE_DIR}/generated/csharp"
+ARTIFACTS_DIR="${PETSTORE_DIR}/generated/csharp/artifacts"
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}"
+
+docker run --rm -it \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "${TARGET_DIR}:/target" \
+  -w "${WORKING_DIR}" \
+  -u root:root \
+  mcr.microsoft.com/dotnet/sdk:9.0 dotnet pack -o /artifacts
+
+docker run --rm -it \
+  -v "${TARGET_DIR}:${WORKING_DIR}" \
+  -w "${WORKING_DIR}" \
+  -u root:root \
+  mcr.microsoft.com/dotnet/sdk:9.0 dotnet build

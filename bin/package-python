@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+WORKING_DIR="/app/openapi"
+PETSTORE_DIR="${DIR}/../examples/petstore"
+SDK_DIR="${PETSTORE_DIR}/sdks/python"
+TARGET_DIR="${PETSTORE_DIR}/generated/python"
+ARTIFACTS_DIR="${PETSTORE_DIR}/generated/python/artifacts"
+BASE_DIR="${DIR}/.."
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}"
+
+if [[ -f "${BASE_DIR}/venv/bin/python" ]]; then
+  PYTHON="${BASE_DIR}/venv/bin/python"
+else
+  PYTHON="python3"
+fi
+
+pushd "${SDK_DIR}"
+${PYTHON} -m build --wheel
+cp dist/openapi_client-*.whl "${ARTIFACTS_DIR}"
+popd

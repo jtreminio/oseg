@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+WORKING_DIR="/app/openapi"
+PETSTORE_DIR="${DIR}/../examples/petstore"
+SDK_DIR="${PETSTORE_DIR}/sdks/java"
+TARGET_DIR="${PETSTORE_DIR}/generated/java"
+ARTIFACTS_DIR="${PETSTORE_DIR}/generated/java/artifacts"
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}"
+
+docker run --rm -it \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-java-gradle-cache:/home/gradle/.gradle" \
+  -w "${WORKING_DIR}" \
+  -e GEN_DIR=/app \
+  gradle:8-jdk21 ./gradlew clean jar
+
+cp "${SDK_DIR}/build/libs/"openapi-java-client-*.jar "${ARTIFACTS_DIR}/openapi-java-client.jar"

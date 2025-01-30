@@ -72,15 +72,17 @@ new SplFileObject("{{ printable.value }}")
 
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+namespace {{ sdk_options.additional_properties.oseg_namespace }};
 
-$config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
+require_once {{ sdk_options.additional_properties.oseg_autoload_location }};
+
+$config = \{{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
 
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
         {% call(properties) m.parse_object_properties_macro(obj, 4) %}
-{{ obj_name|print_variable }} = (new {{ sdk_options.additional_properties.invokerPackage }}\Model\{{ obj.type|pascal_case }}()){% if not properties %};{% endif %}
+{{ obj_name|print_variable }} = (new \{{ sdk_options.additional_properties.invokerPackage }}\Model\{{ obj.type|pascal_case }}()){% if not properties %};{% endif %}
 
             {% for name, value in properties.items() %}
     ->set{{ name|print_setter }}({{ value }}){% if loop.last %};{% endif %}
@@ -98,7 +100,7 @@ $config = {{ sdk_options.additional_properties.invokerPackage }}\Configuration::
 try {
     {{ "" -}}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
-    (new {{ sdk_options.additional_properties.invokerPackage }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config))->{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
+    (new \{{ sdk_options.additional_properties.invokerPackage }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config))->{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
 {% else %}
 
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8) %}
@@ -115,8 +117,7 @@ try {
 
     copy($response->getRealPath(), __DIR__ . '/file_response.zip');
 {% endif %}
-} catch ({{ sdk_options.additional_properties.invokerPackage }}\ApiException $e) {
-    echo 'Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}: '
-        . print_r($e->getResponseObject());
+} catch (\{{ sdk_options.additional_properties.invokerPackage }}\ApiException $e) {
+    echo "Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}: {$e->getMessage()}";
 }
 {{ "" }}

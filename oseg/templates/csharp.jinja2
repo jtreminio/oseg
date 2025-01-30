@@ -91,9 +91,11 @@ using {{ sdk_options.additional_properties.packageName }}.Api;
 using {{ sdk_options.additional_properties.packageName }}.{{ sdk_options.additional_properties.clientPackage }};
 using {{ sdk_options.additional_properties.packageName }}.Model;
 
+namespace {{ sdk_options.additional_properties.oseg_namespace }};
+
 public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}
 {
-    public static void Main()
+    public static void Run()
     {
         var config = new Configuration();
 

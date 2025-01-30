@@ -77,9 +77,9 @@ class PythonExtension(jinja_extension.BaseExtension):
         name = self.snake_case(name)
 
         if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
+            return self.camel_case(self.unreserve_keyword(name))
 
-        return name
+        return self.camel_case(name)
 
     def print_variable(self, name: str) -> str:
         name = self.snake_case(name)
