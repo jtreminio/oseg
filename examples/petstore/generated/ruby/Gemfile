@@ -1,0 +1,3 @@
+source "file://#{File.expand_path('.')}/artifacts"
+
+gem "openapi_client"

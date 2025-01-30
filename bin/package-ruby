@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+WORKING_DIR="/app/openapi"
+PETSTORE_DIR="${DIR}/../examples/petstore"
+SDK_DIR="${PETSTORE_DIR}/sdks/ruby"
+TARGET_DIR="${PETSTORE_DIR}/generated/ruby"
+ARTIFACTS_DIR="${PETSTORE_DIR}/generated/ruby/artifacts"
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}/gems"
+
+docker run --rm \
+  -e GEM_HOME="/.gem-cache" \
+  -e BUNDLE_PATH="/.bundle-cache" \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-ruby-gem-cache:/.gem-cache" \
+  -v "oseg-ruby-bundle-cache:/.bundle-cache" \
+  -w "${WORKING_DIR}" \
+  ruby:3.4 gem build openapi_client.gemspec -o /artifacts/gems/openapi_client-1.0.0.gem
+
+docker run --rm \
+  -e GEM_HOME="/.gem-cache" \
+  -e BUNDLE_PATH="/.bundle-cache" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-ruby-gem-cache:/.gem-cache" \
+  -v "oseg-ruby-bundle-cache:/.bundle-cache" \
+  -w "/artifacts" \
+  ruby:3.4 gem generate_index
