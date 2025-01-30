@@ -79,7 +79,7 @@ List.of {% if not printable.value %}(){% else %}
 
 {%- import "_macros.jinja2" as m with context -%}
 
-package {{ sdk_options.additional_properties.finalPackageName }};
+package {{ sdk_options.additional_properties.oseg_namespace }};
 
 import {{ sdk_options.additional_properties.invokerPackage }}.ApiException;
 import {{ sdk_options.additional_properties.invokerPackage }}.Configuration;
@@ -93,7 +93,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class {{ operation.operation_id|pascal_case }}_{{ example_name|snake_case }}
+public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}
 {
     public static void main(String[] args)
     {

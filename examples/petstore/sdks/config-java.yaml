@@ -5,7 +5,9 @@ additionalProperties:
   modelPackage: org.openapitools.client.model
   # Useful for example namespace
   finalPackageName: org.openapitools.client.examples
+  artifactId: openapi-java-client
   hideGenerationTimestamp: true
+  oseg_namespace: oseg.petstore.examples
 globalProperties:
   apiTests: false
   modelTests: false
