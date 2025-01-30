@@ -9,23 +9,23 @@ with ApiClient(configuration) as api_client:
     user_1 = models.User(
         id=12345,
         username="my_user_1",
-        first_name="John",
-        last_name="Doe",
+        firstName="John",
+        lastName="Doe",
         email="john@example.com",
         password="secure_123",
         phone="555-123-1234",
-        user_status=1,
+        userStatus=1,
     )
 
     user_2 = models.User(
         id=67890,
         username="my_user_2",
-        first_name="Jane",
-        last_name="Doe",
+        firstName="Jane",
+        lastName="Doe",
         email="jane@example.com",
         password="secure_456",
         phone="555-123-5678",
-        user_status=2,
+        userStatus=2,
     )
 
     user = [

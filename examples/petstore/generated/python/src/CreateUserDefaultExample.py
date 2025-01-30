@@ -9,12 +9,12 @@ with ApiClient(configuration) as api_client:
     user = models.User(
         id=12345,
         username="my_user",
-        first_name="John",
-        last_name="Doe",
+        firstName="John",
+        lastName="Doe",
         email="john@example.com",
         password="secure_123",
         phone="555-123-1234",
-        user_status=1,
+        userStatus=1,
     )
 
     try:

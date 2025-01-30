@@ -8,9 +8,9 @@ configuration = Configuration()
 with ApiClient(configuration) as api_client:
     order = models.Order(
         id=12345,
-        pet_id=98765,
+        petId=98765,
         quantity=5,
-        ship_date=datetime.fromisoformat("2025-01-01T17:32:28Z"),
+        shipDate=datetime.fromisoformat("2025-01-01T17:32:28Z"),
         status="approved",
         complete=False,
     )

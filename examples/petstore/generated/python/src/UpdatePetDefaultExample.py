@@ -28,7 +28,7 @@ with ApiClient(configuration) as api_client:
 
     pet = models.Pet(
         name="My pet name",
-        photo_urls=[
+        photoUrls=[
             "https://example.com/picture_1.jpg",
             "https://example.com/picture_2.jpg",
         ],
@@ -39,10 +39,10 @@ with ApiClient(configuration) as api_client:
     )
 
     try:
-        response = api.PetApi(api_client).add_pet(
+        response = api.PetApi(api_client).update_pet(
             pet=pet,
         )
 
         pprint(response)
     except ApiException as e:
-        print("Exception when calling Pet#add_pet: %s\n" % e)
+        print("Exception when calling Pet#update_pet: %s\n" % e)
