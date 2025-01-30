@@ -66,7 +66,7 @@ new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-{{ printable.value }}
+{{ printable.value|camel_case }}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
@@ -103,7 +103,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
         var {{ obj_name|print_variable }} = new {{ obj.type }}(
-        {% call(properties) m.parse_object_properties_macro(obj, 12) %}
+        {% call(properties) m.parse_object_properties_macro(property_container, obj, 12) %}
             {% for name, value in properties.items() %}
             {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
 

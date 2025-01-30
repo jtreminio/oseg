@@ -82,11 +82,13 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_object_properties(
         self,
         context: Context,
+        property_container: "model.PropertyContainer",
         parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_object_properties(
             macros=model.JinjaMacros(context.parent),
+            property_container=property_container,
             parent=parent,
             indent_count=indent_count,
         )

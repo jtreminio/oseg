@@ -124,6 +124,10 @@ class SchemaJoiner:
 
         sorted_results = {}
         for name in required:
+            # todo unit test
+            if name not in result:
+                continue
+
             sorted_results[name] = result[name]
             del result[name]
 

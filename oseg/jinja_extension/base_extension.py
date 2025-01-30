@@ -146,6 +146,10 @@ class BaseExtension(Protocol):
         if not enum_varnames:
             return None
 
+        # todo unit test
+        if value is None:
+            return None
+
         if schema.type == oa.DataType.ARRAY and schema.items:
             return enum_varnames[schema.items.enum.index(value)]
 

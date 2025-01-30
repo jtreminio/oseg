@@ -10,6 +10,7 @@ class TemplateParser:
     def parse_object_properties(
         self,
         macros: "model.JinjaMacros",
+        property_container: "model.PropertyContainer",
         parent: "model.PropertyObject",
         indent_count: int,
     ) -> dict[str, str]:
@@ -26,7 +27,11 @@ class TemplateParser:
                 prop=prop,
             )
 
-        for name, parsed in self._parse_object(parent).items():
+        # todo test multiple objects in array belonging to objects in array
+        #      do not overwrite each other's names
+        parent_name = f"{parent.name}_" if property_container.body != parent else ""
+
+        for name, parsed in self._parse_object(parent, parent_name).items():
             if not parsed.is_array:
                 result[name] = macros.print_object(parsed)
             else:
@@ -152,6 +157,7 @@ class TemplateParser:
     def _parse_object(
         self,
         obj: "model.PropertyObject",
+        parent_name: str,
     ) -> dict[str, "model.PrintableObject"]:
         result = {}
         for property_name, sub_obj in obj.objects.items():
@@ -159,7 +165,9 @@ class TemplateParser:
             printable = model.PrintableObject()
             result[prop_name] = printable
 
-            printable.value = sub_obj.name
+            # todo test multiple objects in array belonging to objects in array
+            #      do not overwrite each other's names
+            printable.value = f"{parent_name}{sub_obj.name}"
             printable.target_type = sub_obj.type
 
         for property_name, array_obj in obj.array_objects.items():
@@ -167,7 +175,9 @@ class TemplateParser:
             printable = model.PrintableObject()
             result[prop_name] = printable
 
-            printable.value = prop_name
+            # todo test multiple objects in array belonging to objects in array
+            #      do not overwrite each other's names
+            printable.value = f"{parent_name}{prop_name}"
             printable.target_type = array_obj.name
 
         return result

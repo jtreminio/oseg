@@ -75,7 +75,7 @@ end
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
 {{ obj_name|print_variable }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|pascal_case }}.new
-        {% call(properties) m.parse_object_properties_macro(obj, 0) %}
+        {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
             {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_variable }} = {{ value }}
             {% endfor %}

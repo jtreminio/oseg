@@ -98,6 +98,8 @@ class PropertyFlattener:
                 }
                 i += 1
 
-            result[name] = array_obj
+            # todo test multiple objects in array belonging to objects in array
+            #      do not overwrite each other's names
+            result[f"{parent_name}{name}"] = array_obj
 
         return result
