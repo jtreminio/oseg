@@ -9,6 +9,7 @@ import org.openapitools.client.model.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,13 +19,13 @@ public class PlaceOrderDefaultExample
     {
         var config = Configuration.getDefaultApiClient();
 
-        var order = new Order()
-            .id(12345L)
-            .petId(98765L)
-            .quantity(5)
-            .shipDate(OffsetDateTime.parse("2025-01-01T17:32:28Z"))
-            .status(Order.StatusEnum.APPROVED)
-            .complete(false);
+        var order = new Order();
+        order.id(12345L);
+        order.petId(98765L);
+        order.quantity(5);
+        order.shipDate(OffsetDateTime.parse("2025-01-01T17:32:28Z"));
+        order.status(Order.StatusEnum.APPROVED);
+        order.complete(false);
 
         try
         {
