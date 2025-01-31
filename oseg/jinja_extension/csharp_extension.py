@@ -97,7 +97,7 @@ class CSharpExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.pascal_case(name)
+        name = self.pascal_case(self.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -105,7 +105,7 @@ class CSharpExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.camel_case(name)
+        name = self.camel_case(self.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

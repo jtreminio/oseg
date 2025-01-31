@@ -16,10 +16,10 @@ class PhpExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        return self.pascal_case(name)
+        return self.pascal_case(self.split_uc(name))
 
     def print_variable(self, name: str) -> str:
-        return f"${self.snake_case(name)}"
+        return f"${self.snake_case(self.split_uc(name))}"
 
     def print_scalar(
         self,
