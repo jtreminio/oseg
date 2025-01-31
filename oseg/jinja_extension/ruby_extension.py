@@ -68,7 +68,7 @@ class RubyExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.snake_case(name)
+        name = self.snake_case(self.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -76,7 +76,7 @@ class RubyExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.snake_case(name)
+        name = self.snake_case(self.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

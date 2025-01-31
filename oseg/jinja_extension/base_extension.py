@@ -133,6 +133,18 @@ class BaseExtension(Protocol):
     def uc_first(self, value: str) -> str:
         return f"{value[:1].upper()}{value[1:]}"
 
+    def split_uc(self, value: str) -> str:
+        """Useful for splitting words with consecutive uppercase letters.
+
+        OAuthName -> O_Auth_Name
+        """
+
+        return (
+            "".join([f"_{char}" if char.isupper() else char for char in value])
+            .strip()
+            .lstrip("_")
+        )
+
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 
