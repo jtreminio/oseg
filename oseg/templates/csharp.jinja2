@@ -91,8 +91,10 @@ using {{ sdk_options.additional_properties.packageName }}.Api;
 using {{ sdk_options.additional_properties.packageName }}.{{ sdk_options.additional_properties.clientPackage }};
 using {{ sdk_options.additional_properties.packageName }}.Model;
 
+{% if sdk_options.oseg.namespace %}
 namespace {{ sdk_options.oseg.namespace }};
 
+{% endif %}
 public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}
 {
     public static void Run()

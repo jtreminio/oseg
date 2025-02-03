@@ -4,9 +4,11 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$config = \OpenAPI\Client\Configuration::getDefaultConfiguration();
+use OpenAPI;
 
-$user = (new \OpenAPI\Client\Model\User())
+$config = OpenAPI\Client\Configuration::getDefaultConfiguration();
+
+$user = (new OpenAPI\Client\Model\User())
     ->setId(12345)
     ->setUsername("new-username")
     ->setFirstName("Joe")
@@ -17,10 +19,10 @@ $user = (new \OpenAPI\Client\Model\User())
     ->setUserStatus(1);
 
 try {
-    (new \OpenAPI\Client\Api\UserApi(config: $config))->updateUser(
+    (new OpenAPI\Client\Api\UserApi(config: $config))->updateUser(
         username: "my-username",
         user: $user,
     );
-} catch (\OpenAPI\Client\ApiException $e) {
+} catch (OpenAPI\Client\ApiException $e) {
     echo "Exception when calling User#updateUser: {$e->getMessage()}";
 }

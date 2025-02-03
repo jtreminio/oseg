@@ -37,6 +37,9 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["split_uc"]: Callable[[str], str] = (
             lambda value: parser.NormalizeStr.split_uc(value)
         )
+        environment.filters["split"]: Callable[[str, str], str] = (
+            lambda value, separator: value.split(separator)
+        )
         environment.filters["print_setter"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.print_setter(name)
         )

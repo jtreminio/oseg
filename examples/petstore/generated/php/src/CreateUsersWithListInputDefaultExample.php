@@ -4,9 +4,11 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$config = \OpenAPI\Client\Configuration::getDefaultConfiguration();
+use OpenAPI;
 
-$user_1 = (new \OpenAPI\Client\Model\User())
+$config = OpenAPI\Client\Configuration::getDefaultConfiguration();
+
+$user_1 = (new OpenAPI\Client\Model\User())
     ->setId(12345)
     ->setUsername("my_user_1")
     ->setFirstName("John")
@@ -16,7 +18,7 @@ $user_1 = (new \OpenAPI\Client\Model\User())
     ->setPhone("555-123-1234")
     ->setUserStatus(1);
 
-$user_2 = (new \OpenAPI\Client\Model\User())
+$user_2 = (new OpenAPI\Client\Model\User())
     ->setId(67890)
     ->setUsername("my_user_2")
     ->setFirstName("Jane")
@@ -32,9 +34,9 @@ $user = [
 ];
 
 try {
-    (new \OpenAPI\Client\Api\UserApi(config: $config))->createUsersWithListInput(
+    (new OpenAPI\Client\Api\UserApi(config: $config))->createUsersWithListInput(
         user: $user,
     );
-} catch (\OpenAPI\Client\ApiException $e) {
+} catch (OpenAPI\Client\ApiException $e) {
     echo "Exception when calling User#createUsersWithListInput: {$e->getMessage()}";
 }

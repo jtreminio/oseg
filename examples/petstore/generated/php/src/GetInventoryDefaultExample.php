@@ -4,12 +4,14 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$config = \OpenAPI\Client\Configuration::getDefaultConfiguration();
+use OpenAPI;
+
+$config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
 try {
-    $response = (new \OpenAPI\Client\Api\StoreApi(config: $config))->getInventory();
+    $response = (new OpenAPI\Client\Api\StoreApi(config: $config))->getInventory();
 
     print_r($response);
-} catch (\OpenAPI\Client\ApiException $e) {
+} catch (OpenAPI\Client\ApiException $e) {
     echo "Exception when calling Store#getInventory: {$e->getMessage()}";
 }
