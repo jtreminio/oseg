@@ -75,11 +75,7 @@ class PythonExtension(jinja_extension.BaseExtension):
 
     def print_setter(self, name: str) -> str:
         # todo unit test
-        prop_case = self._sdk_options.additional_properties.get(
-            "oseg_property_case",
-            "camel_case",
-        )
-
+        prop_case = self._sdk_options.oseg.get("property_case", "camel_case")
         name = parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):

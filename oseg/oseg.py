@@ -9,11 +9,17 @@ class Generator:
     def __init__(
         self,
         oas_file: str,
+        oseg_options: Optional["model.OsegOptionsDict"] = None,
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
         self._jinja = jinja_extension.JinjaExt.factory()
-        self._oa_parser = parser.OaParser(oas_file, operation_id, example_data)
+        self._oa_parser = parser.OaParser(
+            oas_file,
+            oseg_options,
+            operation_id,
+            example_data,
+        )
 
     def generate(
         self,

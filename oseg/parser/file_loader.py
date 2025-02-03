@@ -18,7 +18,8 @@ class FileLoader:
     def oas(self):
         return self.get_file_contents(self._oas_file)
 
-    def get_file_contents(self, filename: str) -> dict[str, any]:
+    @staticmethod
+    def get_file_contents(filename: str) -> dict[str, any]:
         if not os.path.isfile(filename):
             return {}
 

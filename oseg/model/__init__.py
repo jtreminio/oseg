@@ -1,3 +1,4 @@
+from .oseg_options import OsegOptions, OsegOptionsDict
 from .property_proto import PropertyProto
 
 from .operation import Operation

@@ -3,13 +3,12 @@ additionalProperties:
   invokerPackage: org.openapitools.client
   apiPackage: org.openapitools.client.api
   modelPackage: org.openapitools.client.model
-  # Useful for example namespace
-  finalPackageName: org.openapitools.client.examples
   artifactId: openapi-java-client
   hideGenerationTimestamp: true
-  oseg_namespace: oseg.petstore.examples
 globalProperties:
   apiTests: false
   modelTests: false
   apiDocs: false
   modelDocs: false
+oseg:
+  package: oseg.petstore.examples

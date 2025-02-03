@@ -72,11 +72,11 @@ new SplFileObject("{{ printable.value }}")
 
 <?php
 
-{% if sdk_options.additional_properties.oseg_namespace %}
-namespace {{ sdk_options.additional_properties.oseg_namespace }};
+{% if sdk_options.oseg.namespace %}
+namespace {{ sdk_options.oseg.namespace }};
 
 {% endif %}
-require_once {{ sdk_options.additional_properties.oseg_autoload_location }};
+require_once {{ sdk_options.oseg.autoload_location }};
 
 $config = \{{ sdk_options.additional_properties.invokerPackage }}\Configuration::getDefaultConfiguration();
 

@@ -79,7 +79,7 @@ new ArrayList<{{ printable.target_type }}>(List.of {% if not printable.value %}(
 
 {%- import "_macros.jinja2" as m with context -%}
 
-package {{ sdk_options.additional_properties.oseg_namespace }};
+package {{ sdk_options.oseg.package }};
 
 import {{ sdk_options.additional_properties.invokerPackage }}.ApiException;
 import {{ sdk_options.additional_properties.invokerPackage }}.Configuration;

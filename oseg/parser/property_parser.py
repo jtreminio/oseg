@@ -77,9 +77,12 @@ class PropertyParser:
                     property_name=name,
                 )
 
-                # todo make this an option
-                # if name not in data:
-                #    continue
+                # todo unit test
+                if (
+                    name not in data
+                    and self._oa_parser.oseg_options.ignore_null_required
+                ):
+                    continue
 
                 value = data.get(name)
 
