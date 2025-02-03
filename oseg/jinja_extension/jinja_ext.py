@@ -2,7 +2,7 @@ import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
 from typing import Callable
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class JinjaExt(jinja2.ext.Extension):
@@ -23,16 +23,19 @@ class JinjaExt(jinja2.ext.Extension):
         super().__init__(environment)
 
         environment.filters["camel_case"]: Callable[[str], str] = (
-            lambda value: self._sdk_generator.camel_case(value)
+            lambda value: parser.NormalizeStr.camel_case(value)
         )
         environment.filters["pascal_case"]: Callable[[str], str] = (
-            lambda value: self._sdk_generator.pascal_case(value)
+            lambda value: parser.NormalizeStr.pascal_case(value)
         )
         environment.filters["snake_case"]: Callable[[str], str] = (
-            lambda value: self._sdk_generator.snake_case(value)
+            lambda value: parser.NormalizeStr.snake_case(value)
         )
         environment.filters["uc_first"]: Callable[[str], str] = (
-            lambda value: self._sdk_generator.uc_first(value)
+            lambda value: parser.NormalizeStr.uc_first(value)
+        )
+        environment.filters["split_uc"]: Callable[[str], str] = (
+            lambda value: parser.NormalizeStr.split_uc(value)
         )
         environment.filters["print_setter"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.print_setter(name)
@@ -82,11 +85,13 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_object_properties(
         self,
         context: Context,
+        property_container: "model.PropertyContainer",
         parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_object_properties(
             macros=model.JinjaMacros(context.parent),
+            property_container=property_container,
             parent=parent,
             indent_count=indent_count,
         )

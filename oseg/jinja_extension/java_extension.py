@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class JavaExtension(jinja_extension.BaseExtension):
@@ -99,7 +99,7 @@ class JavaExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.pascal_case(name)
+        name = parser.NormalizeStr.pascal_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -107,7 +107,7 @@ class JavaExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.camel_case(name)
+        name = parser.NormalizeStr.camel_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -134,9 +134,7 @@ class JavaExtension(jinja_extension.BaseExtension):
             if item.type == "string":
                 if item.is_enum:
                     parent_type_prepend = f"{parent.type}." if parent else ""
-                    printable.target_type = (
-                        f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
-                    )
+                    printable.target_type = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
 
             for i in item.value:
                 printable.value.append(self._handle_value(item, i, parent))
@@ -168,7 +166,9 @@ class JavaExtension(jinja_extension.BaseExtension):
         if value is None:
             return None
 
-        return self.upper_case(value)
+        value: str
+
+        return value.upper()
 
     def _handle_value(
         self,
@@ -186,7 +186,9 @@ class JavaExtension(jinja_extension.BaseExtension):
                 return self._to_json(value)
 
             parent_type_prepend = f"{parent.type}." if parent else ""
-            target_type = f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+            target_type = (
+                f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+            )
 
             return f"{target_type}.{enum_name}"
 

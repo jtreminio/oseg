@@ -61,6 +61,7 @@ class TestTemplateParser(unittest.TestCase):
 
         root_properties = self.template_parser.parse_object_properties(
             macros=self.jinja_macros,
+            property_container=container,
             parent=container.body,
             indent_count=0,
         )
@@ -81,6 +82,7 @@ class TestTemplateParser(unittest.TestCase):
 
         category_properties = self.template_parser.parse_object_properties(
             macros=self.jinja_macros,
+            property_container=container,
             parent=container.body.objects.get("category"),
             indent_count=0,
         )

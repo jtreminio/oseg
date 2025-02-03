@@ -77,8 +77,8 @@ with ApiClient(configuration) as api_client:
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-    {{ obj_name|print_variable }} = models.{{ obj.type }}(
-        {% call(properties) m.parse_object_properties_macro(obj, 8) %}
+    {{ obj_name|print_variable }} = models.{{ obj.type|split_uc|pascal_case }}(
+        {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
             {% for name, value in properties.items() %}
         {{ name|print_setter }}={{ value }},
             {% endfor %}
@@ -95,7 +95,7 @@ with ApiClient(configuration) as api_client:
     try:
         {{ "" -}}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-        api.{{ operation.api_name|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
+        api.{{ operation.api_name|split_uc|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
 {% else %}
 
 {% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}

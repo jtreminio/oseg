@@ -9,6 +9,7 @@ import org.openapitools.client.model.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +19,15 @@ public class CreateUserDefaultExample
     {
         var config = Configuration.getDefaultApiClient();
 
-        var user = new User()
-            .id(12345L)
-            .username("my_user")
-            .firstName("John")
-            .lastName("Doe")
-            .email("john@example.com")
-            .password("secure_123")
-            .phone("555-123-1234")
-            .userStatus(1);
+        var user = new User();
+        user.id(12345L);
+        user.username("my_user");
+        user.firstName("John");
+        user.lastName("Doe");
+        user.email("john@example.com");
+        user.password("secure_123");
+        user.phone("555-123-1234");
+        user.userStatus(1);
 
         try
         {

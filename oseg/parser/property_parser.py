@@ -77,6 +77,10 @@ class PropertyParser:
                     property_name=name,
                 )
 
+                # todo make this an option
+                # if name not in data:
+                #    continue
+
                 value = data.get(name)
 
                 if self._handle_object(

@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class TypescriptNodeExtension(jinja_extension.BaseExtension):
@@ -88,7 +88,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.camel_case(name)
+        name = parser.NormalizeStr.camel_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -96,7 +96,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.camel_case(name)
+        name = parser.NormalizeStr.camel_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -142,7 +142,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
 
                 parent_type_prepend = f"{parent.type}." if parent else ""
 
-                return f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+                return f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
 
         return None
 
@@ -161,7 +161,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
             if parent is None:
                 return self._to_json(value)
 
-            base = f"{self.pascal_case(item.name)}Enum"
+            base = f"{parser.NormalizeStr.pascal_case(item.name)}Enum"
             parent_type_prepend = f"{parent.type}." if parent else ""
 
             return f"models.{parent_type_prepend}{base}.{enum_name}"
@@ -195,4 +195,4 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         if value is None:
             return None
 
-        return self.pascal_case(value)
+        return parser.NormalizeStr.pascal_case(value)

@@ -1,4 +1,3 @@
-import caseconverter
 import json
 import openapi_pydantic as oa
 from abc import abstractmethod
@@ -118,21 +117,6 @@ class BaseExtension(Protocol):
 
         return printable
 
-    def camel_case(self, value: str) -> str:
-        return caseconverter.camelcase(value)
-
-    def pascal_case(self, value: str) -> str:
-        return caseconverter.pascalcase(value)
-
-    def snake_case(self, value: str) -> str:
-        return caseconverter.snakecase(value)
-
-    def upper_case(self, value: str) -> str:
-        return value.upper()
-
-    def uc_first(self, value: str) -> str:
-        return f"{value[:1].upper()}{value[1:]}"
-
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 
@@ -146,6 +130,10 @@ class BaseExtension(Protocol):
         if not enum_varnames:
             return None
 
+        # todo unit test
+        if value is None:
+            return None
+
         if schema.type == oa.DataType.ARRAY and schema.items:
             return enum_varnames[schema.items.enum.index(value)]
 
@@ -156,6 +144,7 @@ class BaseExtension(Protocol):
         schema: oa.Schema,
         value: any,
     ) -> str | None:
+        # todo unit test
         enum_varnames_override = schema.model_extra.get(self.X_ENUM_VARNAMES_OVERRIDE)
 
         if not enum_varnames_override:

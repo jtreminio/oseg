@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class PythonExtension(jinja_extension.BaseExtension):
@@ -65,7 +65,7 @@ class PythonExtension(jinja_extension.BaseExtension):
     ]
 
     def is_reserved_keyword(self, name: str) -> bool:
-        return self.snake_case(name) in self.RESERVED_KEYWORDS
+        return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
@@ -74,15 +74,27 @@ class PythonExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.snake_case(name)
+        # todo unit test
+        prop_case = self._sdk_options.additional_properties.get(
+            "oseg_property_case",
+            "camel_case",
+        )
+
+        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):
-            return self.camel_case(self.unreserve_keyword(name))
+            if prop_case == "camel_case":
+                return parser.NormalizeStr.camel_case(self.unreserve_keyword(name))
 
-        return self.camel_case(name)
+            return self.unreserve_keyword(name)
+
+        if prop_case == "camel_case":
+            return parser.NormalizeStr.camel_case(name)
+
+        return name
 
     def print_variable(self, name: str) -> str:
-        name = self.snake_case(name)
+        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

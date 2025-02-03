@@ -56,7 +56,7 @@ fs.createReadStream("{{ printable.value }}")
 
 {%- macro print_object(printable) -%}
     {% if printable.value == None %}undefined{% else %}
-{{ printable.value }}
+{{ printable.value|camel_case }}
     {%- endif %}
 {%- endmacro -%}
 
@@ -76,13 +76,13 @@ import * as fs from 'fs';
 import api from "{{ sdk_options.additional_properties.npmName }}"
 import models from "{{ sdk_options.additional_properties.npmName }}"
 
-const apiCaller = new api.{{ operation.api_name|pascal_case }}Api();
+const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
 
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-const {{ obj_name|print_variable }} = new models.{{ obj.type }}();
-    {% call(properties) m.parse_object_properties_macro(obj, 0) %}
+const {{ obj_name|print_variable }} = new models.{{ obj.type|split_uc|pascal_case }}();
+    {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
         {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }};
         {% endfor %}

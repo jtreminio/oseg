@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class CSharpExtension(jinja_extension.BaseExtension):
@@ -92,12 +92,14 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
     def unreserve_keyword(self, name: str) -> str:
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return f"{self.RESERVED_KEYWORD_PREPEND}{self.uc_first(name)}"
+            return (
+                f"{self.RESERVED_KEYWORD_PREPEND}{parser.NormalizeStr.uc_first(name)}"
+            )
 
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.pascal_case(name)
+        name = parser.NormalizeStr.pascal_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -105,7 +107,7 @@ class CSharpExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.camel_case(name)
+        name = parser.NormalizeStr.camel_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -160,7 +162,7 @@ class CSharpExtension(jinja_extension.BaseExtension):
         if value is None:
             return None
 
-        return self.pascal_case(value)
+        return parser.NormalizeStr.pascal_case(value)
 
     def _get_target_type(
         self,
@@ -177,7 +179,7 @@ class CSharpExtension(jinja_extension.BaseExtension):
 
                 parent_type_prepend = f"{parent.type}." if parent else ""
 
-                return f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+                return f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
 
             if item.format == "date-time":
                 return "DateTime"
@@ -217,7 +219,9 @@ class CSharpExtension(jinja_extension.BaseExtension):
                 return self._to_json(value)
 
             parent_type_prepend = f"{parent.type}." if parent else ""
-            target_type = f"{parent_type_prepend}{self.pascal_case(item.name)}Enum"
+            target_type = (
+                f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+            )
 
             return f"{target_type}.{enum_name}"
 

@@ -9,6 +9,7 @@ import org.openapitools.client.model.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,33 +19,33 @@ public class AddPetDefaultExample
     {
         var config = Configuration.getDefaultApiClient();
 
-        var category = new Category()
-            .id(12345L)
-            .name("Category_Name");
+        var category = new Category();
+        category.id(12345L);
+        category.name("Category_Name");
 
-        var tags1 = new Tag()
-            .id(12345L)
-            .name("tag_1");
+        var tags1 = new Tag();
+        tags1.id(12345L);
+        tags1.name("tag_1");
 
-        var tags2 = new Tag()
-            .id(98765L)
-            .name("tag_2");
+        var tags2 = new Tag();
+        tags2.id(98765L);
+        tags2.name("tag_2");
 
-        var tags = List.of (
+        var tags = new ArrayList<Tag>(List.of (
             tags1,
             tags2
-        );
+        ));
 
-        var pet = new Pet()
-            .name("My pet name")
-            .photoUrls(List.of (
-                "https://example.com/picture_1.jpg",
-                "https://example.com/picture_2.jpg"
-            ))
-            .id(12345L)
-            .status(Pet.StatusEnum.AVAILABLE)
-            .category(category)
-            .tags(tags);
+        var pet = new Pet();
+        pet.name("My pet name");
+        pet.photoUrls(List.of (
+            "https://example.com/picture_1.jpg",
+            "https://example.com/picture_2.jpg"
+        ));
+        pet.id(12345L);
+        pet.status(Pet.StatusEnum.AVAILABLE);
+        pet.category(category);
+        pet.tags(tags);
 
         try
         {

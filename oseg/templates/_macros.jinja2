@@ -1,5 +1,5 @@
-{%- macro parse_object_properties_macro(obj, indent_count) -%}
-    {{- caller(parse_object_properties(obj, indent_count)) }}
+{%- macro parse_object_properties_macro(property_container, obj, indent_count) -%}
+    {{- caller(parse_object_properties(property_container, obj, indent_count)) }}
 {%- endmacro -%}
 
 {%- macro parse_object_list_properties_macro(obj, indent_count) -%}

@@ -1,6 +1,6 @@
 from jinja2.runtime import Macro
 from mock import mock
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class MockExtension(jinja_extension.BaseExtension):
@@ -16,7 +16,7 @@ class MockExtension(jinja_extension.BaseExtension):
     ]
 
     def is_reserved_keyword(self, name: str) -> bool:
-        return self.snake_case(name) in self.RESERVED_KEYWORDS
+        return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
@@ -25,7 +25,7 @@ class MockExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = self.snake_case(name)
+        name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -33,7 +33,7 @@ class MockExtension(jinja_extension.BaseExtension):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = self.snake_case(name)
+        name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

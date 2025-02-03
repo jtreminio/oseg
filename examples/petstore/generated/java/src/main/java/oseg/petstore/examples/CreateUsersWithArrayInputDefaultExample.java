@@ -9,6 +9,7 @@ import org.openapitools.client.model.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,30 +19,30 @@ public class CreateUsersWithArrayInputDefaultExample
     {
         var config = Configuration.getDefaultApiClient();
 
-        var user1 = new User()
-            .id(12345L)
-            .username("my_user_1")
-            .firstName("John")
-            .lastName("Doe")
-            .email("john@example.com")
-            .password("secure_123")
-            .phone("555-123-1234")
-            .userStatus(1);
+        var user1 = new User();
+        user1.id(12345L);
+        user1.username("my_user_1");
+        user1.firstName("John");
+        user1.lastName("Doe");
+        user1.email("john@example.com");
+        user1.password("secure_123");
+        user1.phone("555-123-1234");
+        user1.userStatus(1);
 
-        var user2 = new User()
-            .id(67890L)
-            .username("my_user_2")
-            .firstName("Jane")
-            .lastName("Doe")
-            .email("jane@example.com")
-            .password("secure_456")
-            .phone("555-123-5678")
-            .userStatus(2);
+        var user2 = new User();
+        user2.id(67890L);
+        user2.username("my_user_2");
+        user2.firstName("Jane");
+        user2.lastName("Doe");
+        user2.email("jane@example.com");
+        user2.password("secure_456");
+        user2.phone("555-123-5678");
+        user2.userStatus(2);
 
-        var user = List.of (
+        var user = new ArrayList<User>(List.of (
             user1,
             user2
-        );
+        ));
 
         try
         {

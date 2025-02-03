@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, parser
 
 
 class PhpExtension(jinja_extension.BaseExtension):
@@ -16,10 +16,10 @@ class PhpExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
-        return self.pascal_case(name)
+        return parser.NormalizeStr.pascal_case(parser.NormalizeStr.split_uc(name))
 
     def print_variable(self, name: str) -> str:
-        return f"${self.snake_case(name)}"
+        return f"${parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))}"
 
     def print_scalar(
         self,
@@ -60,7 +60,7 @@ class PhpExtension(jinja_extension.BaseExtension):
         if item.type == "string" and item.is_enum and parent is not None:
             namespace = self._sdk_options.additional_properties.get("invokerPackage")
             enum_name = self._get_enum_name(item, item.name, value)
-            parent_type_prepend = f"\\{self.pascal_case(parent.type)}"
+            parent_type_prepend = f"\\{parser.NormalizeStr.pascal_case(parent.type)}"
 
             return f"\\{namespace}\\Model{parent_type_prepend}::{enum_name}"
 
@@ -88,4 +88,4 @@ class PhpExtension(jinja_extension.BaseExtension):
         if value == "" or value is None:
             return f"{name.upper()}_EMPTY"
 
-        return f"{name.upper()}_{self.snake_case(value).upper()}"
+        return f"{name.upper()}_{parser.NormalizeStr.snake_case(value).upper()}"
