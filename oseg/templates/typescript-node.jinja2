@@ -73,8 +73,8 @@ fs.createReadStream("{{ printable.value }}")
 {%- import "_macros.jinja2" as m with context -%}
 
 import * as fs from 'fs';
-import api from "{{ sdk_options.additional_properties.npmName }}"
-import models from "{{ sdk_options.additional_properties.npmName }}"
+import api from "{{ config.npm_name }}"
+import models from "{{ config.npm_name }}"
 
 const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
 
@@ -95,6 +95,7 @@ const {{ obj_name|print_variable }} = {{ "" }}
     {% endif %}
 
 {% endfor %}
+{# todo don't print variables for formdata requests #}
 {% if operation.request.parameters or operation.request.has_formdata %}
     {% call(properties) m.parse_api_call_properties_macro(property_container, 0, null, False) %}
         {% for name, value in properties.items() %}

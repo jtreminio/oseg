@@ -79,13 +79,13 @@ new ArrayList<{{ printable.target_type }}>(List.of {% if not printable.value %}(
 
 {%- import "_macros.jinja2" as m with context -%}
 
-package {{ sdk_options.oseg.package }};
+package {{ config.oseg_package }};
 
-import {{ sdk_options.additional_properties.invokerPackage }}.ApiException;
-import {{ sdk_options.additional_properties.invokerPackage }}.Configuration;
-import {{ sdk_options.additional_properties.apiPackage }}.*;
-import {{ sdk_options.additional_properties.invokerPackage }}.auth.*;
-import {{ sdk_options.additional_properties.modelPackage }}.*;
+import {{ config.invoker_package }}.ApiException;
+import {{ config.invoker_package }}.Configuration;
+import {{ config.api_package }}.*;
+import {{ config.invoker_package }}.auth.*;
+import {{ config.model_package }}.*;
 
 import java.io.File;
 import java.time.LocalDate;

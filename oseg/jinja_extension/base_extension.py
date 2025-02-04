@@ -2,7 +2,7 @@ import json
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol
-from oseg import jinja_extension as j, model, parser
+from oseg import jinja_extension as j, model, parser, configs
 
 
 class BaseExtension(Protocol):
@@ -12,11 +12,22 @@ class BaseExtension(Protocol):
     X_ENUM_VARNAMES = "x-enum-varnames"
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
-    _sdk_options: "model.SdkOptions"
+    _config: "configs.BaseConfig"
     _template_parser: "parser.TemplateParser"
 
     def __init__(self):
         self._template_parser = parser.TemplateParser(self)
+
+    @staticmethod
+    def default_generator_names() -> list[str]:
+        return [
+            j.CSharpExtension.NAME,
+            j.JavaExtension.NAME,
+            j.PhpExtension.NAME,
+            j.PythonExtension.NAME,
+            j.RubyExtension.NAME,
+            j.TypescriptNodeExtension.NAME,
+        ]
 
     @staticmethod
     def default_generators() -> dict[str, "BaseExtension"]:
@@ -30,12 +41,12 @@ class BaseExtension(Protocol):
         }
 
     @property
-    def sdk_options(self) -> "model.SdkOptions":
-        return self._sdk_options
+    def config(self) -> "configs.BaseConfig":
+        return self._config
 
-    @sdk_options.setter
-    def sdk_options(self, options: "model.SdkOptions"):
-        self._sdk_options = options
+    @config.setter
+    def config(self, config: "configs.BaseConfig"):
+        self._config = config
 
     @property
     def template_parser(self) -> parser.TemplateParser:
@@ -63,6 +74,7 @@ class BaseExtension(Protocol):
         parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
+        # todo pass PropertyContainer to sniff if current call is for api call method
         raise NotImplementedError
 
     def print_file(self, item: model.PropertyFile) -> model.PrintableScalar:

@@ -11,7 +11,7 @@ SDK=$2
 BASE_DIR="${DIR}/../examples/${SOURCE_DIR}"
 
 OAS="${BASE_DIR}/openapi.yaml"
-CONFIG_FILE="${BASE_DIR}/sdks/config-${SDK}.yaml"
+CONFIG_FILE="${BASE_DIR}/config-${SDK}.yaml"
 OUTPUT_DIR="${BASE_DIR}/sdks"
 
 if [[ -z "${SOURCE_DIR-}" ]] || [[ ! -d "${BASE_DIR}" ]]; then
@@ -31,7 +31,7 @@ fi
 
 CONFIG_PARAM="-g ${SDK}"
 if [[ -f "${CONFIG_FILE}" ]]; then
-  CONFIG_PARAM="-c /local/sdks/config-${SDK}.yaml"
+  CONFIG_PARAM="-c /local/config-${SDK}.yaml"
 fi
 
 if [[ ! -d "${OUTPUT_DIR}/${SDK}" ]]; then

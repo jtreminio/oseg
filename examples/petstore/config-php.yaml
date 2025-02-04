@@ -5,11 +5,11 @@ additionalProperties:
   composerPackageName: openapi/client
   packageVersion: "1.0.0"
   artifactVersion: "1.0.0"
+  oseg.namespace: OSEG\PetStore\Examples
+  oseg.autoloadLocation: "__DIR__ . '/../vendor/autoload.php'"
+  oseg.ignoreOptionalUnset: false
 globalProperties:
   apiTests: false
   modelTests: false
   apiDocs: false
   modelDocs: false
-oseg:
-  namespace: OSEG\PetStore\Examples
-  autoload_location: "__DIR__ . '/../vendor/autoload.php'"

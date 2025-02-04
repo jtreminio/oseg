@@ -16,13 +16,11 @@ class OaParser:
     def __init__(
         self,
         oas_file: str,
-        oseg_options: Optional["model.OsegOptionsDict"] = None,
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
         self._file_loader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
-        self._oseg_options = model.OsegOptions(oseg_options)
         self._setup_oas()
 
         self._component_resolver = parser.ComponentResolver(self)
@@ -39,10 +37,6 @@ class OaParser:
     @property
     def operations(self) -> dict[str, "model.Operation"]:
         return self._operations
-
-    @property
-    def oseg_options(self) -> "model.OsegOptions":
-        return self._oseg_options
 
     @property
     def file_loader(self) -> "parser.FileLoader":

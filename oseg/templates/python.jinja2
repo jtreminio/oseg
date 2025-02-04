@@ -69,7 +69,7 @@ open("{{ printable.value }}", "rb").read()
 from datetime import date, datetime
 from pprint import pprint
 
-from {{ sdk_options.additional_properties.packageName }} import ApiClient, ApiException, Configuration, api, models
+from {{ config.package_name }} import ApiClient, ApiException, Configuration, api, models
 
 configuration = Configuration()
 

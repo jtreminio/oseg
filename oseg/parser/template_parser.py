@@ -16,6 +16,9 @@ class TemplateParser:
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
+        # todo skip non-nullable optional properties
+        #  using config.oseg_ignore_optional_unset
+
         result = {}
 
         for _, prop in parent.non_objects().items():

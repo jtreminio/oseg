@@ -2,7 +2,7 @@ import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
 from typing import Callable
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class JinjaExt(jinja2.ext.Extension):
@@ -67,15 +67,9 @@ class JinjaExt(jinja2.ext.Extension):
         return self._sdk_generator
 
     @sdk_generator.setter
-    def sdk_generator(self, sdk_options: "model.SdkOptions"):
-        if (
-            sdk_options.generator_name is None
-            or sdk_options.generator_name not in self._generators
-        ):
-            raise NotImplementedError
-
-        self._sdk_generator = self._generators[sdk_options.generator_name]
-        self._sdk_generator.sdk_options = sdk_options
+    def sdk_generator(self, config: "configs.BaseConfig"):
+        self._sdk_generator = self._generators[config.GENERATOR_NAME]
+        self._sdk_generator.config = config
 
     def add_generator(
         self,

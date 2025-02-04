@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class JavaExtension(jinja_extension.BaseExtension):
@@ -85,6 +85,8 @@ class JavaExtension(jinja_extension.BaseExtension):
         "volatile",
         "while",
     ]
+
+    _config: "configs.JavaConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

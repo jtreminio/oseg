@@ -77,13 +77,6 @@ class PropertyParser:
                     property_name=name,
                 )
 
-                # todo unit test
-                if (
-                    name not in data
-                    and self._oa_parser.oseg_options.ignore_null_required
-                ):
-                    continue
-
                 value = data.get(name)
 
                 if self._handle_object(
@@ -136,6 +129,7 @@ class PropertyParser:
         value: dict[str, any] | None,
     ) -> bool:
         """handle named object"""
+        # todo handle optional nullable
 
         if parser.TypeChecker.is_array(schema):
             return False
@@ -179,6 +173,7 @@ class PropertyParser:
         value: dict[str, any] | None,
     ) -> bool:
         """handle arrays of named objects"""
+        # todo handle optional nullable
 
         if not parser.TypeChecker.is_array(schema):
             return False

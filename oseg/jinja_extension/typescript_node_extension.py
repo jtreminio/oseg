@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class TypescriptNodeExtension(jinja_extension.BaseExtension):
@@ -77,6 +77,8 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
         "with",
         "yield",
     ]
+
+    _config: "configs.TypescriptNodeConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
@@ -164,6 +166,7 @@ class TypescriptNodeExtension(jinja_extension.BaseExtension):
             base = f"{parser.NormalizeStr.pascal_case(item.name)}Enum"
             parent_type_prepend = f"{parent.type}." if parent else ""
 
+            # todo if currently in api call method, append ".toString()" to enums
             return f"models.{parent_type_prepend}{base}.{enum_name}"
 
         if item.type == "string" and item.format == "date-time":

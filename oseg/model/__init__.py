@@ -1,4 +1,3 @@
-from .oseg_options import OsegOptions, OsegOptionsDict
 from .property_proto import PropertyProto
 
 from .operation import Operation
@@ -29,4 +28,3 @@ from .property_object import (
     PropertyObjectArray,
 )
 from .property_scalar import PropertyScalar
-from .sdk_options import SdkOptions

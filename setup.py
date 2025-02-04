@@ -27,6 +27,8 @@ setup(
         "openapi-pydantic>=0.5",
         "pydantic>=2.10",
         "PyYAML>=6.0",
+        "click>=8.1.8",
+        "tabulate>=0.9.0",
     ],
     extras_require={
         "dev": ["mock~=5.1.0"],

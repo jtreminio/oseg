@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class PhpExtension(jinja_extension.BaseExtension):
@@ -8,6 +8,8 @@ class PhpExtension(jinja_extension.BaseExtension):
 
     RESERVED_KEYWORD_PREPEND = ""
     RESERVED_KEYWORDS = []
+
+    _config: "configs.PhpConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
         return False
@@ -58,7 +60,7 @@ class PhpExtension(jinja_extension.BaseExtension):
 
         # if enum but no parent, use the literal value
         if item.type == "string" and item.is_enum and parent is not None:
-            namespace = self._sdk_options.additional_properties.get("invokerPackage")
+            namespace = self._config.invoker_package
             enum_name = self._get_enum_name(item, item.name, value)
             parent_type_prepend = f"\\{parser.NormalizeStr.pascal_case(parent.type)}"
 

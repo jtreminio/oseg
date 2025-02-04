@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class RubyExtension(jinja_extension.BaseExtension):
@@ -57,6 +57,8 @@ class RubyExtension(jinja_extension.BaseExtension):
         "while",
         "yield",
     ]
+
+    _config: "configs.PhpConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

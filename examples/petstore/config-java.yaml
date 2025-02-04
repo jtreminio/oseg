@@ -5,10 +5,9 @@ additionalProperties:
   modelPackage: org.openapitools.client.model
   artifactId: openapi-java-client
   hideGenerationTimestamp: true
+  oseg.package: oseg.petstore.examples
 globalProperties:
   apiTests: false
   modelTests: false
   apiDocs: false
   modelDocs: false
-oseg:
-  package: oseg.petstore.examples

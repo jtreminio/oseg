@@ -2,6 +2,7 @@ generatorName: python
 additionalProperties:
   packageName: openapi_client
   projectName: openapi-client
+  oseg.variableNamingConvention: camel_case
 globalProperties:
   apiTests: false
   modelTests: false

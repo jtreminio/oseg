@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class PythonExtension(jinja_extension.BaseExtension):
@@ -64,6 +64,8 @@ class PythonExtension(jinja_extension.BaseExtension):
         "yield",
     ]
 
+    _config: "configs.PythonConfig"
+
     def is_reserved_keyword(self, name: str) -> bool:
         return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
@@ -75,7 +77,7 @@ class PythonExtension(jinja_extension.BaseExtension):
 
     def print_setter(self, name: str) -> str:
         # todo unit test
-        prop_case = self._sdk_options.oseg.get("property_case", "camel_case")
+        prop_case = self._config.oseg_variable_naming_convention
         name = parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):

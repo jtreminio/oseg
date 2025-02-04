@@ -1,4 +1,4 @@
-from oseg import jinja_extension, model, parser
+from oseg import jinja_extension, model, parser, configs
 
 
 class CSharpExtension(jinja_extension.BaseExtension):
@@ -86,6 +86,8 @@ class CSharpExtension(jinja_extension.BaseExtension):
         "volatile",
         "while",
     ]
+
+    _config: "configs.CSharpConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

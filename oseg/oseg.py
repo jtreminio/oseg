@@ -2,32 +2,30 @@ import caseconverter
 import os
 from typing import Optional
 
-from . import jinja_extension, model, parser
+from . import jinja_extension, configs, model, parser
 
 
 class Generator:
     def __init__(
         self,
         oas_file: str,
-        oseg_options: Optional["model.OsegOptionsDict"] = None,
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
         self._jinja = jinja_extension.JinjaExt.factory()
         self._oa_parser = parser.OaParser(
             oas_file,
-            oseg_options,
             operation_id,
             example_data,
         )
 
     def generate(
         self,
-        config_file: str,
+        config: configs.BaseConfigDef | str,
         output_dir: str,
     ) -> int:
-        sdk_options = self._get_sdk_options(config_file)
-        self._jinja.sdk_generator = sdk_options
+        config = configs.BaseConfig.factory(config)
+        self._jinja.sdk_generator = config
         file_extension = self._jinja.sdk_generator.FILE_EXTENSION
 
         if not os.path.isdir(output_dir):
@@ -39,7 +37,7 @@ class Generator:
                     operation=operation,
                     example_name=name,
                     property_container=property_container,
-                    sdk_options=sdk_options,
+                    config=config,
                     output_dir=output_dir,
                     file_extension=file_extension,
                 )
@@ -51,7 +49,7 @@ class Generator:
         operation: model.Operation,
         example_name: str,
         property_container: model.PropertyContainer,
-        sdk_options: model.SdkOptions,
+        config: configs.BaseConfig,
         output_dir: str,
         file_extension: str,
     ) -> None:
@@ -65,18 +63,10 @@ class Generator:
             operation=operation,
             property_container=property_container,
             example_name=example_name,
-            sdk_options=sdk_options,
+            config=config,
         )
 
         target_file = f"{output_dir}/{filename}.{file_extension}"
 
         with open(target_file, "w", encoding="utf-8") as f:
             f.write(rendered)
-
-    def _get_sdk_options(self, config_file: str) -> model.SdkOptions:
-        data = self._oa_parser.file_loader.get_file_contents(config_file)
-
-        if not len(data):
-            raise NotImplementedError(f"{config_file} contains invalid data")
-
-        return model.SdkOptions(config_file, data)

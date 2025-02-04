@@ -87,12 +87,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using {{ sdk_options.additional_properties.packageName }}.Api;
-using {{ sdk_options.additional_properties.packageName }}.{{ sdk_options.additional_properties.clientPackage }};
-using {{ sdk_options.additional_properties.packageName }}.Model;
+using {{ config.package_name }}.Api;
+using {{ config.package_name }}.Client;
+using {{ config.package_name }}.Model;
 
-{% if sdk_options.oseg.namespace %}
-namespace {{ sdk_options.oseg.namespace }};
+{% if config.oseg_namespace %}
+namespace {{ config.oseg_namespace }};
 
 {% endif %}
 public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}

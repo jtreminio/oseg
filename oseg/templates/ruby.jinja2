@@ -66,15 +66,15 @@ File.new("{{ printable.value }}", "r")
 
 {%- import "_macros.jinja2" as m with context -%}
 
-require "{{ sdk_options.additional_properties.gemName }}"
+require "{{ config.gem_name }}"
 
-{{ sdk_options.additional_properties.moduleName }}.configure do |config|
+{{ config.module_name }}.configure do |config|
 end
 
 {% for obj_name, obj in property_container.flattened_objects().items() %}
     {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
     {% if not obj.is_array %}
-{{ obj_name|print_variable }} = {{ sdk_options.additional_properties.moduleName }}::{{ obj.type|split_uc|pascal_case }}.new
+{{ obj_name|print_variable }} = {{ config.module_name }}::{{ obj.type|split_uc|pascal_case }}.new
         {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
             {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_variable }} = {{ value }}
@@ -91,7 +91,7 @@ end
 begin
     {{ "" -}}
     {% if operation.response and operation.response.body  %}response = {% endif -%}
-    {{ sdk_options.additional_properties.moduleName }}::{{ operation.api_name|split_uc|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not property_container.has_data %}
+    {{ config.module_name }}::{{ operation.api_name|split_uc|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not property_container.has_data %}
 
 {% else %}(
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8, True) %}
@@ -117,7 +117,7 @@ begin
 
     FileUtils.cp(response.path, "path/to/file.zip")
 {% endif %}
-rescue {{ sdk_options.additional_properties.moduleName }}::ApiError => e
+rescue {{ config.module_name }}::ApiError => e
     puts "Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|snake_case }}: #{e}"
 end
 {{ "" }}
