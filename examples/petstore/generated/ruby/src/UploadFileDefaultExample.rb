@@ -1,10 +1,10 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    response = OpenapiClient::PetApi.new.upload_file(
+    response = OpenApiClient::PetApi.new.upload_file(
         12345,
         {
             additional_metadata: "Additional data to pass to server",
@@ -13,6 +13,6 @@ begin
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling Pet#upload_file: #{e}"
 end

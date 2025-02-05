@@ -1,9 +1,9 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
-order = OpenapiClient::Order.new
+order = OpenApiClient::Order.new
 order.id = 12345
 order.pet_id = 98765
 order.quantity = 5
@@ -12,11 +12,11 @@ order.status = "approved"
 order.complete = false
 
 begin
-    response = OpenapiClient::StoreApi.new.place_order(
+    response = OpenApiClient::StoreApi.new.place_order(
         order,
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling Store#place_order: #{e}"
 end

@@ -1,12 +1,12 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    OpenapiClient::UserApi.new.delete_user(
+    OpenApiClient::UserApi.new.delete_user(
         "my_username",
     )
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling User#delete_user: #{e}"
 end

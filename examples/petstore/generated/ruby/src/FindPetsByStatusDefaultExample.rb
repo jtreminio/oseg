@@ -1,10 +1,10 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    response = OpenapiClient::PetApi.new.find_pets_by_status(
+    response = OpenApiClient::PetApi.new.find_pets_by_status(
         [
             "available",
             "pending",
@@ -12,6 +12,6 @@ begin
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling Pet#find_pets_by_status: #{e}"
 end

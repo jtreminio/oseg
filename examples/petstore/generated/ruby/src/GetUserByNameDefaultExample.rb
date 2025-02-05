@@ -1,14 +1,14 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    response = OpenapiClient::UserApi.new.get_user_by_name(
+    response = OpenApiClient::UserApi.new.get_user_by_name(
         "my_username",
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling User#get_user_by_name: #{e}"
 end

@@ -1,14 +1,14 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    response = OpenapiClient::StoreApi.new.get_order_by_id(
+    response = OpenApiClient::StoreApi.new.get_order_by_id(
         3,
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling Store#get_order_by_id: #{e}"
 end

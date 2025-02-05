@@ -1,15 +1,15 @@
 require "openapi_client"
 
-OpenapiClient.configure do |config|
+OpenApiClient.configure do |config|
 end
 
 begin
-    response = OpenapiClient::UserApi.new.login_user(
+    response = OpenApiClient::UserApi.new.login_user(
         "my_username",
         "my_secret_password",
     )
 
     p response
-rescue OpenapiClient::ApiError => e
+rescue OpenApiClient::ApiError => e
     puts "Exception when calling User#login_user: #{e}"
 end
