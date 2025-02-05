@@ -50,9 +50,11 @@ using Org.OpenAPITools.Api;
 using Org.OpenAPITools.Client;
 using Org.OpenAPITools.Model;
 
+namespace OSEG.PetStore.Examples;
+
 public class AddPetDefaultExample
 {
-    public static void Main()
+    public static void Run()
     {
         var config = new Configuration();
 
@@ -110,7 +112,7 @@ public class AddPetDefaultExample
 ### [java](https://openapi-generator.tech/docs/generators/java/)
 
 ```java
-package org.openapitools.client.examples;
+package oseg.petstore.examples;
 
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
@@ -121,42 +123,43 @@ import org.openapitools.client.model.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AddPet_default_example
+public class AddPetDefaultExample
 {
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
 
-        var category = new Category()
-            .id(12345L)
-            .name("Category_Name");
+        var category = new Category();
+        category.id(12345L);
+        category.name("Category_Name");
 
-        var tags1 = new Tag()
-            .id(12345L)
-            .name("tag_1");
+        var tags1 = new Tag();
+        tags1.id(12345L);
+        tags1.name("tag_1");
 
-        var tags2 = new Tag()
-            .id(98765L)
-            .name("tag_2");
+        var tags2 = new Tag();
+        tags2.id(98765L);
+        tags2.name("tag_2");
 
-        var tags = List.of (
+        var tags = new ArrayList<Tag>(List.of (
             tags1,
             tags2
-        );
+        ));
 
-        var pet = new Pet()
-            .name("My pet name")
-            .photoUrls(List.of (
-                "https://example.com/picture_1.jpg",
-                "https://example.com/picture_2.jpg"
-            ))
-            .id(12345L)
-            .status(Pet.StatusEnum.AVAILABLE)
-            .category(category)
-            .tags(tags);
+        var pet = new Pet();
+        pet.name("My pet name");
+        pet.photoUrls(List.of (
+            "https://example.com/picture_1.jpg",
+            "https://example.com/picture_2.jpg"
+        ));
+        pet.id(12345L);
+        pet.status(Pet.StatusEnum.AVAILABLE);
+        pet.category(category);
+        pet.tags(tags);
 
         try
         {
@@ -181,7 +184,11 @@ public class AddPet_default_example
 ```php
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+namespace OSEG\PetStore\Examples;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 
@@ -220,8 +227,7 @@ try {
 
     print_r($response);
 } catch (OpenAPI\Client\ApiException $e) {
-    echo 'Exception when calling Pet#addPet: '
-        . print_r($e->getResponseObject());
+    echo "Exception when calling Pet#addPet: {$e->getMessage()}";
 }
 ```
 
@@ -258,7 +264,7 @@ with ApiClient(configuration) as api_client:
 
     pet = models.Pet(
         name="My pet name",
-        photo_urls=[
+        photoUrls=[
             "https://example.com/picture_1.jpg",
             "https://example.com/picture_2.jpg",
         ],
@@ -329,10 +335,10 @@ end
 
 ```typescript
 import * as fs from 'fs';
-import * as apis from "openapi_client/api/apis"
-import * as models from "openapi_client/model/models"
+import api from "openapi_client"
+import models from "openapi_client"
 
-const apiCaller = new apis.PetApi();
+const apiCaller = new api.PetApi();
 
 const category = new models.Category();
 category.id = 12345;
@@ -347,15 +353,15 @@ tags2.id = 98765;
 tags2.name = "tag_2";
 
 const tags = [
-  tags1,
-  tags2,
+    tags1,
+    tags2,
 ];
 
 const pet = new models.Pet();
 pet.name = "My pet name";
 pet.photoUrls = [
-  "https://example.com/picture_1.jpg",
-  "https://example.com/picture_2.jpg",
+    "https://example.com/picture_1.jpg",
+    "https://example.com/picture_2.jpg",
 ];
 pet.id = 12345;
 pet.status = models.Pet.StatusEnum.Available;
@@ -363,7 +369,7 @@ pet.category = category;
 pet.tags = tags;
 
 apiCaller.addPet(
-  pet,
+    pet,
 ).then(response => {
   console.log(response.body);
 }).catch(error => {
@@ -391,38 +397,55 @@ If you use a custom JSON file with examples you can define as many examples per 
 
 Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/). Adding a new SDK requires a few steps:
 
-1) Create the OpenAPI config file ([Python example](./examples/petstore/config-python.yaml))
+1) Create a config class with required and optional parameters for the chosen SDK. We follow the naming convention outlined in [openapi-generator page for each generator](https://openapi-generator.tech/docs/generators/python).
 2) Create the Jinja extension class that handles language-specific parameter and method naming, and some other things ([Python example](./oseg/jinja_extension/python_extension.py))
 3) Create the Jinja template ([Python example](./oseg/templates/python.jinja2))
 
 ## How to run
 
-This project is in its infancy, for now to run it you simply run
+The entrypoint to this project is [run.py](./run.py). It currently supports two commands:
+
+### config-help
+
+Prints all config options available to a given generator.
+
+Run `python3 run.py config-help --help` for more details.
+
+Show config options for the `python` generator:
 
 ```bash
-python run.py examples/petstore/openapi.yaml \
-    examples/petstore/config-python.yaml \
-    examples/petstore/generated/python \
-    --example_data_file=examples/petstore/example_data.json
+python3 run.py config-help -g python
 ```
 
-This will save generated Python snippets to `examples/petstore/generated/python`. 
+### generate
 
-To change the generator used, replace `python` with any of:
+Generates the SDK snippets and writes to specified location.
 
-* `csharp`
-* `java`
-* `php`
-* `ruby`
-* `typescript-node`
+Run `python3 run.py generate --help` for more details.
 
-For example:
+Run with a local config file:
 
 ```bash
-python run.py examples/petstore/openapi.yaml \
-    examples/petstore/config-csharp.yaml \
-    examples/petstore/generated/csharp \
-    --example_data_file=examples/petstore/example_data.json
+python3 run.py generate \
+    -i examples/petstore/openapi.yaml \
+    -o examples/petstore/generated/python/src \
+    --config-file examples/petstore/config-python.yaml \
+    --example-data-file examples/petstore/example_data.json
+```
+
+Run with inline config values. These config values can be seen by running `python3 run.py config-help -g {generator}`:
+
+```bash
+python3 run.py generate \
+    -i examples/petstore/openapi.yaml \
+    -o examples/petstore/generated/python/src \
+    --generator-name python \
+    --config '{
+      "packageName": "openapi_client",
+      "oseg.variableNamingConvention": "camel_case",
+      "oseg.ignoreOptionalUnset": false
+    }' \
+    --example-data-file examples/petstore/example_data.json
 ```
 
 ## Tests

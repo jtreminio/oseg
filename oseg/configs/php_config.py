@@ -25,7 +25,7 @@ class PhpConfig(BaseConfig):
         "invokerPackage": inspect.cleandoc(
             """
             The namespace of the source package. This is the SDK package
-            you are generating example snippets for. Ex: Yay\Pets
+            you are generating example snippets for. Ex: Yay\\Pets
             """
         ),
     }
@@ -35,7 +35,7 @@ class PhpConfig(BaseConfig):
             "description": inspect.cleandoc(
                 """
                 Namespace for your example snippets.
-                Ex: OSEG\PetStore\Examples
+                Ex: OSEG\\PetStore\\Examples
                 """
             ),
             "default": None,
