@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
+## example: ./bin/package-typescript-node petstore
+
 set -e
 
 DIR=$(cd `dirname $0` && pwd)
+PROJECT=$1
+SDK="typescript-node"
 WORKING_DIR="/app/openapi"
-PETSTORE_DIR="${DIR}/../examples/petstore"
-SDK_DIR="${PETSTORE_DIR}/sdks/typescript-node"
-TARGET_DIR="${PETSTORE_DIR}/generated/typescript-node"
-ARTIFACTS_DIR="${PETSTORE_DIR}/generated/typescript-node/artifacts"
+PROJECT_DIR="${DIR}/../examples/${PROJECT}"
+SDK_DIR="${PROJECT_DIR}/sdks/${SDK}"
+TARGET_DIR="${PROJECT_DIR}/generated/${SDK}"
+ARTIFACTS_DIR="${PROJECT_DIR}/generated/${SDK}/artifacts"
+
+if [[ -z "${PROJECT-}" ]] || [[ ! -d "${PROJECT_DIR}" ]]; then
+  echo "Must provide project"
+  exit 1
+fi
 
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"

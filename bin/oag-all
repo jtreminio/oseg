@@ -7,9 +7,9 @@ set -e
 DIR=$(cd `dirname $0` && pwd)
 SOURCE_DIR=$1
 
-bash "${DIR}/run-oag" "${SOURCE_DIR}" csharp
-bash "${DIR}/run-oag" "${SOURCE_DIR}" java
-bash "${DIR}/run-oag" "${SOURCE_DIR}" php
-bash "${DIR}/run-oag" "${SOURCE_DIR}" python
-bash "${DIR}/run-oag" "${SOURCE_DIR}" ruby
-bash "${DIR}/run-oag" "${SOURCE_DIR}" typescript-node
+bash "${DIR}/oag-run" "${SOURCE_DIR}" csharp
+bash "${DIR}/oag-run" "${SOURCE_DIR}" java
+bash "${DIR}/oag-run" "${SOURCE_DIR}" php
+bash "${DIR}/oag-run" "${SOURCE_DIR}" python
+bash "${DIR}/oag-run" "${SOURCE_DIR}" ruby
+bash "${DIR}/oag-run" "${SOURCE_DIR}" typescript-node

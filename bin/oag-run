@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## example: ./bin/run-oag petstore csharp
+## example: ./bin/oag-run petstore csharp
 
 set -e
 
@@ -46,3 +46,7 @@ docker run --rm \
     -i "/local/openapi.yaml" \
     -o "/local/sdks/${SDK}" \
     --skip-validate-spec
+
+if [[ "${SDK}" = "java" ]]; then
+  chmod +x "${OUTPUT_DIR}/${SDK}/gradlew"
+fi

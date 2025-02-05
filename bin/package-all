@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+## example: ./bin/package-all petstore
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+PROJECT=$1
+
+if [[ -z "${PROJECT-}" ]]; then
+  echo "Must provide project"
+  exit 1
+fi
+
+bash "${DIR}/package-csharp" "${PROJECT}"
+bash "${DIR}/package-java" "${PROJECT}"
+bash "${DIR}/package-php" "${PROJECT}"
+bash "${DIR}/package-python" "${PROJECT}"
+bash "${DIR}/package-ruby" "${PROJECT}"
+bash "${DIR}/package-typescript-node" "${PROJECT}"
