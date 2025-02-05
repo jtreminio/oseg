@@ -20,6 +20,7 @@ fi
 
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}/gems"
+rm -f "${SDK_DIR}/"*.gem
 
 docker run --rm \
   -e GEM_HOME="/.gem-cache" \
@@ -29,7 +30,9 @@ docker run --rm \
   -v "oseg-ruby-gem-cache:/.gem-cache" \
   -v "oseg-ruby-bundle-cache:/.bundle-cache" \
   -w "${WORKING_DIR}" \
-  ruby:3.4 gem build openapi_client.gemspec -o /artifacts/gems/openapi_client-1.0.0.gem
+  ruby:3.4 gem build *.gemspec
+
+mv "${SDK_DIR}/"*.gem "${ARTIFACTS_DIR}/gems/"
 
 docker run --rm \
   -e GEM_HOME="/.gem-cache" \

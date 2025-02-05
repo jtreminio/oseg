@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "openapi_client": "file:./artifacts/openapi_client-1.0.0.tgz",
+    "openapi_client": "file:./artifacts/packaged.tgz",
     "@types/node": "^22.12",
     "ts-node": "^10.9",
     "typescript": "^5.0"

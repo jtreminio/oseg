@@ -26,7 +26,7 @@ rm -rf "${TARGET_DIR}/vendor"
 cp -r "${SDK_DIR}" "${ARTIFACTS_DIR}/package"
 cd "${ARTIFACTS_DIR}/package"
 
-zip -9 -r "${ARTIFACTS_DIR}/openapi-client.zip" \
+zip -9 -r "${ARTIFACTS_DIR}/packaged.zip" \
   ./ \
   -x "./.DS_Store" \
      "./.gitmodules" \

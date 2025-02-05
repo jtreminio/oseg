@@ -29,4 +29,4 @@ docker run --rm -it \
   -e GEN_DIR=/app \
   gradle:8-jdk21 ./gradlew clean jar
 
-cp "${SDK_DIR}/build/libs/"openapi-java-client-*.jar "${ARTIFACTS_DIR}/openapi-java-client.jar"
+cp "${SDK_DIR}/build/libs/"openapi-java-client-*.jar "${ARTIFACTS_DIR}/packaged.jar"

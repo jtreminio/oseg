@@ -30,5 +30,5 @@ fi
 
 pushd "${SDK_DIR}"
 ${PYTHON} -m build --wheel
-cp dist/openapi_client-*.whl "${ARTIFACTS_DIR}"
+cp dist/*-*.whl "${ARTIFACTS_DIR}/packaged.whl"
 popd

@@ -1,8 +1,0 @@
-generatorName: php
-additionalProperties:
-  invokerPackage: "OpenAPIMuseum\\Client"
-globalProperties:
-  apiTests: false
-  modelTests: false
-  apiDocs: false
-  modelDocs: false

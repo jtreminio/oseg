@@ -1,8 +1,0 @@
-generatorName: typescript-node
-additionalProperties:
-  npmName: openapimuseum_client
-globalProperties:
-  apiTests: false
-  modelTests: false
-  apiDocs: false
-  modelDocs: false

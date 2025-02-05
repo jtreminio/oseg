@@ -1,9 +1,0 @@
-generatorName: ruby
-additionalProperties:
-  gemName: openapimuseum_client
-  moduleName: OpenApiMuseumClient
-globalProperties:
-  apiTests: false
-  modelTests: false
-  apiDocs: false
-  modelDocs: false

@@ -43,3 +43,5 @@ docker run -it --rm \
   -v "oseg-npm-cache:/root/.npm" \
   -w "${WORKING_DIR}" \
   node:22 npm pack --pack-destination /artifacts
+
+mv "${PROJECT_DIR}/generated/${SDK}/artifacts/"*.tgz "${PROJECT_DIR}/generated/${SDK}/artifacts/packaged.tgz"
