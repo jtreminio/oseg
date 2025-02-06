@@ -397,9 +397,12 @@ If you use a custom JSON file with examples you can define as many examples per 
 
 Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/). Adding a new SDK requires a few steps:
 
-1) Create a config class with required and optional parameters for the chosen SDK. We follow the naming convention outlined in [openapi-generator page for each generator](https://openapi-generator.tech/docs/generators/python).
-2) Create the Jinja extension class that handles language-specific parameter and method naming, and some other things ([Python example](./oseg/jinja_extension/python_extension.py))
-3) Create the Jinja template ([Python example](./oseg/templates/python.jinja2))
+1) Create the Generator
+   * handles language-specific parameter and method naming
+   * contains a config class with required and optional parameters for the chosen SDK. We follow the naming convention outlined in [openapi-generator page for each generator](https://openapi-generator.tech/docs/generators/python).
+   * and some other things
+   * ([Python example](./oseg/generator/python_generator.py))
+2) Create the Jinja template ([Python example](./oseg/templates/python.jinja2))
 
 ## How to run
 
