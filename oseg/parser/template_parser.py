@@ -1,15 +1,14 @@
 from typing import Optional
-
-from oseg import jinja_extension, model, configs
+from oseg import generator as g, model, configs
 
 
 class TemplateParser:
     def __init__(
         self,
-        extension: "jinja_extension.BaseExtension",
+        generator: "g.BaseGenerator",
         config: "configs.BaseConfig",
     ):
-        self._extension: jinja_extension.BaseExtension = extension
+        self._generator: g.BaseGenerator = generator
         self._config = config
 
     def parse_object_properties(
@@ -111,7 +110,7 @@ class TemplateParser:
 
             if property_container.body and prop == property_container.body:
                 if include_body is None or include_body is True:
-                    result[prop_name] = self._extension.print_variable(
+                    result[prop_name] = self._generator.print_variable(
                         property_container.body.type
                     )
 
@@ -120,7 +119,7 @@ class TemplateParser:
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray
             ):
-                result[prop_name] = self._extension.print_variable(prop_name)
+                result[prop_name] = self._generator.print_variable(prop_name)
 
                 continue
 
@@ -139,21 +138,21 @@ class TemplateParser:
         prop: "model.PropertyProto",
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
-            printable = self._extension.print_scalar(parent, prop)
+            printable = self._generator.print_scalar(parent, prop)
 
             if printable.is_array:
                 return macros.print_scalar_array(printable)
 
             return macros.print_scalar(printable)
         elif isinstance(prop, model.PropertyFile):
-            printable = self._extension.print_file(prop)
+            printable = self._generator.print_file(prop)
 
             if printable.is_array:
                 return macros.print_file_array(printable)
 
             return macros.print_file(printable)
         elif isinstance(prop, model.PropertyFreeForm):
-            printable = self._extension.print_free_form(prop)
+            printable = self._generator.print_free_form(prop)
 
             if printable.is_array:
                 return macros.print_free_form_array(printable)
@@ -234,9 +233,9 @@ class TemplateParser:
         if the name is a reserved keyword.
         """
 
-        name = self._extension.print_variable(name)
+        name = self._generator.print_variable(name)
 
-        if self._extension.is_reserved_keyword(original_name):
-            name = self._extension.unreserve_keyword(name)
+        if self._generator.is_reserved_keyword(original_name):
+            name = self._generator.unreserve_keyword(name)
 
         return name

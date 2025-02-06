@@ -2,10 +2,45 @@ import json
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol
-from oseg import model, parser, configs
+from oseg import generator, model, parser, configs
 
 
-class BaseExtension(Protocol):
+class GeneratorFactory:
+    @staticmethod
+    def factory(config: "configs.BaseConfig") -> "BaseGenerator":
+        if isinstance(config, configs.CSharpConfig):
+            return generator.CSharpExtension(config)
+
+        if isinstance(config, configs.JavaConfig):
+            return generator.JavaExtension(config)
+
+        if isinstance(config, configs.PhpConfig):
+            return generator.PhpExtension(config)
+
+        if isinstance(config, configs.PythonConfig):
+            return generator.PythonExtension(config)
+
+        if isinstance(config, configs.RubyConfig):
+            return generator.RubyExtension(config)
+
+        if isinstance(config, configs.TypescriptNodeConfig):
+            return generator.TypescriptNodeExtension(config)
+
+        raise NotImplementedError
+
+    @staticmethod
+    def default_generator_names() -> list[str]:
+        return [
+            generator.CSharpExtension.NAME,
+            generator.JavaExtension.NAME,
+            generator.PhpExtension.NAME,
+            generator.PythonExtension.NAME,
+            generator.RubyExtension.NAME,
+            generator.TypescriptNodeExtension.NAME,
+        ]
+
+
+class BaseGenerator(Protocol):
     FILE_EXTENSION: str
     NAME: str
     TEMPLATE: str

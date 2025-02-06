@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 
-from . import jinja_extension as j, configs, model, parser
+from . import jinja_extension as j, generator, configs, model, parser
 
 
 class Generator:
@@ -23,7 +23,7 @@ class Generator:
         output_dir: str,
     ) -> int:
         config = configs.BaseConfig.factory(config)
-        sdk_generator = j.ExtensionFactory.factory(config)
+        sdk_generator = generator.GeneratorFactory.factory(config)
         jinja = j.JinjaExt.factory(sdk_generator)
 
         if not os.path.isdir(output_dir):

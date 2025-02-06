@@ -2,14 +2,14 @@ import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
 from typing import Callable
-from oseg import jinja_extension, model, parser
+from oseg import generator, model, parser
 
 
 class JinjaExt(jinja2.ext.Extension):
-    _sdk_generator: "jinja_extension.BaseExtension"
+    _sdk_generator: "generator.BaseGenerator"
 
     @staticmethod
-    def factory(sdk_generator: "jinja_extension.BaseExtension") -> "JinjaExt":
+    def factory(sdk_generator: "generator.BaseGenerator") -> "JinjaExt":
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,

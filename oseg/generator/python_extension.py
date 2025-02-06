@@ -1,67 +1,73 @@
-from oseg import jinja_extension, model, parser, configs
+from oseg import generator, model, parser, configs
 
 
-class RubyExtension(jinja_extension.BaseExtension):
-    FILE_EXTENSION = "rb"
-    NAME = "ruby"
+class PythonExtension(generator.BaseGenerator):
+    FILE_EXTENSION = "py"
+    NAME = "python"
     TEMPLATE = f"{NAME}.jinja2"
 
-    RESERVED_KEYWORD_PREPEND = "_"
+    RESERVED_KEYWORD_PREPEND = "var_"
     RESERVED_KEYWORDS = [
-        "__file__",
-        "__line__",
-        "_header_accept",
-        "_header_accept_result",
-        "_header_content_type",
-        "alias",
+        "all_params",
         "and",
-        "auth_names",
-        "begin",
+        "as",
+        "assert",
+        "async",
+        "auth_settings",
+        "await",
+        "base64",
+        "body_params",
         "break",
-        "case",
         "class",
+        "continue",
+        "date",
         "def",
-        "defined?",
-        "do",
+        "del",
+        "elif",
         "else",
-        "elsif",
-        "end",
-        "ensure",
+        "except",
+        "exec",
         "false",
+        "field",
+        "finally",
+        "float",
         "for",
         "form_params",
+        "from",
+        "global",
         "header_params",
         "if",
+        "import",
         "in",
-        "local_var_path",
-        "module",
-        "next",
-        "nil",
+        "is",
+        "json",
+        "lambda",
+        "local_var_files",
+        "none",
+        "nonlocal",
         "not",
         "or",
-        "post_body",
+        "pass",
+        "path_params",
+        "print",
+        "property",
         "query_params",
-        "redo",
-        "rescue",
-        "retry",
+        "raise",
+        "resource_path",
         "return",
+        "schema",
         "self",
-        "send",
-        "super",
-        "then",
         "true",
-        "undef",
-        "unless",
-        "until",
-        "when",
+        "try",
         "while",
+        "with",
         "yield",
     ]
 
-    _config: "configs.PhpConfig"
+    _config: "configs.PythonConfig"
 
     def is_reserved_keyword(self, name: str) -> bool:
-        return name.lower() in self.RESERVED_KEYWORDS
+        return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
@@ -70,10 +76,18 @@ class RubyExtension(jinja_extension.BaseExtension):
         return name
 
     def print_setter(self, name: str) -> str:
+        # todo unit test
+        prop_case = self._config.oseg_variable_naming_convention
         name = parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))
 
         if self.is_reserved_keyword(name):
+            if prop_case == "camel_case":
+                return parser.NormalizeStr.camel_case(self.unreserve_keyword(name))
+
             return self.unreserve_keyword(name)
+
+        if prop_case == "camel_case":
+            return parser.NormalizeStr.camel_case(name)
 
         return name
 
@@ -87,7 +101,7 @@ class RubyExtension(jinja_extension.BaseExtension):
 
     def print_scalar(
         self,
-        parent: model.PropertyObject,
+        parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
@@ -112,13 +126,13 @@ class RubyExtension(jinja_extension.BaseExtension):
         return printable
 
     def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
-        if value is None:
-            return "nil"
+        if item.type == "boolean" or value is None:
+            return value
 
         if item.type == "string" and item.format == "date-time":
-            return f'Date.parse("{value}").to_time'
+            return f'datetime.fromisoformat("{value}")'
 
         if item.type == "string" and item.format == "date":
-            return f'Date.parse("{value}").to_date'
+            return f'date.fromisoformat("{value}")'
 
         return self._to_json(value)
