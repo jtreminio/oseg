@@ -95,17 +95,17 @@ with ApiClient(configuration) as api_client:
 {% endcall %}
     try:
         {{ "" -}}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-        api.{{ operation.api_name|split_uc|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not property_container.has_data %})
+        api.{{ operation.api_name|split_uc|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not properties %})
 {% else %}
 
-{% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}
     {% for name, value in properties.items() %}
             {{ name|print_variable }}={{ value }},
     {% endfor %}
-{% endcall %}
         )
 {% endif %}
+{% endcall %}
     {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
         pprint(response)

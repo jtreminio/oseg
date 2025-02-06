@@ -132,12 +132,18 @@ class TemplateParser:
         """
 
         result = {}
+        # todo test has_data
+        # When all api call values are null, and none are required
+        # don't print anything
+        has_data = False
 
         for _, prop in property_container.properties(required_flag).items():
             prop_name = self._resolve_keyword(prop.name, prop.original_name)
 
             if property_container.body and prop == property_container.body:
                 if include_body is None or include_body is True:
+                    has_data = True
+
                     result[prop_name] = self._generator.print_variable(
                         property_container.body.type
                     )
@@ -158,6 +164,7 @@ class TemplateParser:
                 if not prop.is_required and not prop.is_set:
                     result[prop_name] = self._generator.print_null()
                 else:
+                    has_data = True
                     result[prop_name] = self._generator.print_variable(prop_name)
 
                 continue
@@ -167,6 +174,12 @@ class TemplateParser:
                 parent=property_container.body,
                 prop=prop,
             )
+
+            if prop.value is not None or prop.is_required:
+                has_data = True
+
+        if not has_data:
+            return self._indent({}, indent_count)
 
         return self._indent(result, indent_count)
 

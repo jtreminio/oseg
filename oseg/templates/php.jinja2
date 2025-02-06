@@ -104,17 +104,17 @@ $config = {{ config.invoker_package }}\Configuration::getDefaultConfiguration();
 {% endcall %}
 try {
     {{ "" -}}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 8) %}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
-    (new {{ config.invoker_package }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config))->{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
+    (new {{ config.invoker_package }}\Api\{{ operation.api_name|pascal_case }}Api(config: $config))->{{ operation.operation_id|camel_case }}({%- if not properties %});
 {% else %}
 
-{% call(properties) m.parse_api_call_properties_macro(property_container, 8) %}
     {% for name, value in properties.items() %}
         {{ name|snake_case }}: {% if value != "null" %}{% endif %}{{ value }},
     {% endfor %}
-{% endcall %}
     );
 {% endif %}
+{% endcall %}
 {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
     print_r($response);

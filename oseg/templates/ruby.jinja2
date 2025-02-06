@@ -91,26 +91,26 @@ end
 {% endcall %}
 begin
     {{ "" -}}
-    {% if operation.response and operation.response.body  %}response = {% endif -%}
-    {{ config.module_name }}::{{ operation.api_name|split_uc|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not property_container.has_data %}
-
-{% else %}(
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8, True) %}
-    {% for name, value in properties.items() %}
+    {% call(opt_properties) m.parse_api_call_properties_macro(property_container, 8, False) %}
+        {% if operation.response and operation.response.body  %}response = {% endif -%}
+    {{ config.module_name }}::{{ operation.api_name|split_uc|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not properties and not opt_properties %}
+
+        {% else %}(
+            {% for name, value in properties.items() %}
         {{ value }},
-    {% endfor %}
-{% endcall %}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 8, False) %}
-    {% if properties %}
+            {% endfor %}
+            {% if opt_properties %}
         {
-        {% for name, value in properties.items() %}
+                {% for name, value in opt_properties.items() %}
             {{ name|print_variable }}: {{ value }},
-        {% endfor %}
+                {% endfor %}
         },
-    {% endif %}
-{% endcall %}
+            {% endif %}
     )
-{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endcall %}
 {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
     p response

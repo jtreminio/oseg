@@ -121,18 +121,18 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
         try
         {
             {{ "" -}}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|split_uc|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not property_container.has_data %});
+            new {{ operation.api_name|split_uc|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
 {% else %}
 
-{% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
     {% for name, value in properties.items() %}
                 {{ value }}{% if not loop.last %},{% endif %}
 
     {% endfor %}
-{% endcall %}
             );
 {% endif %}
+{% endcall %}
     {% if operation.response and operation.response.body and not operation.response.is_binary %}
 
             System.out.println(response);
