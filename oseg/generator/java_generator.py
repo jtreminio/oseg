@@ -231,6 +231,9 @@ class JavaGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "null"
+
     def _get_enum_name(
         self,
         item: model.PropertyScalar,
@@ -266,7 +269,7 @@ class JavaGenerator(generator.BaseGenerator):
             enum_name = self._get_enum_name(item, value)
 
             if enum_name is None:
-                return "null"
+                return self.print_null()
 
             if parent is None:
                 return self._to_json(value)

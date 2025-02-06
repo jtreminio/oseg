@@ -101,25 +101,26 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {
         var config = new Configuration();
 
-{% for obj_name, obj in property_container.flattened_objects().items() %}
-    {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
-    {% if not obj.is_array %}
+{% call(objects) m.parse_objects_macro(property_container) %}
+    {% for obj_name, obj in objects.items() %}
+        {% if not obj.is_array %}
         var {{ obj_name|print_variable }} = new {{ obj.type|split_uc|pascal_case }}(
-        {% call(properties) m.parse_object_properties_macro(property_container, obj, 12) %}
-            {% for name, value in properties.items() %}
+            {% call(properties) m.parse_object_properties_macro(property_container, obj, 12) %}
+                {% for name, value in properties.items() %}
             {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
 
-            {% endfor %}
-        {% endcall %}
+                {% endfor %}
+            {% endcall %}
         );
-    {% else %}
+        {% else %}
         var {{ obj_name|print_variable }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, 8) %}
+            {%- call(value) m.parse_object_list_properties_macro(obj, 8) %}
         {{- value }};
-        {% endcall %}
-    {% endif %}
+            {% endcall %}
+        {% endif %}
 
-{% endfor %}
+    {% endfor %}
+{% endcall %}
         try
         {
             {{ "" -}}

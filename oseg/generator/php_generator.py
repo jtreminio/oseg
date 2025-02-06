@@ -128,6 +128,9 @@ class PhpGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "null"
+
     def _handle_value(
         self,
         item: model.PropertyScalar,

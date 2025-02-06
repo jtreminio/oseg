@@ -36,6 +36,7 @@ class PropertyParser:
                         schema=schema,
                         _type=parser.NormalizeStr.normalize(type_of),
                         is_required=sub_container.is_required,
+                        is_set=True,
                     )
 
                 container.properties.append(sub_container)
@@ -77,13 +78,11 @@ class PropertyParser:
                     property_name=name,
                 )
 
-                value = data.get(name)
-
                 if self._handle_object(
                     container=container,
                     schema=property_schema,
                     name=name,
-                    value=value,
+                    data=data,
                 ):
                     break
 
@@ -91,7 +90,7 @@ class PropertyParser:
                     container=container,
                     schema=property_schema,
                     name=name,
-                    value=value,
+                    data=data,
                 ):
                     break
 
@@ -99,7 +98,7 @@ class PropertyParser:
                     container=container,
                     schema=non_object_property_schema,
                     name=name,
-                    value=value,
+                    data=data,
                 ):
                     continue
 
@@ -107,7 +106,7 @@ class PropertyParser:
                     container=container,
                     schema=non_object_property_schema,
                     name=name,
-                    value=value,
+                    data=data,
                 ):
                     continue
 
@@ -115,7 +114,7 @@ class PropertyParser:
                     container=container,
                     schema=non_object_property_schema,
                     name=name,
-                    value=value,
+                    data=data,
                 ):
                     continue
 
@@ -126,7 +125,7 @@ class PropertyParser:
         container: "model.PropertyObject",
         schema: oa.Reference | oa.Schema,
         name: str,
-        value: dict[str, any] | None,
+        data: dict[str, any],
     ) -> bool:
         """handle named object"""
         # todo handle optional nullable
@@ -142,6 +141,7 @@ class PropertyParser:
 
         type_of = self._oa_parser.get_component_name(schema)
         is_required = self._is_required(container.schema, name)
+        value = data.get(name)
 
         if not is_required and value is None:
             value = schema.default
@@ -154,12 +154,14 @@ class PropertyParser:
                 name=name,
                 value=value,
                 is_required=self._is_required(container.schema, name),
+                is_set=name in data,
             )
 
             return True
 
         parsed = self._create_property_object_container(schema, value)
         parsed.is_required = is_required
+        parsed.is_set = name in data
 
         container.properties[name] = parsed
 
@@ -170,7 +172,7 @@ class PropertyParser:
         container: "model.PropertyObject",
         schema: oa.Reference | oa.Schema,
         name: str,
-        value: dict[str, any] | None,
+        data: dict[str, any],
     ) -> bool:
         """handle arrays of named objects"""
         # todo handle optional nullable
@@ -186,6 +188,7 @@ class PropertyParser:
 
         type_of = self._oa_parser.get_component_name(schema.items)
         is_required = self._is_required(container.schema, name)
+        value = data.get(name)
 
         if not is_required and value is None:
             value = schema.items.default
@@ -207,6 +210,7 @@ class PropertyParser:
                 name=name,
                 value=value,
                 is_required=self._is_required(parent, name),
+                is_set=name in data,
             )
 
             return True
@@ -215,6 +219,7 @@ class PropertyParser:
             schema=parent,
             _type=type_of,
             is_required=is_required,
+            is_set=name in data,
         )
 
         for example in value:
@@ -232,7 +237,7 @@ class PropertyParser:
         container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
-        value: any,
+        data: dict[str, any],
     ) -> bool:
         """handle binary (file upload) types"""
 
@@ -242,8 +247,9 @@ class PropertyParser:
         container.properties[name] = model.PropertyFile(
             schema=schema,
             name=name,
-            value=value,
+            value=data.get(name),
             is_required=self._is_required(container.schema, name),
+            is_set=name in data,
         )
 
         return True
@@ -253,7 +259,7 @@ class PropertyParser:
         container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
-        value: any,
+        data: dict[str, any],
     ) -> bool:
         """handle free-form type, ignore inline schemas that should use $ref"""
 
@@ -263,8 +269,9 @@ class PropertyParser:
         container.properties[name] = model.PropertyFreeForm(
             schema=schema,
             name=name,
-            value=value,
+            value=data.get(name),
             is_required=self._is_required(container.schema, name),
+            is_set=name in data,
         )
 
         return True
@@ -274,7 +281,7 @@ class PropertyParser:
         container: "model.PropertyObject",
         schema: oa.Schema,
         name: str,
-        value: any,
+        data: dict[str, any],
     ) -> bool:
         """handle scalar types"""
 
@@ -284,8 +291,9 @@ class PropertyParser:
         container.properties[name] = model.PropertyScalar(
             schema=schema,
             name=name,
-            value=value,
+            value=data.get(name),
             is_required=self._is_required(container.schema, name),
+            is_set=name in data,
         )
 
         return True

@@ -171,9 +171,12 @@ class RubyGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "nil"
+
     def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
         if value is None:
-            return "nil"
+            return self.print_null()
 
         if item.type == "string" and item.format == "date-time":
             return f'Date.parse("{value}").to_time'

@@ -78,23 +78,24 @@ import models from "{{ config.npm_name }}"
 
 const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
 
-{% for obj_name, obj in property_container.flattened_objects().items() %}
-    {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
-    {% if not obj.is_array %}
+{% call(objects) m.parse_objects_macro(property_container) %}
+    {% for obj_name, obj in objects.items() %}
+        {% if not obj.is_array %}
 const {{ obj_name|print_variable }} = new models.{{ obj.type|split_uc|pascal_case }}();
-    {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
-        {% for name, value in properties.items() %}
+        {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
+            {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }};
-        {% endfor %}
-    {% endcall %}
-    {% else %}
-const {{ obj_name|print_variable }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
-    {{- value }};
+            {% endfor %}
         {% endcall %}
-    {% endif %}
+        {% else %}
+const {{ obj_name|print_variable }} = {{ "" }}
+            {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
+    {{- value }};
+            {% endcall %}
+        {% endif %}
 
-{% endfor %}
+    {% endfor %}
+{% endcall %}
 {# todo don't print variables for formdata requests #}
 {% if operation.request.parameters or operation.request.has_formdata %}
     {% call(properties) m.parse_api_call_properties_macro(property_container, 0, null, False) %}

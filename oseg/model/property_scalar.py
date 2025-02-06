@@ -14,8 +14,9 @@ class PropertyScalar(model.PropertyProto):
         name: str,
         value: T,
         is_required: bool,
+        is_set: bool,
     ):
-        super().__init__(schema, name, value, is_required)
+        super().__init__(schema, name, value, is_required, is_set)
 
         self._type = self._get_type()
         self._normalize_value()

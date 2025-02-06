@@ -13,6 +13,7 @@ class PropertyProto(Protocol):
     _is_array: bool
     _is_required: bool
     _is_nullable: bool
+    _is_set: bool
 
     def __init__(
         self,
@@ -20,6 +21,7 @@ class PropertyProto(Protocol):
         name: str,
         value: any,
         is_required: bool,
+        is_set: bool,
     ):
         self._schema = schema
         self._name = name
@@ -28,6 +30,7 @@ class PropertyProto(Protocol):
         self._is_array = parser.TypeChecker.is_array(self._schema)
         self._is_required = is_required
         self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
+        self._is_set = is_set
 
     @property
     def schema(self) -> oa.Schema:
@@ -61,6 +64,10 @@ class PropertyProto(Protocol):
     @property
     def is_nullable(self) -> bool:
         return self._is_nullable
+
+    @property
+    def is_set(self) -> bool:
+        return self._is_set
 
     # todo currently only support single type, not list of types
     def _get_type(self) -> str:

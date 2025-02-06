@@ -25,6 +25,7 @@ class PropertyObjectInterface(Protocol):
     _base_type: str | None
     _is_nullable: bool
     _is_required: bool
+    _is_set: bool
     _name: str
     # maps to property name ignoring conflicts with other identical names
     _original_name: str
@@ -75,6 +76,14 @@ class PropertyObjectInterface(Protocol):
     def is_required(self, flag: bool):
         self._is_required = flag
 
+    @property
+    def is_set(self) -> bool:
+        return self._is_set
+
+    @is_set.setter
+    def is_set(self, flag: bool):
+        self._is_set = flag
+
 
 class PropertyObject(PropertyObjectInterface):
     def __init__(
@@ -93,6 +102,7 @@ class PropertyObject(PropertyObjectInterface):
         self._properties: dict[str, T_PROPERTIES] = {}
         self._name = self._type
         self._original_name = self._name
+        self._is_set = True
 
     @property
     def properties(self) -> dict[str, T_PROPERTIES]:
@@ -187,6 +197,7 @@ class PropertyObjectArray(PropertyObjectInterface):
         schema: oa.Schema,
         _type: str,
         is_required: bool,
+        is_set: bool,
     ):
         self._schema = schema
         self._type = _type
@@ -196,6 +207,7 @@ class PropertyObjectArray(PropertyObjectInterface):
         self._properties: list[PROPERTY_OBJECT_TYPE] = []
         self._name = self._type
         self._original_name = self._name
+        self._is_set = is_set
 
     @property
     def properties(self) -> list[PROPERTY_OBJECT_TYPE]:

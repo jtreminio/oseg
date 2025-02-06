@@ -219,6 +219,10 @@ class BaseGenerator(Protocol):
 
         return printable
 
+    @abstractmethod
+    def print_null(self) -> str:
+        raise NotImplementedError
+
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 

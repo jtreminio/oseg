@@ -181,6 +181,9 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "undefined"
+
     def _get_target_type(
         self,
         item: model.PropertyScalar,
@@ -207,7 +210,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
             enum_name = self._get_enum_name(item, value)
 
             if enum_name is None:
-                return "undefined"
+                return self.print_null()
 
             if parent is None:
                 return self._to_json(value)

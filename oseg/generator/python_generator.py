@@ -189,6 +189,9 @@ class PythonGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "None"
+
     def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
         if item.type == "boolean" or value is None:
             return value

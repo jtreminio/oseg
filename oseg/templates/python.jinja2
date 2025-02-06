@@ -74,24 +74,25 @@ from {{ config.package_name }} import ApiClient, ApiException, Configuration, ap
 configuration = Configuration()
 
 with ApiClient(configuration) as api_client:
-{% for obj_name, obj in property_container.flattened_objects().items() %}
-    {% set parent_name = obj_name if obj_name != property_container.body.type else "" %}
-    {% if not obj.is_array %}
+{% call(objects) m.parse_objects_macro(property_container) %}
+    {% for obj_name, obj in objects.items() %}
+        {% if not obj.is_array %}
     {{ obj_name|print_variable }} = models.{{ obj.type|split_uc|pascal_case }}(
-        {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
-            {% for name, value in properties.items() %}
+            {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
+                {% for name, value in properties.items() %}
         {{ name|print_setter }}={{ value }},
-            {% endfor %}
-        {% endcall %}
+                {% endfor %}
+            {% endcall %}
     )
-    {% else %}
+        {% else %}
     {{ obj_name|print_variable }} = {{ "" }}
-        {%- call(value) m.parse_object_list_properties_macro(obj, 4) %}
+            {%- call(value) m.parse_object_list_properties_macro(obj, 4) %}
             {{- value }}
-        {% endcall %}
-    {% endif %}
+            {% endcall %}
+        {% endif %}
 
-{% endfor %}
+    {% endfor %}
+{% endcall %}
     try:
         {{ "" -}}
         {% if operation.response and operation.response.body  %}response = {% endif -%}

@@ -11,6 +11,25 @@ class TemplateParser:
         self._generator: g.BaseGenerator = generator
         self._config = config
 
+    def parse_objects(
+        self,
+        property_container: "model.PropertyContainer",
+    ) -> dict[str, "model.PropertyObject"]:
+        """Parse all top-level object variables"""
+
+        result = {}
+
+        for name, obj in property_container.flattened_objects().items():
+            # todo test
+            # if object is not required, is not nullable, and has no example data,
+            # we can skip printing it
+            if not obj.is_required and not obj.is_nullable and not obj.is_set:
+                continue
+
+            result[name] = obj
+
+        return result
+
     def parse_object_properties(
         self,
         macros: "model.JinjaMacros",
@@ -20,12 +39,21 @@ class TemplateParser:
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
 
-        # todo skip non-nullable optional properties
-        #  using config.oseg_ignore_optional_unset
-
         result = {}
 
         for _, prop in parent.non_objects().items():
+            # todo test
+            # if config flag oseg_ignore_optional_unset is enabled,
+            # and property is not required, and does not have example data,
+            # we can skip printing it
+            if (
+                self._config.oseg_ignore_optional_unset
+                and not prop.is_required
+                and prop.value is None
+                and not prop.is_set
+            ):
+                continue
+
             prop_name = self._resolve_keyword(prop.name, prop.original_name)
 
             result[prop_name] = self._parse_non_objects(
@@ -119,7 +147,18 @@ class TemplateParser:
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray
             ):
-                result[prop_name] = self._generator.print_variable(prop_name)
+                # todo test
+                # If a property listed in the api call signature is not required,
+                # and and has no example data, we want to print a null value
+                # instead of simply skipping printing it completely.
+                # We always want to use all properties during the api call
+                # because some generators do not have named parameters,
+                # meaning they must list all properties in the order defined
+                # in the OAS
+                if not prop.is_required and not prop.is_set:
+                    result[prop_name] = self._generator.print_null()
+                else:
+                    result[prop_name] = self._generator.print_variable(prop_name)
 
                 continue
 
@@ -168,6 +207,10 @@ class TemplateParser:
     ) -> dict[str, "model.PrintableObject"]:
         result = {}
         for property_name, sub_obj in obj.objects.items():
+            # todo test
+            if not sub_obj.is_required and not sub_obj.is_set:
+                continue
+
             prop_name = self._resolve_keyword(property_name, sub_obj.original_name)
             printable = model.PrintableObject()
             result[prop_name] = printable
@@ -178,6 +221,10 @@ class TemplateParser:
             printable.target_type = sub_obj.type
 
         for property_name, array_obj in obj.array_objects.items():
+            # todo test
+            if not array_obj.is_required and not array_obj.is_set:
+                continue
+
             prop_name = self._resolve_keyword(property_name, array_obj.original_name)
             printable = model.PrintableObject()
             result[prop_name] = printable
