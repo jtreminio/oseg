@@ -3,7 +3,7 @@ import json
 import os
 import click
 from tabulate import tabulate
-from oseg import Generator, jinja_extension, configs
+from oseg import Generator, generator as g
 
 """
 Example:
@@ -32,7 +32,7 @@ python3 run.py config-help -g csharp
 """
 
 
-generator_names = jinja_extension.ExtensionFactory.default_generator_names()
+generator_names = g.GeneratorFactory.default_generator_names()
 
 
 @click.group()
@@ -149,7 +149,7 @@ def generate(
     ),
 )
 def config_help(generator_name: str):
-    result = configs.BaseConfig.config_help(generator_name)
+    result = g.BaseConfig.config_help(generator_name)
 
     data = [
         ["Name", "", "Required", "Default"],
@@ -172,7 +172,7 @@ def get_config(
     config_file: str | None,
     generator_name: str | None,
     config: str | None,
-) -> str | configs.BaseConfigDef:
+) -> str | g.BaseConfigDef:
     if config_file:
         assert (
             generator_name is None
@@ -188,7 +188,7 @@ def get_config(
 
     assert isinstance(config, str), f"--config required when --config-file is not used"
 
-    result: configs.BaseConfigDef = {
+    result: g.BaseConfigDef = {
         "generatorName": generator_name,
         "additionalProperties": json.loads(config),
     }
