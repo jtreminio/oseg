@@ -1,7 +1,71 @@
-from oseg import generator, model, parser, configs
+import inspect
+from typing import TypedDict
+from oseg import generator, model, parser
+
+PythonConfigDef = TypedDict(
+    "PythonConfigDef",
+    {
+        "packageName": str,
+        "oseg.variableNamingConvention": str | None,
+        "oseg.ignoreOptionalUnset": bool | None,
+    },
+)
 
 
-class PythonExtension(generator.BaseGenerator):
+class PythonConfigComplete(TypedDict):
+    generatorName: str
+    additionalProperties: PythonConfigDef
+
+
+class PythonConfig(generator.BaseConfig):
+    GENERATOR_NAME = "python"
+
+    PROPS_REQUIRED = {
+        "packageName": inspect.cleandoc(
+            """
+            The package name of the source package. This is the SDK package
+            you are generating example snippets for. Ex: openapi_client
+            """
+        ),
+    }
+
+    PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "oseg.variableNamingConvention": {
+            "description": inspect.cleandoc(
+                """
+                Naming convention of variable names, one of "camelCase"
+                or "snake_case". (Default: snake_case)
+                """
+            ),
+            "default": "snake_case",
+        },
+        "oseg.ignoreOptionalUnset": {
+            "description": inspect.cleandoc(
+                """
+                Skip printing optional properties that do not have
+                a value. (Default: true)
+                """
+            ),
+            "default": True,
+        },
+    }
+
+    def __init__(self, config: PythonConfigDef):
+        self.package_name = config.get("packageName")
+        assert isinstance(self.package_name, str)
+
+        self.oseg_variable_naming_convention = config.get(
+            "oseg.variableNamingConvention",
+            self.PROPS_OPTIONAL["oseg.variableNamingConvention"].get("default"),
+        )
+
+        self.oseg_ignore_optional_unset = config.get(
+            "oseg.ignoreOptionalUnset",
+            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
+        )
+
+
+class PythonGenerator(generator.BaseGenerator):
     FILE_EXTENSION = "py"
     NAME = "python"
     TEMPLATE = f"{NAME}.jinja2"
@@ -64,7 +128,7 @@ class PythonExtension(generator.BaseGenerator):
         "yield",
     ]
 
-    _config: "configs.PythonConfig"
+    _config: PythonConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS

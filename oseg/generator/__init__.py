@@ -1,7 +1,13 @@
-from .base_generator import BaseGenerator, GeneratorFactory
-from .csharp_extension import CSharpExtension
-from .java_extension import JavaExtension
-from .php_extension import PhpExtension
-from .python_extension import PythonExtension
-from .ruby_extension import RubyExtension
-from .typescript_node_extension import TypescriptNodeExtension
+from .base_generator import (
+    BaseConfig,
+    BaseConfigDef,
+    BaseGenerator,
+    GeneratorFactory,
+    PropsOptionalT,
+)
+from .csharp_generator import CSharpConfig, CSharpGenerator
+from .java_generator import JavaConfig, JavaGenerator
+from .php_generator import PhpConfig, PhpGenerator
+from .python_generator import PythonConfig, PythonGenerator
+from .ruby_generator import RubyConfig, RubyGenerator
+from .typescript_node_generator import TypescriptNodeConfig, TypescriptNodeGenerator

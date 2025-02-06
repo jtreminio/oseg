@@ -1,12 +1,12 @@
 from typing import Optional
-from oseg import generator as g, model, configs
+from oseg import generator as g, model
 
 
 class TemplateParser:
     def __init__(
         self,
         generator: "g.BaseGenerator",
-        config: "configs.BaseConfig",
+        config: "g.BaseConfig",
     ):
         self._generator: g.BaseGenerator = generator
         self._config = config

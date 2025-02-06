@@ -1,7 +1,67 @@
-from oseg import generator, model, parser, configs
+import inspect
+from typing import TypedDict
+from oseg import generator, model, parser
+
+RubyConfigDef = TypedDict(
+    "RubyConfigDef",
+    {
+        "gemName": str,
+        "moduleName": str,
+        "oseg.ignoreOptionalUnset": bool | None,
+    },
+)
 
 
-class RubyExtension(generator.BaseGenerator):
+class RubyConfigComplete(TypedDict):
+    generatorName: str
+    moduleName: str
+    additionalProperties: RubyConfigDef
+
+
+class RubyConfig(generator.BaseConfig):
+    GENERATOR_NAME = "ruby"
+
+    PROPS_REQUIRED = {
+        "gemName": inspect.cleandoc(
+            """
+            The gem name of the source package. This is the SDK package
+            you are generating example snippets for. Ex: openapi_client
+            """
+        ),
+        "moduleName": inspect.cleandoc(
+            """
+            The module name of the source package. This is the SDK package
+            you are generating example snippets for. Ex: OpenAPIClient
+            """
+        ),
+    }
+
+    PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "oseg.ignoreOptionalUnset": {
+            "description": inspect.cleandoc(
+                """
+                Skip printing optional properties that do not have
+                a value. (Default: true)
+                """
+            ),
+            "default": True,
+        },
+    }
+
+    def __init__(self, config: RubyConfigDef):
+        self.gem_name = config.get("gemName")
+        self.module_name = config.get("moduleName")
+
+        assert isinstance(self.gem_name, str)
+        assert isinstance(self.module_name, str)
+
+        self.oseg_ignore_optional_unset = config.get(
+            "oseg.ignoreOptionalUnset",
+            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
+        )
+
+
+class RubyGenerator(generator.BaseGenerator):
     FILE_EXTENSION = "rb"
     NAME = "ruby"
     TEMPLATE = f"{NAME}.jinja2"
@@ -58,7 +118,7 @@ class RubyExtension(generator.BaseGenerator):
         "yield",
     ]
 
-    _config: "configs.PhpConfig"
+    _config: RubyConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

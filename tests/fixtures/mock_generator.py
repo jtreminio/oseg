@@ -2,8 +2,7 @@ import inspect
 from jinja2.runtime import Macro
 from mock import mock
 from typing import TypedDict
-from oseg.configs.base_config import BaseConfig, PropsOptionalT
-from oseg import jinja_extension, model, parser
+from oseg import generator, model, parser
 
 MockConfigDef = TypedDict(
     "MockConfigDef",
@@ -19,7 +18,7 @@ class MockConfigComplete(TypedDict):
     additionalProperties: MockConfigDef
 
 
-class MockConfig(BaseConfig):
+class MockConfig(generator.BaseConfig):
     GENERATOR_NAME = "mock"
 
     PROPS_REQUIRED = {
@@ -31,7 +30,7 @@ class MockConfig(BaseConfig):
         ),
     }
 
-    PROPS_OPTIONAL: dict[str, PropsOptionalT] = {
+    PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -53,7 +52,7 @@ class MockConfig(BaseConfig):
         )
 
 
-class MockExtension(jinja_extension.BaseExtension):
+class MockGenerator(generator.BaseGenerator):
     FILE_EXTENSION = "mock"
     NAME = "mock"
     TEMPLATE = f"{NAME}.jinja2"
@@ -64,6 +63,8 @@ class MockExtension(jinja_extension.BaseExtension):
         "while",
         "with",
     ]
+
+    _config: MockConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS

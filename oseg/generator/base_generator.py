@@ -1,42 +1,125 @@
 import json
 import openapi_pydantic as oa
 from abc import abstractmethod
-from typing import Protocol
-from oseg import generator, model, parser, configs
+from typing import Protocol, TypedDict, Any
+from oseg import generator, model, parser
+
+
+class PropsOptionalT(TypedDict):
+    description: str
+    default: Any
+
+
+class BaseConfigDef(TypedDict):
+    generatorName: str
+    additionalProperties: dict[str, any]
+
+
+class BaseConfig(Protocol):
+    GENERATOR_NAME: str
+    PROPS_REQUIRED: dict[str, str]
+    PROPS_OPTIONAL: dict[str, PropsOptionalT]
+
+    # Skip printing optional properties that do not have a value
+    oseg_ignore_optional_unset: bool
+
+    @staticmethod
+    def factory(config: BaseConfigDef | str) -> "BaseConfig":
+        if isinstance(config, str):
+            data = parser.FileLoader.get_file_contents(config)
+
+            if not len(data):
+                raise NotImplementedError(f"{config} contains invalid data")
+
+            config = data
+
+        additional_properties = config.get("additionalProperties", {})
+
+        match config.get("generatorName"):
+            case generator.CSharpConfig.GENERATOR_NAME:
+                return generator.CSharpConfig(additional_properties)
+            case generator.JavaConfig.GENERATOR_NAME:
+                return generator.JavaConfig(additional_properties)
+            case generator.PhpConfig.GENERATOR_NAME:
+                return generator.PhpConfig(additional_properties)
+            case generator.PythonConfig.GENERATOR_NAME:
+                return generator.PythonConfig(additional_properties)
+            case generator.RubyConfig.GENERATOR_NAME:
+                return generator.RubyConfig(additional_properties)
+            case generator.TypescriptNodeConfig.GENERATOR_NAME:
+                return generator.TypescriptNodeConfig(additional_properties)
+            case _:
+                raise NotImplementedError("Generator not found for config")
+
+    @staticmethod
+    def config_help(generator_name: str):
+        match generator_name:
+            case generator.CSharpConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.CSharpConfig.PROPS_REQUIRED,
+                    "optional": generator.CSharpConfig.PROPS_OPTIONAL,
+                }
+            case generator.JavaConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.JavaConfig.PROPS_REQUIRED,
+                    "optional": generator.JavaConfig.PROPS_OPTIONAL,
+                }
+            case generator.PhpConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.PhpConfig.PROPS_REQUIRED,
+                    "optional": generator.PhpConfig.PROPS_OPTIONAL,
+                }
+            case generator.PythonConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.PythonConfig.PROPS_REQUIRED,
+                    "optional": generator.PythonConfig.PROPS_OPTIONAL,
+                }
+            case generator.RubyConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.RubyConfig.PROPS_REQUIRED,
+                    "optional": generator.RubyConfig.PROPS_OPTIONAL,
+                }
+            case generator.TypescriptNodeConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.TypescriptNodeConfig.PROPS_REQUIRED,
+                    "optional": generator.TypescriptNodeConfig.PROPS_OPTIONAL,
+                }
+            case _:
+                raise NotImplementedError("Generator not found for config_help")
 
 
 class GeneratorFactory:
     @staticmethod
-    def factory(config: "configs.BaseConfig") -> "BaseGenerator":
-        if isinstance(config, configs.CSharpConfig):
-            return generator.CSharpExtension(config)
+    def factory(config: BaseConfig) -> "BaseGenerator":
+        if isinstance(config, generator.CSharpConfig):
+            return generator.CSharpGenerator(config)
 
-        if isinstance(config, configs.JavaConfig):
-            return generator.JavaExtension(config)
+        if isinstance(config, generator.JavaConfig):
+            return generator.JavaGenerator(config)
 
-        if isinstance(config, configs.PhpConfig):
-            return generator.PhpExtension(config)
+        if isinstance(config, generator.PhpConfig):
+            return generator.PhpGenerator(config)
 
-        if isinstance(config, configs.PythonConfig):
-            return generator.PythonExtension(config)
+        if isinstance(config, generator.PythonConfig):
+            return generator.PythonGenerator(config)
 
-        if isinstance(config, configs.RubyConfig):
-            return generator.RubyExtension(config)
+        if isinstance(config, generator.RubyConfig):
+            return generator.RubyGenerator(config)
 
-        if isinstance(config, configs.TypescriptNodeConfig):
-            return generator.TypescriptNodeExtension(config)
+        if isinstance(config, generator.TypescriptNodeConfig):
+            return generator.TypescriptNodeGenerator(config)
 
         raise NotImplementedError
 
     @staticmethod
     def default_generator_names() -> list[str]:
         return [
-            generator.CSharpExtension.NAME,
-            generator.JavaExtension.NAME,
-            generator.PhpExtension.NAME,
-            generator.PythonExtension.NAME,
-            generator.RubyExtension.NAME,
-            generator.TypescriptNodeExtension.NAME,
+            generator.CSharpGenerator.NAME,
+            generator.JavaGenerator.NAME,
+            generator.PhpGenerator.NAME,
+            generator.PythonGenerator.NAME,
+            generator.RubyGenerator.NAME,
+            generator.TypescriptNodeGenerator.NAME,
         ]
 
 
@@ -47,12 +130,12 @@ class BaseGenerator(Protocol):
     X_ENUM_VARNAMES = "x-enum-varnames"
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
-    def __init__(self, config: configs.BaseConfig):
+    def __init__(self, config: BaseConfig):
         self._config = config
         self._template_parser = parser.TemplateParser(self, config)
 
     @property
-    def config(self) -> "configs.BaseConfig":
+    def config(self) -> BaseConfig:
         return self._config
 
     @property
