@@ -1,7 +1,7 @@
 import unittest
 from random import randrange
 from test_utils import TestUtils
-from fixtures.mock_extension import MockExtension, JINJA_MACROS
+from fixtures.mock_extension import MockConfig, MockExtension, JINJA_MACROS
 from oseg import model, parser
 
 
@@ -13,8 +13,10 @@ class TestTemplateParser(unittest.TestCase):
         cls.oa_parser = TestUtils.oa_parser("properties")
 
         cls.jinja_macros = model.JinjaMacros(JINJA_MACROS)
-        jinja_ext = MockExtension()
-        cls.template_parser = jinja_ext.template_parser
+        config_data = parser.FileLoader.get_file_contents("fixtures/config-mock.yaml")
+        config = MockConfig(config_data.get("additionalProperties", {}))
+        sdk_generator = MockExtension(config)
+        cls.template_parser = sdk_generator.template_parser
 
         cls.example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
         cls.example_data = {

@@ -32,7 +32,7 @@ python3 run.py config-help -g csharp
 """
 
 
-generator_names = jinja_extension.BaseExtension.default_generator_names()
+generator_names = jinja_extension.ExtensionFactory.default_generator_names()
 
 
 @click.group()

@@ -1,4 +1,5 @@
 from .base_extension import BaseExtension
+from .extension_factory import ExtensionFactory
 from .jinja_ext import JinjaExt
 from .csharp_extension import CSharpExtension
 from .java_extension import JavaExtension

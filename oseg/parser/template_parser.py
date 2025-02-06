@@ -1,11 +1,16 @@
 from typing import Optional
 
-from oseg import jinja_extension, model
+from oseg import jinja_extension, model, configs
 
 
 class TemplateParser:
-    def __init__(self, extension: "jinja_extension.BaseExtension"):
+    def __init__(
+        self,
+        extension: "jinja_extension.BaseExtension",
+        config: "configs.BaseConfig",
+    ):
         self._extension: jinja_extension.BaseExtension = extension
+        self._config = config
 
     def parse_object_properties(
         self,

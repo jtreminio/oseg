@@ -18,7 +18,7 @@ class BaseConfig(Protocol):
     PROPS_OPTIONAL: dict[str, PropsOptionalT]
 
     # Skip printing optional properties that do not have a value
-    oseg_ignore_optional_unset = True
+    oseg_ignore_optional_unset: bool
 
     @staticmethod
     def factory(config: BaseConfigDef | str) -> "BaseConfig":
@@ -32,62 +32,54 @@ class BaseConfig(Protocol):
 
         additional_properties = config.get("additionalProperties", {})
 
-        if config.get("generatorName") == configs.CSharpConfig.GENERATOR_NAME:
-            return configs.CSharpConfig(additional_properties)
-
-        if config.get("generatorName") == configs.JavaConfig.GENERATOR_NAME:
-            return configs.JavaConfig(additional_properties)
-
-        if config.get("generatorName") == configs.PhpConfig.GENERATOR_NAME:
-            return configs.PhpConfig(additional_properties)
-
-        if config.get("generatorName") == configs.PythonConfig.GENERATOR_NAME:
-            return configs.PythonConfig(additional_properties)
-
-        if config.get("generatorName") == configs.RubyConfig.GENERATOR_NAME:
-            return configs.RubyConfig(additional_properties)
-
-        if config.get("generatorName") == configs.TypescriptNodeConfig.GENERATOR_NAME:
-            return configs.TypescriptNodeConfig(additional_properties)
-
-        raise NotImplementedError("Generator not found for config")
+        match config.get("generatorName"):
+            case configs.CSharpConfig.GENERATOR_NAME:
+                return configs.CSharpConfig(additional_properties)
+            case configs.JavaConfig.GENERATOR_NAME:
+                return configs.JavaConfig(additional_properties)
+            case configs.PhpConfig.GENERATOR_NAME:
+                return configs.PhpConfig(additional_properties)
+            case configs.PythonConfig.GENERATOR_NAME:
+                return configs.PythonConfig(additional_properties)
+            case configs.RubyConfig.GENERATOR_NAME:
+                return configs.RubyConfig(additional_properties)
+            case configs.TypescriptNodeConfig.GENERATOR_NAME:
+                return configs.TypescriptNodeConfig(additional_properties)
+            case _:
+                raise NotImplementedError("Generator not found for config")
 
     @staticmethod
     def config_help(generator_name: str):
-        if generator_name == configs.CSharpConfig.GENERATOR_NAME:
-            return {
-                "required": configs.CSharpConfig.PROPS_REQUIRED,
-                "optional": configs.CSharpConfig.PROPS_OPTIONAL,
-            }
-
-        if generator_name == configs.JavaConfig.GENERATOR_NAME:
-            return {
-                "required": configs.JavaConfig.PROPS_REQUIRED,
-                "optional": configs.JavaConfig.PROPS_OPTIONAL,
-            }
-
-        if generator_name == configs.PhpConfig.GENERATOR_NAME:
-            return {
-                "required": configs.PhpConfig.PROPS_REQUIRED,
-                "optional": configs.PhpConfig.PROPS_OPTIONAL,
-            }
-
-        if generator_name == configs.PythonConfig.GENERATOR_NAME:
-            return {
-                "required": configs.PythonConfig.PROPS_REQUIRED,
-                "optional": configs.PythonConfig.PROPS_OPTIONAL,
-            }
-
-        if generator_name == configs.RubyConfig.GENERATOR_NAME:
-            return {
-                "required": configs.RubyConfig.PROPS_REQUIRED,
-                "optional": configs.RubyConfig.PROPS_OPTIONAL,
-            }
-
-        if generator_name == configs.TypescriptNodeConfig.GENERATOR_NAME:
-            return {
-                "required": configs.TypescriptNodeConfig.PROPS_REQUIRED,
-                "optional": configs.TypescriptNodeConfig.PROPS_OPTIONAL,
-            }
-
-        raise NotImplementedError("Generator not found for config_help")
+        match generator_name:
+            case configs.CSharpConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.CSharpConfig.PROPS_REQUIRED,
+                    "optional": configs.CSharpConfig.PROPS_OPTIONAL,
+                }
+            case configs.JavaConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.JavaConfig.PROPS_REQUIRED,
+                    "optional": configs.JavaConfig.PROPS_OPTIONAL,
+                }
+            case configs.PhpConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.PhpConfig.PROPS_REQUIRED,
+                    "optional": configs.PhpConfig.PROPS_OPTIONAL,
+                }
+            case configs.PythonConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.PythonConfig.PROPS_REQUIRED,
+                    "optional": configs.PythonConfig.PROPS_OPTIONAL,
+                }
+            case configs.RubyConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.RubyConfig.PROPS_REQUIRED,
+                    "optional": configs.RubyConfig.PROPS_OPTIONAL,
+                }
+            case configs.TypescriptNodeConfig.GENERATOR_NAME:
+                return {
+                    "required": configs.TypescriptNodeConfig.PROPS_REQUIRED,
+                    "optional": configs.TypescriptNodeConfig.PROPS_OPTIONAL,
+                }
+            case _:
+                raise NotImplementedError("Generator not found for config_help")

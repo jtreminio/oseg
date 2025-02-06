@@ -2,7 +2,7 @@ import json
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol
-from oseg import jinja_extension as j, model, parser, configs
+from oseg import model, parser, configs
 
 
 class BaseExtension(Protocol):
@@ -12,41 +12,13 @@ class BaseExtension(Protocol):
     X_ENUM_VARNAMES = "x-enum-varnames"
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
-    _config: "configs.BaseConfig"
-    _template_parser: "parser.TemplateParser"
-
-    def __init__(self):
-        self._template_parser = parser.TemplateParser(self)
-
-    @staticmethod
-    def default_generator_names() -> list[str]:
-        return [
-            j.CSharpExtension.NAME,
-            j.JavaExtension.NAME,
-            j.PhpExtension.NAME,
-            j.PythonExtension.NAME,
-            j.RubyExtension.NAME,
-            j.TypescriptNodeExtension.NAME,
-        ]
-
-    @staticmethod
-    def default_generators() -> dict[str, "BaseExtension"]:
-        return {
-            j.CSharpExtension.NAME: j.CSharpExtension(),
-            j.JavaExtension.NAME: j.JavaExtension(),
-            j.PhpExtension.NAME: j.PhpExtension(),
-            j.PythonExtension.NAME: j.PythonExtension(),
-            j.RubyExtension.NAME: j.RubyExtension(),
-            j.TypescriptNodeExtension.NAME: j.TypescriptNodeExtension(),
-        }
+    def __init__(self, config: configs.BaseConfig):
+        self._config = config
+        self._template_parser = parser.TemplateParser(self, config)
 
     @property
     def config(self) -> "configs.BaseConfig":
         return self._config
-
-    @config.setter
-    def config(self, config: "configs.BaseConfig"):
-        self._config = config
 
     @property
     def template_parser(self) -> parser.TemplateParser:

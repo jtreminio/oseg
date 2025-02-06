@@ -2,6 +2,7 @@ generatorName: mock
 additionalProperties:
   packageName: openapi_client
   projectName: openapi-client
+  oseg.ignoreOptionalUnset: true
 globalProperties:
   apiTests: false
   modelTests: false

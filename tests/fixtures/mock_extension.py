@@ -1,6 +1,56 @@
+import inspect
 from jinja2.runtime import Macro
 from mock import mock
+from typing import TypedDict
+from oseg.configs.base_config import BaseConfig, PropsOptionalT
 from oseg import jinja_extension, model, parser
+
+MockConfigDef = TypedDict(
+    "MockConfigDef",
+    {
+        "packageName": str,
+        "oseg.ignoreOptionalUnset": bool | None,
+    },
+)
+
+
+class MockConfigComplete(TypedDict):
+    generatorName: str
+    additionalProperties: MockConfigDef
+
+
+class MockConfig(BaseConfig):
+    GENERATOR_NAME = "mock"
+
+    PROPS_REQUIRED = {
+        "packageName": inspect.cleandoc(
+            """
+            The package name of the source package. This is the SDK package
+            you are generating example snippets for. Ex: openapi_client
+            """
+        ),
+    }
+
+    PROPS_OPTIONAL: dict[str, PropsOptionalT] = {
+        "oseg.ignoreOptionalUnset": {
+            "description": inspect.cleandoc(
+                """
+                Skip printing optional properties that do not have
+                a value. (Default: true)
+                """
+            ),
+            "default": True,
+        },
+    }
+
+    def __init__(self, config: MockConfigDef):
+        self.package_name = config.get("packageName")
+        assert isinstance(self.package_name, str)
+
+        self.oseg_ignore_optional_unset = config.get(
+            "oseg.ignoreOptionalUnset",
+            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
+        )
 
 
 class MockExtension(jinja_extension.BaseExtension):

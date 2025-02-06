@@ -1,8 +1,7 @@
-import caseconverter
 import os
 from typing import Optional
 
-from . import jinja_extension, configs, model, parser
+from . import jinja_extension as j, configs, model, parser
 
 
 class Generator:
@@ -12,7 +11,6 @@ class Generator:
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
-        self._jinja = jinja_extension.JinjaExt.factory()
         self._oa_parser = parser.OaParser(
             oas_file,
             operation_id,
@@ -25,48 +23,31 @@ class Generator:
         output_dir: str,
     ) -> int:
         config = configs.BaseConfig.factory(config)
-        self._jinja.sdk_generator = config
-        file_extension = self._jinja.sdk_generator.FILE_EXTENSION
+        sdk_generator = j.ExtensionFactory.factory(config)
+        jinja = j.JinjaExt.factory(sdk_generator)
 
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
 
         for _, operation in self._oa_parser.operations.items():
             for name, property_container in operation.request.example_data.items():
-                self._parse_operation(
+                operation_id = operation.operation_id
+                filename = parser.NormalizeStr.pascal_case(
+                    parser.NormalizeStr.normalize(f"{operation_id}_{name}")
+                )
+                file_extension = sdk_generator.FILE_EXTENSION
+                target_file = f"{output_dir}/{filename}.{file_extension}"
+
+                print(f"Begin parsing for {config.GENERATOR_NAME} {filename}")
+
+                rendered = jinja.template.render(
                     operation=operation,
-                    example_name=name,
                     property_container=property_container,
+                    example_name=name,
                     config=config,
-                    output_dir=output_dir,
-                    file_extension=file_extension,
                 )
 
+                with open(target_file, "w", encoding="utf-8") as f:
+                    f.write(rendered)
+
         return 0
-
-    def _parse_operation(
-        self,
-        operation: model.Operation,
-        example_name: str,
-        property_container: model.PropertyContainer,
-        config: configs.BaseConfig,
-        output_dir: str,
-        file_extension: str,
-    ) -> None:
-        operation_id = operation.operation_id
-        filename = f"{operation_id[:1].upper()}{operation_id[1:]}_{example_name}"
-        print(f"Begin parsing for {filename}")
-
-        filename = caseconverter.pascalcase(parser.NormalizeStr.normalize(filename))
-
-        rendered = self._jinja.template.render(
-            operation=operation,
-            property_container=property_container,
-            example_name=example_name,
-            config=config,
-        )
-
-        target_file = f"{output_dir}/{filename}.{file_extension}"
-
-        with open(target_file, "w", encoding="utf-8") as f:
-            f.write(rendered)

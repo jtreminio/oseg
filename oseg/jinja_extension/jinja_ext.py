@@ -2,14 +2,14 @@ import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
 from typing import Callable
-from oseg import jinja_extension, model, parser, configs
+from oseg import jinja_extension, model, parser
 
 
 class JinjaExt(jinja2.ext.Extension):
     _sdk_generator: "jinja_extension.BaseExtension"
 
     @staticmethod
-    def factory() -> "JinjaExt":
+    def factory(sdk_generator: "jinja_extension.BaseExtension") -> "JinjaExt":
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,
@@ -17,7 +17,12 @@ class JinjaExt(jinja2.ext.Extension):
             extensions=[JinjaExt],
         )
 
-        return env.extensions.get("oseg.jinja_extension.jinja_ext.JinjaExt")
+        extension: JinjaExt = env.extensions.get(
+            "oseg.jinja_extension.jinja_ext.JinjaExt"
+        )
+        extension._sdk_generator = sdk_generator
+
+        return extension
 
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)
@@ -56,27 +61,9 @@ class JinjaExt(jinja2.ext.Extension):
             parse_api_call_properties=self._parse_api_call_properties
         )
 
-        self._generators = jinja_extension.BaseExtension.default_generators()
-
     @property
     def template(self) -> jinja2.Template:
         return self.environment.get_template(self._sdk_generator.TEMPLATE)
-
-    @property
-    def sdk_generator(self) -> "jinja_extension.BaseExtension":
-        return self._sdk_generator
-
-    @sdk_generator.setter
-    def sdk_generator(self, config: "configs.BaseConfig"):
-        self._sdk_generator = self._generators[config.GENERATOR_NAME]
-        self._sdk_generator.config = config
-
-    def add_generator(
-        self,
-        name: str,
-        generator: "jinja_extension.BaseExtension",
-    ) -> None:
-        self._generators[name] = generator
 
     @pass_context
     def _parse_object_properties(
