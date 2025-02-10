@@ -72,7 +72,7 @@ fs.createReadStream("{{ printable.value }}")
 
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
-    {% if not printable.is_primary and printable.is_first %}{% set comment = "// " %}{% endif %}
+    {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 
     {%- if printable.method == "api_key" %}{{ comment }}apiCaller.setApiKey(api.{{ operation.api_name|split_uc|pascal_case }}ApiApiKeys.{{ printable.name }}, "{{ printable.value }}");
     {%- elif printable.method == "username" %}{{ comment }}apiCaller.username = "{{ printable.value }}";

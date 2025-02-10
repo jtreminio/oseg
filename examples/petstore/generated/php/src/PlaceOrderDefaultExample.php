@@ -9,7 +9,7 @@ use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 $config->setAccessToken("YOUR_ACCESS_TOKEN");
-$config->setApiKey("api_key", "YOUR_API_KEY");
+// $config->setApiKey("api_key", "YOUR_API_KEY");
 
 $order = (new OpenAPI\Client\Model\Order())
     ->setId(12345)

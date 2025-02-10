@@ -19,7 +19,7 @@ public class PlaceOrderDefaultExample
     {
         var config = Configuration.getDefaultApiClient();
         config.setAccessToken("YOUR_ACCESS_TOKEN");
-        config.setApiKey("YOUR_API_KEY");
+        // config.setApiKey("YOUR_API_KEY");
 
         var order = new Order();
         order.id(12345L);

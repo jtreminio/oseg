@@ -9,7 +9,7 @@ use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
 $config->setAccessToken("YOUR_ACCESS_TOKEN");
-$config->setApiKey("api_key", "YOUR_API_KEY");
+// $config->setApiKey("api_key", "YOUR_API_KEY");
 
 try {
     $response = (new OpenAPI\Client\Api\UserApi(config: $config))->getUserByName(

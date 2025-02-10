@@ -83,7 +83,7 @@ new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
 
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
-    {% if not printable.is_primary and printable.is_first %}{% set comment = "// " %}{% endif %}
+    {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 
     {%- if printable.method == "api_key" %}{{ comment }}config.ApiKey = "{{ printable.value }}";
     {%- elif printable.method == "username" %}{{ comment }}config.Username = "{{ printable.value }}";
