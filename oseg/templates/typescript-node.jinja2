@@ -135,7 +135,7 @@ apiCaller.{{ operation.operation_id|camel_case }}({% if not properties %})
 {% if not operation.response.is_binary %}
   console.log(response.body);
 {% elif operation.response.is_binary %}
-  fs.createWriteStream('file_response.zip').write(response.body);
+  fs.createWriteStream('./file_response').write(response.body);
 {% endif -%}
 }){% endif %}.catch(error => {
   console.log("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}:");

@@ -8,7 +8,7 @@ using Org.OpenAPITools.Model;
 
 namespace OSEG.PetStore.Examples;
 
-public class GetInventoryDefaultExample
+public class GetInventoryExample
 {
     public static void Run()
     {

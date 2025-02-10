@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GetInventoryDefaultExample
+public class LogoutUserExample
 {
     public static void main(String[] args)
     {
@@ -22,11 +22,9 @@ public class GetInventoryDefaultExample
 
         try
         {
-            var response = new StoreApi(config).getInventory();
-
-            System.out.println(response);
+            new UserApi(config).logoutUser();
         } catch (ApiException e) {
-            System.err.println("Exception when calling Store#getInventory");
+            System.err.println("Exception when calling User#logoutUser");
             System.err.println("Status code: " + e.getCode());
             System.err.println("Reason: " + e.getResponseBody());
             System.err.println("Response headers: " + e.getResponseHeaders());

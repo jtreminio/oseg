@@ -8,7 +8,7 @@ using Org.OpenAPITools.Model;
 
 namespace OSEG.PetStore.Examples;
 
-public class LogoutUserDefaultExample
+public class LogoutUserExample
 {
     public static void Run()
     {

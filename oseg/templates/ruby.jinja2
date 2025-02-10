@@ -135,7 +135,7 @@ begin
     p response
 {% elif operation.response and operation.response.is_binary %}
 
-    FileUtils.cp(response.path, "path/to/file.zip")
+    FileUtils.cp(response.path, "./file_response")
 {% endif %}
 rescue {{ config.module_name }}::ApiError => e
     puts "Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|snake_case }}: #{e}"

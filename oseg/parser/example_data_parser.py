@@ -4,7 +4,7 @@ from oseg import parser, model
 
 
 class ExampleDataParser:
-    DEFAULT_EXAMPLE_NAME = "default_example"
+    DEFAULT_EXAMPLE_NAME = "example"
 
     def __init__(self, oa_parser: "parser.OaParser"):
         self._oa_parser = oa_parser

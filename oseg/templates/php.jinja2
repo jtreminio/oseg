@@ -140,7 +140,7 @@ try {
     print_r($response);
 {% elif operation.response and operation.response.is_binary %}
 
-    copy($response->getRealPath(), __DIR__ . '/file_response.zip');
+    copy($response->getRealPath(), __DIR__ . '/file_response');
 {% endif %}
 } catch ({{ config.invoker_package }}\ApiException $e) {
     echo "Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}: {$e->getMessage()}";

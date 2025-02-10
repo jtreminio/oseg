@@ -133,7 +133,7 @@ with ApiClient(configuration) as api_client:
         pprint(response)
     {% elif operation.response and operation.response.is_binary %}
 
-        open("file_response.zip", "wb").write(response.read())
+        open("./file_response", "wb").write(response.read())
     {% endif %}
     except ApiException as e:
         print("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|snake_case }}: %s\n" % e)
