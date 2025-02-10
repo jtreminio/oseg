@@ -9,6 +9,7 @@ RESOLVABLE = Union[
     oa.RequestBody,
     oa.Response,
     oa.Schema,
+    oa.SecurityScheme,
 ]
 
 
@@ -47,6 +48,10 @@ class OaParser:
         return self._openapi.paths
 
     @property
+    def security(self) -> list[dict[str, list[str]]] | None:
+        return self._openapi.security
+
+    @property
     def components(self) -> oa.Components:
         return self._openapi.components
 
@@ -64,6 +69,12 @@ class OaParser:
 
     def resolve_response(self, schema: oa.Response | oa.Reference) -> oa.Response:
         return self._get_resolved_component(schema, self.components.responses)
+
+    def resolve_security(
+        self,
+        schema: oa.SecurityScheme | oa.Reference,
+    ) -> oa.SecurityScheme:
+        return self._get_resolved_component(schema, self.components.securitySchemes)
 
     def resolve_example(self, schema: oa.Example | oa.Reference) -> oa.Example | None:
         return self._get_resolved_component(schema, self.components.examples)

@@ -11,6 +11,7 @@ class JinjaMacros:
         self._print_file_array: Macro = macros["print_file_array"]
         self._print_free_form: Macro = macros["print_free_form"]
         self._print_free_form_array: Macro = macros["print_free_form_array"]
+        self._print_security: Macro = macros["print_security"]
 
     @property
     def print_object(self) -> Macro:
@@ -43,3 +44,7 @@ class JinjaMacros:
     @property
     def print_free_form_array(self) -> Macro:
         return self._print_free_form_array
+
+    @property
+    def print_security(self) -> Macro:
+        return self._print_security

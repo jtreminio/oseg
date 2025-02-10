@@ -1,6 +1,7 @@
 require "openapi_client"
 
 OpenApiClient.configure do |config|
+    config.access_token = "YOUR_ACCESS_TOKEN";
 end
 
 begin

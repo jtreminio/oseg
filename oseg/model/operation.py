@@ -9,12 +9,14 @@ class Operation:
         operation: oa.Operation,
         request: "model.Request",
         response: Optional["model.Response"],
+        security: "model.Security",
         api_name: str,
         http_method: str,
     ):
         self._operation = operation
         self._request: "model.Request" = request
         self._response: Optional["model.Response"] = response
+        self._security: "model.Security" = security
         self._api_name = api_name
         self._http_method = http_method
 
@@ -35,3 +37,7 @@ class Operation:
     @property
     def response(self) -> Optional["model.Response"]:
         return self._response
+
+    @property
+    def security(self) -> Optional["model.Security"]:
+        return self._security

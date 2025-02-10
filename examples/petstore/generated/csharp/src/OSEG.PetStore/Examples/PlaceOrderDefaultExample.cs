@@ -13,6 +13,8 @@ public class PlaceOrderDefaultExample
     public static void Run()
     {
         var config = new Configuration();
+        config.AccessToken = "YOUR_ACCESS_TOKEN";
+        config.ApiKey = "YOUR_API_KEY";
 
         var order = new Order(
             id: 12345,

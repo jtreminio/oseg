@@ -68,6 +68,17 @@ new SplFileObject("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary and printable.is_first %}{% set comment = "// " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}{{ comment }}$config->setApiKey("{{ printable.name }}", "{{ printable.value }}");
+    {%- elif printable.method == "username" %}{{ comment }}$config->setUsername("{{ printable.value }}");
+    {%- elif printable.method == "password" %}{{ comment }}$config->setPassword("{{ printable.value }}");
+    {%- elif printable.method == "access_token" %}{{ comment }}$config->setAccessToken("{{ printable.value }}");
+    {%- endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 <?php
@@ -78,9 +89,18 @@ namespace {{ config.oseg_namespace }};
 {% endif %}
 require_once {{ config.oseg_autoload_location }};
 
+use SplFileObject;
 use {{ config.invoker_package|split("\\")|first }};
 
 $config = {{ config.invoker_package }}\Configuration::getDefaultConfiguration();
+{% if operation.security.is_optional %}
+// Authentication is optional for this API endpoint
+{% endif %}
+{% call(security_schemes) m.parse_security_macro(operation, 0) %}
+    {% for _, security in security_schemes.items() %}
+{{ security }}
+    {% endfor %}
+{% endcall %}
 
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}

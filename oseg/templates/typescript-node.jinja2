@@ -70,6 +70,17 @@ fs.createReadStream("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary and printable.is_first %}{% set comment = "// " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}{{ comment }}apiCaller.setApiKey(api.{{ operation.api_name|split_uc|pascal_case }}ApiApiKeys.{{ printable.name }}, "{{ printable.value }}");
+    {%- elif printable.method == "username" %}{{ comment }}apiCaller.username = "{{ printable.value }}";
+    {%- elif printable.method == "password" %}{{ comment }}apiCaller.password = "{{ printable.value }}";
+    {%- elif printable.method == "access_token" %}{{ comment }}apiCaller.accessToken = "{{ printable.value }}";
+    {%- endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 import * as fs from 'fs';
@@ -77,6 +88,14 @@ import api from "{{ config.npm_name }}"
 import models from "{{ config.npm_name }}"
 
 const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
+{% if operation.security.is_optional %}
+// Authentication is optional for this API endpoint
+{% endif %}
+{% call(security_schemes) m.parse_security_macro(operation, 4) %}
+    {% for _, security in security_schemes.items() %}
+{{ security }}
+    {% endfor %}
+{% endcall %}
 
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}

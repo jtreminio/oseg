@@ -13,6 +13,7 @@ public class DeletePetDefaultExample
     public static void Run()
     {
         var config = new Configuration();
+        config.AccessToken = "YOUR_ACCESS_TOKEN";
 
         try
         {

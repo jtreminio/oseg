@@ -51,6 +51,7 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["print_variable"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.print_variable(name)
         )
+        environment.globals.update(parse_security=self._parse_security)
         environment.globals.update(parse_objects=self._parse_objects)
         environment.globals.update(
             parse_object_properties=self._parse_object_properties
@@ -65,6 +66,19 @@ class JinjaExt(jinja2.ext.Extension):
     @property
     def template(self) -> jinja2.Template:
         return self.environment.get_template(self._sdk_generator.TEMPLATE)
+
+    @pass_context
+    def _parse_security(
+        self,
+        context: Context,
+        operation: "model.Operation",
+        indent_count: int,
+    ) -> dict[str, str]:
+        return self._sdk_generator.template_parser.parse_security(
+            macros=model.JinjaMacros(context.parent),
+            operation=operation,
+            indent_count=indent_count,
+        )
 
     def _parse_objects(
         self,

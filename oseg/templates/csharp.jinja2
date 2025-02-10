@@ -81,6 +81,17 @@ new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary and printable.is_first %}{% set comment = "// " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}{{ comment }}config.ApiKey = "{{ printable.value }}";
+    {%- elif printable.method == "username" %}{{ comment }}config.Username = "{{ printable.value }}";
+    {%- elif printable.method == "password" %}{{ comment }}config.Password = "{{ printable.value }}";
+    {%- elif printable.method == "access_token" %}{{ comment }}config.AccessToken = "{{ printable.value }}";
+    {%- endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 using System;
@@ -100,6 +111,14 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     public static void Run()
     {
         var config = new Configuration();
+        {% if operation.security.is_optional %}
+        // Authentication is optional for this API endpoint
+        {% endif %}
+{% call(security_schemes) m.parse_security_macro(operation, 8) %}
+    {% for _, security in security_schemes.items() %}
+        {{ security }}
+    {% endfor %}
+{% endcall %}
 
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}

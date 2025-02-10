@@ -3,6 +3,7 @@ from .property_proto import PropertyProto
 from .operation import Operation
 from .response import Response
 from .request import Request
+from .security import Security, SecurityMethod
 
 from .example_data import (
     EXAMPLE_DATA_BODY,
@@ -18,6 +19,7 @@ from .printable import (
     PrintableFreeForm,
     PrintableObject,
     PrintableScalar,
+    PrintableSecurity,
 )
 from .property_container import PropertyContainer
 from .property_file import PropertyFile

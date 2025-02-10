@@ -18,6 +18,7 @@ public class FindPetsByTagsDefaultExample
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
+        config.setAccessToken("YOUR_ACCESS_TOKEN");
 
         try
         {

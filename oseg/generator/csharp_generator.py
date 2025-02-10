@@ -9,6 +9,7 @@ CSharpConfigDef = TypedDict(
         "packageName": str,
         "oseg.namespace": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
+        "oseg.security": dict[str, any] | None,
     },
 )
 
@@ -49,6 +50,14 @@ class CSharpConfig(generator.BaseConfig):
             ),
             "default": True,
         },
+        "oseg.security": {
+            "description": inspect.cleandoc(
+                """
+                Security scheme definitions
+                """
+            ),
+            "default": {},
+        },
     }
 
     def __init__(self, config: CSharpConfigDef):
@@ -64,6 +73,8 @@ class CSharpConfig(generator.BaseConfig):
             "oseg.ignoreOptionalUnset",
             self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
         )
+
+        self.oseg_security = self._parse_security(config)
 
 
 class CSharpGenerator(generator.BaseGenerator):

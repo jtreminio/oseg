@@ -64,11 +64,30 @@ File.new("{{ printable.value }}", "r")
 ]
 {%- endmacro -%}
 
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary and printable.is_first %}{% set comment = "# " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}{{ comment }}config.api_key = "{{ printable.value }}";
+    {%- elif printable.method == "username" %}{{ comment }}config.username = "{{ printable.value }}";
+    {%- elif printable.method == "password" %}{{ comment }}config.password = "{{ printable.value }}";
+    {%- elif printable.method == "access_token" %}{{ comment }}config.access_token = "{{ printable.value }}";
+    {%- endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 require "{{ config.gem_name }}"
 
 {{ config.module_name }}.configure do |config|
+{% if operation.security.is_optional %}
+    # Authentication is optional for this API endpoint
+{% endif %}
+{% call(security_schemes) m.parse_security_macro(operation, 4) %}
+    {% for _, security in security_schemes.items() %}
+    {{ security }}
+    {% endfor %}
+{% endcall %}
 end
 
 {% call(objects) m.parse_objects_macro(property_container) %}

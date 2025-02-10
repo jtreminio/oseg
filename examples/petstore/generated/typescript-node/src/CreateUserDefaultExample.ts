@@ -3,6 +3,7 @@ import api from "openapi_client"
 import models from "openapi_client"
 
 const apiCaller = new api.UserApi();
+apiCaller.setApiKey(api.UserApiApiKeys.api_key, "YOUR_API_KEY");
 
 const user = new models.User();
 user.id = 12345;

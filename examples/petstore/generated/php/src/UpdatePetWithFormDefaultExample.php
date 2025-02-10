@@ -4,9 +4,11 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SplFileObject;
 use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
+$config->setAccessToken("YOUR_ACCESS_TOKEN");
 
 try {
     (new OpenAPI\Client\Api\PetApi(config: $config))->updatePetWithForm(

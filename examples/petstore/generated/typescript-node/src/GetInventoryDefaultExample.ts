@@ -3,6 +3,7 @@ import api from "openapi_client"
 import models from "openapi_client"
 
 const apiCaller = new api.StoreApi();
+apiCaller.setApiKey(api.StoreApiApiKeys.api_key, "YOUR_API_KEY");
 
 apiCaller.getInventory().then(response => {
   console.log(response.body);

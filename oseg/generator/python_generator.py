@@ -8,6 +8,7 @@ PythonConfigDef = TypedDict(
         "packageName": str,
         "oseg.variableNamingConvention": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
+        "oseg.security": dict[str, any] | None,
     },
 )
 
@@ -48,6 +49,14 @@ class PythonConfig(generator.BaseConfig):
             ),
             "default": True,
         },
+        "oseg.security": {
+            "description": inspect.cleandoc(
+                """
+                Security scheme definitions
+                """
+            ),
+            "default": {},
+        },
     }
 
     def __init__(self, config: PythonConfigDef):
@@ -63,6 +72,8 @@ class PythonConfig(generator.BaseConfig):
             "oseg.ignoreOptionalUnset",
             self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
         )
+
+        self.oseg_security = self._parse_security(config)
 
 
 class PythonGenerator(generator.BaseGenerator):

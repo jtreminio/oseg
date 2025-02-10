@@ -9,6 +9,7 @@ RESOLVABLE = Union[
     oa.RequestBody,
     oa.Response,
     oa.Schema,
+    oa.SecurityScheme,
 ]
 
 
@@ -56,6 +57,7 @@ class ComponentResolver:
         self._component_parameters()
         self._component_request_bodies()
         self._component_responses()
+        self._component_security_schemes()
         self._operations()
 
     def name(self, schema: RESOLVABLE) -> str | None:
@@ -139,6 +141,16 @@ class ComponentResolver:
             self._add(response, name)
             self._response(response)
 
+    def _component_security_schemes(self) -> None:
+        """Find named in '#/components/securitySchemes/'."""
+        # todo test
+
+        for name, security in self._oa_parser.components.securitySchemes.items():
+            security = self._oa_parser.resolve_security(security)
+            self._oa_parser.components.securitySchemes[name] = security
+
+            self._add(security, name)
+
     def _operations(self) -> None:
         """Operation Requests will contain schemas in 'parameters'
         and 'requestBody'.
@@ -165,6 +177,9 @@ class ComponentResolver:
                         response = self._oa_parser.resolve_response(response)
                         operation.responses[http_code] = response
                         self._response(response)
+
+                if operation.security is None:
+                    operation.security = self._oa_parser.components.securitySchemes
 
     def _examples(self, schema: oa.Schema | oa.MediaType | oa.Parameter) -> None:
         if schema.example:

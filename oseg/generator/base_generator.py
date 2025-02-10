@@ -22,6 +22,7 @@ class BaseConfig(Protocol):
 
     # Skip printing optional properties that do not have a value
     oseg_ignore_optional_unset: bool
+    oseg_security: dict[str, dict[str, any]]
 
     @staticmethod
     def factory(config: BaseConfigDef | str) -> "BaseConfig":
@@ -86,6 +87,20 @@ class BaseConfig(Protocol):
                 }
             case _:
                 raise NotImplementedError("Generator not found for config_help")
+
+    # todo test
+    def _parse_security(self, config: dict[str, any]) -> dict[str, any]:
+        security = {}
+
+        for name, values in config.items():
+            if name.startswith("oseg.security."):
+                security[name.replace("oseg.security.", "")] = values
+
+        return (
+            security
+            if security
+            else self.PROPS_OPTIONAL["oseg.security"].get("default")
+        )
 
 
 class GeneratorFactory:

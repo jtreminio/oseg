@@ -1,3 +1,7 @@
+{%- macro parse_security_macro(operation, indent_count) -%}
+    {{- caller(parse_security(operation, indent_count)) }}
+{%- endmacro -%}
+
 {%- macro parse_objects_macro(property_container) -%}
     {{- caller(parse_objects(property_container)) }}
 {%- endmacro -%}

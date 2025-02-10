@@ -1,6 +1,7 @@
 require "openapi_client"
 
 OpenApiClient.configure do |config|
+    config.api_key = "YOUR_API_KEY";
 end
 
 user = OpenApiClient::User.new

@@ -3,6 +3,8 @@ additionalProperties:
   packageName: Org.OpenAPITools
   packageGuid: "{C69F4F3D-BE68-4A19-A3F0-5EEE1810150B}"
   oseg.namespace: OSEG.PetStore.Examples
+  oseg.security.api_key.api_key: YOUR_API_KEY
+  oseg.security.petstore_auth.access_token: YOUR_ACCESS_TOKEN
 globalProperties:
   apiTests: false
   modelTests: false

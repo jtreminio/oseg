@@ -57,6 +57,7 @@ public class AddPetDefaultExample
     public static void Run()
     {
         var config = new Configuration();
+        config.AccessToken = "YOUR_ACCESS_TOKEN";
 
         var category = new Category(
             id: 12345,
@@ -132,6 +133,7 @@ public class AddPetDefaultExample
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
+        config.setAccessToken("YOUR_ACCESS_TOKEN");
 
         var category = new Category();
         category.id(12345L);
@@ -188,9 +190,11 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SplFileObject;
 use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
+$config->setAccessToken("YOUR_ACCESS_TOKEN");
 
 $category = (new OpenAPI\Client\Model\Category())
     ->setId(12345)
@@ -239,7 +243,9 @@ from pprint import pprint
 
 from openapi_client import ApiClient, ApiException, Configuration, api, models
 
-configuration = Configuration()
+configuration = Configuration(
+    access_token="YOUR_ACCESS_TOKEN",
+)
 
 with ApiClient(configuration) as api_client:
     category = models.Category(
@@ -290,6 +296,7 @@ with ApiClient(configuration) as api_client:
 require "openapi_client"
 
 OpenApiClient.configure do |config|
+    config.access_token = "YOUR_ACCESS_TOKEN";
 end
 
 category = OpenApiClient::Category.new
@@ -339,6 +346,7 @@ import api from "openapi_client"
 import models from "openapi_client"
 
 const apiCaller = new api.PetApi();
+apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 
 const category = new models.Category();
 category.id = 12345;

@@ -3,7 +3,9 @@ from pprint import pprint
 
 from openapi_client import ApiClient, ApiException, Configuration, api, models
 
-configuration = Configuration()
+configuration = Configuration(
+    access_token="YOUR_ACCESS_TOKEN",
+)
 
 with ApiClient(configuration) as api_client:
     try:

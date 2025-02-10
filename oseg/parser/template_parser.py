@@ -11,6 +11,57 @@ class TemplateParser:
         self._generator: g.BaseGenerator = generator
         self._config = config
 
+    def parse_security(
+        self,
+        macros: "model.JinjaMacros",
+        operation: "model.Operation",
+        indent_count: int,
+    ) -> dict[str, str]:
+        # todo test
+
+        security_config = self._config.oseg_security
+        result = {}
+        is_primary = True
+
+        for schemes in operation.security.schemes:
+            for name, scheme in schemes.items():
+                if scheme.method == model.SecurityMethod.USERNAME:
+                    result[f"{scheme.name}_username"] = macros.print_security(
+                        printable=model.PrintableSecurity(
+                            name=scheme.name,
+                            method=scheme.method.value,
+                            value=security_config.get(f"{name}.username"),
+                            is_primary=is_primary,
+                        )
+                    )
+
+                    if not security_config.get(f"{name}.password"):
+                        continue
+
+                    result[f"{scheme.name}_password"] = macros.print_security(
+                        printable=model.PrintableSecurity(
+                            name=scheme.name,
+                            method="password",
+                            value=security_config.get(f"{name}.password"),
+                            is_primary=is_primary,
+                        )
+                    )
+
+                    continue
+
+                result[scheme.name] = macros.print_security(
+                    printable=model.PrintableSecurity(
+                        name=scheme.name,
+                        method=scheme.method.value,
+                        value=security_config.get(f"{name}.{scheme.method.value}"),
+                        is_primary=is_primary,
+                    )
+                )
+
+            is_primary = False
+
+        return self._indent(result, indent_count)
+
     def parse_objects(
         self,
         property_container: "model.PropertyContainer",

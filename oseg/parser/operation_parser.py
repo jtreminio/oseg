@@ -63,6 +63,7 @@ class OperationParser:
                     operation=oa_operation,
                     request=request,
                     response=self._get_response(oa_operation),
+                    security=model.Security(self._oa_parser, oa_operation),
                     api_name=self._get_api_name(oa_operation),
                     http_method=http_method,
                 )

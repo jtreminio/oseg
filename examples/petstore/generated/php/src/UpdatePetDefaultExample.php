@@ -4,9 +4,11 @@ namespace OSEG\PetStore\Examples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use SplFileObject;
 use OpenAPI;
 
 $config = OpenAPI\Client\Configuration::getDefaultConfiguration();
+$config->setAccessToken("YOUR_ACCESS_TOKEN");
 
 $category = (new OpenAPI\Client\Model\Category())
     ->setId(12345)

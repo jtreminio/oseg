@@ -64,6 +64,17 @@ open("{{ printable.value }}", "rb").read()
 ]
 {%- endmacro -%}
 
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary and printable.is_first %}{% set comment = "# " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}{{ comment }}api_key="{{ printable.value }}",
+    {%- elif printable.method == "username" %}{{ comment }}username="{{ printable.value }}",
+    {%- elif printable.method == "password" %}{{ comment }}password="{{ printable.value }}",
+    {%- elif printable.method == "access_token" %}{{ comment }}access_token="{{ printable.value }}",
+    {%- endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 from datetime import date, datetime
@@ -71,7 +82,18 @@ from pprint import pprint
 
 from {{ config.package_name }} import ApiClient, ApiException, Configuration, api, models
 
-configuration = Configuration()
+configuration = Configuration({% if not operation.security %}){% else %}
+
+    {% if operation.security.is_optional %}
+    # Authentication is optional for this API endpoint
+    {% endif %}
+    {% call(security_schemes) m.parse_security_macro(operation, 4) %}
+        {% for _, security in security_schemes.items() %}
+    {{ security }}
+        {% endfor %}
+    {% endcall %}
+)
+{% endif %}
 
 with ApiClient(configuration) as api_client:
 {% call(objects) m.parse_objects_macro(property_container) %}

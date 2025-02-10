@@ -18,6 +18,7 @@ public class LogoutUserDefaultExample
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
+        config.setApiKey("YOUR_API_KEY");
 
         try
         {

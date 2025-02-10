@@ -3,6 +3,7 @@ import api from "openapi_client"
 import models from "openapi_client"
 
 const apiCaller = new api.PetApi();
+apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 
 const category = new models.Category();
 category.id = 12345;

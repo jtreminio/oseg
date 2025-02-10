@@ -8,6 +8,7 @@ RubyConfigDef = TypedDict(
         "gemName": str,
         "moduleName": str,
         "oseg.ignoreOptionalUnset": bool | None,
+        "oseg.security": dict[str, any] | None,
     },
 )
 
@@ -46,6 +47,14 @@ class RubyConfig(generator.BaseConfig):
             ),
             "default": True,
         },
+        "oseg.security": {
+            "description": inspect.cleandoc(
+                """
+                Security scheme definitions
+                """
+            ),
+            "default": {},
+        },
     }
 
     def __init__(self, config: RubyConfigDef):
@@ -59,6 +68,8 @@ class RubyConfig(generator.BaseConfig):
             "oseg.ignoreOptionalUnset",
             self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
         )
+
+        self.oseg_security = self._parse_security(config)
 
 
 class RubyGenerator(generator.BaseGenerator):

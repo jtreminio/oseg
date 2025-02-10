@@ -18,6 +18,8 @@ public class GetUserByNameDefaultExample
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
+        config.setAccessToken("YOUR_ACCESS_TOKEN");
+        config.setApiKey("YOUR_API_KEY");
 
         try
         {

@@ -13,6 +13,7 @@ public class UpdateUserDefaultExample
     public static void Run()
     {
         var config = new Configuration();
+        config.ApiKey = "YOUR_API_KEY";
 
         var user = new User(
             id: 12345,

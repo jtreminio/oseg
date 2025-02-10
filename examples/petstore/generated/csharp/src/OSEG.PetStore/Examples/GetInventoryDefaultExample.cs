@@ -13,6 +13,7 @@ public class GetInventoryDefaultExample
     public static void Run()
     {
         var config = new Configuration();
+        config.ApiKey = "YOUR_API_KEY";
 
         try
         {
