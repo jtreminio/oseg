@@ -202,8 +202,6 @@ class ExampleDataParser:
         self,
         content: oa.MediaType | None,
     ) -> dict[str, any]:
-        # todo tests for data from content
-
         if not content:
             return {}
 

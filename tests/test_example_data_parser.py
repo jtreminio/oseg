@@ -678,6 +678,22 @@ class TestExampleDataParser(unittest.TestCase):
         # reset data
         operation.request.example_data = None
 
+    def test_content_example(self):
+        oa_parser = self.oa_parser_body
+        operation = oa_parser.operations.get("content_example")
+        container = operation.request.example_data["example"]
+
+        self.assertEqual(container.body.scalars["id"].value, 50)
+        self.assertEqual(container.body.scalars["name"].value, "fish")
+
+    def test_content_examples(self):
+        oa_parser = self.oa_parser_body
+        operation = oa_parser.operations.get("content_examples")
+        container = operation.request.example_data["example_name"]
+
+        self.assertEqual(container.body.scalars["id"].value, 500)
+        self.assertEqual(container.body.scalars["name"].value, "birds")
+
 
 if __name__ == "__main__":
     unittest.main()

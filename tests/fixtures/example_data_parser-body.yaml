@@ -59,6 +59,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Terrier'
+  /content_example:
+    post:
+      tags:
+        - pet
+      operationId: content_example
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            example:
+              id: 50
+              name: fish
+            schema:
+              $ref: '#/components/schemas/Pet'
+  /content_examples:
+    post:
+      tags:
+        - pet
+      operationId: content_examples
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example_name:
+                value:
+                  id: 500
+                  name: birds
+            schema:
+              $ref: '#/components/schemas/Pet'
 components:
   schemas:
     Pet:
