@@ -150,6 +150,12 @@ def object_macro_callback(printable: model.PrintableObject) -> str | None:
     return str(printable.value).lower()
 
 
+def print_security_macro_callback(printable: model.PrintableSecurity) -> str:
+    comment = "# " if not printable.is_primary else ""
+
+    return f"{comment}{printable.method}: {printable.value}"
+
+
 scalar_mock = mock.MagicMock(spec="__call__")
 scalar_mock.side_effect = scalar_macro_callback
 
@@ -159,8 +165,11 @@ freeform_mock.side_effect = freeform_macro_callback
 object_mock = mock.MagicMock(spec="__call__")
 object_mock.side_effect = object_macro_callback
 
+security_mock = mock.MagicMock(spec="__call__")
+security_mock.side_effect = print_security_macro_callback
+
 JINJA_MACROS: dict[str, Macro] = {
-    "print_security": object_mock,
+    "print_security": security_mock,
     "print_object": object_mock,
     "print_object_array": object_mock,
     "print_scalar": scalar_mock,

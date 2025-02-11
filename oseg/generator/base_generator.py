@@ -22,7 +22,7 @@ class BaseConfig(Protocol):
 
     # Skip printing optional properties that do not have a value
     oseg_ignore_optional_unset: bool
-    oseg_security: dict[str, dict[str, any]]
+    oseg_security: dict[str, str]
 
     @staticmethod
     def factory(config: BaseConfigDef | str) -> "BaseConfig":
