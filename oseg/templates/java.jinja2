@@ -80,12 +80,7 @@ new ArrayList<{{ printable.target_type }}>(List.of {% if not printable.value %}(
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-
-    {%- if printable.method == "api_key" %}{{ comment }}config.setApiKey("{{ printable.value }}");
-    {%- elif printable.method == "username" %}{{ comment }}config.setUsername("{{ printable.value }}");
-    {%- elif printable.method == "password" %}{{ comment }}config.setPassword("{{ printable.value }}");
-    {%- elif printable.method == "access_token" %}{{ comment }}config.setAccessToken("{{ printable.value }}");
-    {%- endif %}
+{{ comment }}config.set{{ printable.method|pascal_case }}("{{ printable.value }}");
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}

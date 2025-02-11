@@ -128,7 +128,6 @@ class PropertyParser:
         data: dict[str, any],
     ) -> bool:
         """handle named object"""
-        # todo handle optional nullable
 
         if parser.TypeChecker.is_array(schema):
             return False
@@ -175,7 +174,6 @@ class PropertyParser:
         data: dict[str, any],
     ) -> bool:
         """handle arrays of named objects"""
-        # todo handle optional nullable
 
         if not parser.TypeChecker.is_array(schema):
             return False

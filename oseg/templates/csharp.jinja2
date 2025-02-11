@@ -85,10 +85,9 @@ new List<{{ printable.target_type }}>{% if not printable.value %}(){% else %}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 
-    {%- if printable.method == "api_key" %}{{ comment }}config.ApiKey = new Dictionary<string, string> {["{{ printable.name }}"] = "{{ printable.value }}"};
-    {%- elif printable.method == "username" %}{{ comment }}config.Username = "{{ printable.value }}";
-    {%- elif printable.method == "password" %}{{ comment }}config.Password = "{{ printable.value }}";
-    {%- elif printable.method == "access_token" %}{{ comment }}config.AccessToken = "{{ printable.value }}";
+    {%- if printable.method == "api_key" %}
+{{ comment }}config.ApiKey = new Dictionary<string, string> {["{{ printable.name }}"] = "{{ printable.value }}"};
+    {%- else %}{{ comment }}config.{{ printable.method|pascal_case }} = "{{ printable.value }}";
     {%- endif %}
 {%-endmacro -%}
 

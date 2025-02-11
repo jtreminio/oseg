@@ -73,9 +73,7 @@ new SplFileObject("{{ printable.value }}")
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 
     {%- if printable.method == "api_key" %}{{ comment }}$config->setApiKey("{{ printable.name }}", "{{ printable.value }}");
-    {%- elif printable.method == "username" %}{{ comment }}$config->setUsername("{{ printable.value }}");
-    {%- elif printable.method == "password" %}{{ comment }}$config->setPassword("{{ printable.value }}");
-    {%- elif printable.method == "access_token" %}{{ comment }}$config->setAccessToken("{{ printable.value }}");
+    {%- else %}{{ comment }}$config->set{{ printable.method|pascal_case }}("{{ printable.value }}");
     {%- endif %}
 {%-endmacro -%}
 

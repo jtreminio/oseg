@@ -27,8 +27,6 @@ class PrintableScalar:
 class PrintableSecurity:
     name: str
     method: Literal["access_token", "api_key", "username", "password"]
-    value: str | None = None
-    # for password in HTTP Basic username:password auth
-    value_2: str | None = None
+    value: str = ""
     # is the first security scheme(s) for Operation
     is_primary: bool = False
