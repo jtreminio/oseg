@@ -14,7 +14,7 @@ public class GetUserByNameExample
     {
         var config = new Configuration();
         config.AccessToken = "YOUR_ACCESS_TOKEN";
-        // config.ApiKey = "YOUR_API_KEY";
+        // config.ApiKey = new Dictionary<string, string> {["api_key"] = "YOUR_API_KEY"};
 
         try
         {

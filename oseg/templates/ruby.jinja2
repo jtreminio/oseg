@@ -68,7 +68,7 @@ File.new("{{ printable.value }}", "r")
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
 
-    {%- if printable.method == "api_key" %}{{ comment }}config.api_key = "{{ printable.value }}";
+    {%- if printable.method == "api_key" %}{{ comment }}config.api_key["{{ printable.name }}"] = "{{ printable.value }}";
     {%- elif printable.method == "username" %}{{ comment }}config.username = "{{ printable.value }}";
     {%- elif printable.method == "password" %}{{ comment }}config.password = "{{ printable.value }}";
     {%- elif printable.method == "access_token" %}{{ comment }}config.access_token = "{{ printable.value }}";

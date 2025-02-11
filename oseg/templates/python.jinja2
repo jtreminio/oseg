@@ -68,7 +68,7 @@ open("{{ printable.value }}", "rb").read()
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
 
-    {%- if printable.method == "api_key" %}{{ comment }}api_key="{{ printable.value }}",
+    {%- if printable.method == "api_key" %}{{ comment }}api_key={"{{ printable.name }}": "{{ printable.value }}"},
     {%- elif printable.method == "username" %}{{ comment }}username="{{ printable.value }}",
     {%- elif printable.method == "password" %}{{ comment }}password="{{ printable.value }}",
     {%- elif printable.method == "access_token" %}{{ comment }}access_token="{{ printable.value }}",

@@ -134,6 +134,9 @@ class OaParser:
         if not self._openapi.components.schemas:
             self._openapi.components.schemas = {}
 
+        if not self._openapi.components.securitySchemes:
+            self._openapi.components.securitySchemes = {}
+
         if not self._openapi.paths:
             self._openapi.paths = {}
 

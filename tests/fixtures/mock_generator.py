@@ -116,6 +116,9 @@ class MockGenerator(generator.BaseGenerator):
 
         return printable
 
+    def print_null(self) -> str:
+        return "None"
+
 
 def scalar_macro_callback(printable: model.PrintableScalar) -> str | None:
     if printable.value is None:
@@ -157,6 +160,7 @@ object_mock = mock.MagicMock(spec="__call__")
 object_mock.side_effect = object_macro_callback
 
 JINJA_MACROS: dict[str, Macro] = {
+    "print_security": object_mock,
     "print_object": object_mock,
     "print_object_array": object_mock,
     "print_scalar": scalar_mock,

@@ -4,7 +4,7 @@ from pprint import pprint
 from openapi_client import ApiClient, ApiException, Configuration, api, models
 
 configuration = Configuration(
-    api_key="YOUR_API_KEY",
+    api_key={"api_key": "YOUR_API_KEY"},
 )
 
 with ApiClient(configuration) as api_client:
