@@ -84,7 +84,9 @@ class TypeChecker:
 
     @classmethod
     def is_ref(cls, schema: Union[BaseModel, oa.Reference]) -> bool:
-        return hasattr(schema, "ref")
+        return hasattr(schema, "ref") or (
+            hasattr(schema, "model_extra") and "$ref" in schema.model_extra
+        )
 
     @classmethod
     def is_ref_array(cls, schema: Union[BaseModel, oa.Reference]) -> bool:

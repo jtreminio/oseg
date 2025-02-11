@@ -143,7 +143,6 @@ class ComponentResolver:
 
     def _component_security_schemes(self) -> None:
         """Find named in '#/components/securitySchemes/'."""
-        # todo test
 
         for name, security in self._oa_parser.components.securitySchemes.items():
             security = self._oa_parser.resolve_security(security)

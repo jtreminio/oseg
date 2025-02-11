@@ -154,14 +154,16 @@ class OaParser:
             name = schema.get("$ref").split("/").pop()
 
         if name is not None:
-            return components.get(name)
+            return self._get_resolved_component(components.get(name), components)
 
         if name is None and not parser.TypeChecker.is_ref(schema):
             return schema
 
         if isinstance(schema, str):
             name = schema.split("/").pop()
+        elif hasattr(schema, "model_extra") and "$ref" in schema.model_extra:
+            name = schema.model_extra.get("$ref").split("/").pop()
         else:
             name = schema.ref.split("/").pop()
 
-        return components.get(name)
+        return self._get_resolved_component(components.get(name), components)

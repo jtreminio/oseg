@@ -5,14 +5,16 @@ from test_utils import TestUtils
 
 
 class TestComponentResolver(unittest.TestCase):
-    oa_parser: parser.OaParser
+    oa_parser_properties: parser.OaParser
+    oa_parser_component_resolver: parser.OaParser
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.oa_parser = TestUtils.oa_parser("properties")
+        cls.oa_parser_properties = TestUtils.oa_parser("properties")
+        cls.oa_parser_component_resolver = TestUtils.oa_parser("component_resolver")
 
     def test_parameters(self):
-        operation = self.oa_parser.operations["default"]
+        operation = self.oa_parser_properties.operations["default"]
 
         data = [
             {
@@ -49,11 +51,11 @@ class TestComponentResolver(unittest.TestCase):
                 self.assertEqual(expected["property"], parameter.name)
                 self.assertEqual(
                     expected["type"],
-                    self.oa_parser.get_component_name(parameter),
+                    self.oa_parser_properties.get_component_name(parameter),
                 )
 
     def test_request_with_named_body_properties(self):
-        operation = self.oa_parser.operations["default"]
+        operation = self.oa_parser_properties.operations["default"]
         body = operation.request.body
 
         self.assertEqual(
@@ -191,17 +193,19 @@ class TestComponentResolver(unittest.TestCase):
                 if parser.TypeChecker.is_array(property_schema):
                     self.assertEqual(
                         None,
-                        self.oa_parser.get_component_name(property_schema),
+                        self.oa_parser_properties.get_component_name(property_schema),
                     )
 
                     self.assertEqual(
                         expected["items_type"],
-                        self.oa_parser.get_component_name(property_schema.items),
+                        self.oa_parser_properties.get_component_name(
+                            property_schema.items
+                        ),
                     )
                 else:
                     self.assertEqual(
                         expected["property_type"],
-                        self.oa_parser.get_component_name(property_schema),
+                        self.oa_parser_properties.get_component_name(property_schema),
                     )
 
         prop_nested_object_schema = body.properties.get("prop_nested_object")
@@ -211,11 +215,15 @@ class TestComponentResolver(unittest.TestCase):
 
         self.assertEqual(
             "Pet_prop_nested_object_key_1",
-            self.oa_parser.get_component_name(prop_nested_object_schema_key_1),
+            self.oa_parser_properties.get_component_name(
+                prop_nested_object_schema_key_1
+            ),
         )
 
     def test_request_with_non_named_body_properties(self):
-        operation = self.oa_parser.operations["inline_request_body_properties"]
+        operation = self.oa_parser_properties.operations[
+            "inline_request_body_properties"
+        ]
         body = operation.request.body
 
         self.assertEqual(
@@ -353,17 +361,19 @@ class TestComponentResolver(unittest.TestCase):
                 if parser.TypeChecker.is_array(property_schema):
                     self.assertEqual(
                         None,
-                        self.oa_parser.get_component_name(property_schema),
+                        self.oa_parser_properties.get_component_name(property_schema),
                     )
 
                     self.assertEqual(
                         expected["items_name"],
-                        self.oa_parser.get_component_name(property_schema.items),
+                        self.oa_parser_properties.get_component_name(
+                            property_schema.items
+                        ),
                     )
                 else:
                     self.assertEqual(
                         expected["property_name"],
-                        self.oa_parser.get_component_name(property_schema),
+                        self.oa_parser_properties.get_component_name(property_schema),
                     )
 
         prop_nested_object_schema = body.properties.get("prop_nested_object")
@@ -373,7 +383,9 @@ class TestComponentResolver(unittest.TestCase):
 
         self.assertEqual(
             "inline_request_body_properties_request_prop_nested_object_key_1",
-            self.oa_parser.get_component_name(prop_nested_object_schema_key_1),
+            self.oa_parser_properties.get_component_name(
+                prop_nested_object_schema_key_1
+            ),
         )
 
     def test_responses(self):
@@ -394,16 +406,18 @@ class TestComponentResolver(unittest.TestCase):
 
         for expected in data:
             with self.subTest(expected["operation_id"]):
-                operation = self.oa_parser.operations[expected["operation_id"]]
+                operation = self.oa_parser_properties.operations[
+                    expected["operation_id"]
+                ]
                 response = operation.response
 
                 self.assertEqual(
                     expected["type"],
-                    self.oa_parser.get_component_name(response.body),
+                    self.oa_parser_properties.get_component_name(response.body),
                 )
 
     def test_title_used(self):
-        operation = self.oa_parser.operations["using_title"]
+        operation = self.oa_parser_properties.operations["using_title"]
         body = operation.request.body
 
         data = [
@@ -441,42 +455,102 @@ class TestComponentResolver(unittest.TestCase):
                 self.assertEqual(expected["property"], parameter.name)
                 self.assertEqual(
                     expected["type"],
-                    self.oa_parser.get_component_name(parameter),
+                    self.oa_parser_properties.get_component_name(parameter),
                 )
 
         expected_body_type = "MyCustomRequestBodyClass"
         self.assertEqual(
             expected_body_type,
-            self.oa_parser.get_component_name(body),
+            self.oa_parser_properties.get_component_name(body),
         )
 
         expected_prop_1_type = "MyCustomRequestBodyClass_prop_object"
         self.assertEqual(
             expected_prop_1_type,
-            self.oa_parser.get_component_name(body.properties.get("prop_object")),
+            self.oa_parser_properties.get_component_name(
+                body.properties.get("prop_object")
+            ),
         )
 
         expected_prop_2_type = "CustomPropObjectName"
         self.assertEqual(
             expected_prop_2_type,
-            self.oa_parser.get_component_name(body.properties.get("prop_object_2")),
+            self.oa_parser_properties.get_component_name(
+                body.properties.get("prop_object_2")
+            ),
         )
 
     def test_title_used_formdata(self):
-        operation = self.oa_parser.operations["using_title_formdata"]
+        operation = self.oa_parser_properties.operations["using_title_formdata"]
         body = operation.request.body
 
         expected_prop_1_type = "MyCustomRequestBodyClass_prop_object"
         self.assertEqual(
             expected_prop_1_type,
-            self.oa_parser.get_component_name(body.properties.get("prop_object")),
+            self.oa_parser_properties.get_component_name(
+                body.properties.get("prop_object")
+            ),
         )
 
         expected_prop_2_type = "CustomPropObjectName"
         self.assertEqual(
             expected_prop_2_type,
-            self.oa_parser.get_component_name(body.properties.get("prop_object_2")),
+            self.oa_parser_properties.get_component_name(
+                body.properties.get("prop_object_2")
+            ),
         )
+
+    def test_refs_are_resolved(self):
+        oa_parser = self.oa_parser_component_resolver
+
+        data = [
+            {
+                "component": oa_parser.components.responses,
+                "schema_1": "SomeResponse",
+                "schema_2": "SomeResponseRef",
+            },
+            {
+                "component": oa_parser.components.schemas,
+                "schema_1": "SomeSchema",
+                "schema_2": "SomeSchemaRef",
+            },
+            {
+                "component": oa_parser.components.parameters,
+                "schema_1": "SomeParameter",
+                "schema_2": "SomeParameterRef",
+            },
+            {
+                "component": oa_parser.components.examples,
+                "schema_1": "SomeExample",
+                "schema_2": "SomeExampleRef",
+            },
+            {
+                "component": oa_parser.components.securitySchemes,
+                "schema_1": "petstore_auth",
+                "schema_2": "petstore_auth_ref",
+            },
+            {
+                "component": oa_parser.components.securitySchemes,
+                "schema_1": "api_key",
+                "schema_2": "api_key_ref",
+            },
+        ]
+
+        for expected in data:
+            with self.subTest(f"{expected["schema_1"]} - {expected["schema_2"]}"):
+                schema_1 = expected["component"].get(expected["schema_1"])
+                schema_2 = expected["component"].get(expected["schema_2"])
+
+                self.assertIsNotNone(schema_1)
+                self.assertIsNotNone(schema_2)
+                self.assertEqual(schema_1, schema_2)
+
+                name_1 = oa_parser.get_component_name(schema_1)
+                name_2 = oa_parser.get_component_name(schema_2)
+
+                self.assertIsNotNone(name_1)
+                self.assertIsNotNone(name_2)
+                self.assertEqual(name_1, name_2)
 
 
 if __name__ == "__main__":
