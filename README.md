@@ -52,7 +52,7 @@ using Org.OpenAPITools.Model;
 
 namespace OSEG.PetStore.Examples;
 
-public class AddPetDefaultExample
+public class AddPetExample
 {
     public static void Run()
     {
@@ -128,7 +128,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AddPetDefaultExample
+public class AddPetExample
 {
     public static void main(String[] args)
     {

@@ -1,6 +1,6 @@
 {
   "addPet": {
-    "default_example": {
+    "example": {
       "body": {
         "id": 12345,
         "category": {
@@ -27,7 +27,7 @@
     }
   },
   "createUser": {
-    "default_example": {
+    "example": {
       "body": {
         "id": 12345,
         "username": "my_user",
@@ -41,7 +41,7 @@
     }
   },
   "createUsersWithArrayInput": {
-    "default_example": {
+    "example": {
       "body": [
         {
           "id": 12345,
@@ -67,7 +67,7 @@
     }
   },
   "createUsersWithListInput": {
-    "default_example": {
+    "example": {
       "body": [
         {
           "id": 12345,
@@ -93,14 +93,14 @@
     }
   },
   "deleteOrder": {
-    "default_example": {
+    "example": {
       "path": {
         "orderId": 12345
       }
     }
   },
   "deletePet": {
-    "default_example": {
+    "example": {
       "header": {
         "api_key": "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a"
       },
@@ -110,14 +110,14 @@
     }
   },
   "deleteUser": {
-    "default_example": {
+    "example": {
       "path": {
         "username": "my_username"
       }
     }
   },
   "findPetsByStatus": {
-    "default_example": {
+    "example": {
       "query": {
         "status": [
           "available",
@@ -127,7 +127,7 @@
     }
   },
   "findPetsByTags": {
-    "default_example": {
+    "example": {
       "query": {
         "tags": [
           "tag_1",
@@ -137,31 +137,31 @@
     }
   },
   "getInventory": {
-    "default_example": {}
+    "example": {}
   },
   "getOrderById": {
-    "default_example": {
+    "example": {
       "path": {
         "orderId": 3
       }
     }
   },
   "getPetById": {
-    "default_example": {
+    "example": {
       "path": {
         "petId": 12345
       }
     }
   },
   "getUserByName": {
-    "default_example": {
+    "example": {
       "path": {
         "username": "my_username"
       }
     }
   },
   "loginUser": {
-    "default_example": {
+    "example": {
       "query": {
         "username": "my_username",
         "password": "my_secret_password"
@@ -169,10 +169,10 @@
     }
   },
   "logoutUser": {
-    "default_example": {}
+    "example": {}
   },
   "placeOrder": {
-    "default_example": {
+    "example": {
       "body": {
         "id": 12345,
         "petId": 98765,
@@ -184,7 +184,7 @@
     }
   },
   "updatePet": {
-    "default_example": {
+    "example": {
       "body": {
         "id": 12345,
         "category": {
@@ -211,7 +211,7 @@
     }
   },
   "updatePetWithForm": {
-    "default_example": {
+    "example": {
       "path": {
         "petId": 12345
       },
@@ -222,7 +222,7 @@
     }
   },
   "updateUser": {
-    "default_example": {
+    "example": {
       "path": {
         "username": "my-username"
       },
@@ -239,7 +239,7 @@
     }
   },
   "uploadFile": {
-    "default_example": {
+    "example": {
       "path": {
         "petId": 12345
       },
