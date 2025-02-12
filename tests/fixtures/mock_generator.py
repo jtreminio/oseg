@@ -44,11 +44,14 @@ class MockConfig(generator.BaseConfig):
 
     def __init__(self, config: MockConfigDef):
         self.package_name = config.get("packageName")
+        assert isinstance(self.package_name, str)
 
         self.oseg_ignore_optional_unset = config.get(
             "oseg.ignoreOptionalUnset",
             self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
         )
+
+        self.oseg_security = self._parse_security(config)
 
 
 class MockGenerator(generator.BaseGenerator):

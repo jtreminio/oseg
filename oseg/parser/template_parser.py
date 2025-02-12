@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from oseg import generator as g, model
 
 
@@ -17,7 +17,7 @@ class TemplateParser:
         operation: "model.Operation",
         indent_count: int,
     ) -> dict[str, str]:
-        # todo test
+        """Prints security/authentication"""
 
         security_config = self._config.oseg_security
         result = {}
@@ -63,13 +63,12 @@ class TemplateParser:
     def parse_objects(
         self,
         property_container: "model.PropertyContainer",
-    ) -> dict[str, "model.PropertyObject"]:
+    ) -> dict[str, Union["model.PropertyObject", "model.PropertyObjectArray"]]:
         """Parse all top-level object variables"""
 
         result = {}
 
         for name, obj in property_container.flattened_objects().items():
-            # todo test
             # if object is not required, is not nullable, and has no example data,
             # we can skip printing it
             if not obj.is_required and not obj.is_nullable and not obj.is_set:
@@ -91,7 +90,6 @@ class TemplateParser:
         result = {}
 
         for _, prop in parent.non_objects().items():
-            # todo test
             # if config flag oseg_ignore_optional_unset is enabled,
             # and property is not required, and does not have example data,
             # we can skip printing it
@@ -111,8 +109,6 @@ class TemplateParser:
                 prop=prop,
             )
 
-        # todo test multiple objects in array belonging to objects in array
-        #      do not overwrite each other's names
         parent_name = f"{parent.name}_" if property_container.body != parent else ""
 
         for name, parsed in self._parse_object(parent, parent_name).items():

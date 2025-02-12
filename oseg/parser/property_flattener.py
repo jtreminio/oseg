@@ -66,7 +66,7 @@ class PropertyFlattener:
 
             i = 1
             for prop in parent.properties:
-                sub_name = f"{name}_{i}"
+                sub_name = f"{name}_{i}".lower()
                 prop.name = sub_name
                 result = {
                     **self._flatten_object(prop, sub_name),
@@ -78,7 +78,7 @@ class PropertyFlattener:
             return result
 
         for name, prop in parent.objects.items():
-            sub_name = f"{parent_name}{name}"
+            sub_name = f"{parent_name}{name}".lower()
             prop.name = sub_name
             result = {
                 **self._flatten_object(prop, sub_name),
@@ -89,7 +89,7 @@ class PropertyFlattener:
         for name, array_obj in parent.array_objects.items():
             i = 1
             for prop in array_obj.properties:
-                sub_name = f"{parent_name}{name}_{i}"
+                sub_name = f"{parent_name}{name}_{i}".lower()
                 prop.name = sub_name
                 result = {
                     **self._flatten_object(prop, sub_name),
@@ -98,8 +98,6 @@ class PropertyFlattener:
                 }
                 i += 1
 
-            # todo test multiple objects in array belonging to objects in array
-            #      do not overwrite each other's names
             result[f"{parent_name}{name}"] = array_obj
 
         return result

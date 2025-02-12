@@ -387,6 +387,29 @@ paths:
       responses:
         '200':
           description: Successful operation
+  /multiple_dogs:
+    post:
+      tags:
+        - pet
+      operationId: multiple_dogs
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultipleDogs'
+  /array_dogs:
+    post:
+      tags:
+        - pet
+      operationId: array_dogs
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+          $ref: '#/components/requestBodies/DogArray'
 components:
   schemas:
     Pet:
@@ -567,6 +590,13 @@ components:
           type: string
         with:
           type: string
+    MultipleDogs:
+      type: object
+      properties:
+        dog_1:
+          $ref: '#/components/schemas/Dog'
+        dog_2:
+          $ref: '#/components/schemas/Dog'
     Tag:
       title: Pet Tag
       description: A tag for a pet
@@ -650,6 +680,14 @@ components:
           properties:
             id:
               type: integer
+  requestBodies:
+    DogArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Dog'
   responses:
     PropRefResponse:
       description: Successful operation
