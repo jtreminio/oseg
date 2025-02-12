@@ -236,12 +236,14 @@ class ExampleDataParser:
         self,
         schema: oa.Schema,
     ) -> Optional["model.EXAMPLE_DATA_BODY"]:
-        # example/s data wins out over everything
+        # example data wins out over everything
         if schema.example is not None:
             return schema.example
 
+        # examples data wins out over everything else,
+        # but only want the first set of values
         if hasattr(schema, "examples") and schema.examples is not None:
-            return schema.examples
+            return schema.examples[0]
 
         # if property is nullable and default value is null, use it
         if schema.default is None and parser.TypeChecker.is_nullable(schema):

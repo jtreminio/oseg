@@ -93,6 +93,19 @@ paths:
                   name: birds
             schema:
               $ref: '#/components/schemas/Pet'
+  /body_with_examples:
+    post:
+      tags:
+        - pet
+      operationId: body_with_examples
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchemaWithExamples"
+      responses:
+        '200':
+          description: Successful operation
 components:
   schemas:
     Pet:
@@ -136,3 +149,11 @@ components:
             group:
               type: string
               default: hunting
+    SchemaWithExamples:
+      type: object
+      properties:
+        key_1:
+          type: string
+      examples:
+        - key_1: value_1
+        - key_1: value_2

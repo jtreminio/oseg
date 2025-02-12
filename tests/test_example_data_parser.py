@@ -694,6 +694,17 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertEqual(container.body.scalars["id"].value, 500)
         self.assertEqual(container.body.scalars["name"].value, "birds")
 
+    def test_schema_with_examples(self):
+        operation = self.oa_parser_body.operations["body_with_examples"]
+        container = operation.request.example_data["example"]
+
+        # We expect to see only the first example in examples
+        self.assertEqual(len(list(operation.request.example_data)), 1)
+        self.assertEqual(container.body.scalars["key_1"].value, "value_1")
+
+        schema = self.oa_parser_body.components.schemas.get("SchemaWithExamples")
+        self.assertEqual(len(list(schema.examples)), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
