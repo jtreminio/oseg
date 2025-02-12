@@ -35,17 +35,15 @@ class TemplateParser:
                         )
                     )
 
-                    if not security_config.get(f"{name}.password"):
-                        continue
-
-                    result[f"{scheme.name}_password"] = macros.print_security(
-                        printable=model.PrintableSecurity(
-                            name=scheme.name,
-                            method="password",
-                            value=security_config.get(f"{name}.password"),
-                            is_primary=is_primary,
+                    if security_config.get(f"{name}.password"):
+                        result[f"{scheme.name}_password"] = macros.print_security(
+                            printable=model.PrintableSecurity(
+                                name=scheme.name,
+                                method="password",
+                                value=security_config.get(f"{name}.password"),
+                                is_primary=is_primary,
+                            )
                         )
-                    )
 
                     continue
 

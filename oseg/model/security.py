@@ -48,35 +48,19 @@ class Security:
         self._is_optional = False
         self._schemes = []
 
-        # security not defined anywhere
-        if not operation.security and not oa_parser.components.securitySchemes:
+        if (
+            # security not defined anywhere
+            not operation.security
+            and not oa_parser.components.securitySchemes
+            # security disabled for this operation
+        ) or operation.security == {}:
             self._is_optional = True
-
-            return
-
-        # security disabled for this operation
-        if operation.security == {}:
-            self._is_optional = True
-
-            return
-
-        # no operation-level security overrides, use all global security schemes
-        if operation.security is None:
-            for name, scheme in oa_parser.components.securitySchemes.items():
-                self._schemes.append(
-                    {
-                        name: SecurityScheme(
-                            name=name,
-                            method=self._resolve_scheme_method(scheme),
-                        )
-                    }
-                )
 
             return
 
         # operation-level security overrides global security schemes
         for security in operation.security:
-            # empty dict means security is optioanl for this operation
+            # empty dict means security is optional for this operation
             if security == {}:
                 self._is_optional = True
 
