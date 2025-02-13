@@ -76,7 +76,7 @@ fs.createReadStream("{{ printable.value }}")
 
     {%- if printable.method == "api_key" %}
 {{ comment }}apiCaller.setApiKey(
-    {{- "" }}api.{{ operation.api_name|split_uc|pascal_case }}ApiApiKeys.{{ printable.name }},
+    {{- "" }}api.{{ operation.api_name|underscore|pascal_case }}ApiApiKeys.{{ printable.name }},
     {{- "" }} "{{ printable.value }}");
     {%- else %}{{ comment }}apiCaller.{{ printable.method|camel_case }} = "{{ printable.value }}";
     {%- endif %}
@@ -88,7 +88,7 @@ import * as fs from 'fs';
 import api from "{{ config.npm_name }}"
 import models from "{{ config.npm_name }}"
 
-const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
+const apiCaller = new api.{{ operation.api_name|underscore|pascal_case }}Api();
 {% if operation.security.is_optional %}
 // Authentication is optional for this API endpoint
 {% endif %}
@@ -101,7 +101,7 @@ const apiCaller = new api.{{ operation.api_name|split_uc|pascal_case }}Api();
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-const {{ obj_name|print_variable }} = new models.{{ obj.type|split_uc|pascal_case }}();
+const {{ obj_name|print_variable }} = new models.{{ obj.type|underscore|pascal_case }}();
         {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
             {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }};

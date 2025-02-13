@@ -1,7 +1,10 @@
+import re
 import caseconverter
 
 
 class NormalizeStr:
+    _underscore_cache: dict[str, str] = {}
+
     @staticmethod
     def normalize(name: str | None) -> str | None:
         if name is None:
@@ -26,14 +29,41 @@ class NormalizeStr:
         return f"{value[:1].upper()}{value[1:]}"
 
     @staticmethod
-    def split_uc(value: str) -> str:
-        """Useful for splitting words with consecutive uppercase letters.
+    def underscore(word: str) -> str:
+        """Underscore the given word
 
-        OAuthName -> O_Auth_Name
+        Copied from openapi-generator
+        https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/main/java/org/openapitools/codegen/utils/StringUtils.java
         """
 
-        return (
-            "".join([f"_{char}" if char.isupper() else char for char in value])
-            .strip()
-            .lstrip("_")
-        )
+        if word in NormalizeStr._underscore_cache:
+            return NormalizeStr._underscore_cache[word]
+
+        if len(word) < 2:
+            return word
+
+        capital_letter_pattern = re.compile(r"([A-Z]+)([A-Z][a-z][a-z]+)")
+        lowercase_pattern = re.compile(r"([a-z\d])([A-Z])")
+        pkg_separator_pattern = re.compile(r"\.")
+        dollar_pattern = re.compile(r"\$")
+
+        replacement_pattern = r"\1_\2"
+        # Replace package separator with slash.
+        result = pkg_separator_pattern.sub("/", word)
+        # Replace $ with two underscores for inner classes.
+        result = dollar_pattern.sub("__", result)
+        # Replace capital letter with _ plus lowercase letter.
+        result = capital_letter_pattern.sub(replacement_pattern, result)
+        result = lowercase_pattern.sub(replacement_pattern, result)
+        result = result.replace("-", "_")
+        # Replace space with underscore
+        result = result.replace(" ", "_")
+
+        # the first char is special, it will always be separate from rest
+        # when caps and next character is caps
+        if result[0].isupper() and result[1].isupper():
+            result = f"{result[:1].upper()}_{result[1:]}"
+
+        NormalizeStr._underscore_cache[word] = result
+
+        return result

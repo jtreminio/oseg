@@ -108,10 +108,12 @@ class PhpGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        return parser.NormalizeStr.pascal_case(parser.NormalizeStr.split_uc(name))
+        return parser.NormalizeStr.pascal_case(parser.NormalizeStr.underscore(name))
 
     def print_variable(self, name: str) -> str:
-        return f"${parser.NormalizeStr.snake_case(parser.NormalizeStr.split_uc(name))}"
+        return (
+            f"${parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))}"
+        )
 
     def print_scalar(
         self,

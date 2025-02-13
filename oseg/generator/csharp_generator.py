@@ -177,7 +177,7 @@ class CSharpGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.pascal_case(parser.NormalizeStr.split_uc(name))
+        name = parser.NormalizeStr.pascal_case(parser.NormalizeStr.underscore(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -185,7 +185,7 @@ class CSharpGenerator(generator.BaseGenerator):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(parser.NormalizeStr.split_uc(name))
+        name = parser.NormalizeStr.camel_case(parser.NormalizeStr.underscore(name))
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

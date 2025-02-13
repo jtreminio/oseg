@@ -91,7 +91,7 @@ end
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-{{ obj_name|print_variable }} = {{ config.module_name }}::{{ obj.type|split_uc|pascal_case }}.new
+{{ obj_name|print_variable }} = {{ config.module_name }}::{{ obj.type|underscore|pascal_case }}.new
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
                 {% for name, value in properties.items() %}
 {{ obj_name|print_variable }}.{{ name|print_variable }} = {{ value }}
@@ -111,7 +111,7 @@ begin
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8, True) %}
     {% call(opt_properties) m.parse_api_call_properties_macro(property_container, 8, False) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-    {{ config.module_name }}::{{ operation.api_name|split_uc|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not properties and not opt_properties %}
+    {{ config.module_name }}::{{ operation.api_name|underscore|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not properties and not opt_properties %}
 
         {% else %}(
             {% for name, value in properties.items() %}

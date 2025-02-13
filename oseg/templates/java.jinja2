@@ -118,7 +118,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
-        var {{ obj_name|print_variable }} = new {{ obj.type|split_uc|pascal_case }}();
+        var {{ obj_name|print_variable }} = new {{ obj.type|underscore|pascal_case }}();
                 {% for name, value in properties.items() %}
         {{ obj_name|print_variable }}.{{ name|print_variable }}({{ value }});
                 {% endfor %}
@@ -137,7 +137,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|split_uc|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
+            new {{ operation.api_name|underscore|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}

@@ -192,7 +192,7 @@ class PropertyParser:
             value = schema.items.default
 
         # required but value still null, default to sane value
-        if value is None:
+        if value is None or not isinstance(value, list):
             value = []
 
         if container.schema.properties:

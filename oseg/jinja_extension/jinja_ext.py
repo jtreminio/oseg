@@ -39,8 +39,8 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["uc_first"]: Callable[[str], str] = (
             lambda value: parser.NormalizeStr.uc_first(value)
         )
-        environment.filters["split_uc"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.split_uc(value)
+        environment.filters["underscore"]: Callable[[str], str] = (
+            lambda value: parser.NormalizeStr.underscore(value)
         )
         environment.filters["split"]: Callable[[str, str], str] = (
             lambda value, separator: value.split(separator)

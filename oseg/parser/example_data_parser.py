@@ -312,8 +312,8 @@ class ExampleDataParser:
                 data=example_data.body,
             )
 
-            parsed.is_required = request.is_required
-            container.body = parsed
+            if parsed:
+                container.body = parsed
 
         return container
 

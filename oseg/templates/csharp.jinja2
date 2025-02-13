@@ -122,7 +122,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-        var {{ obj_name|print_variable }} = new {{ obj.type|split_uc|pascal_case }}(
+        var {{ obj_name|print_variable }} = new {{ obj.type|underscore|pascal_case }}(
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 12) %}
                 {% for name, value in properties.items() %}
             {{ name|print_variable }}: {{ value }}{% if not loop.last %},{% endif %}
@@ -144,7 +144,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|split_uc|pascal_case }}Api(config).{{ operation.operation_id|pascal_case }}({%- if not properties %});
+            new {{ operation.api_name|underscore|pascal_case }}Api(config).{{ operation.operation_id|pascal_case }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
