@@ -111,7 +111,7 @@ class TestOperationParser(unittest.TestCase):
             "security-advisories/list-global-advisories/some_value"
         ]
 
-        expected = "security_advisories_list_global_advisories_some_value"
+        expected = "security-advisories/list-global-advisories/some_value"
 
         self.assertEqual(expected, operation.operation_id)
 

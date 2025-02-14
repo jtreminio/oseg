@@ -206,8 +206,9 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
                     return None
 
                 parent_type_prepend = f"{parent.type}." if parent else ""
+                name = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
 
-                return f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+                return parser.NormalizeStr.uc_first(name)
 
         return None
 
@@ -227,7 +228,9 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
                 return self._to_json(value)
 
             base = f"{parser.NormalizeStr.pascal_case(item.name)}Enum"
-            parent_type_prepend = f"{parent.type}." if parent else ""
+            parent_type_prepend = (
+                parser.NormalizeStr.uc_first(f"{parent.type}.") if parent else ""
+            )
 
             # todo if currently in api call method, append ".toString()" to enums
             return f"models.{parent_type_prepend}{base}.{enum_name}"

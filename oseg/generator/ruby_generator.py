@@ -141,7 +141,7 @@ class RubyGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))
+        name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -149,7 +149,7 @@ class RubyGenerator(generator.BaseGenerator):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))
+        name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

@@ -196,12 +196,12 @@ class JavaGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.pascal_case(name)
+        parsed = parser.NormalizeStr.camel_case(name)
 
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
+        if self.is_reserved_keyword(parsed.lower()):
+            return self.unreserve_keyword(parsed)
 
-        return name
+        return parsed
 
     def print_variable(self, name: str) -> str:
         name = parser.NormalizeStr.camel_case(name)
@@ -290,7 +290,7 @@ class JavaGenerator(generator.BaseGenerator):
                 f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
             )
 
-            return f"{target_type}.{enum_name}"
+            return parser.NormalizeStr.uc_first(f"{target_type}.{enum_name}")
 
         if item.type == "string" and item.format == "date-time":
             return f'OffsetDateTime.parse("{value}")'

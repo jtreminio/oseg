@@ -275,7 +275,7 @@ class TemplateParser:
 
             # todo test multiple objects in array belonging to objects in array
             #      do not overwrite each other's names
-            printable.value = f"{parent_name}{sub_obj.name}"
+            printable.value = sub_obj.name
             printable.target_type = sub_obj.type
 
         for property_name, array_obj in obj.array_objects.items():
@@ -338,9 +338,7 @@ class TemplateParser:
         if the name is a reserved keyword.
         """
 
-        name = self._generator.print_variable(name)
-
         if self._generator.is_reserved_keyword(original_name):
-            name = self._generator.unreserve_keyword(name)
+            return self._generator.unreserve_keyword(name)
 
         return name

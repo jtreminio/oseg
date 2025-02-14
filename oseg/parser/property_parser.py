@@ -29,12 +29,13 @@ class PropertyParser:
 
                 if container is None:
                     type_of = sub_container.base_type
+
                     if type_of is None:
                         type_of = sub_container.type
 
                     container = model.PropertyObjectArray(
                         schema=schema,
-                        _type=parser.NormalizeStr.normalize(type_of),
+                        _type=type_of,
                         is_required=sub_container.is_required,
                         is_set=True,
                     )
@@ -64,14 +65,12 @@ class PropertyParser:
 
         container = model.PropertyObject(
             schema=schema,
-            _type=parser.NormalizeStr.normalize(type_of),
-            base_type=parser.NormalizeStr.normalize(base_type),
+            _type=type_of,
+            base_type=base_type,
             is_required=False,
         )
 
         for name, property_schema in properties.items():
-            name = parser.NormalizeStr.normalize(name)
-
             for current_schema in merged_values.schemas:
                 non_object_property_schema = self._oa_parser.resolve_property(
                     schema=current_schema,
@@ -128,6 +127,8 @@ class PropertyParser:
         data: dict[str, any],
     ) -> bool:
         """handle named object"""
+
+        # todo when ref object is free-form object, return early here
 
         if parser.TypeChecker.is_array(schema):
             return False

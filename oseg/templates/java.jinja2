@@ -49,8 +49,7 @@ Map.of {% if not printable.value %}(){% else %}
 List.of {% if not printable.value %}(){% else %}
 (
         {% for obj in printable.value %}
-    Map.of {% if not obj.value %}(){% else %}
-    (
+    Map.of {% if not obj.value %}(){% if not loop.last %},{% endif %}{% else %}(
             {% for k, v in obj.items() %}
         "{{ k }}": {{ v }},
             {% endfor %}
@@ -67,7 +66,7 @@ List.of {% if not printable.value %}(){% else %}
 
 {%- macro print_object_array(printable) -%}
     {% if printable.value == None %}null{% else %}
-new ArrayList<{{ printable.target_type }}>(List.of {% if not printable.value %}()){% else %}
+new ArrayList<{{ printable.target_type|pascal_case }}>(List.of {% if not printable.value %}()){% else %}
 (
         {% for i in printable.value %}
     {{ i|camel_case }}{% if not loop.last %},{% endif %}
@@ -118,7 +117,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
-        var {{ obj_name|print_variable }} = new {{ obj.type|underscore|pascal_case }}();
+        var {{ obj_name|print_variable }} = new {{ obj.type|pascal_case }}();
                 {% for name, value in properties.items() %}
         {{ obj_name|print_variable }}.{{ name|print_variable }}({{ value }});
                 {% endfor %}
@@ -137,7 +136,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|underscore|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
+            new {{ operation.api_name|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}

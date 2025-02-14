@@ -22,7 +22,6 @@ setup(
     python_requires=">=3.9",
     install_requires=[
         "black>=24.10",
-        "case-converter>=1.1",
         "Jinja2>=3.1",
         "openapi-pydantic>=0.5",
         "pydantic>=2.10",

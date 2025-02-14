@@ -106,6 +106,6 @@ class OperationParser:
 
     def _get_api_name(self, operation: oa.Operation) -> str:
         if operation.tags and len(operation.tags):
-            return operation.tags[0].replace(" ", "_")
+            return operation.tags[0]
 
         return self.DEFAULT_API_NAME

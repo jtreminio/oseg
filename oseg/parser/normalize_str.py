@@ -1,5 +1,4 @@
 import re
-import caseconverter
 
 
 class NormalizeStr:
@@ -7,37 +6,59 @@ class NormalizeStr:
 
     @staticmethod
     def normalize(name: str | None) -> str | None:
+        # todo delete me
         if name is None:
             return None
 
         return name.replace("/", "_").replace("-", "_")
 
-    @staticmethod
-    def camel_case(value: str) -> str:
-        return caseconverter.camelcase(value)
+    @classmethod
+    def camel_case(cls, value: str) -> str:
+        return cls.lc_first(cls.pascal_case(value))
 
-    @staticmethod
-    def pascal_case(value: str) -> str:
-        return caseconverter.pascalcase(value)
+    @classmethod
+    def pascal_case(cls, value: str) -> str:
+        value = cls.underscore(value).split("_")
 
-    @staticmethod
-    def snake_case(value: str) -> str:
-        return caseconverter.snakecase(value)
+        result = ""
 
-    @staticmethod
-    def uc_first(value: str) -> str:
+        for x in value:
+            result += cls.uc_first(x)
+
+        return result
+
+    @classmethod
+    def snake_case(cls, value: str) -> str:
+        value = cls.underscore(value).split("_")
+
+        result = value.pop(0).lower()
+
+        for x in value:
+            result += f"_{x.lower()}"
+
+        return result
+
+    @classmethod
+    def uc_first(cls, value: str) -> str:
         return f"{value[:1].upper()}{value[1:]}"
 
-    @staticmethod
-    def underscore(word: str) -> str:
+    @classmethod
+    def lc_first(cls, value: str) -> str:
+        return f"{value[:1].lower()}{value[1:]}"
+
+    @classmethod
+    def underscore(cls, word: str) -> str | None:
         """Underscore the given word
 
         Copied from openapi-generator
         https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/main/java/org/openapitools/codegen/utils/StringUtils.java
         """
 
-        if word in NormalizeStr._underscore_cache:
-            return NormalizeStr._underscore_cache[word]
+        if word is None:
+            return None
+
+        if word in cls._underscore_cache:
+            return cls._underscore_cache[word]
 
         if len(word) < 2:
             return word
@@ -46,8 +67,9 @@ class NormalizeStr:
         lowercase_pattern = re.compile(r"([a-z\d])([A-Z])")
         pkg_separator_pattern = re.compile(r"\.")
         dollar_pattern = re.compile(r"\$")
-
+        non_alphanumeric_underscore_pattern = re.compile(r"([^0-9a-zA-Z_]+)")
         replacement_pattern = r"\1_\2"
+
         # Replace package separator with slash.
         result = pkg_separator_pattern.sub("/", word)
         # Replace $ with two underscores for inner classes.
@@ -58,12 +80,25 @@ class NormalizeStr:
         result = result.replace("-", "_")
         # Replace space with underscore
         result = result.replace(" ", "_")
+        # Replace non-alphanumeric with _
+        result = non_alphanumeric_underscore_pattern.sub("_", result)
+        # Replace any double __ with single _ (yes it undoes a step from above)
+        result = result.replace("__", "_")
+        # Remove trailing whitespace or _
+        result = result.strip(" _")
 
-        # the first char is special, it will always be separate from rest
-        # when caps and next character is caps
-        if result[0].isupper() and result[1].isupper():
-            result = f"{result[:1].upper()}_{result[1:]}"
-
-        NormalizeStr._underscore_cache[word] = result
+        cls._underscore_cache[word] = result
 
         return result
+
+    @classmethod
+    def underscore_e(cls, word: str) -> str:
+        # the first char is special, it will always be separate from rest
+        # when caps and next character is caps
+
+        word = cls.underscore(word)
+
+        if len(word) >= 2 and word[0].isupper() and word[1].isupper():
+            return f"{word[:1].upper()}_{word[1:]}"
+
+        return word

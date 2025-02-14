@@ -153,9 +153,8 @@ class PythonGenerator(generator.BaseGenerator):
     def print_setter(self, name: str) -> str:
         # todo unit test
         prop_case = self._config.oseg_variable_naming_convention
-        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))
 
-        if self.is_reserved_keyword(name):
+        if self.is_reserved_keyword(parser.NormalizeStr.snake_case(name)):
             if prop_case == "camel_case":
                 return parser.NormalizeStr.camel_case(self.unreserve_keyword(name))
 
@@ -167,7 +166,7 @@ class PythonGenerator(generator.BaseGenerator):
         return name
 
     def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))
+        name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)

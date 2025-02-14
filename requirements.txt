@@ -1,5 +1,4 @@
 black~=24.10.0
-case-converter~=1.1.0
 Jinja2~=3.1.4
 openapi-pydantic~=0.5.0
 pydantic~=2.10.5

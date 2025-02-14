@@ -1,6 +1,6 @@
 import openapi_pydantic as oa
 from typing import Optional
-from oseg import model, parser
+from oseg import model
 
 
 class Operation:
@@ -19,8 +19,7 @@ class Operation:
         self._security: "model.Security" = security
         self._api_name = api_name
         self._http_method = http_method
-
-        self._operation_id = parser.NormalizeStr.normalize(operation.operationId)
+        self._operation_id = operation.operationId
 
     @property
     def operation_id(self) -> str:

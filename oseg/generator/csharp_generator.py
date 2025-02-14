@@ -177,15 +177,15 @@ class CSharpGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.pascal_case(parser.NormalizeStr.underscore(name))
+        parsed = parser.NormalizeStr.camel_case(name)
 
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
+        if self.is_reserved_keyword(parsed.lower()):
+            return self.unreserve_keyword(parsed)
 
-        return name
+        return parsed
 
     def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(parser.NormalizeStr.underscore(name))
+        name = parser.NormalizeStr.camel_case(name)
 
         if self.is_reserved_keyword(name):
             return self.unreserve_keyword(name)
@@ -256,8 +256,9 @@ class CSharpGenerator(generator.BaseGenerator):
                     return "string"
 
                 parent_type_prepend = f"{parent.type}." if parent else ""
+                name = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
 
-                return f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+                return parser.NormalizeStr.uc_first(name)
 
             if item.format == "date-time":
                 return "DateTime"
@@ -304,7 +305,7 @@ class CSharpGenerator(generator.BaseGenerator):
                 f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
             )
 
-            return f"{target_type}.{enum_name}"
+            return parser.NormalizeStr.uc_first(f"{target_type}.{enum_name}")
 
         if item.type == "string" and item.format == "date-time":
             return f'DateTime.Parse("{value}")'

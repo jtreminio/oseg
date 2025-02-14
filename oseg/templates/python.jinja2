@@ -97,7 +97,7 @@ with ApiClient(configuration) as api_client:
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-    {{ obj_name|print_variable }} = models.{{ obj.type|underscore|pascal_case }}(
+    {{ obj_name|print_variable }} = models.{{ obj.type|uc_first }}(
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
                 {% for name, value in properties.items() %}
         {{ name|print_setter }}={{ value }},
@@ -117,7 +117,7 @@ with ApiClient(configuration) as api_client:
         {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-        api.{{ operation.api_name|underscore|pascal_case }}Api(api_client).{{ operation.operation_id|underscore|snake_case }}({%- if not properties %})
+        api.{{ operation.api_name|pascal_case }}Api(api_client).{{ operation.operation_id|snake_case }}({%- if not properties %})
 {% else %}
 
     {% for name, value in properties.items() %}

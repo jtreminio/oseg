@@ -31,9 +31,7 @@ class Generator:
         for _, operation in self._oa_parser.operations.items():
             for name, property_container in operation.request.example_data.items():
                 operation_id = operation.operation_id
-                filename = parser.NormalizeStr.pascal_case(
-                    parser.NormalizeStr.normalize(f"{operation_id}_{name}")
-                )
+                filename = parser.NormalizeStr.pascal_case(f"{operation_id}_{name}")
                 file_extension = sdk_generator.FILE_EXTENSION
                 target_file = f"{output_dir}/{filename}.{file_extension}"
 

@@ -108,12 +108,10 @@ class PhpGenerator(generator.BaseGenerator):
         return name
 
     def print_setter(self, name: str) -> str:
-        return parser.NormalizeStr.pascal_case(parser.NormalizeStr.underscore(name))
+        return parser.NormalizeStr.pascal_case(name)
 
     def print_variable(self, name: str) -> str:
-        return (
-            f"${parser.NormalizeStr.snake_case(parser.NormalizeStr.underscore(name))}"
-        )
+        return f"${parser.NormalizeStr.snake_case(name)}"
 
     def print_scalar(
         self,
@@ -180,9 +178,9 @@ class PhpGenerator(generator.BaseGenerator):
         enum_varname = super()._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
-            return f"{name.upper()}_{enum_varname}"
+            return parser.NormalizeStr.underscore(f"{name}_{enum_varname}").upper()
 
         if value == "" or value is None:
-            return f"{name.upper()}_EMPTY"
+            return parser.NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
-        return f"{name.upper()}_{parser.NormalizeStr.snake_case(value).upper()}"
+        return parser.NormalizeStr.underscore(f"{name}_{value}").upper()

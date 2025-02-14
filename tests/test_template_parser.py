@@ -121,16 +121,16 @@ class TestTemplateParser(unittest.TestCase):
         container = operation.request.example_data[self.example_name]
 
         expected = {
-            "dog_2_category": "Category",
-            "dog_2_tags_1": "Tag",
-            "dog_2_tags_2": "Tag",
-            "dog_2_tags": "Tag",
-            "dog_1_category": "Category",
-            "dog_1_tags_1": "Tag",
-            "dog_1_tags_2": "Tag",
-            "dog_1_tags": "Tag",
-            "dog_1": "Dog",
-            "dog_2": "Dog",
+            "Dog_2_category": "Category",
+            "Dog_2_tags_1": "Tag",
+            "Dog_2_tags_2": "Tag",
+            "Dog_2_tags": "Tag",
+            "Dog_1_category": "Category",
+            "Dog_1_tags_1": "Tag",
+            "Dog_1_tags_2": "Tag",
+            "Dog_1_tags": "Tag",
+            "Dog_1": "Dog",
+            "Dog_2": "Dog",
             "Dog": "Dog",
         }
 
@@ -162,7 +162,7 @@ class TestTemplateParser(unittest.TestCase):
 
         expected = {
             "name": body_data["name"],
-            "photo_urls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -195,7 +195,7 @@ class TestTemplateParser(unittest.TestCase):
 
         default_expected = {
             "name": body_data["name"],
-            "photo_urls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -208,7 +208,7 @@ class TestTemplateParser(unittest.TestCase):
         data_provider = {
             "id": {
                 "name": default_expected["name"],
-                "photo_urls": default_expected["photo_urls"],
+                "photoUrls": default_expected["photoUrls"],
                 "status": default_expected["status"],
                 "category": default_expected["category"],
                 "tags": default_expected["tags"],
@@ -218,7 +218,7 @@ class TestTemplateParser(unittest.TestCase):
             },
             "status": {
                 "name": default_expected["name"],
-                "photo_urls": default_expected["photo_urls"],
+                "photoUrls": default_expected["photoUrls"],
                 "id": default_expected["id"],
                 "category": default_expected["category"],
                 "tags": default_expected["tags"],
@@ -257,7 +257,7 @@ class TestTemplateParser(unittest.TestCase):
 
         expected = {
             "name": None,
-            "photo_urls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -294,7 +294,7 @@ class TestTemplateParser(unittest.TestCase):
 
         expected = {
             "name": body_data["name"],
-            "photo_urls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
             "id": None,
             "status": body_data["status"],
             "category": "category",
@@ -343,7 +343,7 @@ class TestTemplateParser(unittest.TestCase):
             "dog_1_tags_2": ["id", "name"],
             "dog_1": [
                 "name",
-                "photo_urls",
+                "photoUrls",
                 "id",
                 "status",
                 "var_try",
@@ -354,7 +354,7 @@ class TestTemplateParser(unittest.TestCase):
             ],
             "dog_2": [
                 "name",
-                "photo_urls",
+                "photoUrls",
                 "id",
                 "status",
                 "var_try",
@@ -394,15 +394,15 @@ class TestTemplateParser(unittest.TestCase):
         container = operation.request.example_data[self.example_name]
 
         expected = {
-            "dog_2_category": ["id", "name"],
-            "dog_2_tags_1": ["id", "name"],
-            "dog_2_tags_2": ["id", "name"],
-            "dog_1_category": ["id", "name"],
-            "dog_1_tags_1": ["id", "name"],
-            "dog_1_tags_2": ["id", "name"],
-            "dog_1": [
+            "Dog_2_category": ["id", "name"],
+            "Dog_2_tags_1": ["id", "name"],
+            "Dog_2_tags_2": ["id", "name"],
+            "Dog_1_category": ["id", "name"],
+            "Dog_1_tags_1": ["id", "name"],
+            "Dog_1_tags_2": ["id", "name"],
+            "Dog_1": [
                 "name",
-                "photo_urls",
+                "photoUrls",
                 "id",
                 "status",
                 "var_try",
@@ -411,9 +411,9 @@ class TestTemplateParser(unittest.TestCase):
                 "category",
                 "tags",
             ],
-            "dog_2": [
+            "Dog_2": [
                 "name",
-                "photo_urls",
+                "photoUrls",
                 "id",
                 "status",
                 "var_try",
@@ -502,8 +502,8 @@ class TestTemplateParser(unittest.TestCase):
         container = operation.request.example_data[self.example_name]
 
         expected = {
-            "dog_2_tags": "[dog_2_tags_1,dog_2_tags_2]",
-            "dog_1_tags": "[dog_1_tags_1,dog_1_tags_2]",
+            "Dog_2_tags": "[dog_2_tags_1,dog_2_tags_2]",
+            "Dog_1_tags": "[dog_1_tags_1,dog_1_tags_2]",
             "Dog": "[dog_1,dog_2]",
         }
 
@@ -541,12 +541,12 @@ class TestTemplateParser(unittest.TestCase):
         )
 
         expected = {
-            "pet_id": str(path_data["petId"]),
-            "query_param": str(query_data["queryParam"]),
+            "petId": str(path_data["petId"]),
+            "queryParam": str(query_data["queryParam"]),
             "var_try": query_data["try"],
             "var_while": query_data["while"],
             "var_with": query_data["with"],
-            "dog": "dog",
+            "Dog": "dog",
         }
 
         self.assertDictEqual(expected, api_call_properties)
@@ -570,10 +570,10 @@ class TestTemplateParser(unittest.TestCase):
         )
 
         expected = {
-            "pet_id": str(path_data["petId"]),
+            "petId": str(path_data["petId"]),
             "name": body_data["name"],
-            "photo_urls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
-            "query_param": str(query_data["queryParam"]),
+            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "queryParam": str(query_data["queryParam"]),
             "var_try": query_data["try"],
             "var_while": query_data["while"],
             "var_with": query_data["with"],
@@ -641,6 +641,14 @@ class TestTemplateParser(unittest.TestCase):
                 )
 
                 self.assertEqual(expected, result)
+
+    # todo test print_file
+
+    # todo test print_free_form
+
+    # todo test _get_enum_varname
+
+    # todo test _get_enum_varname_override
 
     @classmethod
     def _example_data(cls) -> dict[str, dict[str, any]]:
