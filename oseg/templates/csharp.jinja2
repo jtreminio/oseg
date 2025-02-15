@@ -3,7 +3,7 @@
 {%- endmacro -%}
 
 {%- macro print_scalar_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     {{ i }},
@@ -13,7 +13,7 @@
 {%- endmacro -%}
 
 {%- macro print_file(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new FileStream(
     path: "{{ printable.value }}",
     mode: FileMode.Open
@@ -22,7 +22,7 @@ new FileStream(
 {%- endmacro -%}
 
 {%- macro print_file_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new List<Stream>{% if not printable.value %}(){% else %}
 
 {
@@ -37,7 +37,7 @@ new List<Stream>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new Dictionary<string, object>{% if not printable.value %}(){% else %}
 
 {
@@ -49,7 +49,7 @@ new Dictionary<string, object>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
 
 {
@@ -70,7 +70,7 @@ new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new List<{{ printable.target_type|print_classname }}>{% if not printable.value %}(){% else %}
 
 {

@@ -1,11 +1,11 @@
 {%- macro print_scalar(printable) -%}
-{% if printable.value == "null" %}undefined{% else %}
+{% if printable.value == "null" %}{{ print_null() }}{% else %}
 {{ printable.value }}
 {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_scalar_array(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     {{ i }},
@@ -15,13 +15,13 @@
 {%- endmacro -%}
 
 {%- macro print_file(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 fs.createReadStream("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_file_array(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     fs.createReadStream("{{ i }}"),
@@ -31,7 +31,7 @@ fs.createReadStream("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 {
         {% for k, v in printable.value.items() %}
     "{{ k }}": {{ v }},
@@ -41,7 +41,7 @@ fs.createReadStream("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for obj in printable.value %}
     {
@@ -55,13 +55,13 @@ fs.createReadStream("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 {{ printable.value|print_variablename }}
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
-    {% if printable.value == None %}undefined{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
     {% for i in printable.value %}
     {{ i|print_variablename }},

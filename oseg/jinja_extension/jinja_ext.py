@@ -71,6 +71,7 @@ class JinjaExt(jinja2.ext.Extension):
         environment.globals.update(
             parse_api_call_properties=self._parse_api_call_properties
         )
+        environment.globals.update(print_null=lambda: self._sdk_generator.print_null())
 
     @property
     def template(self) -> jinja2.Template:

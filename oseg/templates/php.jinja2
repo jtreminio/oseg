@@ -3,7 +3,7 @@
 {%- endmacro -%}
 
 {%- macro print_scalar_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     {{ i }},
@@ -13,13 +13,13 @@
 {%- endmacro -%}
 
 {%- macro print_file(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 new SplFileObject("{{ printable.value }}")
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_file_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.values %}
     new SplFileObject("{{ i }}"),
@@ -29,7 +29,7 @@ new SplFileObject("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for k, v in printable.value.items() %}
     "{{ k }}" => {{ v }},
@@ -39,7 +39,7 @@ new SplFileObject("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for obj in printable.value %}
     [
@@ -53,13 +53,13 @@ new SplFileObject("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 ${{ printable.value|print_variablename }}
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
-    {% if printable.value == None %}null{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
     {% for i in printable.value %}
     ${{ i|print_variablename }},

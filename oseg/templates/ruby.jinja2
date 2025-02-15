@@ -3,7 +3,7 @@
 {%- endmacro -%}
 
 {%- macro print_scalar_array(printable) -%}
-    {% if printable.value == None %}nil{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     {{ i }},
@@ -13,13 +13,13 @@
 {%- endmacro -%}
 
 {%- macro print_file(printable) -%}
-    {% if printable.value == None %}nil{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 File.new("{{ printable.value }}", "r")
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_file_array(printable) -%}
-    {% if printable.value == None %}nil{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
     File.new("{{ i }}", "r"),
@@ -29,7 +29,7 @@ File.new("{{ printable.value }}", "r")
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}nil{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 {
         {% for k, v in printable.value.items() %}
     "{{ k }}": {{ v }},
@@ -39,7 +39,7 @@ File.new("{{ printable.value }}", "r")
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}nil{% else %}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for obj in printable.value %}
     {
