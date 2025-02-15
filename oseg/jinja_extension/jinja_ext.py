@@ -48,11 +48,17 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["split"]: Callable[[str, str], str] = (
             lambda value, separator: value.split(separator)
         )
-        environment.filters["print_setter"]: Callable[[str], str] = (
-            lambda name: self._sdk_generator.print_setter(name)
+        environment.filters["print_classname"]: Callable[[str], str] = (
+            lambda name: self._sdk_generator.print_classname(name)
         )
-        environment.filters["print_variable"]: Callable[[str], str] = (
-            lambda name: self._sdk_generator.print_variable(name)
+        environment.filters["print_methodname"]: Callable[[str], str] = (
+            lambda name: self._sdk_generator.print_methodname(name)
+        )
+        environment.filters["print_propname"]: Callable[[str], str] = (
+            lambda name: self._sdk_generator.print_propname(name)
+        )
+        environment.filters["print_variablename"]: Callable[[str], str] = (
+            lambda name: self._sdk_generator.print_variablename(name)
         )
         environment.globals.update(parse_security=self._parse_security)
         environment.globals.update(parse_objects=self._parse_objects)

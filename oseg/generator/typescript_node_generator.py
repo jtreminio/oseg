@@ -1,6 +1,7 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 TypescriptNodeConfigDef = TypedDict(
     "TypescriptNodeConfigDef",
@@ -144,26 +145,22 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         return name.lower() in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
-        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
+        if not self.is_reserved_keyword(name):
+            return name
 
-        return name
+        return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
-    def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(name)
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.camel_case(name)
 
-        return name
+    def print_propname(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.camel_case(name))
 
-    def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(name)
-
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
-
-        return name
+    def print_variablename(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.camel_case(name))
 
     def print_scalar(
         self,
@@ -205,10 +202,10 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
                 if parent is None:
                     return None
 
-                parent_type_prepend = f"{parent.type}." if parent else ""
-                name = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+                parent_type = NormalizeStr.pascal_case(parent.type)
+                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-                return parser.NormalizeStr.uc_first(name)
+                return f"{parent_type}.{enum_type}"
 
         return None
 
@@ -227,13 +224,11 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
             if parent is None:
                 return self._to_json(value)
 
-            base = f"{parser.NormalizeStr.pascal_case(item.name)}Enum"
-            parent_type_prepend = (
-                parser.NormalizeStr.uc_first(f"{parent.type}.") if parent else ""
-            )
+            parent_type = NormalizeStr.pascal_case(parent.type)
+            enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
             # todo if currently in api call method, append ".toString()" to enums
-            return f"models.{parent_type_prepend}{base}.{enum_name}"
+            return f"models.{parent_type}.{enum_type}.{enum_name}"
 
         if item.type == "string" and item.format == "date-time":
             return f'new Date("{value}")'
@@ -248,12 +243,12 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         value: any,
     ) -> str | None:
-        enum_varname = super()._get_enum_varname_override(item.schema, value)
+        enum_varname = self._get_enum_varname_override(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
 
-        enum_varname = super()._get_enum_varname(item.schema, value)
+        enum_varname = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
@@ -264,4 +259,4 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         if value is None:
             return None
 
-        return parser.NormalizeStr.pascal_case(value)
+        return NormalizeStr.pascal_case(value)

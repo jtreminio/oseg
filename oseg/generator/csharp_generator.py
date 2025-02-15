@@ -1,6 +1,7 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 
 CSharpConfigDef = TypedDict(
@@ -169,28 +170,22 @@ class CSharpGenerator(generator.BaseGenerator):
         return name.lower() in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
-        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return (
-                f"{self.RESERVED_KEYWORD_PREPEND}{parser.NormalizeStr.uc_first(name)}"
-            )
+        if not self.is_reserved_keyword(name):
+            return name
 
-        return name
+        return NormalizeStr.camel_case(f"{self.RESERVED_KEYWORD_PREPEND}_{name}")
 
-    def print_setter(self, name: str) -> str:
-        parsed = parser.NormalizeStr.camel_case(name)
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-        if self.is_reserved_keyword(parsed.lower()):
-            return self.unreserve_keyword(parsed)
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-        return parsed
+    def print_propname(self, name: str) -> str:
+        return self.print_variablename(name)
 
-    def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(name)
-
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
-
-        return name
+    def print_variablename(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.camel_case(name))
 
     def print_scalar(
         self,
@@ -224,12 +219,12 @@ class CSharpGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         value: any,
     ) -> str | None:
-        enum_varname = super()._get_enum_varname_override(item.schema, value)
+        enum_varname = self._get_enum_varname_override(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
 
-        enum_varname = super()._get_enum_varname(item.schema, value)
+        enum_varname = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
@@ -240,7 +235,7 @@ class CSharpGenerator(generator.BaseGenerator):
         if value is None:
             return None
 
-        return parser.NormalizeStr.pascal_case(value)
+        return NormalizeStr.pascal_case(value)
 
     def _get_target_type(
         self,
@@ -255,10 +250,10 @@ class CSharpGenerator(generator.BaseGenerator):
                 if parent is None:
                     return "string"
 
-                parent_type_prepend = f"{parent.type}." if parent else ""
-                name = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+                parent_type = NormalizeStr.pascal_case(parent.type)
+                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-                return parser.NormalizeStr.uc_first(name)
+                return f"{parent_type}.{enum_type}"
 
             if item.format == "date-time":
                 return "DateTime"
@@ -300,12 +295,10 @@ class CSharpGenerator(generator.BaseGenerator):
             if parent is None:
                 return self._to_json(value)
 
-            parent_type_prepend = f"{parent.type}." if parent else ""
-            target_type = (
-                f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
-            )
+            parent_type = NormalizeStr.pascal_case(parent.type)
+            enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-            return parser.NormalizeStr.uc_first(f"{target_type}.{enum_name}")
+            return f"{parent_type}.{enum_type}.{enum_name}"
 
         if item.type == "string" and item.format == "date-time":
             return f'DateTime.Parse("{value}")'

@@ -166,11 +166,19 @@ class BaseGenerator(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def print_setter(self, name: str) -> str:
+    def print_classname(self, name: str) -> str:
         raise NotImplementedError
 
     @abstractmethod
-    def print_variable(self, name: str) -> str:
+    def print_methodname(self, name: str) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_propname(self, name: str) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_variablename(self, name: str) -> str:
         raise NotImplementedError
 
     @abstractmethod

@@ -77,7 +77,13 @@ class MockGenerator(generator.BaseGenerator):
 
         return name
 
-    def print_setter(self, name: str) -> str:
+    def print_classname(self, name: str) -> str:
+        return parser.NormalizeStr.pascal_case(name)
+
+    def print_methodname(self, name: str) -> str:
+        return parser.NormalizeStr.camel_case(name)
+
+    def print_propname(self, name: str) -> str:
         name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):
@@ -85,7 +91,7 @@ class MockGenerator(generator.BaseGenerator):
 
         return name
 
-    def print_variable(self, name: str) -> str:
+    def print_variablename(self, name: str) -> str:
         name = parser.NormalizeStr.snake_case(name)
 
         if self.is_reserved_keyword(name):

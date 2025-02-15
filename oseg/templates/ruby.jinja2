@@ -53,13 +53,13 @@ File.new("{{ printable.value }}", "r")
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-{{ printable.value|print_variable }}
+{{ printable.value|print_variablename }}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
 [
     {% for i in printable.value %}
-    {{ i|snake_case }},
+    {{ i|print_variablename }},
     {% endfor %}
 ]
 {%- endmacro -%}
@@ -67,10 +67,9 @@ File.new("{{ printable.value }}", "r")
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
-
-    {%- if printable.method == "api_key" %}{{ comment }}config.api_key["{{ printable.name }}"] = "{{ printable.value }}";
-    {%- else %}{{ comment }}config.{{ printable.method }} = "{{ printable.value }}";
-    {%- endif %}
+{{ comment }}config.{{ printable.method|print_methodname }}
+    {%- if printable.method == "api_key" %}["{{ printable.name }}"] = "{{ printable.value }}";
+    {%- else %} = "{{ printable.value }}";{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
@@ -91,14 +90,14 @@ end
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-{{ obj_name|print_variable }} = {{ config.module_name }}::{{ obj.type|pascal_case }}.new
+{{ obj_name|print_variablename }} = {{ config.module_name }}::{{ obj.type|print_classname }}.new
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
                 {% for name, value in properties.items() %}
-{{ obj_name|print_variable }}.{{ name|print_variable }} = {{ value }}
+{{ obj_name|print_variablename }}.{{ name|print_methodname }} = {{ value }}
                 {% endfor %}
             {% endcall %}
         {% else %}
-{{ obj_name|print_variable }} = {{ "" }}
+{{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
     {{- value }}
             {% endcall %}
@@ -111,7 +110,7 @@ begin
 {% call(properties) m.parse_api_call_properties_macro(property_container, 8, True) %}
     {% call(opt_properties) m.parse_api_call_properties_macro(property_container, 8, False) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-    {{ config.module_name }}::{{ operation.api_name|pascal_case }}Api.new.{{ operation.operation_id|snake_case }}{%- if not properties and not opt_properties %}
+    {{ config.module_name }}::{{ (operation.api_name ~ "Api")|print_classname }}.new.{{ operation.operation_id|print_methodname }}{%- if not properties and not opt_properties %}
 
         {% else %}(
             {% for name, value in properties.items() %}
@@ -120,7 +119,7 @@ begin
             {% if opt_properties %}
         {
                 {% for name, value in opt_properties.items() %}
-            {{ name|print_variable }}: {{ value }},
+            {{ name|print_propname }}: {{ value }},
                 {% endfor %}
         },
             {% endif %}
@@ -136,6 +135,6 @@ begin
     FileUtils.cp(response.path, "./file_response")
 {% endif %}
 rescue {{ config.module_name }}::ApiError => e
-    puts "Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|snake_case }}: #{e}"
+    puts "Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: #{e}"
 end
 {{ "" }}

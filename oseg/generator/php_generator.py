@@ -1,6 +1,7 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 PhpConfigDef = TypedDict(
     "PhpConfigDef",
@@ -107,11 +108,17 @@ class PhpGenerator(generator.BaseGenerator):
     def unreserve_keyword(self, name: str) -> str:
         return name
 
-    def print_setter(self, name: str) -> str:
-        return parser.NormalizeStr.pascal_case(name)
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-    def print_variable(self, name: str) -> str:
-        return f"${parser.NormalizeStr.snake_case(name)}"
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.camel_case(name)
+
+    def print_propname(self, name: str) -> str:
+        return NormalizeStr.snake_case(name)
+
+    def print_variablename(self, name: str) -> str:
+        return NormalizeStr.snake_case(name)
 
     def print_scalar(
         self,
@@ -155,9 +162,9 @@ class PhpGenerator(generator.BaseGenerator):
         if item.type == "string" and item.is_enum and parent is not None:
             namespace = self._config.invoker_package
             enum_name = self._get_enum_name(item, item.name, value)
-            parent_type_prepend = f"\\{parser.NormalizeStr.pascal_case(parent.type)}"
+            parent_type = NormalizeStr.pascal_case(parent.type)
 
-            return f"{namespace}\\Model{parent_type_prepend}::{enum_name}"
+            return f"{namespace}\\Model\\{parent_type}::{enum_name}"
 
         if item.type == "string" and item.format in ["date-time", "date"]:
             return f'new \\DateTime("{value}")'
@@ -170,17 +177,17 @@ class PhpGenerator(generator.BaseGenerator):
         name: str,
         value: any,
     ) -> str:
-        enum_varname = super()._get_enum_varname_override(item.schema, value)
+        enum_varname = self._get_enum_varname_override(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
 
-        enum_varname = super()._get_enum_varname(item.schema, value)
+        enum_varname = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
-            return parser.NormalizeStr.underscore(f"{name}_{enum_varname}").upper()
+            return NormalizeStr.underscore(f"{name}_{enum_varname}").upper()
 
         if value == "" or value is None:
-            return parser.NormalizeStr.underscore(f"{name}_EMPTY").upper()
+            return NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
-        return parser.NormalizeStr.underscore(f"{name}_{value}").upper()
+        return NormalizeStr.underscore(f"{name}_{value}").upper()

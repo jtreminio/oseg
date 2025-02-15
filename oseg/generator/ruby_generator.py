@@ -1,6 +1,7 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 RubyConfigDef = TypedDict(
     "RubyConfigDef",
@@ -135,26 +136,22 @@ class RubyGenerator(generator.BaseGenerator):
         return name.lower() in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
-        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
+        if not self.is_reserved_keyword(name):
+            return name
 
-        return name
+        return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
-    def print_setter(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(name)
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.snake_case(name)
 
-        return name
+    def print_propname(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.snake_case(name))
 
-    def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(name)
-
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
-
-        return name
+    def print_variablename(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.snake_case(name))
 
     def print_scalar(
         self,

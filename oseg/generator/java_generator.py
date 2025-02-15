@@ -1,6 +1,7 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 
 JavaConfigDef = TypedDict(
@@ -187,29 +188,26 @@ class JavaGenerator(generator.BaseGenerator):
         return name.lower() in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
+        if not self.is_reserved_keyword(name):
+            return name
+
         if name == "_":
             return "u"
 
-        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
+        return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
-        return name
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
 
-    def print_setter(self, name: str) -> str:
-        parsed = parser.NormalizeStr.camel_case(name)
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.camel_case(name)
 
-        if self.is_reserved_keyword(parsed.lower()):
-            return self.unreserve_keyword(parsed)
+    def print_propname(self, name: str) -> str:
+        # not currently used by template
+        raise NotImplementedError
 
-        return parsed
-
-    def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.camel_case(name)
-
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
-
-        return name
+    def print_variablename(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.camel_case(name))
 
     def print_scalar(
         self,
@@ -230,8 +228,13 @@ class JavaGenerator(generator.BaseGenerator):
 
             if item.type == "string":
                 if item.is_enum:
-                    parent_type_prepend = f"{parent.type}." if parent else ""
-                    printable.target_type = f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
+                    enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+
+                    if not parent:
+                        printable.target_type = enum_type
+                    else:
+                        parent_type = NormalizeStr.pascal_case(parent.type)
+                        printable.target_type = f"{parent_type}.{enum_type}"
 
             for i in item.value:
                 printable.value.append(self._handle_value(item, i, parent))
@@ -250,12 +253,12 @@ class JavaGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         value: any,
     ) -> str | None:
-        enum_varname = super()._get_enum_varname_override(item.schema, value)
+        enum_varname = self._get_enum_varname_override(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
 
-        enum_varname = super()._get_enum_varname(item.schema, value)
+        enum_varname = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
@@ -285,12 +288,10 @@ class JavaGenerator(generator.BaseGenerator):
             if parent is None:
                 return self._to_json(value)
 
-            parent_type_prepend = f"{parent.type}." if parent else ""
-            target_type = (
-                f"{parent_type_prepend}{parser.NormalizeStr.pascal_case(item.name)}Enum"
-            )
+            parent_type = NormalizeStr.pascal_case(parent.type)
+            enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-            return parser.NormalizeStr.uc_first(f"{target_type}.{enum_name}")
+            return f"{parent_type}.{enum_type}.{enum_name}"
 
         if item.type == "string" and item.format == "date-time":
             return f'OffsetDateTime.parse("{value}")'

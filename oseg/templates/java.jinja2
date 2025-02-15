@@ -61,15 +61,15 @@ List.of {% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-{{ printable.value|camel_case }}
+{{ printable.value|print_variablename }}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
     {% if printable.value == None %}null{% else %}
-new ArrayList<{{ printable.target_type|pascal_case }}>(List.of {% if not printable.value %}()){% else %}
+new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not printable.value %}()){% else %}
 (
         {% for i in printable.value %}
-    {{ i|camel_case }}{% if not loop.last %},{% endif %}
+    {{ i|print_variablename }}{% if not loop.last %},{% endif %}
 
         {% endfor %}
 ))
@@ -79,7 +79,7 @@ new ArrayList<{{ printable.target_type|pascal_case }}>(List.of {% if not printab
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-{{ comment }}config.set{{ printable.method|pascal_case }}("{{ printable.value }}");
+{{ comment }}config.{{ ("set" ~ "_" ~ printable.method)|print_methodname }}("{{ printable.value }}");
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
@@ -99,7 +99,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}
+public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
 {
     public static void main(String[] args)
     {
@@ -117,13 +117,13 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
-        var {{ obj_name|print_variable }} = new {{ obj.type|pascal_case }}();
+        var {{ obj_name|print_variablename }} = new {{ obj.type|print_classname }}();
                 {% for name, value in properties.items() %}
-        {{ obj_name|print_variable }}.{{ name|print_variable }}({{ value }});
+        {{ obj_name|print_variablename }}.{{ name|print_methodname }}({{ value }});
                 {% endfor %}
             {% endcall %}
         {% else %}
-        var {{ obj_name|print_variable }} = {{ "" }}
+        var {{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 8) %}
             {{- value }};
             {% endcall %}
@@ -136,7 +136,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|pascal_case }}Api(config).{{ operation.operation_id|camel_case }}({%- if not properties %});
+            new {{ (operation.api_name ~ "Api")|print_classname }}(config).{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
@@ -153,7 +153,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             response.renameTo(new File("./file_response"));
     {% endif %}
         } catch (ApiException e) {
-            System.err.println("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}");
+            System.err.println("Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}");
             System.err.println("Status code: " + e.getCode());
             System.err.println("Reason: " + e.getResponseBody());
             System.err.println("Response headers: " + e.getResponseHeaders());

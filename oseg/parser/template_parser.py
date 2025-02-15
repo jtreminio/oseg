@@ -189,7 +189,7 @@ class TemplateParser:
                 if include_body is None or include_body is True:
                     has_data = True
 
-                    result[prop_name] = self._generator.print_variable(
+                    result[prop_name] = self._generator.print_variablename(
                         property_container.body.type
                     )
 
@@ -210,7 +210,7 @@ class TemplateParser:
                     result[prop_name] = self._generator.print_null()
                 else:
                     has_data = True
-                    result[prop_name] = self._generator.print_variable(prop_name)
+                    result[prop_name] = self._generator.print_variablename(prop_name)
 
                 continue
 

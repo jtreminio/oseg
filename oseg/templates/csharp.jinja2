@@ -66,16 +66,16 @@ new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}
-{{ printable.value|camel_case }}
+{{ printable.value|print_variablename }}
 {%- endmacro -%}
 
 {%- macro print_object_array(printable) -%}
     {% if printable.value == None %}null{% else %}
-new List<{{ printable.target_type|pascal_case }}>{% if not printable.value %}(){% else %}
+new List<{{ printable.target_type|print_classname }}>{% if not printable.value %}(){% else %}
 
 {
         {% for i in printable.value %}
-    {{ i|camel_case }},
+    {{ i|print_variablename }},
         {% endfor %}
 }
     {%- endif %}{%- endif %}
@@ -84,11 +84,9 @@ new List<{{ printable.target_type|pascal_case }}>{% if not printable.value %}(){
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-
-    {%- if printable.method == "api_key" %}
-{{ comment }}config.ApiKey = new Dictionary<string, string> {["{{ printable.name }}"] = "{{ printable.value }}"};
-    {%- else %}{{ comment }}config.{{ printable.method|pascal_case }} = "{{ printable.value }}";
-    {%- endif %}
+{{ comment }}config.{{ printable.method|print_methodname }} =
+    {%- if printable.method == "api_key" %} new Dictionary<string, string> {["{{ printable.name }}"] = "{{ printable.value }}"};
+    {%- else %} "{{ printable.value }}";{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
@@ -105,7 +103,7 @@ using {{ config.package_name }}.Model;
 namespace {{ config.oseg_namespace }};
 
 {% endif %}
-public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case }}
+public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
 {
     public static void Run()
     {
@@ -122,16 +120,16 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-        var {{ obj_name|print_variable }} = new {{ obj.type|pascal_case }}(
+        var {{ obj_name|print_variablename }} = new {{ obj.type|print_classname }}(
             {% call(properties) m.parse_object_properties_macro(property_container, obj, 12) %}
                 {% for name, value in properties.items() %}
-            {{ name|print_setter }}: {{ value }}{% if not loop.last %},{% endif %}
+            {{ name|print_propname }}: {{ value }}{% if not loop.last %},{% endif %}
 
                 {% endfor %}
             {% endcall %}
         );
         {% else %}
-        var {{ obj_name|print_variable }} = {{ "" }}
+        var {{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 8) %}
         {{- value }};
             {% endcall %}
@@ -144,11 +142,11 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ operation.api_name|pascal_case }}Api(config).{{ operation.operation_id|pascal_case }}({%- if not properties %});
+            new {{ (operation.api_name ~ "Api")|print_classname }}(config).{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
-                {{ name|print_setter }}: {{ value }}{% if not loop.last %},{% endif %}
+                {{ name|print_propname }}: {{ value }}{% if not loop.last %},{% endif %}
 
     {% endfor %}
             );
@@ -166,7 +164,7 @@ public class {{ operation.operation_id|pascal_case }}{{ example_name|pascal_case
         }
         catch (ApiException e)
         {
-            Console.WriteLine("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|pascal_case }}: " + e.Message);
+            Console.WriteLine("Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: " + e.Message);
             Console.WriteLine("Status Code: " + e.ErrorCode);
             Console.WriteLine(e.StackTrace);
         }

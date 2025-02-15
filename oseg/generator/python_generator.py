@@ -1,12 +1,13 @@
 import inspect
 from typing import TypedDict
-from oseg import generator, model, parser
+from oseg import generator, model
+from oseg.parser import NormalizeStr
 
 PythonConfigDef = TypedDict(
     "PythonConfigDef",
     {
         "packageName": str,
-        "oseg.variableNamingConvention": str | None,
+        "oseg.propertyNamingConvention": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
     },
@@ -31,11 +32,11 @@ class PythonConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
-        "oseg.variableNamingConvention": {
+        "oseg.propertyNamingConvention": {
             "description": inspect.cleandoc(
                 """
-                Naming convention of variable names, one of "camelCase"
-                or "snake_case". (Default: snake_case)
+                Naming convention of Model method property names,
+                one of "camelCase" or "snake_case". (Default: snake_case)
                 """
             ),
             "default": "snake_case",
@@ -63,9 +64,9 @@ class PythonConfig(generator.BaseConfig):
         self.package_name = config.get("packageName")
         assert isinstance(self.package_name, str)
 
-        self.oseg_variable_naming_convention = config.get(
-            "oseg.variableNamingConvention",
-            self.PROPS_OPTIONAL["oseg.variableNamingConvention"].get("default"),
+        self.oseg_property_naming_convention = config.get(
+            "oseg.propertyNamingConvention",
+            self.PROPS_OPTIONAL["oseg.propertyNamingConvention"].get("default"),
         )
 
         self.oseg_ignore_optional_unset = config.get(
@@ -142,36 +143,38 @@ class PythonGenerator(generator.BaseGenerator):
     _config: PythonConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
-        return parser.NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
+        return NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str) -> str:
-        if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
-            return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
+        if not self.is_reserved_keyword(name):
+            return name
 
-        return name
+        return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
-    def print_setter(self, name: str) -> str:
+    def print_classname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(name)
+
+    def print_methodname(self, name: str) -> str:
+        return NormalizeStr.snake_case(name)
+
+    def print_propname(self, name: str) -> str:
+        """openapi-generator/Python uses pydantic + property name aliases,
+        but only for Model properties.
+
+        API call method properties will always be snake_case,
+        so use print_variablename for that call.
+        """
+
         # todo unit test
-        prop_case = self._config.oseg_variable_naming_convention
-
-        if self.is_reserved_keyword(parser.NormalizeStr.snake_case(name)):
-            if prop_case == "camel_case":
-                return parser.NormalizeStr.camel_case(self.unreserve_keyword(name))
-
-            return self.unreserve_keyword(name)
+        prop_case = self._config.oseg_property_naming_convention
 
         if prop_case == "camel_case":
-            return parser.NormalizeStr.camel_case(name)
+            return NormalizeStr.camel_case(self.unreserve_keyword(name))
 
-        return name
+        return NormalizeStr.snake_case(self.unreserve_keyword(name))
 
-    def print_variable(self, name: str) -> str:
-        name = parser.NormalizeStr.snake_case(name)
-
-        if self.is_reserved_keyword(name):
-            return self.unreserve_keyword(name)
-
-        return name
+    def print_variablename(self, name: str) -> str:
+        return self.unreserve_keyword(NormalizeStr.snake_case(name))
 
     def print_scalar(
         self,

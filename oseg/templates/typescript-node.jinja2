@@ -56,7 +56,7 @@ fs.createReadStream("{{ printable.value }}")
 
 {%- macro print_object(printable) -%}
     {% if printable.value == None %}undefined{% else %}
-{{ printable.value|print_variable }}
+{{ printable.value|print_variablename }}
     {%- endif %}
 {%- endmacro -%}
 
@@ -64,7 +64,7 @@ fs.createReadStream("{{ printable.value }}")
     {% if printable.value == None %}undefined{% else %}
 [
     {% for i in printable.value %}
-    {{ i|camel_case }},
+    {{ i|print_variablename }},
     {% endfor %}
 ]
     {%- endif %}
@@ -76,9 +76,9 @@ fs.createReadStream("{{ printable.value }}")
 
     {%- if printable.method == "api_key" %}
 {{ comment }}apiCaller.setApiKey(
-    {{- "" }}api.{{ operation.api_name|pascal_case }}ApiApiKeys.{{ printable.name }},
+    {{- "" }}api.{{ (operation.api_name ~ "ApiApiKeys")|print_classname }}.{{ printable.name }},
     {{- "" }} "{{ printable.value }}");
-    {%- else %}{{ comment }}apiCaller.{{ printable.method|camel_case }} = "{{ printable.value }}";
+    {%- else %}{{ comment }}apiCaller.{{ printable.method|print_methodname }} = "{{ printable.value }}";
     {%- endif %}
 {%-endmacro -%}
 
@@ -88,7 +88,7 @@ import * as fs from 'fs';
 import api from "{{ config.npm_name }}"
 import models from "{{ config.npm_name }}"
 
-const apiCaller = new api.{{ operation.api_name|pascal_case }}Api();
+const apiCaller = new api.{{ (operation.api_name ~ "Api")|print_classname }}();
 {% if operation.security.is_optional %}
 // Authentication is optional for this API endpoint
 {% endif %}
@@ -101,14 +101,14 @@ const apiCaller = new api.{{ operation.api_name|pascal_case }}Api();
 {% call(objects) m.parse_objects_macro(property_container) %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-const {{ obj_name|print_variable }} = new models.{{ obj.type|pascal_case }}();
+const {{ obj_name|print_variablename }} = new models.{{ obj.type|print_classname }}();
         {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
             {% for name, value in properties.items() %}
-{{ obj_name|print_variable }}.{{ name|print_setter }} = {{ value }};
+{{ obj_name|print_variablename }}.{{ name|print_propname }} = {{ value }};
             {% endfor %}
         {% endcall %}
         {% else %}
-const {{ obj_name|print_variable }} = {{ "" }}
+const {{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
     {{- value }};
             {% endcall %}
@@ -120,17 +120,17 @@ const {{ obj_name|print_variable }} = {{ "" }}
 {% if operation.request.parameters or operation.request.has_formdata %}
     {% call(properties) m.parse_api_call_properties_macro(property_container, 0, null, False) %}
         {% for name, value in properties.items() %}
-const {{ name|print_variable }} = {{ value }};
+const {{ name|print_variablename }} = {{ value }};
         {% endfor %}
     {% endcall %}
 
 {% endif %}
 {% call(properties) m.parse_api_call_properties_macro(property_container, 4) %}
-apiCaller.{{ operation.operation_id|camel_case }}({% if not properties %})
+apiCaller.{{ operation.operation_id|print_methodname }}({% if not properties %})
 {%- else %}
 
     {% for name, value in properties.items() %}
-    {{ name|print_variable }},
+    {{ name|print_variablename }},
     {% endfor %}
 ){% endif %}{% endcall %}{%- if operation.response and operation.response.body  %}.then(response => {
 {% if not operation.response.is_binary %}
@@ -139,7 +139,7 @@ apiCaller.{{ operation.operation_id|camel_case }}({% if not properties %})
   fs.createWriteStream('./file_response').write(response.body);
 {% endif -%}
 }){% endif %}.catch(error => {
-  console.log("Exception when calling {{ operation.api_name|pascal_case }}#{{ operation.operation_id|camel_case }}:");
+  console.log("Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}:");
   console.log(error.body);
 });
 {{ "" }}

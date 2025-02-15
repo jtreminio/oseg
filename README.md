@@ -453,7 +453,7 @@ python3 run.py generate \
     --generator-name python \
     --config '{
       "packageName": "openapi_client",
-      "oseg.variableNamingConvention": "camel_case",
+      "oseg.propertyNamingConvention": "camel_case",
       "oseg.ignoreOptionalUnset": false
     }' \
     --example-data-file examples/petstore/example_data.json
