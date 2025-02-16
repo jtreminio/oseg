@@ -263,7 +263,7 @@ class ComponentResolver:
 
             return
 
-        if parser.TypeChecker.is_object(schema.items):
+        if parser.TypeChecker.is_object(schema.items) and not self.name(schema.items):
             self._schema_properties(schema.items, items_name)
 
     def _request_body(
