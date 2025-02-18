@@ -2,15 +2,9 @@ import re
 
 
 class NormalizeStr:
+    _pascal_cache: dict[str, str] = {}
+    _snake_cache: dict[str, str] = {}
     _underscore_cache: dict[str, str] = {}
-
-    @staticmethod
-    def normalize(name: str | None) -> str | None:
-        # todo delete me
-        if name is None:
-            return None
-
-        return name.replace("/", "_").replace("-", "_")
 
     @classmethod
     def camel_case(cls, value: str) -> str:
@@ -18,6 +12,9 @@ class NormalizeStr:
 
     @classmethod
     def pascal_case(cls, value: str) -> str:
+        if value in cls._pascal_cache:
+            return cls._pascal_cache[value]
+
         value = cls.underscore(value).split("_")
 
         result = ""
@@ -29,6 +26,9 @@ class NormalizeStr:
 
     @classmethod
     def snake_case(cls, value: str) -> str:
+        if value in cls._snake_cache:
+            return cls._snake_cache[value]
+
         value = cls.underscore(value).split("_")
 
         result = value.pop(0).lower()
