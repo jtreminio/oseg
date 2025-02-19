@@ -8,8 +8,3 @@ additionalProperties:
   oseg.package: oseg.petstore.examples
   oseg.security.api_key.api_key: YOUR_API_KEY
   oseg.security.petstore_auth.access_token: YOUR_ACCESS_TOKEN
-globalProperties:
-  apiTests: false
-  modelTests: false
-  apiDocs: false
-  modelDocs: false
