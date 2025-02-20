@@ -7,16 +7,10 @@ from pathlib import Path
 
 class FileLoader:
     def __init__(self, oas_file: str):
-        self._oas_file = oas_file
-        self._base_dir = os.path.dirname(oas_file)
+        self._oas_file: str = oas_file
+        self.base_dir: str = os.path.dirname(oas_file)
+        self.oas: dict[str, any] = self.get_file_contents(self._oas_file)
         self._cached_example_data: dict[str, dict[str, any]] = {}
-
-    @property
-    def base_dir(self) -> str:
-        return self._base_dir
-
-    def oas(self):
-        return self.get_file_contents(self._oas_file)
 
     @staticmethod
     def get_file_contents(filename: str) -> dict[str, any]:

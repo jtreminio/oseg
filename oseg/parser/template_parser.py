@@ -3,13 +3,9 @@ from oseg import generator as g, model
 
 
 class TemplateParser:
-    def __init__(
-        self,
-        generator: "g.BaseGenerator",
-        config: "g.BaseConfig",
-    ):
-        self._generator = generator
-        self._config = config
+    def __init__(self, generator: "g.BaseGenerator", config: "g.BaseConfig"):
+        self._generator: g.BaseGenerator = generator
+        self._config: g.BaseConfig = config
 
     def parse_security(
         self,

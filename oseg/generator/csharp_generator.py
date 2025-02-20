@@ -164,7 +164,7 @@ class CSharpGenerator(generator.BaseGenerator):
         "while",
     ]
 
-    _config: CSharpConfig
+    config: CSharpConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

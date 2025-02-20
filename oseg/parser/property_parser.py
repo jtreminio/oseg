@@ -5,7 +5,7 @@ from oseg import model, parser
 
 class PropertyParser:
     def __init__(self, oa_parser: parser.OaParser):
-        self._oa_parser = oa_parser
+        self._oa_parser: parser.OaParser = oa_parser
         self._schema_joiner = parser.SchemaJoiner(oa_parser)
 
     def parse(

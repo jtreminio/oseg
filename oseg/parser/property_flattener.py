@@ -3,7 +3,7 @@ from oseg import model
 
 class PropertyFlattener:
     def __init__(self, container: "model.PropertyContainer"):
-        self._container = container
+        self._container: model.PropertyContainer = container
 
     def flatten(self) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
         """Reads through request parameters and body data to recursively find all

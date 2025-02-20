@@ -1,5 +1,5 @@
 import openapi_pydantic as oa
-from typing import Union, Optional
+from typing import Optional
 from oseg import model, parser
 
 
@@ -10,40 +10,22 @@ class OaParser:
         operation_id: str | None = None,
         example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
     ):
-        self._file_loader = parser.FileLoader(oas_file)
-        self._openapi: oa.OpenAPI = oa.parse_obj(self._file_loader.oas())
+        self.file_loader = parser.FileLoader(oas_file)
+        self._openapi: oa.OpenAPI = oa.parse_obj(self.file_loader.oas)
         self._setup_oas()
+
+        self.paths: dict[str, oa.PathItem] = self._openapi.paths
+        self.security: list[dict[str, list[str]]] | None = self._openapi.security
+        self.components: oa.Components = self._openapi.components
 
         self._component_resolver = parser.ComponentResolver(self)
         example_data_parser = parser.ExampleDataParser(self)
         operation_parser = parser.OperationParser(self, example_data_parser)
 
-        self._operations: dict[str, model.Operation] = (
-            operation_parser.setup_operations(
-                operation_id=operation_id,
-                example_data=example_data,
-            )
+        self.operations: dict[str, model.Operation] = operation_parser.setup_operations(
+            operation_id=operation_id,
+            example_data=example_data,
         )
-
-    @property
-    def operations(self) -> dict[str, "model.Operation"]:
-        return self._operations
-
-    @property
-    def file_loader(self) -> parser.FileLoader:
-        return self._file_loader
-
-    @property
-    def paths(self) -> dict[str, oa.PathItem]:
-        return self._openapi.paths
-
-    @property
-    def security(self) -> list[dict[str, list[str]]] | None:
-        return self._openapi.security
-
-    @property
-    def components(self) -> oa.Components:
-        return self._openapi.components
 
     def resolve_component(self, schema: oa.Schema | oa.Reference) -> oa.Schema:
         return self._get_resolved_component(schema, self.components.schemas)

@@ -100,7 +100,7 @@ class PhpGenerator(generator.BaseGenerator):
     RESERVED_KEYWORD_PREPEND = ""
     RESERVED_KEYWORDS = []
 
-    _config: PhpConfig
+    config: PhpConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return False
@@ -160,7 +160,7 @@ class PhpGenerator(generator.BaseGenerator):
 
         # if enum but no parent, use the literal value
         if item.type == "string" and item.is_enum and parent is not None:
-            namespace = self._config.invoker_package
+            namespace = self.config.invoker_package
             enum_name = self._get_enum_name(item, item.name, value)
             parent_type = NormalizeStr.pascal_case(parent.type)
 

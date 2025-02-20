@@ -36,16 +36,13 @@ class SecurityScheme:
 
 
 class Security:
-    _optional: bool
-    _schemes: list[dict[str, SecurityScheme]]
-
     def __init__(
         self,
         oa_parser: parser.OaParser,
         operation: oa.Operation,
     ):
-        self._is_optional = False
-        self._schemes = []
+        self.is_optional: bool = False
+        self.schemes: list[dict[str, SecurityScheme]] = []
 
         if (
             # security not defined anywhere
@@ -53,7 +50,7 @@ class Security:
             and not oa_parser.components.securitySchemes
             # security disabled for this operation
         ) or operation.security == {}:
-            self._is_optional = True
+            self.is_optional = True
 
             return
 
@@ -61,14 +58,14 @@ class Security:
         for security in operation.security:
             # empty dict means security is optional for this operation
             if security == {}:
-                self._is_optional = True
+                self.is_optional = True
 
                 continue
 
             if isinstance(security, str):
                 scheme = oa_parser.components.securitySchemes[security]
 
-                self._schemes.append(
+                self.schemes.append(
                     {
                         security: SecurityScheme(
                             name=security,
@@ -87,15 +84,7 @@ class Security:
                     method=self._resolve_scheme_method(scheme),
                 )
 
-            self._schemes.append(joined)
-
-    @property
-    def is_optional(self) -> bool:
-        return self._is_optional
-
-    @property
-    def schemes(self) -> list[dict[str, SecurityScheme]]:
-        return self._schemes
+            self.schemes.append(joined)
 
     def _resolve_scheme_method(
         self,

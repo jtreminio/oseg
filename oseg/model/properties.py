@@ -1,19 +1,10 @@
 import openapi_pydantic as oa
-from abc import abstractmethod
 from typing import Union, TypeVar, Generic, Protocol
 from oseg import parser
 
 
 class PropertyInterface(Protocol):
-    _name: str
-    # maps to property name ignoring conflicts with other identical names
-    _original_name: str
-    _value: any
-    _schema: oa.Schema
-    _is_array: bool
-    _is_required: bool
-    _is_nullable: bool
-    _is_set: bool
+    value: any
 
     def __init__(
         self,
@@ -23,106 +14,48 @@ class PropertyInterface(Protocol):
         is_required: bool,
         is_set: bool,
     ):
-        self._schema = schema
-        self._name = name
-        self._original_name = name
-        self._value = value
-        self._is_array = parser.TypeChecker.is_array(self._schema)
-        self._is_required = is_required
-        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
-        self._is_set = is_set
-
-    @property
-    def schema(self) -> oa.Schema:
-        return self._schema
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        self._name = name
-
-    @property
-    def original_name(self) -> str:
-        return self._original_name
-
-    @property
-    @abstractmethod
-    def value(self):
-        pass
-
-    @property
-    def is_array(self) -> bool:
-        return self._is_array
-
-    @property
-    def is_required(self) -> bool:
-        return self._is_required
-
-    @property
-    def is_nullable(self) -> bool:
-        return self._is_nullable
-
-    @property
-    def is_set(self) -> bool:
-        return self._is_set
+        self.schema: oa.Schema = schema
+        self.name: str = name
+        # maps to property name ignoring conflicts with other identical names
+        self.original_name: str = name
+        self.value = value
+        self.is_array: bool = parser.TypeChecker.is_array(self.schema)
+        self.is_required: bool = is_required
+        self.is_nullable: bool = parser.TypeChecker.is_nullable(self.schema)
+        self.is_set: bool = is_set
 
     # todo currently only support single type, not list of types
     def _get_type(self) -> str:
-        if self._is_array:
+        if self.is_array:
             # todo figure out why this happens
-            if self._schema.items is None:
+            if self.schema.items is None:
                 return ""
 
-            if isinstance(self._schema.items.type, list):
-                type_value = self._schema.items.type[0].value
+            if isinstance(self.schema.items.type, list):
+                type_value = self.schema.items.type[0].value
             else:
-                type_value = self._schema.items.type.value
+                type_value = self.schema.items.type.value
 
             assert isinstance(
                 type_value, str
-            ), f"'{self._schema}' has invalid array items type"
+            ), f"'{self.schema}' has invalid array items type"
 
             return type_value
 
-        if isinstance(self._schema.type, list):
-            type_value = self._schema.type[0].value
+        if isinstance(self.schema.type, list):
+            type_value = self.schema.type[0].value
         else:
-            type_value = self._schema.type.value
+            type_value = self.schema.type.value
 
-        assert isinstance(type_value, str), f"'{self._schema}' has invalid item type"
+        assert isinstance(type_value, str), f"'{self.schema}' has invalid item type"
 
         return type_value
 
 
 class PropertyFile(PropertyInterface):
-    T = Union[str, list[str], None]
-
+    T = str | list[str] | None
     _FORMAT_BYTES = "byte"
-
-    @property
-    def value(self) -> T:
-        return self._value
-
-    @property
-    def is_bytes(self) -> bool:
-        return self._schema.schema_format == self._FORMAT_BYTES
-
-
-class PropertyFreeForm(PropertyInterface):
-    T = Union[dict[str, any] | list[dict[str, any]] | None]
-
-    @property
-    def value(self) -> T:
-        return self._value
-
-
-class PropertyScalar(PropertyInterface):
-    T_SINGLE = Union[str, int, bool]
-    T_LIST = Union[list[str], list[int], list[bool]]
-    T = Union[T_SINGLE, T_LIST, None]
+    value: T
 
     def __init__(
         self,
@@ -134,141 +67,105 @@ class PropertyScalar(PropertyInterface):
     ):
         super().__init__(schema, name, value, is_required, is_set)
 
-        self._type = self._get_type()
+        self.is_bytes: bool = self.schema.schema_format == self._FORMAT_BYTES
+
+
+class PropertyFreeForm(PropertyInterface):
+    T = dict[str, any] | list[dict[str, any]] | None
+    value: T
+
+    def __init__(
+        self,
+        schema: oa.Schema,
+        name: str,
+        value: T,
+        is_required: bool,
+        is_set: bool,
+    ):
+        super().__init__(schema, name, value, is_required, is_set)
+
+
+class PropertyScalar(PropertyInterface):
+    T_SINGLE = Union[str, int, bool]
+    T_LIST = Union[list[str], list[int], list[bool]]
+    T = Union[T_SINGLE, T_LIST, None]
+    value: T
+
+    def __init__(
+        self,
+        schema: oa.Schema,
+        name: str,
+        value: T,
+        is_required: bool,
+        is_set: bool,
+    ):
+        super().__init__(schema, name, value, is_required, is_set)
+
+        self.type: str = self._get_type()
         self._normalize_value()
-        self._format = self._set_string_format()
-        self._is_enum = self._set_is_enum()
-
-    @property
-    def value(self) -> T:
-        return self._value
-
-    @property
-    def type(self) -> str:
-        return self._type
-
-    @property
-    def format(self) -> str | None:
-        return self._format
-
-    @property
-    def is_enum(self) -> bool:
-        return self._is_enum
+        self.format: str | None = self._set_string_format()
+        self.is_enum: bool = self._set_is_enum()
 
     def _normalize_value(self) -> None:
-        if self._value is None:
+        if self.value is None:
             return
 
-        if self._is_array:
-            self._value: PropertyScalar.T_LIST
+        if self.is_array:
+            self.value: PropertyScalar.T_LIST
             result = []
 
-            for i in self._value:
-                if self._type == oa.DataType.STRING.value:
+            for i in self.value:
+                if self.type == oa.DataType.STRING.value:
                     result.append(str(i))
-                elif self._type == oa.DataType.BOOLEAN.value:
+                elif self.type == oa.DataType.BOOLEAN.value:
                     result.append(bool(i))
                 else:
                     i: int
                     result.append(i)
 
-            self._value = result
+            self.value = result
 
             return
 
-        if self._type == oa.DataType.STRING.value:
-            self._value = str(self._value)
-        elif self._type == oa.DataType.BOOLEAN.value:
-            self._value = bool(self._value)
+        if self.type == oa.DataType.STRING.value:
+            self.value = str(self.value)
+        elif self.type == oa.DataType.BOOLEAN.value:
+            self.value = bool(self.value)
 
     def _set_string_format(self) -> str | None:
-        if self._is_array:
+        if self.is_array:
             return (
-                self._schema.items.schema_format
-                if hasattr(self._schema.items, "schema_format")
+                self.schema.items.schema_format
+                if hasattr(self.schema.items, "schema_format")
                 else None
             )
 
         return (
-            self._schema.schema_format
-            if hasattr(self._schema, "schema_format")
-            else None
+            self.schema.schema_format if hasattr(self.schema, "schema_format") else None
         )
 
     def _set_is_enum(self) -> bool:
-        if self._is_array:
+        if self.is_array:
             return (
-                hasattr(self._schema.items, "enum")
-                and self._schema.items.enum is not None
+                hasattr(self.schema.items, "enum")
+                and self.schema.items.enum is not None
             )
 
-        return hasattr(self._schema, "enum") and self._schema.enum is not None
+        return hasattr(self.schema, "enum") and self.schema.enum is not None
 
 
 class PropertyObjectInterface(Protocol):
-    _schema: oa.Schema
-    _type: str
-    _base_type: str | None
-    _is_nullable: bool
-    _is_required: bool
-    _is_set: bool
-    _name: str
+    schema: oa.Schema
+    type: str
+    base_type: str | None
+    is_nullable: bool
+    is_required: bool
+    is_set: bool
+    name: str
     # maps to property name ignoring conflicts with other identical names
-    _original_name: str
-
-    @property
-    def schema(self) -> oa.Schema:
-        return self._schema
-
-    @property
-    def type(self) -> str:
-        return self._type
-
-    @property
-    def base_type(self) -> str | None:
-        return self._base_type
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        self._name = name
-
-    @property
-    def original_name(self) -> str:
-        return self._original_name
-
-    @property
-    @abstractmethod
-    def properties(self):
-        pass
-
-    @property
-    @abstractmethod
-    def is_array(self) -> bool:
-        pass
-
-    @property
-    def is_nullable(self) -> bool:
-        return self._is_nullable
-
-    @property
-    def is_required(self) -> bool:
-        return self._is_required
-
-    @is_required.setter
-    def is_required(self, flag: bool):
-        self._is_required = flag
-
-    @property
-    def is_set(self) -> bool:
-        return self._is_set
-
-    @is_set.setter
-    def is_set(self, flag: bool):
-        self._is_set = flag
+    original_name: str
+    properties: dict | list
+    is_array: bool
 
 
 class PropertyObject(PropertyObjectInterface):
@@ -281,24 +178,17 @@ class PropertyObject(PropertyObjectInterface):
         base_type: str | None,
         is_required: bool,
     ):
-        self._schema = schema
-        self._type = _type
+        self.schema = schema
+        self.type = _type
         # discriminator base type, if any
-        self._base_type = base_type
-        self._is_required = is_required
-        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
-        self._properties: dict[str, PROPERTY_TYPES] = {}
-        self._name = self._type
-        self._original_name = self._name
-        self._is_set = True
-
-    @property
-    def properties(self) -> dict[str, "PROPERTY_TYPES"]:
-        return self._properties
-
-    @property
-    def is_array(self) -> bool:
-        return False
+        self.base_type = base_type
+        self.is_required = is_required
+        self.is_nullable = parser.TypeChecker.is_nullable(self.schema)
+        self.properties: dict[str, PROPERTY_TYPES] = {}
+        self.name = _type
+        self.original_name = _type
+        self.is_set = True
+        self.is_array = False
 
     @property
     def objects(self) -> dict[str, "PropertyObject"]:
@@ -363,7 +253,7 @@ class PropertyObject(PropertyObjectInterface):
     ) -> dict[str, Generic[TYPE]]:
         result = {}
 
-        for name, prop in self._properties.items():
+        for name, prop in self.properties.items():
             if type_of == PropertyObject and isinstance(prop, type_of):
                 result[name] = prop
 
@@ -390,23 +280,16 @@ class PropertyObjectArray(PropertyObjectInterface):
         is_required: bool,
         is_set: bool,
     ):
-        self._schema = schema
-        self._type = _type
-        self._base_type = _type
-        self._is_required = is_required
-        self._is_nullable = parser.TypeChecker.is_nullable(self._schema)
-        self._properties: list[PROPERTY_OBJECT_TYPE] = []
-        self._name = self._type
-        self._original_name = self._name
-        self._is_set = is_set
-
-    @property
-    def properties(self) -> list["PROPERTY_OBJECT_TYPE"]:
-        return self._properties
-
-    @property
-    def is_array(self) -> bool:
-        return True
+        self.schema: oa.Schema = schema
+        self.type: str = _type
+        self.base_type: str = _type
+        self.is_required: bool = is_required
+        self.is_nullable: bool = parser.TypeChecker.is_nullable(self.schema)
+        self.properties: list[PROPERTY_OBJECT_TYPE] = []
+        self.name = _type
+        self.original_name = _type
+        self.is_set = is_set
+        self.is_array = True
 
 
 PROPERTY_NON_OBJECT_TYPE = Union[PropertyFile, PropertyFreeForm, PropertyScalar]

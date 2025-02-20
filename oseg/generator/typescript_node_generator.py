@@ -139,7 +139,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    _config: TypescriptNodeConfig
+    config: TypescriptNodeConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

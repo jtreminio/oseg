@@ -111,16 +111,11 @@ class BaseGenerator(Protocol):
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
     def __init__(self, config: BaseConfig):
-        self._config = config
-        self._template_parser = parser.TemplateParser(self, config)
-
-    @property
-    def config(self) -> BaseConfig:
-        return self._config
-
-    @property
-    def template_parser(self) -> parser.TemplateParser:
-        return self._template_parser
+        self.config: BaseConfig = config
+        self.template_parser: parser.TemplateParser = parser.TemplateParser(
+            generator=self,
+            config=config,
+        )
 
     @abstractmethod
     def is_reserved_keyword(self, name: str) -> bool:

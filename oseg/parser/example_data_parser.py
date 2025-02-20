@@ -7,7 +7,7 @@ class ExampleDataParser:
     DEFAULT_EXAMPLE_NAME = "example"
 
     def __init__(self, oa_parser: parser.OaParser):
-        self._oa_parser = oa_parser
+        self._oa_parser: parser.OaParser = oa_parser
         self._property_parser = parser.PropertyParser(oa_parser)
         self._schema_joiner = parser.SchemaJoiner(oa_parser)
 

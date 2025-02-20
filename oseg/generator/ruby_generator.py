@@ -130,7 +130,7 @@ class RubyGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    _config: RubyConfig
+    config: RubyConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

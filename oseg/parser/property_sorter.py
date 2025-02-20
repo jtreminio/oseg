@@ -11,7 +11,7 @@ class SortedProperties:
 
 class PropertySorter:
     def __init__(self, container: "model.PropertyContainer"):
-        self._container = container
+        self._container: model.PropertyContainer = container
 
     def sort(self) -> SortedProperties:
         used_property_names = {}

@@ -77,9 +77,9 @@ class ExampleDataParams:
         self.query: dict[str, any] = query if isinstance(query, dict) else {}
         self.header: dict[str, any] = header if isinstance(header, dict) else {}
         self.cookie: dict[str, any] = cookie if isinstance(cookie, dict) else {}
+        self.has_data: bool = self._has_data()
 
-    @property
-    def has_data(self) -> bool:
+    def _has_data(self) -> bool:
         return bool(
             len(self.path.keys())
             or len(self.query.keys())
@@ -95,16 +95,16 @@ class ExampleData:
         self.query: dict[str, any] = parameters.query
         self.header: dict[str, any] = parameters.header
         self.cookie: dict[str, any] = parameters.cookie
+        self.has_body_data: bool = self._has_body_data()
+        self.has_parameter_data: bool = self._has_parameter_data()
 
-    @property
-    def has_body_data(self) -> bool:
+    def _has_body_data(self) -> bool:
         if isinstance(self.body, list):
             return bool(len(self.body))
 
         return bool(len(self.body.keys()))
 
-    @property
-    def has_parameter_data(self) -> bool:
+    def _has_parameter_data(self) -> bool:
         return bool(
             len(self.path.keys())
             or len(self.query.keys())

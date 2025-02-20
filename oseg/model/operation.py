@@ -12,30 +12,10 @@ class Operation:
         api_name: str,
         http_method: str,
     ):
-        self._operation = operation
-        self._request: model.Request = request
-        self._response: model.Response | None = response
-        self._security: model.Security | None = security
-        self._api_name = api_name
-        self._http_method = http_method
-        self._operation_id = operation.operationId
-
-    @property
-    def operation_id(self) -> str:
-        return self._operation_id
-
-    @property
-    def api_name(self) -> str:
-        return self._api_name
-
-    @property
-    def request(self) -> model.Request:
-        return self._request
-
-    @property
-    def response(self) -> model.Response | None:
-        return self._response
-
-    @property
-    def security(self) -> model.Security | None:
-        return self._security
+        self._operation: oa.Operation = operation
+        self.request: model.Request = request
+        self.response: model.Response | None = response
+        self.security: model.Security | None = security
+        self.api_name: str = api_name
+        self.http_method: str = http_method
+        self.operation_id: str = operation.operationId

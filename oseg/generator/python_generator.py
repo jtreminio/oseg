@@ -140,7 +140,7 @@ class PythonGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    _config: PythonConfig
+    config: PythonConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
@@ -166,7 +166,7 @@ class PythonGenerator(generator.BaseGenerator):
         """
 
         # todo unit test
-        prop_case = self._config.oseg_property_naming_convention
+        prop_case = self.config.oseg_property_naming_convention
 
         if prop_case == "camel_case":
             return NormalizeStr.camel_case(self.unreserve_keyword(name))

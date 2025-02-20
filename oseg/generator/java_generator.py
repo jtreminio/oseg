@@ -182,7 +182,7 @@ class JavaGenerator(generator.BaseGenerator):
         "while",
     ]
 
-    _config: JavaConfig
+    config: JavaConfig
 
     def is_reserved_keyword(self, name: str) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS

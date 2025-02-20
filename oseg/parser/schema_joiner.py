@@ -12,7 +12,7 @@ class JoinedValues:
 
 class SchemaJoiner:
     def __init__(self, oa_parser: parser.OaParser):
-        self._oa_parser = oa_parser
+        self._oa_parser: parser.OaParser = oa_parser
 
     def merge_schemas_and_properties(
         self,

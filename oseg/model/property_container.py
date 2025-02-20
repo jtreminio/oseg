@@ -7,17 +7,15 @@ class PropertyContainer:
 
     def __init__(self, request: "model.Request"):
         self._body: model.PROPERTY_TYPES | None = None
-        self._path: model.PropertyObject | None = None
-        self._query: model.PropertyObject | None = None
-        self._header: model.PropertyObject | None = None
-        self._cookie: model.PropertyObject | None = None
+        self.path: model.PropertyObject | None = None
+        self.query: model.PropertyObject | None = None
+        self.header: model.PropertyObject | None = None
+        self.cookie: model.PropertyObject | None = None
+        self.request: model.Request = request
+        self.is_body_required: bool = request.is_required
 
-        self._request: model.Request = request
-        self._is_body_required = request.is_required
-        self._is_sorted = False
-
+        self._is_sorted: bool = False
         self._flattened_objects: dict[str, model.PropertyObject] = {}
-
         self._sorter = parser.PropertySorter(self)
         self._flattener = parser.PropertyFlattener(self)
 
@@ -25,31 +23,11 @@ class PropertyContainer:
     def has_data(self) -> bool:
         return bool(
             (self._body is not None and len(list(self._body.properties)))
-            or (self._path is not None and len(list(self._path.properties)))
-            or (self._query is not None and len(list(self._query.properties)))
-            or (self._header is not None and len(list(self._header.properties)))
-            or (self._cookie is not None and len(list(self._cookie.properties)))
+            or (self.path is not None and len(list(self.path.properties)))
+            or (self.query is not None and len(list(self.query.properties)))
+            or (self.header is not None and len(list(self.header.properties)))
+            or (self.cookie is not None and len(list(self.cookie.properties)))
         )
-
-    @property
-    def request(self):
-        return self._request
-
-    @property
-    def path(self):
-        return self._path
-
-    @property
-    def query(self):
-        return self._query
-
-    @property
-    def header(self):
-        return self._header
-
-    @property
-    def cookie(self):
-        return self._cookie
 
     @property
     def body(self):
@@ -72,10 +50,6 @@ class PropertyContainer:
 
         return body.type
 
-    @property
-    def is_body_required(self) -> bool:
-        return self._request.is_required
-
     def set_parameters(
         self,
         data: model.PropertyObject,
@@ -84,16 +58,16 @@ class PropertyContainer:
         self._clear_sorted_properties()
 
         if param_in.value == oa.ParameterLocation.PATH.value:
-            self._path = data
+            self.path = data
 
         if param_in.value == oa.ParameterLocation.QUERY.value:
-            self._query = data
+            self.query = data
 
         if param_in.value == oa.ParameterLocation.HEADER.value:
-            self._header = data
+            self.header = data
 
         if param_in.value == oa.ParameterLocation.COOKIE.value:
-            self._cookie = data
+            self.cookie = data
 
     def properties(
         self,
