@@ -103,41 +103,6 @@ class BaseConfig(Protocol):
         )
 
 
-class GeneratorFactory:
-    @staticmethod
-    def factory(config: BaseConfig) -> "BaseGenerator":
-        if isinstance(config, generator.CSharpConfig):
-            return generator.CSharpGenerator(config)
-
-        if isinstance(config, generator.JavaConfig):
-            return generator.JavaGenerator(config)
-
-        if isinstance(config, generator.PhpConfig):
-            return generator.PhpGenerator(config)
-
-        if isinstance(config, generator.PythonConfig):
-            return generator.PythonGenerator(config)
-
-        if isinstance(config, generator.RubyConfig):
-            return generator.RubyGenerator(config)
-
-        if isinstance(config, generator.TypescriptNodeConfig):
-            return generator.TypescriptNodeGenerator(config)
-
-        raise NotImplementedError
-
-    @staticmethod
-    def default_generator_names() -> list[str]:
-        return [
-            generator.CSharpGenerator.NAME,
-            generator.JavaGenerator.NAME,
-            generator.PhpGenerator.NAME,
-            generator.PythonGenerator.NAME,
-            generator.RubyGenerator.NAME,
-            generator.TypescriptNodeGenerator.NAME,
-        ]
-
-
 class BaseGenerator(Protocol):
     FILE_EXTENSION: str
     NAME: str
@@ -288,3 +253,38 @@ class BaseGenerator(Protocol):
             return enum_varnames[schema.items.enum.index(value)]
 
         return enum_varnames[schema.enum.index(value)]
+
+
+class GeneratorFactory:
+    @staticmethod
+    def factory(config: BaseConfig) -> BaseGenerator:
+        if isinstance(config, generator.CSharpConfig):
+            return generator.CSharpGenerator(config)
+
+        if isinstance(config, generator.JavaConfig):
+            return generator.JavaGenerator(config)
+
+        if isinstance(config, generator.PhpConfig):
+            return generator.PhpGenerator(config)
+
+        if isinstance(config, generator.PythonConfig):
+            return generator.PythonGenerator(config)
+
+        if isinstance(config, generator.RubyConfig):
+            return generator.RubyGenerator(config)
+
+        if isinstance(config, generator.TypescriptNodeConfig):
+            return generator.TypescriptNodeGenerator(config)
+
+        raise NotImplementedError
+
+    @staticmethod
+    def default_generator_names() -> list[str]:
+        return [
+            generator.CSharpGenerator.NAME,
+            generator.JavaGenerator.NAME,
+            generator.PhpGenerator.NAME,
+            generator.PythonGenerator.NAME,
+            generator.RubyGenerator.NAME,
+            generator.TypescriptNodeGenerator.NAME,
+        ]

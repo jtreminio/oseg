@@ -1,6 +1,5 @@
-from typing import Optional
-
 import openapi_pydantic as oa
+from typing import Optional
 from oseg import parser
 
 
@@ -10,7 +9,7 @@ class Response:
 
     def __init__(
         self,
-        oa_parser: "parser.OaParser",
+        oa_parser: parser.OaParser,
         response: oa.Response,
         http_code: str,
     ):

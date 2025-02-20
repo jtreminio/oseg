@@ -1,6 +1,5 @@
-from typing import Optional
-
 import openapi_pydantic as oa
+from typing import Optional
 from oseg import parser, model
 
 
@@ -25,8 +24,8 @@ class OperationParser:
 
     def __init__(
         self,
-        oa_parser: "parser.OaParser",
-        example_data_parser: "parser.ExampleDataParser",
+        oa_parser: parser.OaParser,
+        example_data_parser: parser.ExampleDataParser,
     ):
         self._oa_parser = oa_parser
         self._example_data_parser = example_data_parser

@@ -6,10 +6,10 @@ from oseg import generator, model, parser
 
 
 class JinjaExt(jinja2.ext.Extension):
-    _sdk_generator: "generator.BaseGenerator"
+    _sdk_generator: generator.BaseGenerator
 
     @staticmethod
-    def factory(sdk_generator: "generator.BaseGenerator") -> "JinjaExt":
+    def factory(sdk_generator: generator.BaseGenerator) -> "JinjaExt":
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,
@@ -81,7 +81,7 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_security(
         self,
         context: Context,
-        operation: "model.Operation",
+        operation: model.Operation,
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_security(
@@ -92,8 +92,8 @@ class JinjaExt(jinja2.ext.Extension):
 
     def _parse_objects(
         self,
-        property_container: "model.PropertyContainer",
-    ) -> dict[str, "model.PropertyObject"]:
+        property_container: model.PropertyContainer,
+    ) -> dict[str, model.PropertyObject]:
         return self._sdk_generator.template_parser.parse_objects(
             property_container=property_container,
         )
@@ -102,7 +102,7 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_object_properties(
         self,
         context: Context,
-        property_container: "model.PropertyContainer",
+        property_container: model.PropertyContainer,
         parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
@@ -130,7 +130,7 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_api_call_properties(
         self,
         context: Context,
-        property_container: "model.PropertyContainer",
+        property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
         include_body: bool | None = None,

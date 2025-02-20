@@ -4,6 +4,9 @@ from pydantic import BaseModel
 
 
 class TypeChecker:
+    SCHEMA_UNION = Union[BaseModel, oa.Schema]
+    REF_UNION = Union[BaseModel, oa.Reference]
+
     _SCALAR_TYPES = [
         "boolean",
         "integer",
@@ -18,17 +21,17 @@ class TypeChecker:
     ]
 
     @classmethod
-    def is_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls._is_of_type(schema, oa.DataType.ARRAY)
 
     @classmethod
-    def is_all_of(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_all_of(cls, schema: SCHEMA_UNION) -> bool:
         return bool(
             hasattr(schema, "allOf") and schema.allOf is not None and len(schema.allOf)
         )
 
     @classmethod
-    def is_discriminator(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_discriminator(cls, schema: SCHEMA_UNION) -> bool:
         return bool(
             cls.is_object(schema)
             and schema.discriminator
@@ -37,7 +40,7 @@ class TypeChecker:
         )
 
     @classmethod
-    def is_file(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_file(cls, schema: SCHEMA_UNION) -> bool:
         """OpenAPI 3.1 has several possible ways to define a file upload property
         but openapi-generator does not care and ignored anything that is not
         "type=string" and "format=binary" or "format=byte".
@@ -56,22 +59,22 @@ class TypeChecker:
         )
 
     @classmethod
-    def is_file_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_file_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_file(schema.items)
 
     @classmethod
-    def is_free_form(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_free_form(cls, schema: SCHEMA_UNION) -> bool:
         return bool(
             cls._is_of_type(schema, oa.DataType.OBJECT)
             and schema.additionalProperties is not None
         )
 
     @classmethod
-    def is_free_form_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_free_form_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_free_form(schema.items)
 
     @classmethod
-    def is_object(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_object(cls, schema: SCHEMA_UNION) -> bool:
         return (
             not cls.is_ref(schema)
             and cls._is_of_type(schema, oa.DataType.OBJECT)
@@ -79,21 +82,21 @@ class TypeChecker:
         )
 
     @classmethod
-    def is_object_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_object_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_object(schema.items)
 
     @classmethod
-    def is_ref(cls, schema: Union[BaseModel, oa.Reference]) -> bool:
+    def is_ref(cls, schema: REF_UNION) -> bool:
         return hasattr(schema, "ref") or (
             hasattr(schema, "model_extra") and "$ref" in schema.model_extra
         )
 
     @classmethod
-    def is_ref_array(cls, schema: Union[BaseModel, oa.Reference]) -> bool:
+    def is_ref_array(cls, schema: REF_UNION) -> bool:
         return cls.is_array(schema) and cls.is_ref(schema.items)
 
     @classmethod
-    def is_scalar(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_scalar(cls, schema: SCHEMA_UNION) -> bool:
         return bool(
             hasattr(schema, "type")
             and cls._is_of_scalar_type(schema.type)
@@ -101,11 +104,11 @@ class TypeChecker:
         )
 
     @classmethod
-    def is_scalar_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_scalar_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_scalar(schema.items)
 
     @classmethod
-    def is_nullable(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_nullable(cls, schema: SCHEMA_UNION) -> bool:
         # 3.0
         if hasattr(schema, "nullable"):
             return bool(schema.nullable)
@@ -118,15 +121,11 @@ class TypeChecker:
         )
 
     @classmethod
-    def is_nullable_array(cls, schema: Union[BaseModel, oa.Schema]) -> bool:
+    def is_nullable_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_nullable(schema)
 
     @classmethod
-    def _is_of_type(
-        cls,
-        schema: Union[BaseModel, oa.Schema],
-        data_type: oa.DataType,
-    ) -> bool:
+    def _is_of_type(cls, schema: SCHEMA_UNION, data_type: oa.DataType) -> bool:
         if not hasattr(schema, "type") or not schema.type:
             return False
 

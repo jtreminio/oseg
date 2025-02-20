@@ -7,14 +7,14 @@ from oseg import model, parser
 @dataclass
 class Request:
     _content_type: str
-    _example_data: dict[str, "model.PropertyContainer"]
-    _custom_example_data: dict[str, "model.PropertyContainer"]
+    _example_data: dict[str, model.PropertyContainer]
+    _custom_example_data: dict[str, model.PropertyContainer]
 
     def __init__(
         self,
-        oa_parser: "parser.OaParser",
+        oa_parser: parser.OaParser,
         operation: oa.Operation,
-        example_data_parser: "parser.ExampleDataParser",
+        example_data_parser: parser.ExampleDataParser,
     ):
         self._oa_parser = oa_parser
         self._example_data_parser = example_data_parser
@@ -38,7 +38,7 @@ class Request:
         self._custom_example_data = {}
 
     @property
-    def example_data(self) -> dict[str, "model.PropertyContainer"]:
+    def example_data(self) -> dict[str, model.PropertyContainer]:
         # default to returning only custom examples
         if len(self._custom_example_data):
             return self._custom_example_data
@@ -47,7 +47,7 @@ class Request:
         return self._example_data
 
     @example_data.setter
-    def example_data(self, data: Optional["model.EXAMPLE_DATA_BY_NAME"]):
+    def example_data(self, data: Optional[model.EXAMPLE_DATA_BY_NAME]):
         """Add custom data.
 
         If passing empty data then we delete previous custom data.

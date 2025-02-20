@@ -1,33 +1,22 @@
 import openapi_pydantic as oa
-from typing import Union, Optional
 from oseg import model, parser
-
-T_PROPERTIES = dict[
-    str,
-    Union[
-        "model.PropertyFile",
-        "model.PropertyFreeForm",
-        "model.PropertyScalar",
-        "model.PROPERTY_OBJECT_TYPE",
-    ],
-]
 
 
 class PropertyContainer:
     _sorted: parser.SortedProperties
 
     def __init__(self, request: "model.Request"):
-        self._body: Optional["model.PROPERTY_OBJECT_TYPE"] = None
-        self._path: Optional["model.PropertyObject"] = None
-        self._query: Optional["model.PropertyObject"] = None
-        self._header: Optional["model.PropertyObject"] = None
-        self._cookie: Optional["model.PropertyObject"] = None
+        self._body: model.PROPERTY_TYPES | None = None
+        self._path: model.PropertyObject | None = None
+        self._query: model.PropertyObject | None = None
+        self._header: model.PropertyObject | None = None
+        self._cookie: model.PropertyObject | None = None
 
-        self._request = request
+        self._request: model.Request = request
         self._is_body_required = request.is_required
         self._is_sorted = False
 
-        self._flattened_objects: dict[str, "model.PropertyObject"] = {}
+        self._flattened_objects: dict[str, model.PropertyObject] = {}
 
         self._sorter = parser.PropertySorter(self)
         self._flattener = parser.PropertyFlattener(self)
@@ -43,31 +32,31 @@ class PropertyContainer:
         )
 
     @property
-    def request(self) -> "model.Request":
+    def request(self):
         return self._request
 
     @property
-    def path(self) -> Optional["model.PropertyObject"]:
+    def path(self):
         return self._path
 
     @property
-    def query(self) -> Optional["model.PropertyObject"]:
+    def query(self):
         return self._query
 
     @property
-    def header(self) -> Optional["model.PropertyObject"]:
+    def header(self):
         return self._header
 
     @property
-    def cookie(self) -> Optional["model.PropertyObject"]:
+    def cookie(self):
         return self._cookie
 
     @property
-    def body(self) -> Optional["model.PROPERTY_OBJECT_TYPE"]:
+    def body(self):
         return self._body
 
     @body.setter
-    def body(self, data: Optional["model.PROPERTY_OBJECT_TYPE"]):
+    def body(self, data: model.PROPERTY_TYPES | None):
         self._clear_sorted_properties()
         self._body = data
 
@@ -89,7 +78,7 @@ class PropertyContainer:
 
     def set_parameters(
         self,
-        data: "model.PropertyObject",
+        data: model.PropertyObject,
         param_in: oa.ParameterLocation,
     ) -> None:
         self._clear_sorted_properties()
@@ -106,7 +95,10 @@ class PropertyContainer:
         if param_in.value == oa.ParameterLocation.COOKIE.value:
             self._cookie = data
 
-    def properties(self, required_flag: bool | None = None) -> T_PROPERTIES:
+    def properties(
+        self,
+        required_flag: bool | None = None,
+    ) -> dict[str, model.PROPERTY_TYPES]:
         self._sort()
 
         if required_flag is True:
@@ -117,7 +109,7 @@ class PropertyContainer:
 
         return {**self._sorted.required, **self._sorted.optional}
 
-    def flattened_objects(self) -> dict[str, "model.PropertyObject"]:
+    def flattened_objects(self) -> dict[str, model.PropertyObject]:
         self._sort()
 
         return self._flattened_objects

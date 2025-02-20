@@ -1,6 +1,5 @@
-from typing import Callable, Union
-
 import openapi_pydantic as oa
+from typing import Callable
 from oseg import model, parser
 
 
@@ -13,7 +12,7 @@ class PropertyParser:
         self,
         schema: oa.Schema,
         data: dict[str, any] | list[dict[str, any]],
-    ) -> Union["model.PropertyObject", "model.PropertyObjectArray"]:
+    ) -> "model.PROPERTY_OBJECT_TYPE":
         if parser.TypeChecker.is_array(schema):
             assert isinstance(
                 data, list

@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-
 import openapi_pydantic as oa
+from dataclasses import dataclass
 from enum import Enum
 from oseg import parser
 
@@ -42,7 +41,7 @@ class Security:
 
     def __init__(
         self,
-        oa_parser: "parser.OaParser",
+        oa_parser: parser.OaParser,
         operation: oa.Operation,
     ):
         self._is_optional = False

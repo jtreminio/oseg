@@ -66,10 +66,6 @@ class ExampleDataDef(ExampleDataParamDef):
     body: NotRequired[EXAMPLE_DATA_BODY]
 
 
-EXAMPLE_DATA_BY_NAME = dict[str, ExampleDataDef]
-EXAMPLE_DATA_BY_OPERATION = dict[str, EXAMPLE_DATA_BY_NAME]
-
-
 class ExampleDataParams:
     def __init__(self, data: ExampleDataParamDef):
         path = data.get("path")
@@ -115,3 +111,7 @@ class ExampleData:
             or len(self.header.keys())
             or len(self.cookie.keys())
         )
+
+
+EXAMPLE_DATA_BY_NAME = dict[str, ExampleDataDef]
+EXAMPLE_DATA_BY_OPERATION = dict[str, EXAMPLE_DATA_BY_NAME]

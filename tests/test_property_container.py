@@ -1,6 +1,5 @@
 import unittest
 from random import randrange
-
 from oseg import model, parser
 from test_utils import TestUtils
 

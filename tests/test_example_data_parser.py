@@ -1,6 +1,5 @@
 import unittest
 import uuid
-
 from oseg import model, parser
 from test_utils import TestUtils
 

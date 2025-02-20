@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 from oseg import generator as g, model
 
 
@@ -8,7 +8,7 @@ class TemplateParser:
         generator: "g.BaseGenerator",
         config: "g.BaseConfig",
     ):
-        self._generator: g.BaseGenerator = generator
+        self._generator = generator
         self._config = config
 
     def parse_security(
@@ -63,7 +63,7 @@ class TemplateParser:
     def parse_objects(
         self,
         property_container: "model.PropertyContainer",
-    ) -> dict[str, Union["model.PropertyObject", "model.PropertyObjectArray"]]:
+    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
         """Parse all top-level object variables"""
 
         result = {}
@@ -232,7 +232,7 @@ class TemplateParser:
         self,
         macros: "model.JinjaMacros",
         parent: Optional["model.PropertyObject"],
-        prop: "model.PropertyProto",
+        prop: "model.PROPERTY_NON_OBJECT_TYPE",
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
             printable = self._generator.print_scalar(parent, prop)

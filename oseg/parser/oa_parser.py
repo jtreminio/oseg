@@ -3,16 +3,6 @@ from typing import Union, Optional
 from oseg import model, parser
 
 
-RESOLVABLE = Union[
-    oa.Example,
-    oa.Parameter,
-    oa.RequestBody,
-    oa.Response,
-    oa.Schema,
-    oa.SecurityScheme,
-]
-
-
 class OaParser:
     def __init__(
         self,
@@ -40,7 +30,7 @@ class OaParser:
         return self._operations
 
     @property
-    def file_loader(self) -> "parser.FileLoader":
+    def file_loader(self) -> parser.FileLoader:
         return self._file_loader
 
     @property
@@ -103,7 +93,7 @@ class OaParser:
 
         return property_schema
 
-    def get_component_name(self, schema: RESOLVABLE) -> str | None:
+    def get_component_name(self, schema: "parser.OA_RESOLVABLE") -> str | None:
         return self._component_resolver.name(schema)
 
     def _setup_oas(self) -> None:
@@ -142,8 +132,8 @@ class OaParser:
 
     def _get_resolved_component(
         self,
-        schema: RESOLVABLE,
-        components: dict[str, RESOLVABLE],
+        schema: "parser.OA_RESOLVABLE",
+        components: dict[str, "parser.OA_RESOLVABLE"],
     ):
         name = None
 

@@ -21,6 +21,11 @@ components:
       properties:
         prop_1:
           type: string
+    FreeFormSchema:
+      type: object
+      additionalProperties: {}
+    StringSchema:
+      type: string
   parameters:
     SomeParameterRef:
       $ref: '#/components/parameters/SomeParameter'

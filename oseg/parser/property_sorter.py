@@ -1,16 +1,12 @@
-from dataclasses import dataclass
-from typing import Union
-
 import openapi_pydantic as oa
+from dataclasses import dataclass
 from oseg import model
-
-T_PARAMETER = Union["model.PropertyProto", "model.PropertyObject"]
 
 
 @dataclass
 class SortedProperties:
-    required: dict[str, T_PARAMETER]
-    optional: dict[str, T_PARAMETER]
+    required: dict[str, "model.PROPERTY_TYPES"]
+    optional: dict[str, "model.PROPERTY_TYPES"]
 
 
 class PropertySorter:
@@ -82,7 +78,7 @@ class PropertySorter:
 
         return optional_parameters
 
-    def _parameter_object(self, param: oa.Parameter) -> T_PARAMETER:
+    def _parameter_object(self, param: oa.Parameter) -> "model.PROPERTY_TYPES":
         """Returns the PropertyObject for a given oa.Parameter regardless
         of what its param_in value is: path, query, header, cookie"""
 
@@ -101,7 +97,7 @@ class PropertySorter:
     def _body_params_by_required(
         self,
         required: bool,
-    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+    ) -> dict[str, "model.PROPERTY_TYPES"]:
         if not self._container.body:
             return {}
 

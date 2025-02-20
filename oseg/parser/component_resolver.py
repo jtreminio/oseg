@@ -1,9 +1,8 @@
-from typing import Union
-
 import openapi_pydantic as oa
+from typing import Union
 from oseg import parser
 
-RESOLVABLE = Union[
+OA_RESOLVABLE = Union[
     oa.Example,
     oa.Parameter,
     oa.RequestBody,
@@ -48,7 +47,7 @@ class ComponentResolver:
     to keep track of this name.
     """
 
-    def __init__(self, oa_parser: "parser.OaParser"):
+    def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser = oa_parser
         self._names: dict[int, str] = {}
 
@@ -60,12 +59,12 @@ class ComponentResolver:
         self._component_security_schemes()
         self._operations()
 
-    def name(self, schema: RESOLVABLE) -> str | None:
+    def name(self, schema: OA_RESOLVABLE) -> str | None:
         schema_id = id(schema)
 
         return self._names[schema_id] if schema_id in self._names else None
 
-    def _add(self, schema: RESOLVABLE, name: str) -> None:
+    def _add(self, schema: OA_RESOLVABLE, name: str) -> None:
         self._names[id(schema)] = name
 
     def _component_examples(self) -> None:
@@ -375,7 +374,7 @@ class ComponentResolver:
 
         schema.allOf = schemas
 
-    def _is_nameable(self, schema: RESOLVABLE) -> bool:
+    def _is_nameable(self, schema: OA_RESOLVABLE) -> bool:
         return (
             parser.TypeChecker.is_ref(schema)
             or parser.TypeChecker.is_ref_array(schema)

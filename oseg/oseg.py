@@ -8,7 +8,7 @@ class Generator:
         self,
         oas_file: str,
         operation_id: str | None = None,
-        example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
+        example_data: Optional[model.EXAMPLE_DATA_BY_OPERATION] = None,
     ):
         self._oa_parser = parser.OaParser(
             oas_file,

@@ -1,9 +1,14 @@
-from .property_proto import PropertyProto
-
-from .operation import Operation
-from .response import Response
-from .request import Request
-from .security import Security, SecurityMethod
+from .properties import (
+    PropertyFile,
+    PropertyFreeForm,
+    PropertyScalar,
+    PropertyObject,
+    PropertyObjectArray,
+    PROPERTY_NON_OBJECT_TYPE,
+    PROPERTY_OBJECT_TYPE,
+    PROPERTY_TYPES,
+)
+from .property_container import PropertyContainer
 
 from .example_data import (
     EXAMPLE_DATA_BODY,
@@ -14,19 +19,17 @@ from .example_data import (
     ExampleData,
     ExampleDataParams,
 )
+
+from .security import Security, SecurityMethod
+from .response import Response
+from .request import Request
+from .operation import Operation
+
 from .jinja_macros import JinjaMacros
+
 from .printable import (
     PrintableFreeForm,
     PrintableObject,
     PrintableScalar,
     PrintableSecurity,
 )
-from .property_container import PropertyContainer
-from .property_file import PropertyFile
-from .property_free_form import PropertyFreeForm
-from .property_object import (
-    PROPERTY_OBJECT_TYPE,
-    PropertyObject,
-    PropertyObjectArray,
-)
-from .property_scalar import PropertyScalar
