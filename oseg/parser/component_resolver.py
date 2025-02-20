@@ -245,6 +245,7 @@ class ComponentResolver:
                 final_name = f"{parent_name}_{name}"
 
             self._add(schema, final_name)
+            self._oa_parser.components.schemas[final_name] = schema
 
             if parser.TypeChecker.is_object(schema):
                 self._schema_properties(schema, final_name)
@@ -286,6 +287,7 @@ class ComponentResolver:
 
                 if array_name is None and name:
                     self._add(schema.items, name)
+                    self._oa_parser.components.requestBodies[name] = schema.items
 
             if name is None and operation:
                 if schema.title is not None:
@@ -294,6 +296,7 @@ class ComponentResolver:
                     name = f"{operation.operationId}_request"
 
                 self._add(schema, name)
+                self._oa_parser.components.schemas[name] = schema
 
             self._schema_properties(schema, name)
             self._examples(media_type)
@@ -334,6 +337,7 @@ class ComponentResolver:
                     name = f"{operation.operationId}_{parameter.name}_parameter"
 
                 self._add(parameter, name)
+                self._oa_parser.components.parameters[name] = parameter
 
             schema = self._oa_parser.resolve_component(parameter.param_schema)
             parameter.param_schema = schema
