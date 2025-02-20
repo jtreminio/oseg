@@ -1,16 +1,16 @@
-from typing import Optional
+from __future__ import annotations
 from oseg import generator as g, model
 
 
 class TemplateParser:
-    def __init__(self, generator: "g.BaseGenerator", config: "g.BaseConfig"):
+    def __init__(self, generator: g.BaseGenerator, config: g.BaseConfig):
         self._generator: g.BaseGenerator = generator
         self._config: g.BaseConfig = config
 
     def parse_security(
         self,
-        macros: "model.JinjaMacros",
-        operation: "model.Operation",
+        macros: model.JinjaMacros,
+        operation: model.Operation,
         indent_count: int,
     ) -> dict[str, str]:
         """Prints security/authentication"""
@@ -58,8 +58,8 @@ class TemplateParser:
 
     def parse_objects(
         self,
-        property_container: "model.PropertyContainer",
-    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+        property_container: model.PropertyContainer,
+    ) -> dict[str, model.PROPERTY_OBJECT_TYPE]:
         """Parse all top-level object variables"""
 
         result = {}
@@ -76,9 +76,9 @@ class TemplateParser:
 
     def parse_object_properties(
         self,
-        macros: "model.JinjaMacros",
-        property_container: "model.PropertyContainer",
-        parent: "model.PropertyObject",
+        macros: model.JinjaMacros,
+        property_container: model.PropertyContainer,
+        parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
@@ -117,8 +117,8 @@ class TemplateParser:
 
     def parse_object_list_properties(
         self,
-        macros: "model.JinjaMacros",
-        parent: "model.PropertyObjectArray",
+        macros: model.JinjaMacros,
+        parent: model.PropertyObjectArray,
         indent_count: int,
     ) -> str:
         """Parse root-level data for a list data for a single Model object"""
@@ -149,8 +149,8 @@ class TemplateParser:
 
     def parse_api_call_properties(
         self,
-        macros: "model.JinjaMacros",
-        property_container: "model.PropertyContainer",
+        macros: model.JinjaMacros,
+        property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
         include_body: bool | None = None,
@@ -226,9 +226,9 @@ class TemplateParser:
 
     def _parse_non_objects(
         self,
-        macros: "model.JinjaMacros",
-        parent: Optional["model.PropertyObject"],
-        prop: "model.PROPERTY_NON_OBJECT_TYPE",
+        macros: model.JinjaMacros,
+        parent: model.PropertyObject | None,
+        prop: model.PROPERTY_NON_OBJECT_TYPE,
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
             printable = self._generator.print_scalar(parent, prop)
@@ -256,9 +256,9 @@ class TemplateParser:
 
     def _parse_object(
         self,
-        obj: "model.PropertyObject",
+        obj: model.PropertyObject,
         parent_name: str,
-    ) -> dict[str, "model.PrintableObject"]:
+    ) -> dict[str, model.PrintableObject]:
         result = {}
         for property_name, sub_obj in obj.objects.items():
             # todo test

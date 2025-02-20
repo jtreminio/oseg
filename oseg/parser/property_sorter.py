@@ -1,3 +1,4 @@
+from __future__ import annotations
 import openapi_pydantic as oa
 from dataclasses import dataclass
 from oseg import model
@@ -5,12 +6,12 @@ from oseg import model
 
 @dataclass
 class SortedProperties:
-    required: dict[str, "model.PROPERTY_TYPES"]
-    optional: dict[str, "model.PROPERTY_TYPES"]
+    required: dict[str, model.PROPERTY_TYPES]
+    optional: dict[str, model.PROPERTY_TYPES]
 
 
 class PropertySorter:
-    def __init__(self, container: "model.PropertyContainer"):
+    def __init__(self, container: model.PropertyContainer):
         self._container: model.PropertyContainer = container
 
     def sort(self) -> SortedProperties:
@@ -78,7 +79,7 @@ class PropertySorter:
 
         return optional_parameters
 
-    def _parameter_object(self, param: oa.Parameter) -> "model.PROPERTY_TYPES":
+    def _parameter_object(self, param: oa.Parameter) -> model.PROPERTY_TYPES:
         """Returns the PropertyObject for a given oa.Parameter regardless
         of what its param_in value is: path, query, header, cookie"""
 
@@ -97,7 +98,7 @@ class PropertySorter:
     def _body_params_by_required(
         self,
         required: bool,
-    ) -> dict[str, "model.PROPERTY_TYPES"]:
+    ) -> dict[str, model.PROPERTY_TYPES]:
         if not self._container.body:
             return {}
 

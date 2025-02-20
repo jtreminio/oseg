@@ -1,5 +1,5 @@
+from __future__ import annotations
 import openapi_pydantic as oa
-from typing import Optional
 from oseg import model, parser
 
 
@@ -8,7 +8,7 @@ class OaParser:
         self,
         oas_file: str,
         operation_id: str | None = None,
-        example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"] = None,
+        example_data: model.EXAMPLE_DATA_BY_OPERATION | None = None,
     ):
         self.file_loader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self.file_loader.oas)
@@ -75,7 +75,7 @@ class OaParser:
 
         return property_schema
 
-    def get_component_name(self, schema: "parser.OA_RESOLVABLE") -> str | None:
+    def get_component_name(self, schema: parser.OA_RESOLVABLE) -> str | None:
         return self._component_resolver.name(schema)
 
     def _setup_oas(self) -> None:
@@ -114,8 +114,8 @@ class OaParser:
 
     def _get_resolved_component(
         self,
-        schema: "parser.OA_RESOLVABLE",
-        components: dict[str, "parser.OA_RESOLVABLE"],
+        schema: parser.OA_RESOLVABLE,
+        components: dict[str, parser.OA_RESOLVABLE],
     ):
         name = None
 

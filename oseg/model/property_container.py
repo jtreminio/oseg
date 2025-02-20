@@ -1,3 +1,4 @@
+from __future__ import annotations
 import openapi_pydantic as oa
 from oseg import model, parser
 
@@ -5,7 +6,7 @@ from oseg import model, parser
 class PropertyContainer:
     _sorted: parser.SortedProperties
 
-    def __init__(self, request: "model.Request"):
+    def __init__(self, request: model.Request):
         self._body: model.PROPERTY_TYPES | None = None
         self.path: model.PropertyObject | None = None
         self.query: model.PropertyObject | None = None

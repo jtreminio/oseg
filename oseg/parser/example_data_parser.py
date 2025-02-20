@@ -1,5 +1,5 @@
+from __future__ import annotations
 import openapi_pydantic as oa
-from typing import Optional
 from oseg import parser, model
 
 
@@ -13,9 +13,9 @@ class ExampleDataParser:
 
     def from_oas_data(
         self,
-        request: "model.Request",
+        request: model.Request,
         operation: oa.Operation,
-    ) -> dict[str, "model.PropertyContainer"]:
+    ) -> dict[str, model.PropertyContainer]:
         """Parse example data embedded in OAS file.
 
         Only needs done once per Request.
@@ -81,9 +81,9 @@ class ExampleDataParser:
 
     def from_custom_data(
         self,
-        request: "model.Request",
-        example_data: Optional["model.EXAMPLE_DATA_BY_NAME"],
-    ) -> dict[str, "model.PropertyContainer"]:
+        request: model.Request,
+        example_data: model.EXAMPLE_DATA_BY_NAME | None,
+    ) -> dict[str, model.PropertyContainer]:
         """Custom example data provided outside of OAS file"""
 
         if example_data is None:
@@ -113,7 +113,7 @@ class ExampleDataParser:
     def _get_operation_example_data(
         self,
         operation: oa.Operation,
-    ) -> "model.EXAMPLE_DATA_BY_NAME":
+    ) -> model.EXAMPLE_DATA_BY_NAME:
         """Read operation example data from OAS file.
 
         Each operation can have multiple examples containing body and parameters.
@@ -140,8 +140,8 @@ class ExampleDataParser:
 
     def _get_parameter_example_data(
         self,
-        request: "model.Request",
-    ) -> "model.ExampleDataParamDef":
+        request: model.Request,
+    ) -> model.ExampleDataParamDef:
         result = {
             oa.ParameterLocation.PATH.value: {},
             oa.ParameterLocation.QUERY.value: {},
@@ -177,8 +177,8 @@ class ExampleDataParser:
 
     def _get_body_example_data(
         self,
-        request: "model.Request",
-    ) -> dict[str, "model.EXAMPLE_DATA_BODY"]:
+        request: model.Request,
+    ) -> dict[str, model.EXAMPLE_DATA_BODY]:
         """Read body example data from OAS file.
 
         Each request can have multiple body examples.
@@ -235,7 +235,7 @@ class ExampleDataParser:
     def _example_data_from_properties(
         self,
         schema: oa.Schema,
-    ) -> Optional["model.EXAMPLE_DATA_BODY"]:
+    ) -> model.EXAMPLE_DATA_BODY | None:
         # example data wins out over everything
         if schema.example is not None:
             return schema.example
@@ -279,9 +279,9 @@ class ExampleDataParser:
 
     def _parse_example(
         self,
-        request: "model.Request",
-        example_data: "model.ExampleData",
-    ) -> "model.PropertyContainer":
+        request: model.Request,
+        example_data: model.ExampleData,
+    ) -> model.PropertyContainer:
         container = model.PropertyContainer(request)
 
         loop_data = {

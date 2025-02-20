@@ -1,3 +1,4 @@
+from __future__ import annotations
 import openapi_pydantic as oa
 from typing import Callable
 from oseg import model, parser
@@ -12,7 +13,7 @@ class PropertyParser:
         self,
         schema: oa.Schema,
         data: dict[str, any] | list[dict[str, any]],
-    ) -> "model.PROPERTY_OBJECT_TYPE":
+    ) -> model.PROPERTY_OBJECT_TYPE:
         if parser.TypeChecker.is_array(schema):
             assert isinstance(
                 data, list
@@ -49,7 +50,7 @@ class PropertyParser:
         self,
         schema: oa.Schema,
         data: dict[str, any],
-    ) -> "model.PropertyObject":
+    ) -> model.PropertyObject:
         if data is None:
             data = {}
 
@@ -120,7 +121,7 @@ class PropertyParser:
 
     def _handle_object(
         self,
-        container: "model.PropertyObject",
+        container: model.PropertyObject,
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
@@ -168,7 +169,7 @@ class PropertyParser:
 
     def _handle_array_object(
         self,
-        container: "model.PropertyObject",
+        container: model.PropertyObject,
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
@@ -232,7 +233,7 @@ class PropertyParser:
 
     def _handle_file(
         self,
-        container: "model.PropertyObject",
+        container: model.PropertyObject,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],
@@ -254,7 +255,7 @@ class PropertyParser:
 
     def _handle_free_form(
         self,
-        container: "model.PropertyObject",
+        container: model.PropertyObject,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],
@@ -276,7 +277,7 @@ class PropertyParser:
 
     def _handle_scalar(
         self,
-        container: "model.PropertyObject",
+        container: model.PropertyObject,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],

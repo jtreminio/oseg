@@ -1,5 +1,5 @@
+from __future__ import annotations
 import openapi_pydantic as oa
-from typing import Optional
 from oseg import parser, model
 
 
@@ -33,8 +33,8 @@ class OperationParser:
     def setup_operations(
         self,
         operation_id: str | None,
-        example_data: Optional["model.EXAMPLE_DATA_BY_OPERATION"],
-    ) -> dict[str, "model.Operation"]:
+        example_data: model.EXAMPLE_DATA_BY_OPERATION | None,
+    ) -> dict[str, model.Operation]:
         example_data = example_data if example_data else {}
 
         if operation_id:
@@ -74,8 +74,8 @@ class OperationParser:
     def _get_request(
         self,
         operation: oa.Operation,
-        custom_example_data: "model.EXAMPLE_DATA_BY_NAME",
-    ) -> Optional["model.Request"]:
+        custom_example_data: model.EXAMPLE_DATA_BY_NAME,
+    ) -> model.Request | None:
         """Only want the first request, if any"""
 
         request = model.Request(
@@ -88,7 +88,7 @@ class OperationParser:
 
         return request
 
-    def _get_response(self, operation: oa.Operation) -> Optional["model.Response"]:
+    def _get_response(self, operation: oa.Operation) -> model.Response | None:
         """Only want the first response, if any"""
 
         if not operation.responses:

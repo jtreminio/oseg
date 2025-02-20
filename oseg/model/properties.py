@@ -1,3 +1,4 @@
+from __future__ import annotations
 import openapi_pydantic as oa
 from typing import Union, TypeVar, Generic, Protocol
 from oseg import parser
@@ -191,11 +192,11 @@ class PropertyObject(PropertyObjectInterface):
         self.is_array = False
 
     @property
-    def objects(self) -> dict[str, "PropertyObject"]:
+    def objects(self) -> dict[str, PropertyObject]:
         return self._get_properties_of_type(PropertyObject, False)
 
     @property
-    def array_objects(self) -> dict[str, "PropertyObjectArray"]:
+    def array_objects(self) -> dict[str, PropertyObjectArray]:
         return self._get_properties_of_type(PropertyObjectArray, True)
 
     @property
@@ -225,7 +226,7 @@ class PropertyObject(PropertyObjectInterface):
     def non_objects(
         self,
         required: bool | None = None,
-    ) -> dict[str, "PROPERTY_NON_OBJECT_TYPE"]:
+    ) -> dict[str, PROPERTY_NON_OBJECT_TYPE]:
         all_props = (
             self.scalars
             | self.array_scalars

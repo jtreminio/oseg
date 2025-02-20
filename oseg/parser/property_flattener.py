@@ -1,11 +1,12 @@
+from __future__ import annotations
 from oseg import model
 
 
 class PropertyFlattener:
-    def __init__(self, container: "model.PropertyContainer"):
+    def __init__(self, container: model.PropertyContainer):
         self._container: model.PropertyContainer = container
 
-    def flatten(self) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+    def flatten(self) -> dict[str, model.PROPERTY_OBJECT_TYPE]:
         """Reads through request parameters and body data to recursively find all
         PropertyObject and PropertyObjectArray objects, returned in a flat
         dict.
@@ -53,9 +54,9 @@ class PropertyFlattener:
 
     def _flatten_object(
         self,
-        parent: "model.PROPERTY_OBJECT_TYPE",
+        parent: model.PROPERTY_OBJECT_TYPE,
         parent_name: str,
-    ) -> dict[str, "model.PROPERTY_OBJECT_TYPE"]:
+    ) -> dict[str, model.PROPERTY_OBJECT_TYPE]:
         """Children are added to the top of results"""
 
         result = {}

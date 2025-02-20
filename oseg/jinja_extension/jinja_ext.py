@@ -1,3 +1,4 @@
+from __future__ import annotations
 import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
@@ -9,7 +10,7 @@ class JinjaExt(jinja2.ext.Extension):
     _sdk_generator: generator.BaseGenerator
 
     @staticmethod
-    def factory(sdk_generator: generator.BaseGenerator) -> "JinjaExt":
+    def factory(sdk_generator: generator.BaseGenerator) -> JinjaExt:
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,

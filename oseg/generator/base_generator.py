@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import openapi_pydantic as oa
 from abc import abstractmethod
@@ -25,7 +26,7 @@ class BaseConfig(Protocol):
     oseg_security: dict[str, str]
 
     @staticmethod
-    def factory(config: BaseConfigDef | str) -> "BaseConfig":
+    def factory(config: BaseConfigDef | str) -> BaseConfig:
         if isinstance(config, str):
             data = parser.FileLoader.get_file_contents(config)
 
