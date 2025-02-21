@@ -19,7 +19,7 @@ setup(
     ],
     keywords="OpenAPI, openapi-generator, sdk",
     packages=find_packages(where=""),
-    python_requires=">=3.9",
+    python_requires=">=3.12",
     install_requires=[
         "black>=24.10",
         "Jinja2>=3.1",
