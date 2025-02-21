@@ -237,12 +237,12 @@ class ExampleDataParser:
         schema: oa.Schema,
         nested_level: int = 0,
     ) -> model.EXAMPLE_DATA_BODY:
+        if nested_level == 10:
+            return {}
+
         # example data wins out over everything
         if schema.example is not None:
             return schema.example
-
-        if nested_level == 10:
-            return {}
 
         # examples data wins out over everything else,
         # but only want the first set of values
@@ -258,7 +258,8 @@ class ExampleDataParser:
 
         if parser.TypeChecker.is_array(schema):
             items_data = self._example_data_from_properties(
-                schema.items, nested_level + 1
+                schema.items,
+                nested_level + 1,
             )
 
             if items_data is not None:
@@ -271,7 +272,8 @@ class ExampleDataParser:
         if parser.TypeChecker.is_object(schema):
             for prop_name, prop_schema in schema.properties.items():
                 data[prop_name] = self._example_data_from_properties(
-                    prop_schema, nested_level + 1
+                    prop_schema,
+                    nested_level + 1,
                 )
 
         """Once we have base object default data built see if we are dealing
@@ -282,7 +284,8 @@ class ExampleDataParser:
 
             for prop_name, prop_schema in merged.properties.items():
                 data[prop_name] = self._example_data_from_properties(
-                    prop_schema, nested_level + 1
+                    prop_schema,
+                    nested_level + 1,
                 )
 
         return data if len(data.keys()) else {}

@@ -30,6 +30,8 @@ class TestExampleDataParser(unittest.TestCase):
             "root_level_non_objects"
         )
 
+        cls.oa_parser_recursive_ref = TestUtils.oa_parser("recursive_ref")
+
     def test_common_path_query_param_scenarios(self):
         data_provider = {
             # Always use example value if set
@@ -759,6 +761,9 @@ class TestExampleDataParser(unittest.TestCase):
                     expected["value"],
                     container.body.value,
                 )
+
+    def test_recursive_ref(self):
+        pass
 
 
 if __name__ == "__main__":

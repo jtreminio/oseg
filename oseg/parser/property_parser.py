@@ -8,12 +8,15 @@ class PropertyParser:
     def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser: parser.OaParser = oa_parser
         self._schema_joiner = parser.SchemaJoiner(oa_parser)
+        self._parents: dict[int, int] = {}
 
     def parse(
         self,
         schema: oa.Schema,
         data: dict[str, any] | list[dict[str, any]],
     ) -> model.PROPERTY_TYPES:
+        self._parents = {}
+
         if parser.TypeChecker.is_array(schema):
             assert isinstance(
                 data, list
@@ -57,7 +60,9 @@ class PropertyParser:
         self,
         schema: oa.Schema,
         data: dict[str, any],
+        nested_level: int = 0,
     ) -> model.PropertyObject | model.PROPERTY_NON_OBJECT_TYPE:
+
         if data is None:
             data = {}
 
@@ -77,6 +82,9 @@ class PropertyParser:
             is_required=False,
         )
 
+        if nested_level == 10:
+            return container
+
         for name, property_schema in properties.items():
             for current_schema in merged_values.schemas:
                 non_object_property_schema = self._oa_parser.resolve_property(
@@ -89,6 +97,7 @@ class PropertyParser:
                     schema=property_schema,
                     name=name,
                     data=data,
+                    nested_level=nested_level,
                 ):
                     break
 
@@ -97,6 +106,7 @@ class PropertyParser:
                     schema=property_schema,
                     name=name,
                     data=data,
+                    nested_level=nested_level,
                 ):
                     break
 
@@ -171,6 +181,7 @@ class PropertyParser:
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
+        nested_level: int,
     ) -> bool:
         """handle named object"""
 
@@ -205,7 +216,11 @@ class PropertyParser:
 
             return True
 
-        parsed = self._create_property_object_container(schema, value)
+        parsed = self._create_property_object_container(
+            schema,
+            value,
+            nested_level + 1,
+        )
         parsed.is_required = is_required
         parsed.is_set = name in data
 
@@ -219,6 +234,7 @@ class PropertyParser:
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
+        nested_level: int,
     ) -> bool:
         """handle arrays of named objects"""
 
@@ -268,7 +284,11 @@ class PropertyParser:
         )
 
         for example in value:
-            parsed = self._create_property_object_container(schema.items, example)
+            parsed = self._create_property_object_container(
+                schema.items,
+                example,
+                nested_level + 1,
+            )
             parsed.is_required = is_required
 
             prop_obj_array.properties.append(parsed)
