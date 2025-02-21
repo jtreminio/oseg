@@ -1,8 +1,8 @@
 import inspect
 from typing import TypedDict
+
 from oseg import generator, model
 from oseg.parser import NormalizeStr
-
 
 JavaConfigDef = TypedDict(
     "JavaConfigDef",
