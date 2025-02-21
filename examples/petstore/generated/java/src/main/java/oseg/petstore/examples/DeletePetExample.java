@@ -23,8 +23,8 @@ public class DeletePetExample
         try
         {
             new PetApi(config).deletePet(
-                12345L,
-                "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a"
+                12345L, // petId
+                "df560d5ba4eb7adbc635c87c3931a8421ae24dc81646196cd66544fd4471414a" // apiKey
             );
         } catch (ApiException e) {
             System.err.println("Exception when calling Pet#deletePet");

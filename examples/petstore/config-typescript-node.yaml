@@ -3,3 +3,4 @@ additionalProperties:
   npmName: openapi_client
   oseg.security.api_key.api_key: YOUR_API_KEY
   oseg.security.petstore_auth.access_token: YOUR_ACCESS_TOKEN
+  oseg.printApiCallProperty: true

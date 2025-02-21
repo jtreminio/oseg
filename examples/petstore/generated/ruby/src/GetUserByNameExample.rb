@@ -7,7 +7,7 @@ end
 
 begin
     response = OpenApiClient::UserApi.new.get_user_by_name(
-        "my_username",
+        "my_username", // username
     )
 
     p response

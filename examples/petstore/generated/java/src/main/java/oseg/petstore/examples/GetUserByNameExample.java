@@ -24,7 +24,7 @@ public class GetUserByNameExample
         try
         {
             var response = new UserApi(config).getUserByName(
-                "my_username"
+                "my_username" // username
             );
 
             System.out.println(response);

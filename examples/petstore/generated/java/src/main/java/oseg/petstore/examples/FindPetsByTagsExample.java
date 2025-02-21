@@ -26,7 +26,7 @@ public class FindPetsByTagsExample
                 List.of (
                     "tag_1",
                     "tag_2"
-                )
+                ) // tags
             );
 
             System.out.println(response);

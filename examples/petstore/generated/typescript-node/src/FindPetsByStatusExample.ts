@@ -5,13 +5,11 @@ import models from "openapi_client"
 const apiCaller = new api.PetApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 
-const status = [
+apiCaller.findPetsByStatus(
+  [
     "available",
     "pending",
-] as Array<"available" | "pending">;
-
-apiCaller.findPetsByStatus(
-    status,
+  ], // status
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

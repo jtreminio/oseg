@@ -5,13 +5,11 @@ import models from "openapi_client"
 const apiCaller = new api.PetApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 
-const tags = [
+apiCaller.findPetsByTags(
+  [
     "tag_1",
     "tag_2",
-];
-
-apiCaller.findPetsByTags(
-    tags,
+  ], // tags
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

@@ -8,9 +8,9 @@
     {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
-    {{ i }},
+  {{ i }},
         {% endfor %}
-]{% if printable.is_enum and not printable.target_type %} as Array<{{ printable.value|join(" | ")}}>{% endif %}
+]
     {%- endif %}
 {%- endmacro -%}
 
@@ -24,7 +24,7 @@ fs.createReadStream("{{ printable.value }}")
     {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for i in printable.value %}
-    fs.createReadStream("{{ i }}"),
+  fs.createReadStream("{{ i }}"),
         {% endfor %}
 ]
     {%- endif %}
@@ -34,7 +34,7 @@ fs.createReadStream("{{ printable.value }}")
     {% if printable.value == None %}{{ print_null() }}{% else %}
 {
         {% for k, v in printable.value.items() %}
-    "{{ k }}": {{ v }},
+  "{{ k }}": {{ v }},
         {% endfor %}
 }
     {%- endif %}
@@ -44,11 +44,11 @@ fs.createReadStream("{{ printable.value }}")
     {% if printable.value == None %}{{ print_null() }}{% else %}
 [
         {% for obj in printable.value %}
-    {
+  {
             {% for k, v in obj.items() %}
-        "{{ k }}": {{ v }},
+    "{{ k }}": {{ v }},
             {% endfor %}
-    },
+  },
         {% endfor %}
 ]
     {%- endif %}
@@ -64,7 +64,7 @@ fs.createReadStream("{{ printable.value }}")
     {% if printable.value == None %}{{ print_null() }}{% else %}
 [
     {% for i in printable.value %}
-    {{ i|print_variablename }},
+  {{ i|print_variablename }},
     {% endfor %}
 ]
     {%- endif %}
@@ -80,6 +80,12 @@ fs.createReadStream("{{ printable.value }}")
     {{- "" }} "{{ printable.value }}");
     {%- else %}{{ comment }}apiCaller.{{ printable.method|print_methodname }} = "{{ printable.value }}";
     {%- endif %}
+{%-endmacro -%}
+
+{%- macro print_variable_name_as_comment(name, value) -%}
+    {% if config.oseg_print_api_call_property %}
+        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
+    {% endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
@@ -110,27 +116,18 @@ const {{ obj_name|print_variablename }} = new models.{{ obj.type|print_classname
         {% else %}
 const {{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
-    {{- value }};
+  {{- value }};
             {% endcall %}
         {% endif %}
 
     {% endfor %}
 {% endcall %}
-{# todo don't print variables for formdata requests #}
-{% if operation.request.parameters or operation.request.has_formdata %}
-    {% call(properties) m.parse_api_call_properties_macro(property_container, 0, null, False) %}
-        {% for name, value in properties.items() %}
-const {{ name|print_variablename }} = {{ value }};
-        {% endfor %}
-    {% endcall %}
-
-{% endif %}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 4) %}
+{% call(properties) m.parse_api_call_properties_macro(property_container, 2) %}
 apiCaller.{{ operation.operation_id|print_methodname }}({% if not properties %})
 {%- else %}
 
     {% for name, value in properties.items() %}
-    {{ name|print_variablename }},
+  {{ value }},{{ print_variable_name_as_comment(name, value) }}
     {% endfor %}
 ){% endif %}{% endcall %}{%- if operation.response and operation.response.body  %}.then(response => {
 {% if not operation.response.is_binary %}

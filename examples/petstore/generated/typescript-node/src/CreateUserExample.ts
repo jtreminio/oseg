@@ -16,7 +16,7 @@ user.phone = "555-123-1234";
 user.userStatus = 1;
 
 apiCaller.createUser(
-    user,
+  user,
 ).catch(error => {
   console.log("Exception when calling User#createUser:");
   console.log(error.body);

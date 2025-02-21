@@ -5,10 +5,8 @@ import models from "openapi_client"
 const apiCaller = new api.PetApi();
 apiCaller.setApiKey(api.PetApiApiKeys.api_key, "YOUR_API_KEY");
 
-const petId = 12345;
-
 apiCaller.getPetById(
-    petId,
+  12345, // petId
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

@@ -9,7 +9,7 @@ begin
         [
             "available",
             "pending",
-        ],
+        ], // status
     )
 
     p response

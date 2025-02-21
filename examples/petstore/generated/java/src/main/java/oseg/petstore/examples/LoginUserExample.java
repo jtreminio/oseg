@@ -24,8 +24,8 @@ public class LoginUserExample
         try
         {
             var response = new UserApi(config).loginUser(
-                "my_username",
-                "my_secret_password"
+                "my_username", // username
+                "my_secret_password" // password
             );
 
             System.out.println(response);

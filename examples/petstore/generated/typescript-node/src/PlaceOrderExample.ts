@@ -15,7 +15,7 @@ order.status = models.Order.StatusEnum.Approved;
 order.complete = false;
 
 apiCaller.placeOrder(
-    order,
+  order,
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

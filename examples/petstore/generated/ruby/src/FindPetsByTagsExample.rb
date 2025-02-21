@@ -9,7 +9,7 @@ begin
         [
             "tag_1",
             "tag_2",
-        ],
+        ], // tags
     )
 
     p response

@@ -23,7 +23,7 @@ public class DeleteUserExample
         try
         {
             new UserApi(config).deleteUser(
-                "my_username"
+                "my_username" // username
             );
         } catch (ApiException e) {
             System.err.println("Exception when calling User#deleteUser");

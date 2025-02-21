@@ -82,6 +82,12 @@ new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not pri
 {{ comment }}config.{{ ("set" ~ "_" ~ printable.method)|print_methodname }}("{{ printable.value }}");
 {%-endmacro -%}
 
+{%- macro print_variable_name_as_comment(name, value) -%}
+    {% if config.oseg_print_api_call_property %}
+        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
+    {% endif %}
+{%-endmacro -%}
+
 {%- import "_macros.jinja2" as m with context -%}
 
 package {{ config.oseg_package }};
@@ -140,8 +146,7 @@ public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
 {% else %}
 
     {% for name, value in properties.items() %}
-                {{ value }}{% if not loop.last %},{% endif %}
-
+                {{ value }}{% if not loop.last %},{% endif %}{{ print_variable_name_as_comment(name, value) }}
     {% endfor %}
             );
 {% endif %}

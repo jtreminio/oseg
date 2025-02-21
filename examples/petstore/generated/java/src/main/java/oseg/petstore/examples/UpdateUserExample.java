@@ -33,7 +33,7 @@ public class UpdateUserExample
         try
         {
             new UserApi(config).updateUser(
-                "my-username",
+                "my-username", // username
                 user
             );
         } catch (ApiException e) {

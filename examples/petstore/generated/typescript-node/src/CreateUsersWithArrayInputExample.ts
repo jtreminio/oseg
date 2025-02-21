@@ -26,12 +26,12 @@ user2.phone = "555-123-5678";
 user2.userStatus = 2;
 
 const user = [
-    user1,
-    user2,
+  user1,
+  user2,
 ];
 
 apiCaller.createUsersWithArrayInput(
-    user,
+  user,
 ).catch(error => {
   console.log("Exception when calling User#createUsersWithArrayInput:");
   console.log(error.body);

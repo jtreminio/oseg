@@ -10,6 +10,7 @@ RubyConfigDef = TypedDict(
         "moduleName": str,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
+        "oseg.printApiCallProperty": bool | None,
     },
 )
 
@@ -56,6 +57,15 @@ class RubyConfig(generator.BaseConfig):
             ),
             "default": {},
         },
+        "oseg.printApiCallProperty": {
+            "description": inspect.cleandoc(
+                """
+                Add property name as comment for non-variable values passed to
+                the API call method. (Default: true)
+                """
+            ),
+            "default": {},
+        },
     }
 
     def __init__(self, config: RubyConfigDef):
@@ -71,6 +81,11 @@ class RubyConfig(generator.BaseConfig):
         )
 
         self.oseg_security = self._parse_security(config)
+
+        self.oseg_print_api_call_property = config.get(
+            "oseg.printApiCallProperty",
+            self.PROPS_OPTIONAL["oseg.printApiCallProperty"].get("default"),
+        )
 
 
 class RubyGenerator(generator.BaseGenerator):

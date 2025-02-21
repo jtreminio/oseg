@@ -23,9 +23,9 @@ public class UploadFileExample
         try
         {
             var response = new PetApi(config).uploadFile(
-                12345L,
-                "Additional data to pass to server",
-                new File("/path/to/file")
+                12345L, // petId
+                "Additional data to pass to server", // additionalMetadata
+                new File("/path/to/file") // _file
             );
 
             System.out.println(response);

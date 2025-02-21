@@ -6,7 +6,7 @@ end
 
 begin
     response = OpenApiClient::PetApi.new.upload_file(
-        12345,
+        12345, // pet_id
         {
             additional_metadata: "Additional data to pass to server",
             file: File.new("/path/to/file", "r"),

@@ -23,7 +23,7 @@ public class GetPetByIdExample
         try
         {
             var response = new PetApi(config).getPetById(
-                12345L
+                12345L // petId
             );
 
             System.out.println(response);

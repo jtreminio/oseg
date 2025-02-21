@@ -7,8 +7,8 @@ end
 
 begin
     response = OpenApiClient::UserApi.new.login_user(
-        "my_username",
-        "my_secret_password",
+        "my_username", // username
+        "my_secret_password", // password
     )
 
     p response

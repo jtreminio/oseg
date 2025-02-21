@@ -5,14 +5,10 @@ import models from "openapi_client"
 const apiCaller = new api.PetApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 
-const petId = 12345;
-const additionalMetadata = "Additional data to pass to server";
-const file = fs.createReadStream("/path/to/file");
-
 apiCaller.uploadFile(
-    petId,
-    additionalMetadata,
-    file,
+  12345, // petId
+  "Additional data to pass to server", // additionalMetadata
+  fs.createReadStream("/path/to/file"), // file
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

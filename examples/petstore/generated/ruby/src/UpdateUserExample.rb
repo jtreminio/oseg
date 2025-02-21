@@ -16,7 +16,7 @@ user.user_status = 1
 
 begin
     OpenApiClient::UserApi.new.update_user(
-        "my-username",
+        "my-username", // username
         user,
     )
 rescue OpenApiClient::ApiError => e

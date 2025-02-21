@@ -18,15 +18,15 @@ tags2.id = 98765;
 tags2.name = "tag_2";
 
 const tags = [
-    tags1,
-    tags2,
+  tags1,
+  tags2,
 ];
 
 const pet = new models.Pet();
 pet.name = "My pet name";
 pet.photoUrls = [
-    "https://example.com/picture_1.jpg",
-    "https://example.com/picture_2.jpg",
+  "https://example.com/picture_1.jpg",
+  "https://example.com/picture_2.jpg",
 ];
 pet.id = 12345;
 pet.status = models.Pet.StatusEnum.Available;
@@ -34,7 +34,7 @@ pet.category = category;
 pet.tags = tags;
 
 apiCaller.addPet(
-    pet,
+  pet,
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

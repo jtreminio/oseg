@@ -26,7 +26,7 @@ public class FindPetsByStatusExample
                 List.of (
                     "available",
                     "pending"
-                )
+                ) // status
             );
 
             System.out.println(response);

@@ -24,7 +24,7 @@ public class GetOrderByIdExample
         try
         {
             var response = new StoreApi(config).getOrderById(
-                3L
+                3L // orderId
             );
 
             System.out.println(response);

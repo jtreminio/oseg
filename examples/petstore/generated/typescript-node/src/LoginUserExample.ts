@@ -6,12 +6,9 @@ const apiCaller = new api.UserApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 // apiCaller.setApiKey(api.UserApiApiKeys.api_key, "YOUR_API_KEY");
 
-const username = "my_username";
-const password = "my_secret_password";
-
 apiCaller.loginUser(
-    username,
-    password,
+  "my_username", // username
+  "my_secret_password", // password
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

@@ -6,10 +6,8 @@ const apiCaller = new api.StoreApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 // apiCaller.setApiKey(api.StoreApiApiKeys.api_key, "YOUR_API_KEY");
 
-const orderId = 3;
-
 apiCaller.getOrderById(
-    orderId,
+  3, // orderId
 ).then(response => {
   console.log(response.body);
 }).catch(error => {

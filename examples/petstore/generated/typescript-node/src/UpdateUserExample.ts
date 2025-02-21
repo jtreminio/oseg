@@ -15,11 +15,9 @@ user.password = "so secure omg";
 user.phone = "555-867-5309";
 user.userStatus = 1;
 
-const username = "my-username";
-
 apiCaller.updateUser(
-    username,
-    user,
+  "my-username", // username
+  user,
 ).catch(error => {
   console.log("Exception when calling User#updateUser:");
   console.log(error.body);

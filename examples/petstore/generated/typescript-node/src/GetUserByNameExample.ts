@@ -6,10 +6,8 @@ const apiCaller = new api.UserApi();
 apiCaller.accessToken = "YOUR_ACCESS_TOKEN";
 // apiCaller.setApiKey(api.UserApiApiKeys.api_key, "YOUR_API_KEY");
 
-const username = "my_username";
-
 apiCaller.getUserByName(
-    username,
+  "my_username", // username
 ).then(response => {
   console.log(response.body);
 }).catch(error => {
