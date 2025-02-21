@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import openapi_pydantic as oa
 from oseg import model, parser
 from test_utils import TestUtils
 
@@ -23,6 +24,10 @@ class TestExampleDataParser(unittest.TestCase):
 
         cls.oa_parser_external_example = TestUtils.oa_parser(
             "example_data_parser-external_example"
+        )
+
+        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
+            "root_level_non_objects"
         )
 
     def test_common_path_query_param_scenarios(self):
@@ -703,6 +708,57 @@ class TestExampleDataParser(unittest.TestCase):
 
         schema = self.oa_parser_body.components.schemas.get("SchemaWithExamples")
         self.assertEqual(len(list(schema.examples)), 2)
+
+    def test_non_objects_hydrated(self):
+        data_provider = {
+            "root_level_free_form": {
+                "type": oa.DataType.OBJECT,
+                "name": "request_body",
+                "value": {"foo": "bar", "bam": "baz"},
+            },
+            "root_level_string": {
+                "type": oa.DataType.STRING,
+                "name": "body",
+                "value": "some string value",
+            },
+            "root_level_int": {
+                "type": oa.DataType.INTEGER,
+                "name": "body",
+                "value": 12345,
+            },
+            "root_level_file": {
+                "type": oa.DataType.STRING,
+                "name": "body",
+                "value": "/some/file/path.pdf",
+            },
+            "root_level_bool": {
+                "type": oa.DataType.BOOLEAN,
+                "name": "body",
+                "value": True,
+            },
+        }
+
+        for operation_id, expected in data_provider.items():
+            with self.subTest(operation_id):
+                operation = self.oa_parser_root_level_non_objects.operations[
+                    operation_id
+                ]
+                container = operation.request.example_data["example"]
+
+                self.assertEqual(
+                    expected["type"],
+                    operation.request.body.type,
+                )
+
+                self.assertEqual(
+                    expected["name"],
+                    container.request.example_data["example"].body.name,
+                )
+
+                self.assertEqual(
+                    expected["value"],
+                    container.body.value,
+                )
 
 
 if __name__ == "__main__":

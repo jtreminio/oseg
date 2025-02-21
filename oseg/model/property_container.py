@@ -22,8 +22,13 @@ class PropertyContainer:
 
     @property
     def has_data(self) -> bool:
+        if parser.TypeChecker.is_property_objectish(self._body):
+            has_body_data = len(list(self._body.properties))
+        else:
+            has_body_data = self._body is not None
+
         return bool(
-            (self._body is not None and len(list(self._body.properties)))
+            has_body_data
             or (self.path is not None and len(list(self.path.properties)))
             or (self.query is not None and len(list(self.query.properties)))
             or (self.header is not None and len(list(self.header.properties)))

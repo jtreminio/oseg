@@ -1,5 +1,5 @@
 from __future__ import annotations
-from oseg import generator as g, model
+from oseg import generator as g, model, parser
 
 
 class TemplateParser:
@@ -185,8 +185,18 @@ class TemplateParser:
                 if include_body is None or include_body is True:
                     has_data = True
 
-                    result[prop_name] = self._generator.print_variablename(
-                        property_container.body.type
+                    if parser.TypeChecker.is_property_objectish(prop):
+                        result[prop_name] = self._generator.print_variablename(
+                            property_container.body.type
+                        )
+
+                        continue
+
+                    # non-object single value
+                    result[prop_name] = self._parse_non_objects(
+                        macros=macros,
+                        parent=None,
+                        prop=prop,
                     )
 
                 continue

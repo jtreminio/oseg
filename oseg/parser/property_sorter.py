@@ -1,7 +1,7 @@
 from __future__ import annotations
 import openapi_pydantic as oa
 from dataclasses import dataclass
-from oseg import model
+from oseg import model, parser
 
 
 @dataclass
@@ -79,7 +79,7 @@ class PropertySorter:
 
         return optional_parameters
 
-    def _parameter_object(self, param: oa.Parameter) -> model.PROPERTY_TYPES:
+    def _parameter_object(self, param: oa.Parameter) -> model.PROPERTY_TYPES | None:
         """Returns the PropertyObject for a given oa.Parameter regardless
         of what its param_in value is: path, query, header, cookie"""
 
@@ -109,7 +109,10 @@ class PropertySorter:
             if (required and self._container.request.is_required) or (
                 not required and not self._container.request.is_required
             ):
-                return {self._container.body_type: self._container.body}
+                if parser.TypeChecker.is_property_objectish(self._container.body):
+                    return {self._container.body_type: self._container.body}
+
+                return {self._container.body.name: self._container.body}
 
             return {}
 

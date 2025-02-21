@@ -235,7 +235,7 @@ class ExampleDataParser:
     def _example_data_from_properties(
         self,
         schema: oa.Schema,
-    ) -> model.EXAMPLE_DATA_BODY | None:
+    ) -> model.EXAMPLE_DATA_BODY:
         # example data wins out over everything
         if schema.example is not None:
             return schema.example
@@ -247,7 +247,7 @@ class ExampleDataParser:
 
         # if property is nullable and default value is null, use it
         if schema.default is None and parser.TypeChecker.is_nullable(schema):
-            return None
+            return {}
 
         if schema.default is not None:
             return schema.default
@@ -275,7 +275,7 @@ class ExampleDataParser:
             for prop_name, prop_schema in merged.properties.items():
                 data[prop_name] = self._example_data_from_properties(prop_schema)
 
-        return data if len(data.keys()) else None
+        return data if len(data.keys()) else {}
 
     def _parse_example(
         self,

@@ -13,7 +13,7 @@ class PropertyParser:
         self,
         schema: oa.Schema,
         data: dict[str, any] | list[dict[str, any]],
-    ) -> model.PROPERTY_OBJECT_TYPE:
+    ) -> model.PROPERTY_TYPES:
         if parser.TypeChecker.is_array(schema):
             assert isinstance(
                 data, list
@@ -44,13 +44,20 @@ class PropertyParser:
 
             return container
 
+        if (
+            self._is_resolvable_of(schema, parser.TypeChecker.is_file)
+            or self._is_resolvable_of(schema, parser.TypeChecker.is_free_form)
+            or self._is_resolvable_of(schema, parser.TypeChecker.is_scalar)
+        ):
+            return self._create_non_object_container(schema, data)
+
         return self._create_property_object_container(schema, data)
 
     def _create_property_object_container(
         self,
         schema: oa.Schema,
         data: dict[str, any],
-    ) -> model.PropertyObject:
+    ) -> model.PropertyObject | model.PROPERTY_NON_OBJECT_TYPE:
         if data is None:
             data = {}
 
@@ -118,6 +125,45 @@ class PropertyParser:
                     continue
 
         return container
+
+    def _create_non_object_container(
+        self,
+        schema: oa.Schema,
+        data: any,
+    ) -> model.PROPERTY_NON_OBJECT_TYPE:
+        """Handles root-level non-object properties"""
+
+        result = self._handle_file(
+            container=None,
+            schema=schema,
+            name="body",
+            data={"body": data},
+        )
+
+        if result:
+            return result
+
+        result = self._handle_free_form(
+            container=None,
+            schema=schema,
+            name="request_body",
+            data={"request_body": data},
+        )
+
+        if result:
+            return result
+
+        result = self._handle_scalar(
+            container=None,
+            schema=schema,
+            name="body",
+            data={"body": data},
+        )
+
+        if result:
+            return result
+
+        raise NotImplementedError("_handle_no_object() unable to handle data")
 
     def _handle_object(
         self,
@@ -233,69 +279,84 @@ class PropertyParser:
 
     def _handle_file(
         self,
-        container: model.PropertyObject,
+        container: model.PropertyObject | None,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],
-    ) -> bool:
+    ) -> model.PropertyFile | None:
         """handle binary (file upload) types"""
 
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_file):
-            return False
+            return None
 
-        container.properties[name] = model.PropertyFile(
+        result = model.PropertyFile(
             schema=schema,
             name=name,
             value=data.get(name),
-            is_required=self._is_required(container.schema, name),
+            is_required=(
+                self._is_required(container.schema, name) if container else False
+            ),
             is_set=name in data,
         )
 
-        return True
+        if container:
+            container.properties[name] = result
+
+        return result
 
     def _handle_free_form(
         self,
-        container: model.PropertyObject,
+        container: model.PropertyObject | None,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],
-    ) -> bool:
+    ) -> model.PropertyFreeForm | None:
         """handle free-form type, ignore inline schemas that should use $ref"""
 
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_free_form):
-            return False
+            return None
 
-        container.properties[name] = model.PropertyFreeForm(
+        result = model.PropertyFreeForm(
             schema=schema,
             name=name,
             value=data.get(name),
-            is_required=self._is_required(container.schema, name),
+            is_required=(
+                self._is_required(container.schema, name) if container else False
+            ),
             is_set=name in data,
         )
 
-        return True
+        if container:
+            container.properties[name] = result
+
+        return result
 
     def _handle_scalar(
         self,
-        container: model.PropertyObject,
+        container: model.PropertyObject | None,
         schema: oa.Schema,
         name: str,
         data: dict[str, any],
-    ) -> bool:
+    ) -> model.PropertyScalar | None:
         """handle scalar types"""
 
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_scalar):
-            return False
+            return None
 
-        container.properties[name] = model.PropertyScalar(
+        result = model.PropertyScalar(
             schema=schema,
             name=name,
             value=data.get(name),
-            is_required=self._is_required(container.schema, name),
+            is_required=(
+                self._is_required(container.schema, name) if container else False
+            ),
             is_set=name in data,
         )
 
-        return True
+        if container:
+            container.properties[name] = result
+
+        return result
 
     def _is_required(self, schema: oa.Schema, prop_name: str) -> bool:
         return bool(schema.required and prop_name in schema.required)

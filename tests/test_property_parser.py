@@ -1,4 +1,5 @@
 import unittest
+import openapi_pydantic as oa
 from oseg import model, parser
 from test_utils import TestUtils
 
@@ -11,6 +12,9 @@ class TestPropertyParser(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.oa_parser_discriminator = TestUtils.oa_parser("discriminator")
         cls.oa_parser_properties = TestUtils.oa_parser("properties")
+        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
+            "root_level_non_objects"
+        )
 
     def test_discriminator(self):
         property_parser = parser.PropertyParser(self.oa_parser_discriminator)
@@ -536,6 +540,43 @@ class TestPropertyParser(unittest.TestCase):
         ]
 
         self.assertListEqual(expected_properties_1, list(example_data.properties()))
+
+    def test_root_level_nonobjects(self):
+        data_provider = {
+            "FreeFormSchema": {
+                "type": model.PropertyFreeForm,
+                "value": {"some_key": "some_value"},
+            },
+            "StringSchema": {
+                "type": model.PropertyScalar,
+                "value": "foo bar",
+            },
+            "IntSchema": {
+                "type": model.PropertyScalar,
+                "value": 654321,
+            },
+            "FileSchema": {
+                "type": model.PropertyFile,
+                "value": "/path.pdf",
+            },
+            "BoolSchema": {
+                "type": model.PropertyScalar,
+                "value": False,
+            },
+        }
+
+        property_parser = parser.PropertyParser(self.oa_parser_root_level_non_objects)
+
+        for name, expected in data_provider.items():
+            with self.subTest(name):
+                schema = self.oa_parser_root_level_non_objects.components.schemas.get(
+                    name
+                )
+
+                parsed = property_parser.parse(schema, expected["value"])
+
+                self.assertEqual(expected["value"], parsed.value)
+                self.assertIsInstance(parsed, expected["type"])
 
 
 if __name__ == "__main__":

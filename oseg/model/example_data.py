@@ -102,7 +102,10 @@ class ExampleData:
         if isinstance(self.body, list):
             return bool(len(self.body))
 
-        return bool(len(self.body.keys()))
+        if isinstance(self.body, dict):
+            return bool(len(self.body.keys()))
+
+        return self.body is not None
 
     def _has_parameter_data(self) -> bool:
         return bool(

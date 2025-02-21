@@ -11,6 +11,10 @@ class TestTemplateParser(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.oa_parser = TestUtils.oa_parser("properties")
 
+        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
+            "root_level_non_objects"
+        )
+
         cls.jinja_macros = model.JinjaMacros(JINJA_MACROS)
         config_data = parser.FileLoader.get_file_contents(
             f"{TestUtils._BASE_DIR}/fixtures/config-mock.yaml"
@@ -587,6 +591,59 @@ class TestTemplateParser(unittest.TestCase):
         }
 
         self.assertDictEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
+
+    def test_parse_api_call_root_level_non_objects(self):
+        data_provider = {
+            "root_level_free_form": {
+                "name": "request_body",
+                "value": {"bam": "baz"},
+                "expected": {"request_body": "{'bam': '\"baz\"'}"},
+            },
+            "root_level_string": {
+                "name": "body",
+                "value": "some string value",
+                "expected": {"body": "some string value"},
+            },
+            "root_level_int": {
+                "name": "body",
+                "value": 12345,
+                "expected": {"body": "12345"},
+            },
+            "root_level_file": {
+                "name": "body",
+                "value": "/some/file/path.pdf",
+                "expected": {"body": "/some/file/path.pdf"},
+            },
+            "root_level_bool": {
+                "name": "body",
+                "value": True,
+                "expected": {"body": "True"},
+            },
+        }
+
+        for operation_id, data in data_provider.items():
+            with self.subTest(operation_id):
+                example_data = {
+                    self.example_name: {
+                        "body": data["value"],
+                    },
+                }
+
+                operation = self.oa_parser_root_level_non_objects.operations.get(
+                    operation_id
+                )
+                operation.request.example_data = example_data
+                container = operation.request.example_data[self.example_name]
+
+                api_call_properties = self.template_parser.parse_api_call_properties(
+                    macros=self.jinja_macros,
+                    property_container=container,
+                    indent_count=0,
+                )
+
+                self.assertEqual(data["expected"], api_call_properties)
 
         operation.request.example_data = None
 

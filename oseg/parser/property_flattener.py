@@ -1,5 +1,5 @@
 from __future__ import annotations
-from oseg import model
+from oseg import model, parser
 
 
 class PropertyFlattener:
@@ -44,10 +44,14 @@ class PropertyFlattener:
 
         """Requests without formdata will have their body content defined
         as a single object in the request, containing all its sub data.
-        
+
         See OperationParser::FORM_DATA_CONTENT_TYPES
         """
-        if self._container.body and not self._container.request.has_formdata:
+        if (
+            self._container.body
+            and not self._container.request.has_formdata
+            and parser.TypeChecker.is_property_objectish(self._container.body)
+        ):
             result[self._container.body_type] = self._container.body
 
         return result

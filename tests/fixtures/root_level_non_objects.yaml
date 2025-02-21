@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Fixture - Root Level Non-Objects
+tags:
+  - name: pet
+paths:
+  /root_level_free_form:
+    post:
+      tags:
+        - pet
+      operationId: root_level_free_form
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FreeFormSchema'
+  /root_level_string:
+    post:
+      tags:
+        - pet
+      operationId: root_level_string
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StringSchema'
+  /root_level_int:
+    post:
+      tags:
+        - pet
+      operationId: root_level_int
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntSchema'
+  /root_level_file:
+    post:
+      tags:
+        - pet
+      operationId: root_level_file
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileSchema'
+  /root_level_bool:
+    post:
+      tags:
+        - pet
+      operationId: root_level_bool
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoolSchema'
+components:
+  schemas:
+    FreeFormSchema:
+      type: object
+      additionalProperties: {}
+      example:
+        foo: bar
+        bam: baz
+    StringSchema:
+      type: string
+      example: "some string value"
+    IntSchema:
+      type: integer
+      example: 12345
+    FileSchema:
+      type: string
+      format: binary
+      example: "/some/file/path.pdf"
+    BoolSchema:
+      type: boolean
+      example: true

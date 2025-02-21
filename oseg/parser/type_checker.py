@@ -1,6 +1,8 @@
+from __future__ import annotations
 import openapi_pydantic as oa
 from typing import Union
 from pydantic import BaseModel
+from oseg import model
 
 
 class TypeChecker:
@@ -72,6 +74,12 @@ class TypeChecker:
     @classmethod
     def is_free_form_array(cls, schema: SCHEMA_UNION) -> bool:
         return cls.is_array(schema) and cls.is_free_form(schema.items)
+
+    @classmethod
+    def is_property_objectish(cls, prop: model.PROPERTY_TYPES) -> bool:
+        return isinstance(prop, model.PropertyObject) or isinstance(
+            prop, model.PropertyObjectArray
+        )
 
     @classmethod
     def is_object(cls, schema: SCHEMA_UNION) -> bool:

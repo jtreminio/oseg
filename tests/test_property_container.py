@@ -11,6 +11,9 @@ class TestPropertyContainer(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.oa_parser = TestUtils.oa_parser("property_container")
         cls.oa_parser_flatten = TestUtils.oa_parser("property_container-flatten")
+        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
+            "root_level_non_objects"
+        )
 
     def test_unique_names_all_required(self):
         operation_id = "unique_names_all_required"
@@ -200,3 +203,59 @@ class TestPropertyContainer(unittest.TestCase):
             example_data["example_2"]["body"]["category"]["id"],
             parsed_request_objects_2.get("category").scalars.get("id").value,
         )
+
+    def test_flatten_nonobjects_ignored(self):
+        data_provider = [
+            "root_level_free_form",
+            "root_level_string",
+            "root_level_int",
+            "root_level_file",
+            "root_level_bool",
+        ]
+
+        for operation_id in data_provider:
+            with self.subTest(operation_id):
+                operation = self.oa_parser_root_level_non_objects.operations[
+                    operation_id
+                ]
+                container = operation.request.example_data["example"]
+
+                self.assertEqual({}, container.flattened_objects())
+                self.assertTrue(container.has_data)
+
+    def test_sort_nonobjects(self):
+        data_provider = {
+            "root_level_free_form": {
+                "name": "request_body",
+                "value": {"foo": "bar", "bam": "baz"},
+            },
+            "root_level_string": {
+                "name": "body",
+                "value": "some string value",
+            },
+            "root_level_int": {
+                "name": "body",
+                "value": 12345,
+            },
+            "root_level_file": {
+                "name": "body",
+                "value": "/some/file/path.pdf",
+            },
+            "root_level_bool": {
+                "name": "body",
+                "value": True,
+            },
+        }
+
+        for operation_id, expected in data_provider.items():
+            with self.subTest(operation_id):
+                operation = self.oa_parser_root_level_non_objects.operations[
+                    operation_id
+                ]
+                container = operation.request.example_data["example"]
+
+                self.assertEqual(
+                    expected["value"],
+                    container.properties().get(expected["name"]).value,
+                )
+                self.assertTrue(container.has_data)

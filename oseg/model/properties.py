@@ -24,6 +24,7 @@ class PropertyInterface(Protocol):
         self.is_required: bool = is_required
         self.is_nullable: bool = parser.TypeChecker.is_nullable(self.schema)
         self.is_set: bool = is_set
+        self.type: str = self._get_type()
 
     # todo currently only support single type, not list of types
     def _get_type(self) -> str:
@@ -54,15 +55,15 @@ class PropertyInterface(Protocol):
 
 
 class PropertyFile(PropertyInterface):
-    T = str | list[str] | None
+    _T = str | list[str] | None
     _FORMAT_BYTES = "byte"
-    value: T
+    value: _T
 
     def __init__(
         self,
         schema: oa.Schema,
         name: str,
-        value: T,
+        value: _T,
         is_required: bool,
         is_set: bool,
     ):
@@ -72,14 +73,14 @@ class PropertyFile(PropertyInterface):
 
 
 class PropertyFreeForm(PropertyInterface):
-    T = dict[str, any] | list[dict[str, any]] | None
-    value: T
+    _T = dict[str, any] | list[dict[str, any]] | None
+    value: _T
 
     def __init__(
         self,
         schema: oa.Schema,
         name: str,
-        value: T,
+        value: _T,
         is_required: bool,
         is_set: bool,
     ):
@@ -87,22 +88,21 @@ class PropertyFreeForm(PropertyInterface):
 
 
 class PropertyScalar(PropertyInterface):
-    T_SINGLE = Union[str, int, bool]
-    T_LIST = Union[list[str], list[int], list[bool]]
-    T = Union[T_SINGLE, T_LIST, None]
-    value: T
+    _T_SINGLE = Union[str, int, bool]
+    _T_LIST = Union[list[str], list[int], list[bool]]
+    _T = Union[_T_SINGLE, _T_LIST, None]
+    value: _T
 
     def __init__(
         self,
         schema: oa.Schema,
         name: str,
-        value: T,
+        value: _T,
         is_required: bool,
         is_set: bool,
     ):
         super().__init__(schema, name, value, is_required, is_set)
 
-        self.type: str = self._get_type()
         self._normalize_value()
         self.format: str | None = self._set_string_format()
         self.is_enum: bool = self._set_is_enum()
@@ -112,7 +112,7 @@ class PropertyScalar(PropertyInterface):
             return
 
         if self.is_array:
-            self.value: PropertyScalar.T_LIST
+            self.value: PropertyScalar._T_LIST
             result = []
 
             for i in self.value:
@@ -170,7 +170,7 @@ class PropertyObjectInterface(Protocol):
 
 
 class PropertyObject(PropertyObjectInterface):
-    TYPE = TypeVar("TYPE", bound=type)
+    _TYPE = TypeVar("_TYPE", bound=type)
 
     def __init__(
         self,
@@ -249,9 +249,9 @@ class PropertyObject(PropertyObjectInterface):
 
     def _get_properties_of_type(
         self,
-        type_of: Generic[TYPE],
+        type_of: Generic[_TYPE],
         is_array: bool,
-    ) -> dict[str, Generic[TYPE]]:
+    ) -> dict[str, Generic[_TYPE]]:
         result = {}
 
         for name, prop in self.properties.items():
