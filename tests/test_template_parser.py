@@ -656,6 +656,70 @@ class TestTemplateParser(unittest.TestCase):
 
         operation.request.example_data = None
 
+    def test_parse_api_call_properties_skip_parameters_no_data_not_required(self):
+        operation_id = "parameters_no_values_not_required"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        container = operation.request.example_data[self.example_name]
+
+        api_call_properties = self.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            property_container=container,
+            indent_count=0,
+        )
+
+        expected = {}
+
+        self.assertDictEqual(expected, api_call_properties)
+
+    def test_parse_api_call_properties_skip_parameters_no_data_required(self):
+        operation_id = "parameters_no_values_required"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        container = operation.request.example_data[self.example_name]
+
+        api_call_properties = self.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            property_container=container,
+            indent_count=0,
+        )
+
+        expected = {
+            "param_2": None,
+            "param_1": None,
+            "param_3": None,
+        }
+
+        self.assertDictEqual(expected, api_call_properties)
+
+    def test_parse_api_call_properties_print_none_for_empty_body_property(self):
+        operation_id = "parameters_and_required_body"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        operation.request.example_data = {
+            self.example_name: {
+                "query": {
+                    "param_1": "foo",
+                },
+            },
+        }
+        container = operation.request.example_data[self.example_name]
+
+        api_call_properties = self.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            property_container=container,
+            indent_count=0,
+        )
+
+        expected = {
+            "param_1": "foo",
+            "key_1": "None",
+        }
+
+        self.assertDictEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
+
     def test_parse_security(self):
         oa_parser = TestUtils.oa_parser("security_schemes")
         security_config = self.config.oseg_security

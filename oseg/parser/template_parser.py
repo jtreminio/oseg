@@ -172,7 +172,6 @@ class TemplateParser:
         """
 
         result = {}
-        # todo test has_data
         # When all api call values are null, and none are required
         # don't print anything
         has_data = False
@@ -202,9 +201,8 @@ class TemplateParser:
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray
             ):
-                # todo test
                 # If a property listed in the api call signature is not required,
-                # and and has no example data, we want to print a null value
+                # and has no example data, we want to print a null value
                 # instead of simply skipping printing it completely.
                 # We always want to use all properties during the api call
                 # because some generators do not have named parameters,

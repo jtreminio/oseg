@@ -410,6 +410,67 @@ paths:
           description: Successful operation
       requestBody:
           $ref: '#/components/requestBodies/DogArray'
+  /parameters_no_values_not_required:
+    post:
+      tags:
+        - pet
+      operationId: parameters_no_values_not_required
+      parameters:
+        - name: param_1
+          in: query
+          schema:
+            type: string
+        - name: param_2
+          in: query
+          schema:
+            type: string
+        - name: param_3
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /parameters_no_values_required:
+    post:
+      tags:
+        - pet
+      operationId: parameters_no_values_required
+      parameters:
+        - name: param_1
+          in: query
+          schema:
+            type: string
+        - name: param_2
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: param_3
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /parameters_and_required_body:
+    post:
+      tags:
+        - pet
+      operationId: parameters_and_required_body
+      parameters:
+        - name: param_1
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/requestBodies/PropRefNestedObject'
 components:
   schemas:
     Pet:
