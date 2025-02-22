@@ -195,7 +195,10 @@ class ExampleDataParser:
             return {}
 
         return {
-            self.DEFAULT_EXAMPLE_NAME: self._example_data_from_properties(request.body),
+            self.DEFAULT_EXAMPLE_NAME: self._example_data_from_properties(
+                schema=request.body,
+                parents=[],
+            ),
         }
 
     def _example_data_from_content(
@@ -235,10 +238,14 @@ class ExampleDataParser:
     def _example_data_from_properties(
         self,
         schema: oa.Schema,
-        nested_level: int = 0,
+        parents: list[int],
     ) -> model.EXAMPLE_DATA_BODY:
-        if nested_level == 10:
+        schema_id = id(schema)
+
+        if schema_id in parents:
             return {}
+
+        parents.append(schema_id)
 
         # example data wins out over everything
         if schema.example is not None:
@@ -259,7 +266,7 @@ class ExampleDataParser:
         if parser.TypeChecker.is_array(schema):
             items_data = self._example_data_from_properties(
                 schema.items,
-                nested_level + 1,
+                parents[:],
             )
 
             if items_data is not None:
@@ -273,7 +280,7 @@ class ExampleDataParser:
             for prop_name, prop_schema in schema.properties.items():
                 data[prop_name] = self._example_data_from_properties(
                     prop_schema,
-                    nested_level + 1,
+                    parents[:],
                 )
 
         """Once we have base object default data built see if we are dealing
@@ -285,7 +292,7 @@ class ExampleDataParser:
             for prop_name, prop_schema in merged.properties.items():
                 data[prop_name] = self._example_data_from_properties(
                     prop_schema,
-                    nested_level + 1,
+                    parents[:],
                 )
 
         return data if len(data.keys()) else {}
