@@ -760,6 +760,64 @@ class TestExampleDataParser(unittest.TestCase):
                     container.body.value,
                 )
 
+    def test_recursive_ref(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+
+        example_data = {
+            example_name: {
+                "body": {
+                    "id": 123,
+                    "dog": {
+                        "id": 456,
+                        "pet": {
+                            "id": 321,
+                            "dog": {
+                                "id": 654,
+                            },
+                        },
+                    },
+                },
+            },
+        }
+
+        oa_parser = TestUtils.oa_parser("recursive_ref")
+        operation = oa_parser.operations.get("default")
+        operation.request.example_data = example_data
+        container = operation.request.example_data[example_name]
+        body_data = example_data[example_name]["body"]
+
+        pet_1 = container.body
+        dog_1 = pet_1.properties.get("dog")
+        pet_2 = dog_1.properties.get("pet")
+        dog_2 = pet_2.properties.get("dog")
+        pet_3 = dog_2.properties.get("pet")
+
+        self.assertEqual(
+            body_data["id"],
+            pet_1.properties.get("id").value,
+        )
+        self.assertTrue(pet_1.is_set)
+
+        self.assertEqual(
+            body_data["dog"]["id"],
+            dog_1.properties.get("id").value,
+        )
+        self.assertTrue(dog_1.is_set)
+
+        self.assertEqual(
+            body_data["dog"]["pet"]["id"],
+            pet_2.properties.get("id").value,
+        )
+        self.assertTrue(pet_2.is_set)
+
+        self.assertEqual(
+            body_data["dog"]["pet"]["dog"]["id"],
+            dog_2.properties.get("id").value,
+        )
+        self.assertTrue(dog_2.is_set)
+
+        self.assertFalse(pet_3.is_set)
+
 
 if __name__ == "__main__":
     unittest.main()

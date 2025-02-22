@@ -195,7 +195,10 @@ class ExampleDataParser:
             return {}
 
         return {
-            self.DEFAULT_EXAMPLE_NAME: self._example_data_from_properties(request.body),
+            self.DEFAULT_EXAMPLE_NAME: self._example_data_from_properties(
+                schema=request.body,
+                parents=[],
+            ),
         }
 
     def _example_data_from_content(
@@ -235,7 +238,15 @@ class ExampleDataParser:
     def _example_data_from_properties(
         self,
         schema: oa.Schema,
+        parents: list[int],
     ) -> model.EXAMPLE_DATA_BODY:
+        schema_id = id(schema)
+
+        if schema_id in parents:
+            return {}
+
+        parents.append(schema_id)
+
         # example data wins out over everything
         if schema.example is not None:
             return schema.example
@@ -253,7 +264,10 @@ class ExampleDataParser:
             return schema.default
 
         if parser.TypeChecker.is_array(schema):
-            items_data = self._example_data_from_properties(schema.items)
+            items_data = self._example_data_from_properties(
+                schema.items,
+                parents[:],
+            )
 
             if items_data is not None:
                 return [items_data]
@@ -264,7 +278,10 @@ class ExampleDataParser:
 
         if parser.TypeChecker.is_object(schema):
             for prop_name, prop_schema in schema.properties.items():
-                data[prop_name] = self._example_data_from_properties(prop_schema)
+                data[prop_name] = self._example_data_from_properties(
+                    prop_schema,
+                    parents[:],
+                )
 
         """Once we have base object default data built see if we are dealing
         with a discriminator or allOf
@@ -273,7 +290,10 @@ class ExampleDataParser:
             merged = self._schema_joiner.merge_schemas_and_properties(schema, data)
 
             for prop_name, prop_schema in merged.properties.items():
-                data[prop_name] = self._example_data_from_properties(prop_schema)
+                data[prop_name] = self._example_data_from_properties(
+                    prop_schema,
+                    parents[:],
+                )
 
         return data if len(data.keys()) else {}
 

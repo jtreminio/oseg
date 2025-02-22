@@ -23,8 +23,9 @@ class PropertyParser:
 
             for i_data in data:
                 sub_container = self._create_property_object_container(
-                    schema.items,
-                    i_data,
+                    schema=schema.items,
+                    data=i_data,
+                    parents=[],
                 )
 
                 if container is None:
@@ -51,14 +52,22 @@ class PropertyParser:
         ):
             return self._create_non_object_container(schema, data)
 
-        return self._create_property_object_container(schema, data)
+        return self._create_property_object_container(
+            schema=schema,
+            data=data,
+            parents=[],
+        )
 
     def _create_property_object_container(
         self,
         schema: oa.Schema,
         data: dict[str, any],
+        parents: list[int],
     ) -> model.PropertyObject | model.PROPERTY_NON_OBJECT_TYPE:
+        data_is_none = False
+
         if data is None:
+            data_is_none = True
             data = {}
 
         merged_values = self._schema_joiner.merge_schemas_and_properties(schema, data)
@@ -77,6 +86,13 @@ class PropertyParser:
             is_required=False,
         )
 
+        schema_id = id(schema)
+
+        if schema_id in parents and data_is_none:
+            return container
+
+        parents.append(schema_id)
+
         for name, property_schema in properties.items():
             for current_schema in merged_values.schemas:
                 non_object_property_schema = self._oa_parser.resolve_property(
@@ -89,6 +105,7 @@ class PropertyParser:
                     schema=property_schema,
                     name=name,
                     data=data,
+                    parents=parents,
                 ):
                     break
 
@@ -97,6 +114,7 @@ class PropertyParser:
                     schema=property_schema,
                     name=name,
                     data=data,
+                    parents=parents,
                 ):
                     break
 
@@ -171,6 +189,7 @@ class PropertyParser:
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
+        parents: list[int],
     ) -> bool:
         """handle named object"""
 
@@ -205,7 +224,11 @@ class PropertyParser:
 
             return True
 
-        parsed = self._create_property_object_container(schema, value)
+        parsed = self._create_property_object_container(
+            schema=schema,
+            data=value,
+            parents=parents[:],
+        )
         parsed.is_required = is_required
         parsed.is_set = name in data
 
@@ -219,6 +242,7 @@ class PropertyParser:
         schema: oa.Reference | oa.Schema,
         name: str,
         data: dict[str, any],
+        parents: list[int],
     ) -> bool:
         """handle arrays of named objects"""
 
@@ -268,7 +292,11 @@ class PropertyParser:
         )
 
         for example in value:
-            parsed = self._create_property_object_container(schema.items, example)
+            parsed = self._create_property_object_container(
+                schema=schema.items,
+                data=example,
+                parents=parents[:],
+            )
             parsed.is_required = is_required
 
             prop_obj_array.properties.append(parsed)
