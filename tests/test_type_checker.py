@@ -4,14 +4,9 @@ from test_utils import TestUtils
 
 
 class TestTypeChecker(unittest.TestCase):
-    oa_parser: parser.OaParser
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser = TestUtils.oa_parser("type_checker")
-
     def test_is_array(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_array = parser.TypeChecker.is_array
 
         expected_true_array = [
@@ -37,7 +32,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_file(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_file
         func_array = parser.TypeChecker.is_file_array
 
@@ -61,7 +57,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_free_form(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_free_form
         func_array = parser.TypeChecker.is_free_form_array
 
@@ -79,7 +76,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_scalar(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_scalar
         func_array = parser.TypeChecker.is_scalar_array
 
@@ -117,7 +115,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_object(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_object
         func_array = parser.TypeChecker.is_object_array
 
@@ -141,7 +140,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_nullable(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
         func_single = parser.TypeChecker.is_nullable
         func_array = parser.TypeChecker.is_nullable_array
 
@@ -179,7 +179,8 @@ class TestTypeChecker(unittest.TestCase):
                     self.assertFalse(func_array(prop))
 
     def test_is_discriminator(self):
-        together = self.oa_parser.components.schemas.get("Together")
+        oa_parser = TestUtils.oa_parser("type_checker")
+        together = oa_parser.components.schemas.get("Together")
 
         expected_true = "prop_discriminator"
 

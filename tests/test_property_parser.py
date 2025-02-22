@@ -5,19 +5,9 @@ from test_utils import TestUtils
 
 
 class TestPropertyParser(unittest.TestCase):
-    oa_parser_discriminator: parser.OaParser
-    oa_parser_properties: parser.OaParser
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser_discriminator = TestUtils.oa_parser("discriminator")
-        cls.oa_parser_properties = TestUtils.oa_parser("properties")
-        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
-            "root_level_non_objects"
-        )
-
     def test_discriminator(self):
-        property_parser = parser.PropertyParser(self.oa_parser_discriminator)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        property_parser = parser.PropertyParser(oa_parser)
 
         data = {
             "id": 10000,
@@ -25,7 +15,7 @@ class TestPropertyParser(unittest.TestCase):
             "group": "hunting",
         }
 
-        schema = self.oa_parser_discriminator.components.schemas.get("Dog")
+        schema = oa_parser.components.schemas.get("Dog")
         dog = property_parser.parse(
             schema=schema,
             data=data,
@@ -52,7 +42,8 @@ class TestPropertyParser(unittest.TestCase):
         self.assertEqual(data["group"], dog.scalars.get("group").value)
 
     def test_discriminator_array(self):
-        property_parser = parser.PropertyParser(self.oa_parser_discriminator)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        property_parser = parser.PropertyParser(oa_parser)
 
         data = {
             "dogs": [
@@ -69,7 +60,7 @@ class TestPropertyParser(unittest.TestCase):
             ],
         }
 
-        schema = self.oa_parser_discriminator.components.schemas.get("Dogs")
+        schema = oa_parser.components.schemas.get("Dogs")
         dogs = property_parser.parse(
             schema=schema,
             data=data,
@@ -139,7 +130,8 @@ class TestPropertyParser(unittest.TestCase):
         instantiate the base Schema without setting discriminator data
         """
 
-        property_parser = parser.PropertyParser(self.oa_parser_discriminator)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        property_parser = parser.PropertyParser(oa_parser)
 
         data_provider = [
             {
@@ -161,7 +153,7 @@ class TestPropertyParser(unittest.TestCase):
             "invalid_breed",
         ]
 
-        schema = self.oa_parser_discriminator.components.schemas.get("Dog")
+        schema = oa_parser.components.schemas.get("Dog")
 
         i = 0
         for data in data_provider:
@@ -196,7 +188,8 @@ class TestPropertyParser(unittest.TestCase):
     def test_all_of(self):
         """allOf without a discriminator"""
 
-        property_parser = parser.PropertyParser(self.oa_parser_discriminator)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        property_parser = parser.PropertyParser(oa_parser)
 
         data = {
             "id": 10000,
@@ -204,7 +197,7 @@ class TestPropertyParser(unittest.TestCase):
             "group": "hunting",
         }
 
-        schema = self.oa_parser_discriminator.components.schemas.get("Terrier")
+        schema = oa_parser.components.schemas.get("Terrier")
         terrier = property_parser.parse(
             schema=schema,
             data=data,
@@ -231,7 +224,8 @@ class TestPropertyParser(unittest.TestCase):
         self.assertEqual(data["group"], terrier.scalars.get("group").value)
 
     def test_all_of_array(self):
-        property_parser = parser.PropertyParser(self.oa_parser_discriminator)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        property_parser = parser.PropertyParser(oa_parser)
 
         data = {
             "terriers": [
@@ -248,7 +242,7 @@ class TestPropertyParser(unittest.TestCase):
             ],
         }
 
-        schema = self.oa_parser_discriminator.components.schemas.get("Terriers")
+        schema = oa_parser.components.schemas.get("Terriers")
         parsed = property_parser.parse(
             schema=schema,
             data=data,
@@ -314,7 +308,8 @@ class TestPropertyParser(unittest.TestCase):
                 i += 1
 
     def test_combined_properties(self):
-        property_parser = parser.PropertyParser(self.oa_parser_properties)
+        oa_parser = TestUtils.oa_parser("properties")
+        property_parser = parser.PropertyParser(oa_parser)
 
         val_object = {"key_1": "value"}
         val_array_object = [{"key_1": "value_1"}, {"key_1": "value_2"}]
@@ -364,7 +359,7 @@ class TestPropertyParser(unittest.TestCase):
             "prop_array_ref_free_form": val_array_free_form,
         }
 
-        schema = self.oa_parser_properties.components.schemas.get("Pet")
+        schema = oa_parser.components.schemas.get("Pet")
         pet = property_parser.parse(
             schema=schema,
             data=data,
@@ -487,7 +482,8 @@ class TestPropertyParser(unittest.TestCase):
 
     def test_non_named_parameter_object(self):
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser_properties.operations["default"]
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations["default"]
         example_data = operation.request.example_data[example_name]
 
         free_form_obj = example_data.query.free_forms["paramComponentObject"]
@@ -503,7 +499,8 @@ class TestPropertyParser(unittest.TestCase):
 
     def test_property_sorting(self):
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser_properties.operations["sorted"]
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations["sorted"]
         example_data = operation.request.example_data[example_name]
 
         expected_properties_1 = [
@@ -519,7 +516,8 @@ class TestPropertyParser(unittest.TestCase):
 
     def test_property_sorting_formdata(self):
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser_properties.operations["sorted_formdata"]
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations["sorted_formdata"]
         example_data = operation.request.example_data[example_name]
 
         expected_properties_1 = [
@@ -565,14 +563,12 @@ class TestPropertyParser(unittest.TestCase):
             },
         }
 
-        property_parser = parser.PropertyParser(self.oa_parser_root_level_non_objects)
+        oa_parser = TestUtils.oa_parser("root_level_non_objects")
+        property_parser = parser.PropertyParser(oa_parser)
 
         for name, expected in data_provider.items():
             with self.subTest(name):
-                schema = self.oa_parser_root_level_non_objects.components.schemas.get(
-                    name
-                )
-
+                schema = oa_parser.components.schemas.get(name)
                 parsed = property_parser.parse(schema, expected["value"])
 
                 self.assertEqual(expected["value"], parsed.value)
