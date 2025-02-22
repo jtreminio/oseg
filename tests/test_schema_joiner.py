@@ -4,22 +4,16 @@ from test_utils import TestUtils
 
 
 class TestSchemaJoiner(unittest.TestCase):
-    oa_parser: parser.OaParser
-    schema_joiner: parser.SchemaJoiner
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser = TestUtils.oa_parser("discriminator")
-        cls.schema_joiner = parser.SchemaJoiner(cls.oa_parser)
-
     def test_no_all_of_no_discriminator(self):
         data = {
             "id": 123,
             "type": "dog",
         }
 
-        pet = self.oa_parser.components.schemas.get("Pet")
-        joined = self.schema_joiner.merge_schemas_and_properties(pet, data)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        schema_joiner = parser.SchemaJoiner(oa_parser)
+        pet = oa_parser.components.schemas.get("Pet")
+        joined = schema_joiner.merge_schemas_and_properties(pet, data)
 
         expected_discriminator_target_type = None
         expected_schema_count = 1
@@ -63,9 +57,11 @@ class TestSchemaJoiner(unittest.TestCase):
             "mans_best_friend": True,
         }
 
-        dog = self.oa_parser.components.schemas.get("Dog")
-        terrier = self.oa_parser.components.schemas.get("Terrier")
-        joined = self.schema_joiner.merge_schemas_and_properties(dog, data)
+        oa_parser = TestUtils.oa_parser("discriminator")
+        schema_joiner = parser.SchemaJoiner(oa_parser)
+        dog = oa_parser.components.schemas.get("Dog")
+        terrier = oa_parser.components.schemas.get("Terrier")
+        joined = schema_joiner.merge_schemas_and_properties(dog, data)
 
         expected_discriminator_target_type = "Terrier"
         expected_schema_count = 2
@@ -88,12 +84,14 @@ class TestSchemaJoiner(unittest.TestCase):
             {"breed": "invalid_breed"},
         ]
 
-        dog = self.oa_parser.components.schemas.get("Dog")
+        oa_parser = TestUtils.oa_parser("discriminator")
+        schema_joiner = parser.SchemaJoiner(oa_parser)
+        dog = oa_parser.components.schemas.get("Dog")
 
         i = 0
         for data in datum:
             with self.subTest(i):
-                joined = self.schema_joiner.merge_schemas_and_properties(dog, data)
+                joined = schema_joiner.merge_schemas_and_properties(dog, data)
 
                 expected_discriminator_target_type = None
                 expected_properties = [
@@ -126,13 +124,15 @@ class TestSchemaJoiner(unittest.TestCase):
             },
         ]
 
-        dog = self.oa_parser.components.schemas.get("Dog")
-        terrier = self.oa_parser.components.schemas.get("Terrier")
+        oa_parser = TestUtils.oa_parser("discriminator")
+        schema_joiner = parser.SchemaJoiner(oa_parser)
+        dog = oa_parser.components.schemas.get("Dog")
+        terrier = oa_parser.components.schemas.get("Terrier")
 
         i = 0
         for data in datum:
             with self.subTest(i):
-                joined = self.schema_joiner.merge_schemas_and_properties(terrier, data)
+                joined = schema_joiner.merge_schemas_and_properties(terrier, data)
 
                 expected_discriminator_target_type = None
                 expected_properties = [

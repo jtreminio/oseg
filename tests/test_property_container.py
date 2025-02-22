@@ -5,20 +5,11 @@ from test_utils import TestUtils
 
 
 class TestPropertyContainer(unittest.TestCase):
-    oa_parser: parser.OaParser
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser = TestUtils.oa_parser("property_container")
-        cls.oa_parser_flatten = TestUtils.oa_parser("property_container-flatten")
-        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
-            "root_level_non_objects"
-        )
-
     def test_unique_names_all_required(self):
         operation_id = "unique_names_all_required"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("property_container")
+        operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[example_name]
 
         properties = container.properties()
@@ -36,7 +27,8 @@ class TestPropertyContainer(unittest.TestCase):
     def test_unique_names_some_required(self):
         operation_id = "unique_names_some_required"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("property_container")
+        operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[example_name]
 
         properties = container.properties()
@@ -54,7 +46,8 @@ class TestPropertyContainer(unittest.TestCase):
     def test_conflicting_names(self):
         operation_id = "conflicting_names"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("property_container")
+        operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[example_name]
 
         properties = container.properties()
@@ -77,7 +70,8 @@ class TestPropertyContainer(unittest.TestCase):
     def test_conflicting_names_with_formdata(self):
         operation_id = "conflicting_names_with_formdata"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("property_container")
+        operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[example_name]
 
         properties = container.properties()
@@ -105,7 +99,8 @@ class TestPropertyContainer(unittest.TestCase):
     def test_conflicting_names_with_no_formdata(self):
         operation_id = "conflicting_names_with_no_formdata"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("property_container")
+        operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[example_name]
 
         properties = container.properties()
@@ -158,7 +153,8 @@ class TestPropertyContainer(unittest.TestCase):
             },
         }
 
-        operation = self.oa_parser_flatten.operations["default"]
+        oa_parser = TestUtils.oa_parser("property_container-flatten")
+        operation = oa_parser.operations["default"]
         operation.request.example_data = example_data
 
         container_1 = operation.request.example_data.get("example_1")
@@ -204,6 +200,8 @@ class TestPropertyContainer(unittest.TestCase):
             parsed_request_objects_2.get("category").scalars.get("id").value,
         )
 
+        operation.request.example_data = None
+
     def test_flatten_nonobjects_ignored(self):
         data_provider = [
             "root_level_free_form",
@@ -213,11 +211,11 @@ class TestPropertyContainer(unittest.TestCase):
             "root_level_bool",
         ]
 
+        oa_parser = TestUtils.oa_parser("root_level_non_objects")
+
         for operation_id in data_provider:
             with self.subTest(operation_id):
-                operation = self.oa_parser_root_level_non_objects.operations[
-                    operation_id
-                ]
+                operation = oa_parser.operations[operation_id]
                 container = operation.request.example_data["example"]
 
                 self.assertEqual({}, container.flattened_objects())
@@ -247,11 +245,11 @@ class TestPropertyContainer(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("root_level_non_objects")
+
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                operation = self.oa_parser_root_level_non_objects.operations[
-                    operation_id
-                ]
+                operation = oa_parser.operations[operation_id]
                 container = operation.request.example_data["example"]
 
                 self.assertEqual(

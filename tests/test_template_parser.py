@@ -5,16 +5,8 @@ from oseg import model, parser
 
 
 class TestTemplateParser(unittest.TestCase):
-    oa_parser: parser.OaParser
-
     @classmethod
     def setUpClass(cls) -> None:
-        cls.oa_parser = TestUtils.oa_parser("properties")
-
-        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
-            "root_level_non_objects"
-        )
-
         cls.jinja_macros = model.JinjaMacros(JINJA_MACROS)
         config_data = parser.FileLoader.get_file_contents(
             f"{TestUtils._BASE_DIR}/fixtures/config-mock.yaml"
@@ -27,7 +19,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_objects(self):
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
@@ -64,6 +57,8 @@ class TestTemplateParser(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("properties")
+
         for to_delete, expected in data_provider.items():
             with self.subTest(to_delete):
                 example_name = self.example_name
@@ -72,7 +67,7 @@ class TestTemplateParser(unittest.TestCase):
                 del example_data[example_name]["body"][to_delete]
 
                 operation_id = "sorted"
-                operation = self.oa_parser.operations.get(operation_id)
+                operation = oa_parser.operations.get(operation_id)
                 operation.request.example_data = example_data
                 container = operation.request.example_data[example_name]
 
@@ -89,7 +84,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_objects_does_not_use_same_name_when_multiple_of_object(self):
         operation_id = "multiple_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -120,7 +116,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_objects_does_not_use_same_name_when_array_of_object(self):
         operation_id = "array_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -151,7 +148,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_object_properties(self):
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
@@ -232,6 +230,8 @@ class TestTemplateParser(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("properties")
+
         for to_delete, expected in data_provider.items():
             with self.subTest(to_delete):
                 example_name = self.example_name
@@ -240,7 +240,7 @@ class TestTemplateParser(unittest.TestCase):
                 del example_data[example_name]["body"][to_delete]
 
                 operation_id = "sorted"
-                operation = self.oa_parser.operations.get(operation_id)
+                operation = oa_parser.operations.get(operation_id)
 
                 operation.request.example_data = example_data
                 container = operation.request.example_data[self.example_name]
@@ -277,7 +277,8 @@ class TestTemplateParser(unittest.TestCase):
         del example_data[example_name]["body"]["name"]
 
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
 
         operation.request.example_data = example_data
         container = operation.request.example_data[self.example_name]
@@ -314,7 +315,8 @@ class TestTemplateParser(unittest.TestCase):
         example_data[example_name]["body"]["id"] = None
 
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
 
         operation.request.example_data = example_data
         container = operation.request.example_data[self.example_name]
@@ -334,7 +336,8 @@ class TestTemplateParser(unittest.TestCase):
         self,
     ):
         operation_id = "multiple_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -393,7 +396,8 @@ class TestTemplateParser(unittest.TestCase):
         self,
     ):
         operation_id = "array_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -450,7 +454,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_object_list_properties(self):
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
@@ -470,7 +475,8 @@ class TestTemplateParser(unittest.TestCase):
         self,
     ):
         operation_id = "multiple_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -501,7 +507,8 @@ class TestTemplateParser(unittest.TestCase):
         self,
     ):
         operation_id = "array_dogs"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
 
@@ -531,7 +538,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_api_call_properties(self):
         operation_id = "sorted"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
@@ -559,7 +567,8 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_api_call_properties_formdata(self):
         operation_id = "sorted_formdata"
-        operation = self.oa_parser.operations.get(operation_id)
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
@@ -623,6 +632,8 @@ class TestTemplateParser(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("root_level_non_objects")
+
         for operation_id, data in data_provider.items():
             with self.subTest(operation_id):
                 example_data = {
@@ -631,9 +642,7 @@ class TestTemplateParser(unittest.TestCase):
                     },
                 }
 
-                operation = self.oa_parser_root_level_non_objects.operations.get(
-                    operation_id
-                )
+                operation = oa_parser.operations.get(operation_id)
                 operation.request.example_data = example_data
                 container = operation.request.example_data[self.example_name]
 

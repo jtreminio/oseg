@@ -4,15 +4,6 @@ from test_utils import TestUtils
 
 
 class TestOperationParser(unittest.TestCase):
-    oa_parser_requests: parser.OaParser
-    oa_parser_responses: parser.OaParser
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser_requests = TestUtils.oa_parser("requests")
-        cls.oa_parser_responses = TestUtils.oa_parser("responses")
-        cls.oa_parser_operation = TestUtils.oa_parser("operation")
-
     def test_has_form_data(self):
         data = [
             "request_x_www_form_urlencoded",
@@ -26,13 +17,16 @@ class TestOperationParser(unittest.TestCase):
             "request_body_ref_1",
         ]
 
+        oa_parser = TestUtils.oa_parser("requests")
+
         for operation_id in data:
             with self.subTest(operation_id):
-                operation = self.oa_parser_requests.operations[operation_id]
+                operation = oa_parser.operations[operation_id]
                 self.assertTrue(operation.request.has_formdata)
 
     def test_octet_stream_not_form_data(self):
-        operation = self.oa_parser_requests.operations["request_octet_stream"]
+        oa_parser = TestUtils.oa_parser("requests")
+        operation = oa_parser.operations["request_octet_stream"]
         self.assertFalse(operation.request.has_formdata)
 
     def test_different_responses(self):
@@ -84,9 +78,11 @@ class TestOperationParser(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("responses")
+
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                operation = self.oa_parser_responses.operations[operation_id]
+                operation = oa_parser.operations[operation_id]
 
                 self.assertEqual(
                     bool(operation.response),
@@ -99,15 +95,17 @@ class TestOperationParser(unittest.TestCase):
                 )
 
     def test_tags(self):
-        operation = self.oa_parser_operation.operations["no_tags"]
+        oa_parser = TestUtils.oa_parser("operation")
+        operation = oa_parser.operations["no_tags"]
         self.assertEqual(parser.OperationParser.DEFAULT_API_NAME, operation.api_name)
 
         expected = "pet"
-        operation = self.oa_parser_operation.operations["with_tags"]
+        operation = oa_parser.operations["with_tags"]
         self.assertEqual(expected, operation.api_name)
 
     def test_operation_id_with_special_chars(self):
-        operation = self.oa_parser_operation.operations[
+        oa_parser = TestUtils.oa_parser("operation")
+        operation = oa_parser.operations[
             "security-advisories/list-global-advisories/some_value"
         ]
 

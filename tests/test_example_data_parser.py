@@ -6,30 +6,6 @@ from test_utils import TestUtils
 
 
 class TestExampleDataParser(unittest.TestCase):
-    oa_parser_path_query_parameters: parser.OaParser
-    oa_parser_single_requestBody: parser.OaParser
-    oa_parser_body: parser.OaParser
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.oa_parser_path_query_parameters = TestUtils.oa_parser(
-            "example_data_parser-path-query-parameters"
-        )
-
-        cls.oa_parser_single_requestBody = TestUtils.oa_parser(
-            "example_data_parser-single-requestBody"
-        )
-
-        cls.oa_parser_body = TestUtils.oa_parser("example_data_parser-body")
-
-        cls.oa_parser_external_example = TestUtils.oa_parser(
-            "example_data_parser-external_example"
-        )
-
-        cls.oa_parser_root_level_non_objects = TestUtils.oa_parser(
-            "root_level_non_objects"
-        )
-
     def test_common_path_query_param_scenarios(self):
         data_provider = {
             # Always use example value if set
@@ -70,7 +46,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_path_query_parameters
+        oa_parser = TestUtils.oa_parser("example_data_parser-path-query-parameters")
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
 
         for operation_id, expected in data_provider.items():
@@ -85,7 +61,7 @@ class TestExampleDataParser(unittest.TestCase):
                 self.assertEqual(expected["required"], parameter.is_required)
 
     def test_different_param_in(self):
-        oa_parser = self.oa_parser_path_query_parameters
+        oa_parser = TestUtils.oa_parser("example_data_parser-path-query-parameters")
 
         operation = oa_parser.operations.get("different_param_in")
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
@@ -144,7 +120,7 @@ class TestExampleDataParser(unittest.TestCase):
 
         operation_id = "mixed_params"
 
-        oa_parser = self.oa_parser_path_query_parameters
+        oa_parser = TestUtils.oa_parser("example_data_parser-path-query-parameters")
         operation = oa_parser.operations.get(operation_id)
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
         container = operation.request.example_data[example_name]
@@ -169,7 +145,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_single_requestBody
+        oa_parser = TestUtils.oa_parser("example_data_parser-single-requestBody")
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
 
         for operation_id, expected in data_provider.items():
@@ -186,7 +162,7 @@ class TestExampleDataParser(unittest.TestCase):
                 self.assertEqual(expected["body_type"], container.body.type)
 
     def test_array_body(self):
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
         operation = oa_parser.operations.get("array_body")
         container = operation.request.example_data[example_name]
@@ -218,7 +194,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_path_query_parameters
+        oa_parser = TestUtils.oa_parser("example_data_parser-path-query-parameters")
         operation = oa_parser.operations.get("different_param_in")
 
         container_1 = operation.request.example_data[example_name]
@@ -272,7 +248,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_path_query_parameters
+        oa_parser = TestUtils.oa_parser("example_data_parser-path-query-parameters")
         operation = oa_parser.operations.get("different_param_in")
         operation.request.example_data = example_data
 
@@ -327,7 +303,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("single_body")
 
         container_1 = operation.request.example_data[example_name]
@@ -355,7 +331,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("single_body")
         operation.request.example_data = example_data
 
@@ -392,7 +368,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("array_body")
 
         container_1 = operation.request.example_data[example_name]
@@ -436,7 +412,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("array_body")
         operation.request.example_data = example_data
 
@@ -490,7 +466,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("discriminator")
 
         container_1 = operation.request.example_data[example_name]
@@ -521,7 +497,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("discriminator")
         operation.request.example_data = example_data
 
@@ -559,7 +535,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("all_of")
 
         container_1 = operation.request.example_data[example_name]
@@ -583,7 +559,7 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("all_of")
         operation.request.example_data = example_data
 
@@ -617,7 +593,7 @@ class TestExampleDataParser(unittest.TestCase):
             }
         }
 
-        oa_parser = self.oa_parser_external_example
+        oa_parser = TestUtils.oa_parser("example_data_parser-external_example")
         operation = oa_parser.operations.get("operation_example")
 
         container_1 = operation.request.example_data["example_1"]
@@ -642,9 +618,6 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertEqual(expected_1, results_1)
         self.assertEqual(expected_2, results_2)
 
-        # reset data
-        operation.request.example_data = None
-
     def test_external_file_example_data_content(self):
         expected_1: model.EXAMPLE_DATA_BODY = {
             "id": 100,
@@ -658,7 +631,7 @@ class TestExampleDataParser(unittest.TestCase):
             "group": "hound",
         }
 
-        oa_parser = self.oa_parser_external_example
+        oa_parser = TestUtils.oa_parser("example_data_parser-external_example")
         operation = oa_parser.operations.get("content_example")
 
         container_1 = operation.request.example_data["example_1"]
@@ -679,11 +652,8 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertEqual(expected_1, results_1)
         self.assertEqual(expected_2, results_2)
 
-        # reset data
-        operation.request.example_data = None
-
     def test_content_example(self):
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("content_example")
         container = operation.request.example_data["example"]
 
@@ -691,7 +661,7 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertEqual(container.body.scalars["name"].value, "fish")
 
     def test_content_examples(self):
-        oa_parser = self.oa_parser_body
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
         operation = oa_parser.operations.get("content_examples")
         container = operation.request.example_data["example_name"]
 
@@ -699,14 +669,15 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertEqual(container.body.scalars["name"].value, "birds")
 
     def test_schema_with_examples(self):
-        operation = self.oa_parser_body.operations["body_with_examples"]
+        oa_parser = TestUtils.oa_parser("example_data_parser-body")
+        operation = oa_parser.operations["body_with_examples"]
         container = operation.request.example_data["example"]
 
         # We expect to see only the first example in examples
         self.assertEqual(len(list(operation.request.example_data)), 1)
         self.assertEqual(container.body.scalars["key_1"].value, "value_1")
 
-        schema = self.oa_parser_body.components.schemas.get("SchemaWithExamples")
+        schema = oa_parser.components.schemas.get("SchemaWithExamples")
         self.assertEqual(len(list(schema.examples)), 2)
 
     def test_non_objects_hydrated(self):
@@ -738,11 +709,11 @@ class TestExampleDataParser(unittest.TestCase):
             },
         }
 
+        oa_parser = TestUtils.oa_parser("root_level_non_objects")
+
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
-                operation = self.oa_parser_root_level_non_objects.operations[
-                    operation_id
-                ]
+                operation = oa_parser.operations[operation_id]
                 container = operation.request.example_data["example"]
 
                 self.assertEqual(
@@ -817,6 +788,8 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertTrue(dog_2.is_set)
 
         self.assertFalse(pet_3.is_set)
+
+        operation.request.example_data = None
 
 
 if __name__ == "__main__":
