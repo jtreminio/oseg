@@ -1,0 +1,17 @@
+generatorName: java
+additionalProperties:
+  invokerPackage: com.artifacts_mmo.client
+  apiPackage: com.artifacts_mmo.client.api
+  modelPackage: com.artifacts_mmo.client.model
+  artifactId: openapi-java-client
+  hideGenerationTimestamp: true
+  oseg.package: oseg.artifacts_mmo.examples
+  oseg.security.HTTPBasic.username: YOUR_USERNAME
+  oseg.security.HTTPBasic.password: YOUR_PASSWORD
+  oseg.security.JWTBearer.access_token: YOUR_ACCESS_TOKEN
+  oseg.printApiCallProperty: true
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

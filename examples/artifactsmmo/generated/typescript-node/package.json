@@ -1,0 +1,17 @@
+{
+  "name": "@oseg/artifacts_mmo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "artifacts_mmo_client": "file:./artifacts/packaged.tgz",
+    "@types/node": "^22.12",
+    "ts-node": "^10.9",
+    "typescript": "^5.0"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC"
+}

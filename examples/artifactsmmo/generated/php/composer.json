@@ -1,0 +1,19 @@
+{
+    "name": "oseg/artifacts_mmo",
+    "autoload": {
+        "psr-4": {
+            "OSEG\\ArtifactsMMO\\": ""
+        }
+    },
+    "require": {
+        "artifacts_mmo/client": "*",
+        "ext-json": "*"
+    },
+    "repositories": [
+      {
+        "type": "artifact",
+        "url": "./artifacts"
+      }
+    ],
+  "minimum-stability": "dev"
+}

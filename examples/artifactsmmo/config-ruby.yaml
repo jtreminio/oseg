@@ -1,0 +1,13 @@
+generatorName: ruby
+additionalProperties:
+  gemName: artifacts_mmo_client
+  moduleName: ArtifactsMMOClient
+  oseg.security.HTTPBasic.username: YOUR_USERNAME
+  oseg.security.HTTPBasic.password: YOUR_PASSWORD
+  oseg.security.JWTBearer.access_token: YOUR_ACCESS_TOKEN
+  oseg.printApiCallProperty: true
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

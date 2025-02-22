@@ -1,0 +1,18 @@
+generatorName: php
+additionalProperties:
+  invokerPackage: "ArtifactsMMO\\Client"
+  packageName: artifacts_mmo/client
+  composerPackageName: artifacts_mmo/client
+  packageVersion: "1.0.0"
+  artifactVersion: "1.0.0"
+  oseg.namespace: OSEG\ArtifactsMMO\Examples
+  oseg.autoloadLocation: "__DIR__ . '/../vendor/autoload.php'"
+  oseg.ignoreOptionalUnset: false
+  oseg.security.HTTPBasic.username: YOUR_USERNAME
+  oseg.security.HTTPBasic.password: YOUR_PASSWORD
+  oseg.security.JWTBearer.access_token: YOUR_ACCESS_TOKEN
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false

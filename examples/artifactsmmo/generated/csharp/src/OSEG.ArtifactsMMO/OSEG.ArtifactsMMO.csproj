@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>OSEG.ArtifactsMMO</PackageId>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OSEG.ArtifactsMMO</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Nullable>annotations</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <LangVersion>latestmajor</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Com.ArtifactsMMO" Version="1.0.0" />
+  </ItemGroup>
+</Project>

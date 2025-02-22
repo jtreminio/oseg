@@ -1,0 +1,13 @@
+generatorName: csharp
+additionalProperties:
+  packageName: Com.ArtifactsMMO
+  packageGuid: "{C2E4EFEB-627A-4161-BE5B-9865067CF6B8}"
+  oseg.namespace: OSEG.ArtifactsMMO.Examples
+  oseg.security.HTTPBasic.username: YOUR_USERNAME
+  oseg.security.HTTPBasic.password: YOUR_PASSWORD
+  oseg.security.JWTBearer.access_token: YOUR_ACCESS_TOKEN
+globalProperties:
+  apiTests: false
+  modelTests: false
+  apiDocs: false
+  modelDocs: false
