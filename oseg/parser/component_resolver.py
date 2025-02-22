@@ -330,6 +330,11 @@ class ComponentResolver:
             parameter = self._oa_parser.resolve_parameter(parameter)
 
             if self.name(parameter) is None and self._is_nameable(parameter):
+                # todo test
+                parameter.param_schema = self._oa_parser.resolve_component(
+                    parameter.param_schema
+                )
+
                 if parameter.param_schema.title is not None:
                     name = parameter.param_schema.title
                 else:

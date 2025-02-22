@@ -51,7 +51,6 @@ docker run --rm \
     ${CONFIG_PARAM} \
     -i "/local/${OAS_FILE}" \
     -o "/local/sdks/${SDK}" \
-    --global-property apis,apiDocs=false,apiTests=false,models,modelDocs=false,modelTests=false \
     --skip-validate-spec
 
 if [[ "${SDK}" = "java" ]]; then

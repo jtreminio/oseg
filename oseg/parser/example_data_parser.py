@@ -258,7 +258,7 @@ class ExampleDataParser:
 
         # if property is nullable and default value is null, use it
         if schema.default is None and parser.TypeChecker.is_nullable(schema):
-            return {}
+            return None
 
         if schema.default is not None:
             return schema.default
@@ -295,7 +295,7 @@ class ExampleDataParser:
                     parents=parents[:],
                 )
 
-        return data if len(data.keys()) else {}
+        return data if len(data.keys()) else None
 
     def _parse_example(
         self,
