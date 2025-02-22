@@ -14,6 +14,6 @@
     {{- caller(parse_object_list_properties(obj, indent_count)) }}
 {%- endmacro -%}
 
-{%- macro parse_api_call_properties_macro(property_container, indent_count, required_flag, include_body) -%}
-    {{- caller(parse_api_call_properties(property_container, indent_count, required_flag, include_body)) }}
+{%- macro parse_api_call_properties_macro(property_container, indent_count, required_flag) -%}
+    {{- caller(parse_api_call_properties(property_container, indent_count, required_flag)) }}
 {%- endmacro -%}

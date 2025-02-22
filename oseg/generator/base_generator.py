@@ -148,7 +148,6 @@ class BaseGenerator(Protocol):
         parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
-        # todo pass PropertyContainer to sniff if current call is for api call method
         raise NotImplementedError
 
     def print_file(self, item: model.PropertyFile) -> model.PrintableScalar:

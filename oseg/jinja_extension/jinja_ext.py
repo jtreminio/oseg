@@ -134,18 +134,13 @@ class JinjaExt(jinja2.ext.Extension):
         property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
-        include_body: bool | None = None,
     ) -> dict[str, str]:
         if isinstance(required_flag, Undefined):
             required_flag = None
-
-        if isinstance(include_body, Undefined):
-            include_body = None
 
         return self._sdk_generator.template_parser.parse_api_call_properties(
             macros=model.JinjaMacros(context.parent),
             property_container=property_container,
             indent_count=indent_count,
             required_flag=required_flag,
-            include_body=include_body,
         )

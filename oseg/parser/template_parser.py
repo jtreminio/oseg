@@ -153,7 +153,6 @@ class TemplateParser:
         property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
-        include_body: bool | None = None,
     ) -> dict[str, str]:
         """Parse data passed directly to an API object.
 
@@ -182,22 +181,21 @@ class TemplateParser:
             prop_name = self._resolve_keyword(prop.name, prop.original_name)
 
             if property_container.body and prop == property_container.body:
-                if include_body is None or include_body is True:
-                    has_data = True
+                has_data = True
 
-                    if parser.TypeChecker.is_property_objectish(prop):
-                        result[prop_name] = self._generator.print_variablename(
-                            property_container.body.type
-                        )
-
-                        continue
-
-                    # non-object single value
-                    result[prop_name] = self._parse_non_objects(
-                        macros=macros,
-                        parent=None,
-                        prop=prop,
+                if parser.TypeChecker.is_property_objectish(prop):
+                    result[prop_name] = self._generator.print_variablename(
+                        property_container.body.type
                     )
+
+                    continue
+
+                # non-object single value
+                result[prop_name] = self._parse_non_objects(
+                    macros=macros,
+                    parent=None,
+                    prop=prop,
+                )
 
                 continue
 
