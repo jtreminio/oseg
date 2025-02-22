@@ -30,7 +30,10 @@ setup(
         "tabulate>=0.9.0",
     ],
     extras_require={
-        "dev": ["mock~=5.1.0"],
+        "dev": [
+            "coverage~=7.6.12",
+            "mock~=5.1.0",
+        ],
         "test": [],
     },
     entry_points={
