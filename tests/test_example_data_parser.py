@@ -791,6 +791,22 @@ class TestExampleDataParser(unittest.TestCase):
 
         operation.request.example_data = None
 
+    def test_recursive_ref_default_data(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        oa_parser = TestUtils.oa_parser("recursive_ref")
+        operation = oa_parser.operations.get("default")
+        container = operation.request.example_data[example_name]
+
+        pet_1 = container.body
+        dog_1 = pet_1.properties.get("dog")
+        pet_2 = dog_1.properties.get("pet")
+        dog_2 = pet_2.properties.get("dog")
+
+        self.assertTrue(pet_1.is_set)
+        self.assertTrue(dog_1.is_set)
+        self.assertTrue(pet_2.is_set)
+        self.assertIsNone(dog_2)
+
 
 if __name__ == "__main__":
     unittest.main()

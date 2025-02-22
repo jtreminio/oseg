@@ -239,11 +239,11 @@ class ExampleDataParser:
         self,
         schema: oa.Schema,
         parents: list[int],
-    ) -> model.EXAMPLE_DATA_BODY:
+    ) -> model.EXAMPLE_DATA_BODY | None:
         schema_id = id(schema)
 
         if schema_id in parents:
-            return {}
+            return None
 
         parents.append(schema_id)
 
@@ -265,8 +265,8 @@ class ExampleDataParser:
 
         if parser.TypeChecker.is_array(schema):
             items_data = self._example_data_from_properties(
-                schema.items,
-                parents[:],
+                schema=schema.items,
+                parents=parents[:],
             )
 
             if items_data is not None:
@@ -279,8 +279,8 @@ class ExampleDataParser:
         if parser.TypeChecker.is_object(schema):
             for prop_name, prop_schema in schema.properties.items():
                 data[prop_name] = self._example_data_from_properties(
-                    prop_schema,
-                    parents[:],
+                    schema=prop_schema,
+                    parents=parents[:],
                 )
 
         """Once we have base object default data built see if we are dealing
@@ -291,8 +291,8 @@ class ExampleDataParser:
 
             for prop_name, prop_schema in merged.properties.items():
                 data[prop_name] = self._example_data_from_properties(
-                    prop_schema,
-                    parents[:],
+                    schema=prop_schema,
+                    parents=parents[:],
                 )
 
         return data if len(data.keys()) else {}
