@@ -531,6 +531,62 @@ class TestComponentResolver(unittest.TestCase):
                 self.assertIsNotNone(name_2)
                 self.assertEqual(name_1, name_2)
 
+    def test_common_parameters(self):
+        oa_parser = TestUtils.oa_parser("common_parameters")
+
+        data_provider = {
+            "additional_parameter_at_start": {
+                "param_1": "string",
+                "param_2": "integer",
+                "param_3": "string",
+                "param_4": "string",
+                "additional_parameter": "string",
+            },
+            "additional_parameter_in_middle": {
+                "param_1": "string",
+                "param_2": "integer",
+                "param_3": "string",
+                "param_4": "string",
+                "additional_parameter": "string",
+            },
+            "additional_parameter_at_end": {
+                "param_1": "string",
+                "param_2": "integer",
+                "param_3": "string",
+                "param_4": "string",
+                "additional_parameter": "string",
+            },
+            "parameters_in_different_order": {
+                "param_1": "string",
+                "param_2": "integer",
+                "param_3": "string",
+                "param_4": "string",
+                "additional_parameter": "string",
+            },
+            "override_parameter_data": {
+                "param_1": "integer",
+                "param_2": "string",
+                "param_3": "string",
+                "param_4": "string",
+            },
+            "no_parameter_data": {
+                "param_1": "string",
+                "param_2": "integer",
+                "param_3": "string",
+                "param_4": "string",
+            },
+        }
+
+        for operation_id, expected_parameters in data_provider.items():
+            with self.subTest(operation_id):
+                operation = oa_parser.operations[operation_id]
+
+                result = {}
+                for parameter in operation.request.parameters:
+                    result[parameter.name] = parameter.param_schema.type.value
+
+                self.assertEqual(expected_parameters, result)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -155,6 +155,8 @@ class ComponentResolver:
         """
 
         for _, path_item in self._oa_parser.paths.items():
+            self._parameters(path_item)
+
             for method in parser.OperationParser.HTTP_METHODS:
                 operation: oa.Operation | None = getattr(path_item, method)
 
@@ -162,6 +164,7 @@ class ComponentResolver:
                     continue
 
                 self._parameters(operation)
+                self._merge_parameters(path_item, operation)
                 self._operation_examples(operation)
 
                 if operation.requestBody:
@@ -320,32 +323,74 @@ class ComponentResolver:
             media_type.media_type_schema = schema
             self._examples(media_type)
 
-    def _parameters(self, operation: oa.Operation) -> None:
+    def _parameters(self, parent: oa.Operation | oa.PathItem) -> None:
         """named parameters do not create a class"""
 
-        if not operation.parameters:
+        if not parent.parameters:
             return
 
-        for i, parameter in enumerate(operation.parameters):
+        result: list[oa.Parameter] = []
+
+        for parameter in parent.parameters:
             parameter = self._oa_parser.resolve_parameter(parameter)
 
             if self.name(parameter) is None and self._is_nameable(parameter):
-                # todo test
                 parameter.param_schema = self._oa_parser.resolve_component(
                     parameter.param_schema
                 )
 
+                add_to_components = True
                 if parameter.param_schema.title is not None:
                     name = parameter.param_schema.title
+                elif hasattr(parent, "operationId"):
+                    name = f"{parent.operationId}_{parameter.name}_parameter"
                 else:
-                    name = f"{operation.operationId}_{parameter.name}_parameter"
+                    name = f"{parameter.name}_parameter"
+                    add_to_components = False
 
                 self._add(parameter, name)
-                self._oa_parser.components.parameters[name] = parameter
+
+                if add_to_components:
+                    self._oa_parser.components.parameters[name] = parameter
 
             schema = self._oa_parser.resolve_component(parameter.param_schema)
             parameter.param_schema = schema
-            operation.parameters[i] = parameter
+            result.append(parameter)
+
+        parent.parameters = result
+
+    def _merge_parameters(
+        self,
+        path_item: oa.PathItem,
+        operation: oa.Operation,
+    ) -> None:
+        """Merge Common Parameters (CParams) and Operation Parameters (OParams).
+
+        CParams order will take precedence over OParams.
+        An OParams overrides a CParams's data but not its defined order.
+        CParams will always be listed before OParams, while also respecting
+        "required" flags.
+        """
+
+        if not path_item.parameters:
+            return
+
+        # No OParams, copy all CParams to OParams
+        if not operation.parameters:
+            operation.parameters = path_item.parameters
+
+            return
+
+        merged: dict[str, oa.Parameter] = {}
+
+        for parameter in path_item.parameters:
+            merged[f"{parameter.param_in}_{parameter.name}"] = parameter
+
+        # override CParams with OParams where applicable
+        for parameter in operation.parameters:
+            merged[f"{parameter.param_in}_{parameter.name}"] = parameter
+
+        operation.parameters = list(merged.values())
 
     def _operation_examples(self, operation: oa.Operation) -> None:
         if not operation.model_extra or "examples" not in operation.model_extra:
