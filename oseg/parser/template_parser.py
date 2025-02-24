@@ -101,6 +101,7 @@ class TemplateParser:
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
+                property_container=property_container,
                 parent=parent,
                 prop=prop,
             )
@@ -192,6 +193,7 @@ class TemplateParser:
                 # non-object single value
                 result[prop_name] = self._parse_non_objects(
                     macros=macros,
+                    property_container=property_container,
                     parent=None,
                     prop=prop,
                 )
@@ -218,6 +220,7 @@ class TemplateParser:
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
+                property_container=property_container,
                 parent=property_container.body,
                 prop=prop,
             )
@@ -233,11 +236,12 @@ class TemplateParser:
     def _parse_non_objects(
         self,
         macros: model.JinjaMacros,
+        property_container: model.PropertyContainer,
         parent: model.PropertyObject | None,
         prop: model.PROPERTY_NON_OBJECT_TYPE,
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
-            printable = self._generator.print_scalar(parent, prop)
+            printable = self._generator.print_scalar(property_container, parent, prop)
 
             if printable.is_array:
                 return macros.print_scalar_array(printable)

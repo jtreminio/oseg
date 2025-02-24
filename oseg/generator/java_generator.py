@@ -226,6 +226,7 @@ class JavaGenerator(generator.BaseGenerator):
 
     def print_scalar(
         self,
+        property_container: model.PropertyContainer,
         parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
