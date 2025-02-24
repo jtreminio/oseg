@@ -102,6 +102,7 @@ class MockGenerator(generator.BaseGenerator):
     def print_scalar(
         self,
         parent: model.PropertyObject,
+        property_container: model.PropertyContainer,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
         printable = model.PrintableScalar()
