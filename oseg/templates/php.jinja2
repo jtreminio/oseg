@@ -93,16 +93,16 @@ $config = {{ config.invoker_package }}\Configuration::getDefaultConfiguration();
 {% if operation.security.is_optional %}
 // Authentication is optional for this API endpoint
 {% endif %}
-{% call(security_schemes) m.parse_security_macro(operation, 0) %}
+{% call(security_schemes) m.parse_security_macro(0) %}
     {% for _, security in security_schemes.items() %}
 {{ security }}
     {% endfor %}
 {% endcall %}
 
-{% call(objects) m.parse_objects_macro(property_container) %}
+{% call(objects) m.parse_objects_macro() %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-            {% call(properties) m.parse_object_properties_macro(property_container, obj, 4) %}
+            {% call(properties) m.parse_object_properties_macro(obj, 4) %}
 ${{ obj_name|print_variablename }} = (new {{ config.invoker_package }}\Model\{{ obj.type|print_classname }}()){% if not properties %};{% endif %}
 
                 {% for name, value in properties.items() %}
@@ -121,7 +121,7 @@ ${{ obj_name|print_variablename }} = {{ "" }}
 {% endcall %}
 try {
     {{ "" -}}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 8) %}
+{% call(properties) m.parse_api_call_properties_macro(8) %}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
     (new {{ config.invoker_package }}\Api\{{ operation.api_name|print_classname }}Api(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}

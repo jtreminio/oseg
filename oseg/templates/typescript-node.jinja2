@@ -98,17 +98,17 @@ const apiCaller = new api.{{ (operation.api_name ~ "Api")|print_classname }}();
 {% if operation.security.is_optional %}
 // Authentication is optional for this API endpoint
 {% endif %}
-{% call(security_schemes) m.parse_security_macro(operation, 0) %}
+{% call(security_schemes) m.parse_security_macro(0) %}
     {% for _, security in security_schemes.items() %}
 {{ security }}
     {% endfor %}
 {% endcall %}
 
-{% call(objects) m.parse_objects_macro(property_container) %}
+{% call(objects) m.parse_objects_macro() %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
 const {{ obj_name|print_variablename }} = new models.{{ obj.type|print_classname }}();
-        {% call(properties) m.parse_object_properties_macro(property_container, obj, 0) %}
+        {% call(properties) m.parse_object_properties_macro(obj, 0) %}
             {% for name, value in properties.items() %}
 {{ obj_name|print_variablename }}.{{ name|print_propname }} = {{ value }};
             {% endfor %}
@@ -122,7 +122,7 @@ const {{ obj_name|print_variablename }} = {{ "" }}
 
     {% endfor %}
 {% endcall %}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 2) %}
+{% call(properties) m.parse_api_call_properties_macro(2) %}
 apiCaller.{{ operation.operation_id|print_methodname }}({% if not properties %})
 {%- else %}
 

@@ -21,14 +21,19 @@ class Generator:
         output_dir: str,
     ) -> int:
         config = generator.BaseConfig.factory(config)
-        sdk_generator = generator.GeneratorFactory.factory(config)
-        jinja = jinja_extension.JinjaExt.factory(sdk_generator)
+        jinja = jinja_extension.JinjaExt.factory()
 
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
 
         for _, operation in self._oa_parser.operations.items():
             for name, property_container in operation.request.example_data.items():
+                sdk_generator = generator.GeneratorFactory.factory(
+                    config,
+                    operation,
+                    property_container,
+                )
+
                 operation_id = operation.operation_id
                 filename = parser.NormalizeStr.pascal_case(f"{operation_id}_{name}")
                 file_extension = sdk_generator.FILE_EXTENSION
@@ -36,9 +41,8 @@ class Generator:
 
                 print(f"Begin parsing for {config.GENERATOR_NAME} {filename}")
 
-                rendered = jinja.template.render(
+                rendered = jinja.template(sdk_generator).render(
                     operation=operation,
-                    property_container=property_container,
                     example_name=name,
                     config=config,
                 )

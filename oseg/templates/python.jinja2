@@ -84,7 +84,7 @@ configuration = Configuration({% if not operation.security %}){% else %}
     {% if operation.security.is_optional %}
     # Authentication is optional for this API endpoint
     {% endif %}
-    {% call(security_schemes) m.parse_security_macro(operation, 4) %}
+    {% call(security_schemes) m.parse_security_macro(4) %}
         {% for _, security in security_schemes.items() %}
     {{ security }}
         {% endfor %}
@@ -93,11 +93,11 @@ configuration = Configuration({% if not operation.security %}){% else %}
 {% endif %}
 
 with ApiClient(configuration) as api_client:
-{% call(objects) m.parse_objects_macro(property_container) %}
+{% call(objects) m.parse_objects_macro() %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
     {{ obj_name|print_variablename }} = models.{{ obj.type|print_classname }}(
-            {% call(properties) m.parse_object_properties_macro(property_container, obj, 8) %}
+            {% call(properties) m.parse_object_properties_macro(obj, 8) %}
                 {% for name, value in properties.items() %}
         {{ name|print_propname }}={{ value }},
                 {% endfor %}
@@ -114,7 +114,7 @@ with ApiClient(configuration) as api_client:
 {% endcall %}
     try:
         {{ "" -}}
-{% call(properties) m.parse_api_call_properties_macro(property_container, 12) %}
+{% call(properties) m.parse_api_call_properties_macro(12) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
         api.{{ (operation.api_name ~ "Api")|print_classname }}(api_client).{{ operation.operation_id|print_methodname }}({%- if not properties %})
 {% else %}

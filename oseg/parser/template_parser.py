@@ -3,23 +3,21 @@ from oseg import generator as g, model, parser
 
 
 class TemplateParser:
-    def __init__(self, generator: g.BaseGenerator, config: g.BaseConfig):
+    def __init__(self, generator: g.BaseGenerator):
         self._generator: g.BaseGenerator = generator
-        self._config: g.BaseConfig = config
 
     def parse_security(
         self,
         macros: model.JinjaMacros,
-        operation: model.Operation,
         indent_count: int,
     ) -> dict[str, str]:
         """Prints security/authentication"""
 
-        security_config = self._config.oseg_security
+        security_config = self._generator.config.oseg_security
         result = {}
         is_primary = True
 
-        for schemes in operation.security.schemes:
+        for schemes in self._generator.operation.security.schemes:
             for name, scheme in schemes.items():
                 if scheme.method == model.SecurityMethod.USERNAME:
                     result[f"{scheme.name}_username"] = macros.print_security(
@@ -56,11 +54,10 @@ class TemplateParser:
 
         return self._indent(result, indent_count)
 
-    def parse_objects(
-        self,
-        property_container: model.PropertyContainer,
-    ) -> dict[str, model.PROPERTY_OBJECT_TYPE]:
+    def parse_objects(self) -> dict[str, model.PROPERTY_OBJECT_TYPE]:
         """Parse all top-level object variables"""
+
+        property_container = self._generator.property_container
 
         result = {}
 
@@ -77,11 +74,12 @@ class TemplateParser:
     def parse_object_properties(
         self,
         macros: model.JinjaMacros,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
         """Parse properties of a given Model object"""
+
+        property_container = self._generator.property_container
 
         result = {}
 
@@ -90,7 +88,7 @@ class TemplateParser:
             # and property is not required, and does not have example data,
             # we can skip printing it
             if (
-                self._config.oseg_ignore_optional_unset
+                self._generator.config.oseg_ignore_optional_unset
                 and not prop.is_required
                 and prop.value is None
                 and not prop.is_set
@@ -101,7 +99,6 @@ class TemplateParser:
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
-                property_container=property_container,
                 parent=parent,
                 prop=prop,
             )
@@ -151,7 +148,6 @@ class TemplateParser:
     def parse_api_call_properties(
         self,
         macros: model.JinjaMacros,
-        property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
@@ -171,6 +167,8 @@ class TemplateParser:
         3) Optional Parameters
         4) Optional body data
         """
+
+        property_container = self._generator.property_container
 
         result = {}
         # When all api call values are null, and none are required
@@ -193,7 +191,6 @@ class TemplateParser:
                 # non-object single value
                 result[prop_name] = self._parse_non_objects(
                     macros=macros,
-                    property_container=property_container,
                     parent=None,
                     prop=prop,
                 )
@@ -220,7 +217,6 @@ class TemplateParser:
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
-                property_container=property_container,
                 parent=property_container.body,
                 prop=prop,
             )
@@ -236,12 +232,11 @@ class TemplateParser:
     def _parse_non_objects(
         self,
         macros: model.JinjaMacros,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject | None,
         prop: model.PROPERTY_NON_OBJECT_TYPE,
     ) -> any:
         if isinstance(prop, model.PropertyScalar):
-            printable = self._generator.print_scalar(property_container, parent, prop)
+            printable = self._generator.print_scalar(parent, prop)
 
             if printable.is_array:
                 return macros.print_scalar_array(printable)

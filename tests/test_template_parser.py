@@ -12,9 +12,6 @@ class TestTemplateParser(unittest.TestCase):
             f"{TestUtils._BASE_DIR}/fixtures/config-mock.yaml"
         )
         cls.config = MockConfig(config_data.get("additionalProperties", {}))
-        sdk_generator = MockGenerator(cls.config)
-        cls.template_parser = sdk_generator.template_parser
-
         cls.example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
 
     def test_parse_objects(self):
@@ -24,6 +21,8 @@ class TestTemplateParser(unittest.TestCase):
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
 
+        sdk_generator = MockGenerator(self.config, operation, container)
+
         expected = {
             "category": "Category",
             "tags_1": "Tag",
@@ -32,9 +31,7 @@ class TestTemplateParser(unittest.TestCase):
             "Dog": "Dog",
         }
 
-        result = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        result = sdk_generator.template_parser.parse_objects()
 
         self.assertEqual(list(expected), list(result))
 
@@ -70,10 +67,9 @@ class TestTemplateParser(unittest.TestCase):
                 operation = oa_parser.operations.get(operation_id)
                 operation.request.example_data = example_data
                 container = operation.request.example_data[example_name]
+                sdk_generator = MockGenerator(self.config, operation, container)
 
-                result = self.template_parser.parse_objects(
-                    property_container=container,
-                )
+                result = sdk_generator.template_parser.parse_objects()
 
                 self.assertEqual(list(expected), list(result))
 
@@ -88,6 +84,7 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "dog_2_category": "Category",
@@ -103,9 +100,7 @@ class TestTemplateParser(unittest.TestCase):
             "MultipleDogs": "MultipleDogs",
         }
 
-        result = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        result = sdk_generator.template_parser.parse_objects()
 
         self.assertEqual(list(expected), list(result))
 
@@ -120,6 +115,7 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "Dog_2_category": "Category",
@@ -135,9 +131,7 @@ class TestTemplateParser(unittest.TestCase):
             "Dog": "Dog",
         }
 
-        result = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        result = sdk_generator.template_parser.parse_objects()
 
         self.assertEqual(list(expected), list(result))
 
@@ -152,12 +146,12 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         body_data = self._example_data()[self.example_name]["body"]
 
-        root_properties = self.template_parser.parse_object_properties(
+        root_properties = sdk_generator.template_parser.parse_object_properties(
             macros=self.jinja_macros,
-            property_container=container,
             parent=container.body,
             indent_count=0,
         )
@@ -176,9 +170,8 @@ class TestTemplateParser(unittest.TestCase):
 
         self.assertDictEqual(expected, root_properties)
 
-        category_properties = self.template_parser.parse_object_properties(
+        category_properties = sdk_generator.template_parser.parse_object_properties(
             macros=self.jinja_macros,
-            property_container=container,
             parent=container.body.objects.get("category"),
             indent_count=0,
         )
@@ -244,10 +237,10 @@ class TestTemplateParser(unittest.TestCase):
 
                 operation.request.example_data = example_data
                 container = operation.request.example_data[self.example_name]
+                sdk_generator = MockGenerator(self.config, operation, container)
 
-                root_properties = self.template_parser.parse_object_properties(
+                root_properties = sdk_generator.template_parser.parse_object_properties(
                     macros=self.jinja_macros,
-                    property_container=container,
                     parent=container.body,
                     indent_count=0,
                 )
@@ -282,10 +275,10 @@ class TestTemplateParser(unittest.TestCase):
 
         operation.request.example_data = example_data
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
-        root_properties = self.template_parser.parse_object_properties(
+        root_properties = sdk_generator.template_parser.parse_object_properties(
             macros=self.jinja_macros,
-            property_container=container,
             parent=container.body,
             indent_count=0,
         )
@@ -320,10 +313,10 @@ class TestTemplateParser(unittest.TestCase):
 
         operation.request.example_data = example_data
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
-        root_properties = self.template_parser.parse_object_properties(
+        root_properties = sdk_generator.template_parser.parse_object_properties(
             macros=self.jinja_macros,
-            property_container=container,
             parent=container.body,
             indent_count=0,
         )
@@ -340,6 +333,7 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "dog_2_category": ["id", "name"],
@@ -373,17 +367,14 @@ class TestTemplateParser(unittest.TestCase):
             "MultipleDogs": ["dog_1", "dog_2"],
         }
 
-        parsed_objects = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        parsed_objects = sdk_generator.template_parser.parse_objects()
 
         for obj_name, obj in parsed_objects.items():
             if obj.is_array:
                 continue
 
-            result = self.template_parser.parse_object_properties(
+            result = sdk_generator.template_parser.parse_object_properties(
                 macros=self.jinja_macros,
-                property_container=container,
                 parent=obj,
                 indent_count=0,
             )
@@ -400,6 +391,7 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "Dog_2_category": ["id", "name"],
@@ -433,17 +425,14 @@ class TestTemplateParser(unittest.TestCase):
             "Dog": ["dog_1", "dog_2"],
         }
 
-        parsed_objects = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        parsed_objects = sdk_generator.template_parser.parse_objects()
 
         for obj_name, obj in parsed_objects.items():
             if obj.is_array:
                 continue
 
-            result = self.template_parser.parse_object_properties(
+            result = sdk_generator.template_parser.parse_object_properties(
                 macros=self.jinja_macros,
-                property_container=container,
                 parent=obj,
                 indent_count=0,
             )
@@ -458,10 +447,11 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = "[tag,tag]"
 
-        tags_properties = self.template_parser.parse_object_list_properties(
+        tags_properties = sdk_generator.template_parser.parse_object_list_properties(
             macros=self.jinja_macros,
             parent=container.body.array_objects.get("tags"),
             indent_count=0,
@@ -479,21 +469,20 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_multiple_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "dog_2_tags": "[dog_2_tags_1,dog_2_tags_2]",
             "dog_1_tags": "[dog_1_tags_1,dog_1_tags_2]",
         }
 
-        parsed_objects = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        parsed_objects = sdk_generator.template_parser.parse_objects()
 
         for obj_name, obj in parsed_objects.items():
             if not obj.is_array:
                 continue
 
-            result = self.template_parser.parse_object_list_properties(
+            result = sdk_generator.template_parser.parse_object_list_properties(
                 macros=self.jinja_macros,
                 parent=obj,
                 indent_count=0,
@@ -511,6 +500,7 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_array_dog_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         expected = {
             "Dog_2_tags": "[dog_2_tags_1,dog_2_tags_2]",
@@ -518,15 +508,13 @@ class TestTemplateParser(unittest.TestCase):
             "Dog": "[dog_1,dog_2]",
         }
 
-        parsed_objects = self.template_parser.parse_objects(
-            property_container=container,
-        )
+        parsed_objects = sdk_generator.template_parser.parse_objects()
 
         for obj_name, obj in parsed_objects.items():
             if not obj.is_array:
                 continue
 
-            result = self.template_parser.parse_object_list_properties(
+            result = sdk_generator.template_parser.parse_object_list_properties(
                 macros=self.jinja_macros,
                 parent=obj,
                 indent_count=0,
@@ -542,13 +530,13 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         path_data = self._example_data()[self.example_name]["path"]
         query_data = self._example_data()[self.example_name]["query"]
 
-        api_call_properties = self.template_parser.parse_api_call_properties(
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
             macros=self.jinja_macros,
-            property_container=container,
             indent_count=0,
         )
 
@@ -571,14 +559,14 @@ class TestTemplateParser(unittest.TestCase):
         operation = oa_parser.operations.get(operation_id)
         operation.request.example_data = self._example_data()
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
         body_data = self._example_data()[self.example_name]["body"]
         path_data = self._example_data()[self.example_name]["path"]
         query_data = self._example_data()[self.example_name]["query"]
 
-        api_call_properties = self.template_parser.parse_api_call_properties(
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
             macros=self.jinja_macros,
-            property_container=container,
             indent_count=0,
         )
 
@@ -645,11 +633,13 @@ class TestTemplateParser(unittest.TestCase):
                 operation = oa_parser.operations.get(operation_id)
                 operation.request.example_data = example_data
                 container = operation.request.example_data[self.example_name]
+                sdk_generator = MockGenerator(self.config, operation, container)
 
-                api_call_properties = self.template_parser.parse_api_call_properties(
-                    macros=self.jinja_macros,
-                    property_container=container,
-                    indent_count=0,
+                api_call_properties = (
+                    sdk_generator.template_parser.parse_api_call_properties(
+                        macros=self.jinja_macros,
+                        indent_count=0,
+                    )
                 )
 
                 self.assertEqual(data["expected"], api_call_properties)
@@ -661,10 +651,10 @@ class TestTemplateParser(unittest.TestCase):
         oa_parser = TestUtils.oa_parser("properties")
         operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
-        api_call_properties = self.template_parser.parse_api_call_properties(
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
             macros=self.jinja_macros,
-            property_container=container,
             indent_count=0,
         )
 
@@ -677,10 +667,10 @@ class TestTemplateParser(unittest.TestCase):
         oa_parser = TestUtils.oa_parser("properties")
         operation = oa_parser.operations.get(operation_id)
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
-        api_call_properties = self.template_parser.parse_api_call_properties(
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
             macros=self.jinja_macros,
-            property_container=container,
             indent_count=0,
         )
 
@@ -704,10 +694,10 @@ class TestTemplateParser(unittest.TestCase):
             },
         }
         container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
 
-        api_call_properties = self.template_parser.parse_api_call_properties(
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
             macros=self.jinja_macros,
-            property_container=container,
             indent_count=0,
         )
 
@@ -763,10 +753,11 @@ class TestTemplateParser(unittest.TestCase):
         for operation_id, expected in data_provider.items():
             with self.subTest(operation_id):
                 operation = oa_parser.operations.get(operation_id)
+                container = operation.request.example_data[self.example_name]
+                sdk_generator = MockGenerator(self.config, operation, container)
 
-                result = self.template_parser.parse_security(
+                result = sdk_generator.template_parser.parse_security(
                     macros=self.jinja_macros,
-                    operation=operation,
                     indent_count=0,
                 )
 

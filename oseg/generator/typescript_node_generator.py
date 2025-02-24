@@ -179,7 +179,6 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
     def print_scalar(
         self,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
@@ -197,18 +196,11 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
             printable.value = []
 
             for i in item.value:
-                printable.value.append(
-                    self._handle_value(property_container, item, i, parent)
-                )
+                printable.value.append(self._handle_value(item, i, parent))
 
             return printable
 
-        printable.value = self._handle_value(
-            property_container,
-            item,
-            item.value,
-            parent,
-        )
+        printable.value = self._handle_value(item, item.value, parent)
 
         return printable
 
@@ -234,7 +226,6 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
     def _handle_value(
         self,
-        property_container: model.PropertyContainer,
         item: model.PropertyScalar,
         value: any,
         parent: model.PropertyObject | None,
@@ -254,8 +245,8 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
             final = f"models.{parent_type}.{enum_type}.{enum_name}"
 
             # if currently in api call method, append ".toString()" to enums
-            if parent and property_container.body == parent:
-                if property_container.request.has_formdata:
+            if parent and self.property_container.body == parent:
+                if self.property_container.request.has_formdata:
                     final += ".toString()"
 
             return final

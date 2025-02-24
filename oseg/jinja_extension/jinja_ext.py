@@ -10,7 +10,7 @@ class JinjaExt(jinja2.ext.Extension):
     _sdk_generator: generator.BaseGenerator
 
     @staticmethod
-    def factory(sdk_generator: generator.BaseGenerator) -> JinjaExt:
+    def factory() -> JinjaExt:
         env = jinja2.Environment(
             loader=jinja2.PackageLoader("oseg"),
             trim_blocks=True,
@@ -21,7 +21,6 @@ class JinjaExt(jinja2.ext.Extension):
         extension: JinjaExt = env.extensions.get(
             "oseg.jinja_extension.jinja_ext.JinjaExt"
         )
-        extension._sdk_generator = sdk_generator
 
         return extension
 
@@ -74,42 +73,34 @@ class JinjaExt(jinja2.ext.Extension):
         )
         environment.globals.update(print_null=lambda: self._sdk_generator.print_null())
 
-    @property
-    def template(self) -> jinja2.Template:
+    def template(self, sdk_generator: generator.BaseGenerator) -> jinja2.Template:
+        self._sdk_generator = sdk_generator
+
         return self.environment.get_template(self._sdk_generator.TEMPLATE)
 
     @pass_context
     def _parse_security(
         self,
         context: Context,
-        operation: model.Operation,
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_security(
             macros=model.JinjaMacros(context.parent),
-            operation=operation,
             indent_count=indent_count,
         )
 
-    def _parse_objects(
-        self,
-        property_container: model.PropertyContainer,
-    ) -> dict[str, model.PropertyObject]:
-        return self._sdk_generator.template_parser.parse_objects(
-            property_container=property_container,
-        )
+    def _parse_objects(self) -> dict[str, model.PropertyObject]:
+        return self._sdk_generator.template_parser.parse_objects()
 
     @pass_context
     def _parse_object_properties(
         self,
         context: Context,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject,
         indent_count: int,
     ) -> dict[str, str]:
         return self._sdk_generator.template_parser.parse_object_properties(
             macros=model.JinjaMacros(context.parent),
-            property_container=property_container,
             parent=parent,
             indent_count=indent_count,
         )
@@ -131,7 +122,6 @@ class JinjaExt(jinja2.ext.Extension):
     def _parse_api_call_properties(
         self,
         context: Context,
-        property_container: model.PropertyContainer,
         indent_count: int,
         required_flag: bool | None = None,
     ) -> dict[str, str]:
@@ -140,7 +130,6 @@ class JinjaExt(jinja2.ext.Extension):
 
         return self._sdk_generator.template_parser.parse_api_call_properties(
             macros=model.JinjaMacros(context.parent),
-            property_container=property_container,
             indent_count=indent_count,
             required_flag=required_flag,
         )

@@ -170,7 +170,6 @@ class RubyGenerator(generator.BaseGenerator):
 
     def print_scalar(
         self,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:

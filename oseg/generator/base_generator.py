@@ -111,12 +111,16 @@ class BaseGenerator(Protocol):
     X_ENUM_VARNAMES = "x-enum-varnames"
     X_ENUM_VARNAMES_OVERRIDE = "x-enum-varnames-override"
 
-    def __init__(self, config: BaseConfig):
+    def __init__(
+        self,
+        config: BaseConfig,
+        operation: model.Operation,
+        property_container: model.PropertyContainer,
+    ):
         self.config: BaseConfig = config
-        self.template_parser: parser.TemplateParser = parser.TemplateParser(
-            generator=self,
-            config=config,
-        )
+        self.operation: model.Operation = operation
+        self.property_container: model.PropertyContainer = property_container
+        self.template_parser = parser.TemplateParser(self)
 
     @abstractmethod
     def is_reserved_keyword(self, name: str) -> bool:
@@ -145,7 +149,6 @@ class BaseGenerator(Protocol):
     @abstractmethod
     def print_scalar(
         self,
-        property_container: model.PropertyContainer,
         parent: model.PropertyObject | None,
         item: model.PropertyScalar,
     ) -> model.PrintableScalar:
@@ -210,11 +213,7 @@ class BaseGenerator(Protocol):
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 
-    def _get_enum_varname(
-        self,
-        schema: oa.Schema,
-        value: any,
-    ) -> str | None:
+    def _get_enum_varname(self, schema: oa.Schema, value: any) -> str | None:
         enum_varnames = schema.model_extra.get(self.X_ENUM_VARNAMES)
 
         if not enum_varnames:
@@ -229,11 +228,7 @@ class BaseGenerator(Protocol):
 
         return enum_varnames[schema.enum.index(value)]
 
-    def _get_enum_varname_override(
-        self,
-        schema: oa.Schema,
-        value: any,
-    ) -> str | None:
+    def _get_enum_varname_override(self, schema: oa.Schema, value: any) -> str | None:
         # todo unit test
         enum_varnames_override = schema.model_extra.get(self.X_ENUM_VARNAMES_OVERRIDE)
 
@@ -253,24 +248,32 @@ class BaseGenerator(Protocol):
 
 class GeneratorFactory:
     @staticmethod
-    def factory(config: BaseConfig) -> BaseGenerator:
+    def factory(
+        config: BaseConfig,
+        operation: model.Operation,
+        property_container: model.PropertyContainer,
+    ) -> BaseGenerator:
         if isinstance(config, generator.CSharpConfig):
-            return generator.CSharpGenerator(config)
+            return generator.CSharpGenerator(config, operation, property_container)
 
         if isinstance(config, generator.JavaConfig):
-            return generator.JavaGenerator(config)
+            return generator.JavaGenerator(config, operation, property_container)
 
         if isinstance(config, generator.PhpConfig):
-            return generator.PhpGenerator(config)
+            return generator.PhpGenerator(config, operation, property_container)
 
         if isinstance(config, generator.PythonConfig):
-            return generator.PythonGenerator(config)
+            return generator.PythonGenerator(config, operation, property_container)
 
         if isinstance(config, generator.RubyConfig):
-            return generator.RubyGenerator(config)
+            return generator.RubyGenerator(config, operation, property_container)
 
         if isinstance(config, generator.TypescriptNodeConfig):
-            return generator.TypescriptNodeGenerator(config)
+            return generator.TypescriptNodeGenerator(
+                config,
+                operation,
+                property_container,
+            )
 
         raise NotImplementedError
 
