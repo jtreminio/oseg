@@ -1,7 +1,7 @@
 require "openapi_client"
 
 OpenApiClient.configure do |config|
-    config.access_token = "YOUR_ACCESS_TOKEN";
+    config.access_token = "YOUR_ACCESS_TOKEN"
 end
 
 begin
@@ -9,7 +9,7 @@ begin
         [
             "available",
             "pending",
-        ], // status
+        ], # status
     )
 
     p response

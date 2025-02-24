@@ -1,7 +1,7 @@
 require "openapi_client"
 
 OpenApiClient.configure do |config|
-    config.api_key["api_key"] = "YOUR_API_KEY";
+    config.api_key["api_key"] = "YOUR_API_KEY"
 end
 
 user = OpenApiClient::User.new
@@ -16,7 +16,7 @@ user.user_status = 1
 
 begin
     OpenApiClient::UserApi.new.update_user(
-        "my-username", // username
+        "my-username", # username
         user,
     )
 rescue OpenApiClient::ApiError => e

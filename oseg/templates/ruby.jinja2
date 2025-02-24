@@ -68,13 +68,13 @@ File.new("{{ printable.value }}", "r")
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
 {{ comment }}config.{{ printable.method|print_methodname }}
-    {%- if printable.method == "api_key" %}["{{ printable.name }}"] = "{{ printable.value }}";
-    {%- else %} = "{{ printable.value }}";{%- endif %}
+    {%- if printable.method == "api_key" %}["{{ printable.name }}"] = "{{ printable.value }}"
+    {%- else %} = "{{ printable.value }}"{%- endif %}
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}
     {% if config.oseg_print_api_call_property %}
-        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
+        {% if name|print_variablename != value %} # {{ name|print_variablename }}{% endif %}
     {% endif %}
 {%-endmacro -%}
 

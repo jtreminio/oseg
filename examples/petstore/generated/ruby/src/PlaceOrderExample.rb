@@ -1,8 +1,8 @@
 require "openapi_client"
 
 OpenApiClient.configure do |config|
-    config.access_token = "YOUR_ACCESS_TOKEN";
-    # config.api_key["api_key"] = "YOUR_API_KEY";
+    config.access_token = "YOUR_ACCESS_TOKEN"
+    # config.api_key["api_key"] = "YOUR_API_KEY"
 end
 
 order = OpenApiClient::Order.new
