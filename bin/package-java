@@ -8,10 +8,10 @@ DIR=$(cd `dirname $0` && pwd)
 PROJECT=$1
 SDK="java"
 WORKING_DIR="/app/openapi"
-PROJECT_DIR="${DIR}/../examples/${PROJECT}"
-SDK_DIR="${PROJECT_DIR}/sdks/${SDK}"
-TARGET_DIR="${PROJECT_DIR}/generated/${SDK}"
-ARTIFACTS_DIR="${PROJECT_DIR}/generated/${SDK}/artifacts"
+PROJECT_DIR="${DIR}/../../oseg-examples/${PROJECT}"
+SDK_DIR="${PROJECT_DIR}/${SDK}/sdk"
+TARGET_DIR="${PROJECT_DIR}/${SDK}"
+ARTIFACTS_DIR="${PROJECT_DIR}/${SDK}/artifacts"
 
 if [[ -z "${PROJECT-}" ]] || [[ ! -d "${PROJECT_DIR}" ]]; then
   echo "Must provide project"
@@ -21,6 +21,8 @@ fi
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
+chmod +x "${SDK_DIR}/gradlew"
+
 docker run --rm -it \
   -v "${SDK_DIR}:${WORKING_DIR}" \
   -v "${ARTIFACTS_DIR}:/artifacts" \
@@ -29,4 +31,4 @@ docker run --rm -it \
   -e GEN_DIR=/app \
   gradle:8-jdk21 ./gradlew clean jar
 
-cp "${SDK_DIR}/build/libs/"openapi-java-client-*.jar "${ARTIFACTS_DIR}/packaged.jar"
+cp "${SDK_DIR}/build/libs/"*-*.jar "${ARTIFACTS_DIR}/packaged.jar"

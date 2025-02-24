@@ -7,7 +7,9 @@ CSharpConfigDef = TypedDict(
     "CSharpConfigDef",
     {
         "packageName": str,
+        "packageGuid": str | None,
         "oseg.namespace": str | None,
+        "oseg.packageGuid": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
     },
@@ -32,6 +34,16 @@ class CSharpConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "packageGuid": {
+            "description": inspect.cleandoc(
+                """
+                The GUID that will be associated with the C# project. This is
+                the SDK package you are generating example snippets for. 
+                (Default: {C69F4F3D-BE68-4A19-A3F0-5EEE1810150B})
+                """
+            ),
+            "default": "{C69F4F3D-BE68-4A19-A3F0-5EEE1810150B}",
+        },
         "oseg.namespace": {
             "description": inspect.cleandoc(
                 """
@@ -40,6 +52,15 @@ class CSharpConfig(generator.BaseConfig):
                 """
             ),
             "default": None,
+        },
+        "oseg.packageGuid": {
+            "description": inspect.cleandoc(
+                """
+                The GUID that will be associated with the C# project.
+                (Default: {4D6EE6C1-B6BF-402C-9D5D-C67B3A3D66B0})
+                """
+            ),
+            "default": "{4D6EE6C1-B6BF-402C-9D5D-C67B3A3D66B0}",
         },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
@@ -64,9 +85,19 @@ class CSharpConfig(generator.BaseConfig):
         self.package_name = config.get("packageName")
         assert isinstance(self.package_name, str)
 
+        self.package_guid = config.get(
+            "packageGuid",
+            self.PROPS_OPTIONAL["packageGuid"].get("default"),
+        )
+
         self.oseg_namespace = config.get(
             "oseg.namespace",
             self.PROPS_OPTIONAL["oseg.namespace"].get("default"),
+        )
+
+        self.oseg_packageGuid = config.get(
+            "oseg.packageGuid",
+            self.PROPS_OPTIONAL["oseg.packageGuid"].get("default"),
         )
 
         self.oseg_ignore_optional_unset = config.get(

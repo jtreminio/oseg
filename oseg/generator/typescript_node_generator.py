@@ -7,6 +7,7 @@ TypescriptNodeConfigDef = TypedDict(
     "TypescriptNodeConfigDef",
     {
         "npmName": str,
+        "oseg.npmName": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
         "oseg.printApiCallProperty": bool | None,
@@ -32,6 +33,15 @@ class TypescriptNodeConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "oseg.npmName": {
+            "description": inspect.cleandoc(
+                """
+                The package name to use in the package.json, for your example snippets.
+                Ex: @oseg/petstore_examples
+                """
+            ),
+            "default": None,
+        },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -63,6 +73,11 @@ class TypescriptNodeConfig(generator.BaseConfig):
     def __init__(self, config: TypescriptNodeConfigDef):
         self.npm_name = config.get("npmName")
         assert isinstance(self.npm_name, str)
+
+        self.oseg_npm_name = config.get(
+            "oseg.npmName",
+            self.PROPS_OPTIONAL["oseg.npmName"].get("default"),
+        )
 
         self.oseg_ignore_optional_unset = config.get(
             "oseg.ignoreOptionalUnset",

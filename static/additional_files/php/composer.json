@@ -1,0 +1,20 @@
+{
+    "name": "{{ oseg_composerPackageName }}",
+    "autoload": {
+        "psr-4": {
+            "{{ oseg_namespace }}\\": ""
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "{{ composerPackageName }}": "*",
+        "ext-json": "*"
+    },
+    "repositories": [
+      {
+        "type": "artifact",
+        "url": "./artifacts"
+      }
+    ],
+  "minimum-stability": "dev"
+}

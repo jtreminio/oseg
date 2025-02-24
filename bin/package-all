@@ -15,6 +15,5 @@ fi
 bash "${DIR}/package-csharp" "${PROJECT}"
 bash "${DIR}/package-java" "${PROJECT}"
 bash "${DIR}/package-php" "${PROJECT}"
-bash "${DIR}/package-python" "${PROJECT}"
 bash "${DIR}/package-ruby" "${PROJECT}"
 bash "${DIR}/package-typescript-node" "${PROJECT}"

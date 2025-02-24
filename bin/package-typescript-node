@@ -8,10 +8,10 @@ DIR=$(cd `dirname $0` && pwd)
 PROJECT=$1
 SDK="typescript-node"
 WORKING_DIR="/app/openapi"
-PROJECT_DIR="${DIR}/../examples/${PROJECT}"
-SDK_DIR="${PROJECT_DIR}/sdks/${SDK}"
-TARGET_DIR="${PROJECT_DIR}/generated/${SDK}"
-ARTIFACTS_DIR="${PROJECT_DIR}/generated/${SDK}/artifacts"
+PROJECT_DIR="${DIR}/../../oseg-examples/${PROJECT}"
+SDK_DIR="${PROJECT_DIR}/${SDK}/sdk"
+TARGET_DIR="${PROJECT_DIR}/${SDK}"
+ARTIFACTS_DIR="${PROJECT_DIR}/${SDK}/artifacts"
 
 if [[ -z "${PROJECT-}" ]] || [[ ! -d "${PROJECT_DIR}" ]]; then
   echo "Must provide project"
@@ -44,4 +44,4 @@ docker run -it --rm \
   -w "${WORKING_DIR}" \
   node:22 npm pack --pack-destination /artifacts
 
-mv "${PROJECT_DIR}/generated/${SDK}/artifacts/"*.tgz "${PROJECT_DIR}/generated/${SDK}/artifacts/packaged.tgz"
+mv "${ARTIFACTS_DIR}/"*.tgz "${ARTIFACTS_DIR}/packaged.tgz"

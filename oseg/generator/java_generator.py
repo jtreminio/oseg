@@ -10,6 +10,7 @@ JavaConfigDef = TypedDict(
         "invokerPackage": str,
         "apiPackage": str,
         "modelPackage": str,
+        "artifactId": str | None,
         "oseg.package": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
@@ -48,6 +49,14 @@ class JavaConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "artifactId": {
+            "description": inspect.cleandoc(
+                """
+                artifactId of the source package. (Default: openapi-java-client)
+                """
+            ),
+            "default": "openapi-java-client",
+        },
         "oseg.package": {
             "description": inspect.cleandoc(
                 """
@@ -93,6 +102,11 @@ class JavaConfig(generator.BaseConfig):
         assert isinstance(self.invoker_package, str)
         assert isinstance(self.api_package, str)
         assert isinstance(self.model_package, str)
+
+        self.artifact_id = config.get(
+            "artifactId",
+            self.PROPS_OPTIONAL["artifactId"].get("default"),
+        )
 
         self.oseg_package = config.get(
             "oseg.package",

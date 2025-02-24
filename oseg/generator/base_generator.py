@@ -2,8 +2,26 @@ from __future__ import annotations
 import json
 import openapi_pydantic as oa
 from abc import abstractmethod
-from typing import Protocol, TypedDict, Any
+from typing import Protocol, TypedDict, Any, Union
 from oseg import generator, model, parser
+
+GENERATOR_CONFIG_TYPE = Union[
+    "generator.CSharpConfig",
+    "generator.JavaConfig",
+    "generator.PhpConfig",
+    "generator.PythonConfig",
+    "generator.RubyConfig",
+    "generator.TypescriptNodeConfig",
+]
+
+GENERATOR_TYPE = Union[
+    "generator.CSharpGenerator",
+    "generator.JavaGenerator",
+    "generator.PhpGenerator",
+    "generator.PythonGenerator",
+    "generator.RubyGenerator",
+    "generator.TypescriptNodeGenerator",
+]
 
 
 class PropsOptionalT(TypedDict):
@@ -26,7 +44,7 @@ class BaseConfig(Protocol):
     oseg_security: dict[str, str]
 
     @staticmethod
-    def factory(config: BaseConfigDef | str) -> BaseConfig:
+    def factory(config: BaseConfigDef | str) -> GENERATOR_CONFIG_TYPE:
         if isinstance(config, str):
             data = parser.FileLoader.get_file_contents(config)
 
@@ -252,7 +270,7 @@ class GeneratorFactory:
         config: BaseConfig,
         operation: model.Operation,
         property_container: model.PropertyContainer,
-    ) -> BaseGenerator:
+    ) -> GENERATOR_TYPE:
         if isinstance(config, generator.CSharpConfig):
             return generator.CSharpGenerator(config, operation, property_container)
 
