@@ -83,7 +83,7 @@ fs.createReadStream("{{ printable.value }}")
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}
-    {% if config.oseg_print_api_call_property %}
+    {% if config.oseg.printApiCallProperty %}
         {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
     {% endif %}
 {%-endmacro -%}
@@ -91,8 +91,8 @@ fs.createReadStream("{{ printable.value }}")
 {%- import "_macros.jinja2" as m with context -%}
 
 import * as fs from 'fs';
-import api from "{{ config.npm_name }}"
-import models from "{{ config.npm_name }}"
+import api from "{{ config.npmName }}"
+import models from "{{ config.npmName }}"
 
 const apiCaller = new api.{{ (operation.api_name ~ "Api")|print_classname }}();
 {% if operation.security.is_optional %}

@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 VisualStudioVersion = 12.0.0.0
 MinimumVisualStudioVersion = 10.0.0.1
-Project("{{ oseg_packageGuid }}") = "{{ oseg_namespace }}", "src\{{ oseg_namespace }}\{{ oseg_namespace }}.csproj", "{{ packageGuid }}"
+Project("{{ oseg.packageGuid }}") = "{{ oseg.namespace }}", "src\{{ oseg.namespace }}\{{ oseg.namespace }}.csproj", "{{ packageGuid }}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution

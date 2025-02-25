@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
@@ -22,8 +23,16 @@ class PhpConfigComplete(TypedDict):
     additionalProperties: PhpConfigDef
 
 
+@dataclass
+class PhpConfigOseg(generator.BaseConfigOseg):
+    namespace: str | None
+    composerPackageName: str | None
+    autoloadLocation: str | None
+
+
 class PhpConfig(generator.BaseConfig):
     GENERATOR_NAME = "php"
+    oseg: PhpConfigOseg
 
     PROPS_REQUIRED = {
         "invokerPackage": inspect.cleandoc(
@@ -38,7 +47,7 @@ class PhpConfig(generator.BaseConfig):
         "composerPackageName": {
             "description": inspect.cleandoc(
                 """
-                The name to use in the composer package name, of the source package.
+                Composer package name of the source package.
                 (Default: openapi/client)
                 """
             ),
@@ -91,35 +100,20 @@ class PhpConfig(generator.BaseConfig):
     }
 
     def __init__(self, config: PhpConfigDef):
-        self.invoker_package = config.get("invokerPackage")
-        assert isinstance(self.invoker_package, str)
+        self._config = config
 
-        self.composer_package_name = config.get(
-            "composerPackageName",
-            self.PROPS_OPTIONAL["composerPackageName"].get("default"),
+        self.invokerPackage = config.get("invokerPackage")
+        assert isinstance(self.invokerPackage, str)
+
+        self.composerPackageName = self._get_value("composerPackageName")
+
+        self.oseg = PhpConfigOseg(
+            namespace=self._get_value("oseg.namespace"),
+            composerPackageName=self._get_value("oseg.composerPackageName"),
+            autoloadLocation=self._get_value("oseg.autoloadLocation"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
-
-        self.oseg_namespace = config.get(
-            "oseg.namespace",
-            self.PROPS_OPTIONAL["oseg.namespace"].get("default"),
-        )
-
-        self.oseg_composer_package_name = config.get(
-            "oseg.composerPackageName",
-            self.PROPS_OPTIONAL["oseg.composerPackageName"].get("default"),
-        )
-
-        self.oseg_autoload_location = config.get(
-            "oseg.autoloadLocation",
-            self.PROPS_OPTIONAL["oseg.autoloadLocation"].get("default"),
-        )
-
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
-
-        self.oseg_security = self._parse_security(config)
 
 
 class PhpGenerator(generator.BaseGenerator):
@@ -190,7 +184,7 @@ class PhpGenerator(generator.BaseGenerator):
 
         # if enum but no parent, use the literal value
         if item.type == "string" and item.is_enum and parent is not None:
-            namespace = self.config.invoker_package
+            namespace = self.config.invokerPackage
             enum_name = self._get_enum_name(item, item.name, value)
             parent_type = NormalizeStr.pascal_case(parent.type)
 
@@ -229,7 +223,7 @@ class PhpProject(generator.ProjectSetup):
     def setup(self) -> None:
         self._copy_files([".gitignore"])
 
-        namespace = self.config.oseg_namespace.split("\\")
+        namespace = self.config.oseg.namespace.split("\\")
         namespace = list(filter(None, namespace))
         namespace = "\\\\".join(namespace)
         namespace = namespace.rstrip("\\\\")
@@ -239,9 +233,9 @@ class PhpProject(generator.ProjectSetup):
                 source="composer.json",
                 target="composer.json",
                 values={
-                    "{{ composerPackageName }}": self.config.composer_package_name,
-                    "{{ oseg_composerPackageName }}": self.config.oseg_composer_package_name,
-                    "{{ oseg_namespace }}": namespace,
+                    "{{ composerPackageName }}": self.config.composerPackageName,
+                    "{{ oseg.composerPackageName }}": self.config.oseg.composerPackageName,
+                    "{{ oseg.namespace }}": namespace,
                 },
             ),
         ]

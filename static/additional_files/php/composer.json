@@ -1,8 +1,8 @@
 {
-    "name": "{{ oseg_composerPackageName }}",
+    "name": "{{ oseg.composerPackageName }}",
     "autoload": {
         "psr-4": {
-            "{{ oseg_namespace }}\\": ""
+            "{{ oseg.namespace }}\\": ""
         }
     },
     "require": {

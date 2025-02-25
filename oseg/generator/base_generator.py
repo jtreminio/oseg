@@ -38,14 +38,20 @@ class BaseConfigDef(TypedDict):
     additionalProperties: dict[str, any]
 
 
+@dataclass
+class BaseConfigOseg:
+    # Skip printing optional properties that do not have a value
+    ignoreOptionalUnset: bool
+    security: dict[str, str]
+
+
 class BaseConfig(Protocol):
     GENERATOR_NAME: str
     PROPS_REQUIRED: dict[str, str]
     PROPS_OPTIONAL: dict[str, PropsOptionalT]
 
-    # Skip printing optional properties that do not have a value
-    oseg_ignore_optional_unset: bool
-    oseg_security: dict[str, str]
+    _config: dict[str, any]
+    oseg: BaseConfigOseg
 
     @staticmethod
     def factory(config: BaseConfigDef | str) -> GENERATOR_CONFIG_TYPE:
@@ -112,10 +118,10 @@ class BaseConfig(Protocol):
                 raise NotImplementedError("Generator not found for config_help")
 
     # todo test
-    def _parse_security(self, config: dict[str, any]) -> dict[str, any]:
+    def _parse_security(self) -> dict[str, any]:
         security = {}
 
-        for name, values in config.items():
+        for name, values in self._config.items():
             if name.startswith("oseg.security."):
                 security[name.replace("oseg.security.", "")] = values
 
@@ -124,6 +130,9 @@ class BaseConfig(Protocol):
             if security
             else self.PROPS_OPTIONAL["oseg.security"].get("default")
         )
+
+    def _get_value(self, name: str) -> any:
+        return self._config.get(name, self.PROPS_OPTIONAL[name].get("default"))
 
 
 class BaseGenerator(Protocol):
@@ -329,11 +338,8 @@ class ProjectSetup:
         self.base_dir: str = base_dir
         self.output_dir: str = output_dir
 
-        if not os.path.isdir(base_dir):
-            os.makedirs(base_dir)
-
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.isdir(f"{base_dir}/{output_dir}"):
+            os.makedirs(f"{base_dir}/{output_dir}")
 
     @staticmethod
     def factory(

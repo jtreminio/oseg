@@ -1,6 +1,7 @@
 from .base_generator import (
     BaseConfig,
     BaseConfigDef,
+    BaseConfigOseg,
     BaseGenerator,
     GeneratorFactory,
     ProjectSetup,

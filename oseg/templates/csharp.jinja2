@@ -95,12 +95,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using {{ config.package_name }}.Api;
-using {{ config.package_name }}.Client;
-using {{ config.package_name }}.Model;
+using {{ config.packageName }}.Api;
+using {{ config.packageName }}.Client;
+using {{ config.packageName }}.Model;
 
-{% if config.oseg_namespace %}
-namespace {{ config.oseg_namespace }};
+{% if config.oseg.namespace %}
+namespace {{ config.oseg.namespace }};
 
 {% endif %}
 public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}

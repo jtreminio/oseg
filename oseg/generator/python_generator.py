@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
@@ -19,8 +20,14 @@ class PythonConfigComplete(TypedDict):
     additionalProperties: PythonConfigDef
 
 
+@dataclass
+class PythonConfigOseg(generator.BaseConfigOseg):
+    propertyNamingConvention: str | None
+
+
 class PythonConfig(generator.BaseConfig):
     GENERATOR_NAME = "python"
+    oseg: PythonConfigOseg
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -61,20 +68,16 @@ class PythonConfig(generator.BaseConfig):
     }
 
     def __init__(self, config: PythonConfigDef):
-        self.package_name = config.get("packageName")
-        assert isinstance(self.package_name, str)
+        self._config = config
 
-        self.oseg_property_naming_convention = config.get(
-            "oseg.propertyNamingConvention",
-            self.PROPS_OPTIONAL["oseg.propertyNamingConvention"].get("default"),
+        self.packageName = config.get("packageName")
+        assert isinstance(self.packageName, str)
+
+        self.oseg = PythonConfigOseg(
+            propertyNamingConvention=self._get_value("oseg.propertyNamingConvention"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
-
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
-
-        self.oseg_security = self._parse_security(config)
 
 
 class PythonGenerator(generator.BaseGenerator):
@@ -166,7 +169,7 @@ class PythonGenerator(generator.BaseGenerator):
         """
 
         # todo unit test
-        prop_case = self.config.oseg_property_naming_convention
+        prop_case = self.config.oseg.propertyNamingConvention
 
         if prop_case == "camel_case":
             return NormalizeStr.camel_case(self.unreserve_keyword(name))

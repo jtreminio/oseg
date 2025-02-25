@@ -13,7 +13,7 @@ class TemplateParser:
     ) -> dict[str, str]:
         """Prints security/authentication"""
 
-        security_config = self._generator.config.oseg_security
+        security_config = self._generator.config.oseg.security
         result = {}
         is_primary = True
 
@@ -84,11 +84,11 @@ class TemplateParser:
         result = {}
 
         for _, prop in parent.non_objects().items():
-            # if config flag oseg_ignore_optional_unset is enabled,
+            # if config flag oseg.ignoreOptionalUnset is enabled,
             # and property is not required, and does not have example data,
             # we can skip printing it
             if (
-                self._generator.config.oseg_ignore_optional_unset
+                self._generator.config.oseg.ignoreOptionalUnset
                 and not prop.is_required
                 and prop.value is None
                 and not prop.is_set

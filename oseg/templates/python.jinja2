@@ -77,7 +77,7 @@ open("{{ printable.value }}", "rb").read()
 from datetime import date, datetime
 from pprint import pprint
 
-from {{ config.package_name }} import ApiClient, ApiException, Configuration, api, models
+from {{ config.packageName }} import ApiClient, ApiException, Configuration, api, models
 
 configuration = Configuration({% if not operation.security %}){% else %}
 

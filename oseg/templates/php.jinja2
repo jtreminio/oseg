@@ -80,16 +80,16 @@ ${{ printable.value|print_variablename }}
 
 <?php
 
-{% if config.oseg_namespace %}
-namespace {{ config.oseg_namespace }};
+{% if config.oseg.namespace %}
+namespace {{ config.oseg.namespace }};
 
 {% endif %}
-require_once {{ config.oseg_autoload_location }};
+require_once {{ config.oseg.autoloadLocation }};
 
 use SplFileObject;
-use {{ config.invoker_package|split("\\")|first }};
+use {{ config.invokerPackage|split("\\")|first }};
 
-$config = {{ config.invoker_package }}\Configuration::getDefaultConfiguration();
+$config = {{ config.invokerPackage }}\Configuration::getDefaultConfiguration();
 {% if operation.security.is_optional %}
 // Authentication is optional for this API endpoint
 {% endif %}
@@ -103,7 +103,7 @@ $config = {{ config.invoker_package }}\Configuration::getDefaultConfiguration();
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
             {% call(properties) m.parse_object_properties_macro(obj, 4) %}
-${{ obj_name|print_variablename }} = (new {{ config.invoker_package }}\Model\{{ obj.type|print_classname }}()){% if not properties %};{% endif %}
+${{ obj_name|print_variablename }} = (new {{ config.invokerPackage }}\Model\{{ obj.type|print_classname }}()){% if not properties %};{% endif %}
 
                 {% for name, value in properties.items() %}
     ->{{ ("set" ~ "_" ~ name)|print_methodname }}({{ value }}){% if loop.last %};{% endif %}
@@ -123,7 +123,7 @@ try {
     {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(8) %}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
-    (new {{ config.invoker_package }}\Api\{{ operation.api_name|print_classname }}Api(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
+    (new {{ config.invokerPackage }}\Api\{{ operation.api_name|print_classname }}Api(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
@@ -139,7 +139,7 @@ try {
 
     copy($response->getRealPath(), __DIR__ . '/file_response');
 {% endif %}
-} catch ({{ config.invoker_package }}\ApiException $e) {
+} catch ({{ config.invokerPackage }}\ApiException $e) {
     echo "Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: {$e->getMessage()}";
 }
 {{ "" }}

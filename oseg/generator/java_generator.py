@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 
 from oseg import generator, model
@@ -12,9 +13,9 @@ JavaConfigDef = TypedDict(
         "modelPackage": str,
         "artifactId": str | None,
         "oseg.package": str | None,
+        "oseg.printApiCallProperty": bool | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
-        "oseg.printApiCallProperty": bool | None,
     },
 )
 
@@ -24,8 +25,15 @@ class JavaConfigComplete(TypedDict):
     additionalProperties: JavaConfigDef
 
 
+@dataclass
+class JavaConfigOseg(generator.BaseConfigOseg):
+    package: str | None
+    printApiCallProperty: bool
+
+
 class JavaConfig(generator.BaseConfig):
     GENERATOR_NAME = "java"
+    oseg: JavaConfigOseg
 
     PROPS_REQUIRED = {
         "invokerPackage": inspect.cleandoc(
@@ -66,6 +74,15 @@ class JavaConfig(generator.BaseConfig):
             ),
             "default": None,
         },
+        "oseg.printApiCallProperty": {
+            "description": inspect.cleandoc(
+                """
+                Add property name as comment for non-variable values passed to
+                the API call method. (Default: true)
+                """
+            ),
+            "default": True,
+        },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -83,46 +100,26 @@ class JavaConfig(generator.BaseConfig):
             ),
             "default": {},
         },
-        "oseg.printApiCallProperty": {
-            "description": inspect.cleandoc(
-                """
-                Add property name as comment for non-variable values passed to
-                the API call method. (Default: true)
-                """
-            ),
-            "default": {},
-        },
     }
 
     def __init__(self, config: JavaConfigDef):
-        self.invoker_package = config.get("invokerPackage")
-        self.api_package = config.get("apiPackage")
-        self.model_package = config.get("modelPackage")
+        self._config = config
 
-        assert isinstance(self.invoker_package, str)
-        assert isinstance(self.api_package, str)
-        assert isinstance(self.model_package, str)
+        self.invokerPackage = config.get("invokerPackage")
+        self.apiPackage = config.get("apiPackage")
+        self.modelPackage = config.get("modelPackage")
 
-        self.artifact_id = config.get(
-            "artifactId",
-            self.PROPS_OPTIONAL["artifactId"].get("default"),
-        )
+        assert isinstance(self.invokerPackage, str)
+        assert isinstance(self.apiPackage, str)
+        assert isinstance(self.modelPackage, str)
 
-        self.oseg_package = config.get(
-            "oseg.package",
-            self.PROPS_OPTIONAL["oseg.package"].get("default"),
-        )
+        self.artifactId = self._get_value("artifactId")
 
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
-
-        self.oseg_security = self._parse_security(config)
-
-        self.oseg_print_api_call_property = config.get(
-            "oseg.printApiCallProperty",
-            self.PROPS_OPTIONAL["oseg.printApiCallProperty"].get("default"),
+        self.oseg = JavaConfigOseg(
+            package=self._get_value("oseg.package"),
+            printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
 
 
@@ -357,8 +354,8 @@ class JavaProject(generator.ProjectSetup):
                 source="build.gradle",
                 target="build.gradle",
                 values={
-                    "{{ artifactId }}": self.config.artifact_id,
-                    "{{ oseg_package }}": self.config.oseg_package,
+                    "{{ artifactId }}": self.config.artifactId,
+                    "{{ oseg.package }}": self.config.oseg.package,
                 },
             ),
         ]

@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
@@ -8,9 +9,9 @@ TypescriptNodeConfigDef = TypedDict(
     {
         "npmName": str,
         "oseg.npmName": str | None,
+        "oseg.printApiCallProperty": bool | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
-        "oseg.printApiCallProperty": bool | None,
     },
 )
 
@@ -20,8 +21,15 @@ class TypescriptNodeConfigComplete(TypedDict):
     additionalProperties: TypescriptNodeConfigDef
 
 
+@dataclass
+class TypescriptNodeConfigOseg(generator.BaseConfigOseg):
+    npmName: str | None
+    printApiCallProperty: bool | None
+
+
 class TypescriptNodeConfig(generator.BaseConfig):
     GENERATOR_NAME = "typescript-node"
+    oseg: TypescriptNodeConfigOseg
 
     PROPS_REQUIRED = {
         "npmName": inspect.cleandoc(
@@ -42,6 +50,15 @@ class TypescriptNodeConfig(generator.BaseConfig):
             ),
             "default": None,
         },
+        "oseg.printApiCallProperty": {
+            "description": inspect.cleandoc(
+                """
+                Add property name as comment for non-variable values passed to
+                the API call method. (Default: true)
+                """
+            ),
+            "default": {},
+        },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -59,36 +76,19 @@ class TypescriptNodeConfig(generator.BaseConfig):
             ),
             "default": {},
         },
-        "oseg.printApiCallProperty": {
-            "description": inspect.cleandoc(
-                """
-                Add property name as comment for non-variable values passed to
-                the API call method. (Default: true)
-                """
-            ),
-            "default": {},
-        },
     }
 
     def __init__(self, config: TypescriptNodeConfigDef):
-        self.npm_name = config.get("npmName")
-        assert isinstance(self.npm_name, str)
+        self._config = config
 
-        self.oseg_npm_name = config.get(
-            "oseg.npmName",
-            self.PROPS_OPTIONAL["oseg.npmName"].get("default"),
-        )
+        self.npmName = config.get("npmName")
+        assert isinstance(self.npmName, str)
 
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
-
-        self.oseg_security = self._parse_security(config)
-
-        self.oseg_print_api_call_property = config.get(
-            "oseg.printApiCallProperty",
-            self.PROPS_OPTIONAL["oseg.printApiCallProperty"].get("default"),
+        self.oseg = TypescriptNodeConfigOseg(
+            npmName=self._get_value("oseg.npmName"),
+            printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
 
 
@@ -309,8 +309,8 @@ class TypescriptNodeProject(generator.ProjectSetup):
                 source="package.json",
                 target="package.json",
                 values={
-                    "{{ npm_name }}": self.config.npm_name,
-                    "{{ oseg_npm_name }}": self.config.oseg_npm_name,
+                    "{{ npmName }}": self.config.npmName,
+                    "{{ oseg.npmName }}": self.config.oseg.npmName,
                 },
             ),
         ]

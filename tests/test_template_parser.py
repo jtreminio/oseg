@@ -712,7 +712,7 @@ class TestTemplateParser(unittest.TestCase):
 
     def test_parse_security(self):
         oa_parser = TestUtils.oa_parser("security_schemes")
-        security_config = self.config.oseg_security
+        security_config = self.config.oseg.security
 
         schemes = {
             "api_key_scheme": f"api_key: {security_config["api_key_scheme.api_key"]}",

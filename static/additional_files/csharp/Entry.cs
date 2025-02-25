@@ -1,4 +1,4 @@
-namespace {{ oseg_namespace }};
+namespace {{ oseg.namespace }};
 
 public class Entry
 {

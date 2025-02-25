@@ -3,9 +3,9 @@
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
     <TargetFramework>net9.0</TargetFramework>
-    <PackageId>{{ oseg_namespace }}</PackageId>
+    <PackageId>{{ oseg.namespace }}</PackageId>
     <OutputType>Exe</OutputType>
-    <RootNamespace>{{ oseg_namespace }}</RootNamespace>
+    <RootNamespace>{{ oseg.namespace }}</RootNamespace>
     <IsPackable>false</IsPackable>
     <Nullable>annotations</Nullable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>

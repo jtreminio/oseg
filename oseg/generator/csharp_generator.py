@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
@@ -21,8 +22,15 @@ class CSharpConfigComplete(TypedDict):
     additionalProperties: CSharpConfigDef
 
 
+@dataclass
+class CSharpConfigOseg(generator.BaseConfigOseg):
+    namespace: str | None
+    packageGuid: str
+
+
 class CSharpConfig(generator.BaseConfig):
     GENERATOR_NAME = "csharp"
+    oseg: CSharpConfigOseg
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -37,8 +45,7 @@ class CSharpConfig(generator.BaseConfig):
         "packageGuid": {
             "description": inspect.cleandoc(
                 """
-                The GUID that will be associated with the C# project. This is
-                the SDK package you are generating example snippets for. 
+                The GUID of the source package. 
                 (Default: {C69F4F3D-BE68-4A19-A3F0-5EEE1810150B})
                 """
             ),
@@ -48,7 +55,7 @@ class CSharpConfig(generator.BaseConfig):
             "description": inspect.cleandoc(
                 """
                 Namespace for your example snippets.
-                Ex: OSEG.PetStore.Examples
+                Ex: OSEG.Examples
                 """
             ),
             "default": None,
@@ -82,30 +89,19 @@ class CSharpConfig(generator.BaseConfig):
     }
 
     def __init__(self, config: CSharpConfigDef):
-        self.package_name = config.get("packageName")
-        assert isinstance(self.package_name, str)
+        self._config = config
 
-        self.package_guid = config.get(
-            "packageGuid",
-            self.PROPS_OPTIONAL["packageGuid"].get("default"),
+        self.packageName = config.get("packageName")
+        assert isinstance(self.packageName, str)
+
+        self.packageGuid = self._get_value("packageGuid")
+
+        self.oseg = CSharpConfigOseg(
+            namespace=self._get_value("oseg.namespace"),
+            packageGuid=self._get_value("oseg.packageGuid"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
-
-        self.oseg_namespace = config.get(
-            "oseg.namespace",
-            self.PROPS_OPTIONAL["oseg.namespace"].get("default"),
-        )
-
-        self.oseg_packageGuid = config.get(
-            "oseg.packageGuid",
-            self.PROPS_OPTIONAL["oseg.packageGuid"].get("default"),
-        )
-
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
-
-        self.oseg_security = self._parse_security(config)
 
 
 class CSharpGenerator(generator.BaseGenerator):
@@ -350,24 +346,24 @@ class CSharpProject(generator.ProjectSetup):
                 source="Entry.cs",
                 target=f"{self.output_dir}/Entry.cs",
                 values={
-                    "{{ oseg_namespace }}": self.config.oseg_namespace,
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
                 },
             ),
             generator.ProjectSetupTemplateFilesDef(
                 source="SLN.sln",
-                target=f"{self.config.oseg_namespace}.sln",
+                target=f"{self.config.oseg.namespace}.sln",
                 values={
-                    "{{ packageGuid }}": self.config.package_guid,
-                    "{{ oseg_namespace }}": self.config.oseg_namespace,
-                    "{{ oseg_packageGuid }}": self.config.oseg_packageGuid,
+                    "{{ packageGuid }}": self.config.packageGuid,
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
+                    "{{ oseg.packageGuid }}": self.config.oseg.packageGuid,
                 },
             ),
             generator.ProjectSetupTemplateFilesDef(
                 source="CSPROJ.csproj",
-                target=f"{self.output_dir}/{self.config.oseg_namespace}.csproj",
+                target=f"{self.output_dir}/{self.config.oseg.namespace}.csproj",
                 values={
-                    "{{ packageName }}": self.config.package_name,
-                    "{{ oseg_namespace }}": self.config.oseg_namespace,
+                    "{{ packageName }}": self.config.packageName,
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
                 },
             ),
         ]

@@ -1,4 +1,5 @@
 import inspect
+from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
@@ -8,9 +9,9 @@ RubyConfigDef = TypedDict(
     {
         "gemName": str,
         "moduleName": str,
+        "oseg.printApiCallProperty": bool | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
-        "oseg.printApiCallProperty": bool | None,
     },
 )
 
@@ -21,8 +22,14 @@ class RubyConfigComplete(TypedDict):
     additionalProperties: RubyConfigDef
 
 
+@dataclass
+class RubyConfigOseg(generator.BaseConfigOseg):
+    printApiCallProperty: bool | None
+
+
 class RubyConfig(generator.BaseConfig):
     GENERATOR_NAME = "ruby"
+    oseg: RubyConfigOseg
 
     PROPS_REQUIRED = {
         "gemName": inspect.cleandoc(
@@ -40,6 +47,15 @@ class RubyConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "oseg.printApiCallProperty": {
+            "description": inspect.cleandoc(
+                """
+                Add property name as comment for non-variable values passed to
+                the API call method. (Default: true)
+                """
+            ),
+            "default": {},
+        },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -57,34 +73,21 @@ class RubyConfig(generator.BaseConfig):
             ),
             "default": {},
         },
-        "oseg.printApiCallProperty": {
-            "description": inspect.cleandoc(
-                """
-                Add property name as comment for non-variable values passed to
-                the API call method. (Default: true)
-                """
-            ),
-            "default": {},
-        },
     }
 
     def __init__(self, config: RubyConfigDef):
-        self.gem_name = config.get("gemName")
-        self.module_name = config.get("moduleName")
+        self._config = config
 
-        assert isinstance(self.gem_name, str)
-        assert isinstance(self.module_name, str)
+        self.gemName = config.get("gemName")
+        self.moduleName = config.get("moduleName")
 
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
-        )
+        assert isinstance(self.gemName, str)
+        assert isinstance(self.moduleName, str)
 
-        self.oseg_security = self._parse_security(config)
-
-        self.oseg_print_api_call_property = config.get(
-            "oseg.printApiCallProperty",
-            self.PROPS_OPTIONAL["oseg.printApiCallProperty"].get("default"),
+        self.oseg = RubyConfigOseg(
+            printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
 
 
@@ -221,7 +224,7 @@ class RubyProject(generator.ProjectSetup):
                 source="Gemfile",
                 target="Gemfile",
                 values={
-                    "{{ gemName }}": self.config.gem_name,
+                    "{{ gemName }}": self.config.gemName,
                 },
             ),
         ]

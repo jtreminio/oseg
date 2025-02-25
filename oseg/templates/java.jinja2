@@ -83,20 +83,20 @@ new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not pri
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}
-    {% if config.oseg_print_api_call_property %}
+    {% if config.oseg.printApiCallProperty %}
         {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
     {% endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
 
-package {{ config.oseg_package }};
+package {{ config.oseg.package }};
 
-import {{ config.invoker_package }}.ApiException;
-import {{ config.invoker_package }}.Configuration;
-import {{ config.api_package }}.*;
-import {{ config.invoker_package }}.auth.*;
-import {{ config.model_package }}.*;
+import {{ config.invokerPackage }}.ApiException;
+import {{ config.invokerPackage }}.Configuration;
+import {{ config.apiPackage }}.*;
+import {{ config.invokerPackage }}.auth.*;
+import {{ config.modelPackage }}.*;
 
 import java.io.File;
 import java.time.LocalDate;

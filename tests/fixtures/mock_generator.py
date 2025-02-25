@@ -1,4 +1,6 @@
 import inspect
+from dataclasses import dataclass
+
 from jinja2.runtime import Macro
 from mock import mock
 from typing import TypedDict
@@ -18,8 +20,14 @@ class MockConfigComplete(TypedDict):
     additionalProperties: MockConfigDef
 
 
+@dataclass
+class MockConfigOseg(generator.BaseConfigOseg):
+    pass
+
+
 class MockConfig(generator.BaseConfig):
     GENERATOR_NAME = "mock"
+    oseg: MockConfigOseg
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -43,15 +51,15 @@ class MockConfig(generator.BaseConfig):
     }
 
     def __init__(self, config: MockConfigDef):
+        self._config = config
+
         self.package_name = config.get("packageName")
         assert isinstance(self.package_name, str)
 
-        self.oseg_ignore_optional_unset = config.get(
-            "oseg.ignoreOptionalUnset",
-            self.PROPS_OPTIONAL["oseg.ignoreOptionalUnset"].get("default"),
+        self.oseg = MockConfigOseg(
+            ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
+            security=self._parse_security(),
         )
-
-        self.oseg_security = self._parse_security(config)
 
 
 class MockGenerator(generator.BaseGenerator):
