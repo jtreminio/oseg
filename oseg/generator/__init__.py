@@ -5,6 +5,8 @@ from .base_generator import (
     GeneratorFactory,
     ProjectSetup,
     PropsOptionalT,
+    ProjectSetupTemplateFilesDef,
+    GENERATOR_CONFIG_TYPE,
 )
 from .csharp_generator import CSharpConfig, CSharpGenerator, CSharpProject
 from .java_generator import JavaConfig, JavaGenerator, JavaProject

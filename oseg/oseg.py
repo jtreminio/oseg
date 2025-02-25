@@ -7,8 +7,11 @@ class Generator:
         self,
         oas_file: str,
         operation_id: str | None = None,
-        example_data: model.EXAMPLE_DATA_BY_OPERATION | None = None,
+        example_data: model.EXAMPLE_DATA_BY_OPERATION | str | None = None,
     ):
+        if isinstance(example_data, str) and os.path.isfile(example_data):
+            example_data = parser.FileLoader.get_file_contents(example_data)
+
         self._oa_parser = parser.OaParser(
             oas_file,
             operation_id,
@@ -17,10 +20,10 @@ class Generator:
 
     def generate(
         self,
-        config: generator.BaseConfigDef | str,
+        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
         output_dir: str,
     ) -> int:
-        config = generator.BaseConfig.factory(config)
+        config = self.read_config_file(config)
         jinja = jinja_extension.JinjaExt.factory()
 
         if not os.path.isdir(output_dir):
@@ -54,11 +57,21 @@ class Generator:
 
     def setup_project(
         self,
-        config: generator.BaseConfigDef | str,
+        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
         base_dir: str,
         output_dir: str,
     ) -> int:
+        config = self.read_config_file(config)
         project_setup = generator.ProjectSetup.factory(config, base_dir, output_dir)
         project_setup.setup()
 
         return 0
+
+    def read_config_file(
+        self,
+        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
+    ) -> generator.GENERATOR_CONFIG_TYPE:
+        if isinstance(config, dict) or isinstance(config, str):
+            return generator.BaseConfig.factory(config)
+
+        return config

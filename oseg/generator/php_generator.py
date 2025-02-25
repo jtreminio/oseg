@@ -235,15 +235,15 @@ class PhpProject(generator.ProjectSetup):
         namespace = namespace.rstrip("\\\\")
 
         template_files = [
-            {
-                "source": "composer.json",
-                "target": "composer.json",
-                "values": {
+            generator.ProjectSetupTemplateFilesDef(
+                source="composer.json",
+                target="composer.json",
+                values={
                     "{{ composerPackageName }}": self.config.composer_package_name,
                     "{{ oseg_composerPackageName }}": self.config.oseg_composer_package_name,
                     "{{ oseg_namespace }}": namespace,
                 },
-            },
+            ),
         ]
 
         self._template_files(template_files)

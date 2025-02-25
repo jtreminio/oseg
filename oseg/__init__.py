@@ -1,3 +1,5 @@
+import os
+
 # coding: utf-8
 
 """
@@ -5,6 +7,7 @@
 """
 
 __version__ = "0.1-dev"
+__ROOT_DIR__ = os.path.dirname(os.path.abspath(__file__)) + "/.."
 
 from .jinja_extension import *
 from .generator import *

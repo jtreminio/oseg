@@ -305,14 +305,14 @@ class TypescriptNodeProject(generator.ProjectSetup):
         self._copy_files([".gitignore", "tsconfig.json"])
 
         template_files = [
-            {
-                "source": "package.json",
-                "target": "package.json",
-                "values": {
+            generator.ProjectSetupTemplateFilesDef(
+                source="package.json",
+                target="package.json",
+                values={
                     "{{ npm_name }}": self.config.npm_name,
                     "{{ oseg_npm_name }}": self.config.oseg_npm_name,
                 },
-            },
+            ),
         ]
 
         self._template_files(template_files)

@@ -353,14 +353,14 @@ class JavaProject(generator.ProjectSetup):
         self._copy_files([".gitignore"])
 
         template_files = [
-            {
-                "source": "build.gradle",
-                "target": "build.gradle",
-                "values": {
+            generator.ProjectSetupTemplateFilesDef(
+                source="build.gradle",
+                target="build.gradle",
+                values={
                     "{{ artifactId }}": self.config.artifact_id,
                     "{{ oseg_package }}": self.config.oseg_package,
                 },
-            },
+            ),
         ]
 
         self._template_files(template_files)

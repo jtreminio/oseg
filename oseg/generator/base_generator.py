@@ -2,11 +2,12 @@ from __future__ import annotations
 import json
 import os
 import shutil
+from dataclasses import dataclass
 
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol, TypedDict, Any, Union
-from oseg import generator, model, parser
+from oseg import generator, model, parser, __ROOT_DIR__
 
 GENERATOR_CONFIG_TYPE = Union[
     "generator.CSharpConfig",
@@ -270,7 +271,7 @@ class BaseGenerator(Protocol):
 class GeneratorFactory:
     @staticmethod
     def factory(
-        config: BaseConfig,
+        config: generator.GENERATOR_CONFIG_TYPE,
         operation: model.Operation,
         property_container: model.PropertyContainer,
     ) -> GENERATOR_TYPE:
@@ -310,7 +311,8 @@ class GeneratorFactory:
         ]
 
 
-class ProjectSetupTemplateFilesDef(TypedDict):
+@dataclass
+class ProjectSetupTemplateFilesDef:
     source: str
     target: str
     values: dict[str, str]
@@ -320,10 +322,9 @@ class ProjectSetup:
     config: GENERATOR_CONFIG_TYPE
 
     def __init__(self, config: GENERATOR_CONFIG_TYPE, base_dir: str, output_dir: str):
-        __DIR = os.path.dirname(os.path.abspath(__file__))
         self.config = config
         self.additional_files_dir: str = (
-            f"{__DIR}/../../static/additional_files/{config.GENERATOR_NAME}"
+            f"{__ROOT_DIR__}/static/additional_files/{config.GENERATOR_NAME}"
         )
         self.base_dir: str = base_dir
         self.output_dir: str = output_dir
@@ -336,12 +337,10 @@ class ProjectSetup:
 
     @staticmethod
     def factory(
-        config: BaseConfigDef | str,
+        config: GENERATOR_CONFIG_TYPE,
         base_dir: str,
         output_dir: str,
     ) -> ProjectSetup:
-        config = generator.BaseConfig.factory(config)
-
         if isinstance(config, generator.CSharpConfig):
             return generator.CSharpProject(config, base_dir, output_dir)
 
@@ -375,16 +374,16 @@ class ProjectSetup:
 
     def _template_files(self, files: list[ProjectSetupTemplateFilesDef]) -> None:
         for file in files:
-            with open(
-                f"{self.additional_files_dir}/{file["source"]}", "r", encoding="utf-8"
-            ) as s:
+            source_file = f"{self.additional_files_dir}/{file.source}"
+            with open(source_file, "r", encoding="utf-8") as s:
                 source = s.read()
 
-                for old, new in file["values"].items():
+                for old, new in file.values.items():
                     if new is None:
                         new = ""
 
                     source = source.replace(old, new)
 
-                with open(file["target"], "w", encoding="utf-8") as t:
+                target_file = f"{self.base_dir}/{file.target}"
+                with open(target_file, "w", encoding="utf-8") as t:
                     t.write(source)

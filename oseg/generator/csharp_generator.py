@@ -346,30 +346,30 @@ class CSharpProject(generator.ProjectSetup):
         self._copy_files([".gitignore", "global.json", "NuGet.Config"])
 
         template_files = [
-            {
-                "source": "Entry.cs",
-                "target": f"{self.output_dir}/Entry.cs",
-                "values": {
+            generator.ProjectSetupTemplateFilesDef(
+                source="Entry.cs",
+                target=f"{self.output_dir}/Entry.cs",
+                values={
                     "{{ oseg_namespace }}": self.config.oseg_namespace,
                 },
-            },
-            {
-                "source": "SLN.sln",
-                "target": f"{self.config.oseg_namespace}.sln",
-                "values": {
+            ),
+            generator.ProjectSetupTemplateFilesDef(
+                source="SLN.sln",
+                target=f"{self.config.oseg_namespace}.sln",
+                values={
                     "{{ packageGuid }}": self.config.package_guid,
                     "{{ oseg_namespace }}": self.config.oseg_namespace,
                     "{{ oseg_packageGuid }}": self.config.oseg_packageGuid,
                 },
-            },
-            {
-                "source": "CSPROJ.csproj",
-                "target": f"{self.output_dir}/{self.config.oseg_namespace}.csproj",
-                "values": {
+            ),
+            generator.ProjectSetupTemplateFilesDef(
+                source="CSPROJ.csproj",
+                target=f"{self.output_dir}/{self.config.oseg_namespace}.csproj",
+                values={
                     "{{ packageName }}": self.config.package_name,
                     "{{ oseg_namespace }}": self.config.oseg_namespace,
                 },
-            },
+            ),
         ]
 
         self._template_files(template_files)

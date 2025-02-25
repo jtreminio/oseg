@@ -217,13 +217,13 @@ class RubyProject(generator.ProjectSetup):
         self._copy_files([".gitignore"])
 
         template_files = [
-            {
-                "source": "Gemfile",
-                "target": "Gemfile",
-                "values": {
+            generator.ProjectSetupTemplateFilesDef(
+                source="Gemfile",
+                target="Gemfile",
+                values={
                     "{{ gemName }}": self.config.gem_name,
                 },
-            },
+            ),
         ]
 
         self._template_files(template_files)
