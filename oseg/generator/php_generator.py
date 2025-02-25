@@ -7,7 +7,9 @@ PhpConfigDef = TypedDict(
     "PhpConfigDef",
     {
         "invokerPackage": str,
+        "composerPackageName": str | None,
         "oseg.namespace": str | None,
+        "oseg.composerPackageName": str | None,
         "oseg.autoloadLocation": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
@@ -33,11 +35,29 @@ class PhpConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "composerPackageName": {
+            "description": inspect.cleandoc(
+                """
+                The name to use in the composer package name, of the source package.
+                (Default: openapi/client)
+                """
+            ),
+            "default": "openapi/client",
+        },
         "oseg.namespace": {
             "description": inspect.cleandoc(
                 """
                 Namespace for your example snippets.
-                Ex: OSEG\\PetStore\\Examples
+                Ex: OSEG\PetStoreExamples
+                """
+            ),
+            "default": None,
+        },
+        "oseg.composerPackageName": {
+            "description": inspect.cleandoc(
+                """
+                The name to use in the composer package name, for your example snippets.
+                Ex: oseg/petstore_examples
                 """
             ),
             "default": None,
@@ -74,9 +94,19 @@ class PhpConfig(generator.BaseConfig):
         self.invoker_package = config.get("invokerPackage")
         assert isinstance(self.invoker_package, str)
 
+        self.composer_package_name = config.get(
+            "composerPackageName",
+            self.PROPS_OPTIONAL["composerPackageName"].get("default"),
+        )
+
         self.oseg_namespace = config.get(
             "oseg.namespace",
             self.PROPS_OPTIONAL["oseg.namespace"].get("default"),
+        )
+
+        self.oseg_composer_package_name = config.get(
+            "oseg.composerPackageName",
+            self.PROPS_OPTIONAL["oseg.composerPackageName"].get("default"),
         )
 
         self.oseg_autoload_location = config.get(
@@ -191,3 +221,29 @@ class PhpGenerator(generator.BaseGenerator):
             return NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
         return NormalizeStr.underscore(f"{name}_{value}").upper()
+
+
+class PhpProject(generator.ProjectSetup):
+    config: PhpConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        namespace = self.config.oseg_namespace.split("\\")
+        namespace = list(filter(None, namespace))
+        namespace = "\\\\".join(namespace)
+        namespace = namespace.rstrip("\\\\")
+
+        template_files = [
+            generator.ProjectSetupTemplateFilesDef(
+                source="composer.json",
+                target="composer.json",
+                values={
+                    "{{ composerPackageName }}": self.config.composer_package_name,
+                    "{{ oseg_composerPackageName }}": self.config.oseg_composer_package_name,
+                    "{{ oseg_namespace }}": namespace,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)

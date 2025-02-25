@@ -8,12 +8,12 @@ DIR=$(cd `dirname $0` && pwd)
 SOURCE_DIR=$1
 SDK=$2
 
-BASE_DIR="${DIR}/../examples/${SOURCE_DIR}"
+BASE_DIR="${DIR}/../../oseg-examples/${SOURCE_DIR}"
 
 OAS_FILE="openapi.yaml"
 OAS="${BASE_DIR}/${OAS_FILE}"
 CONFIG_FILE="${BASE_DIR}/config-${SDK}.yaml"
-OUTPUT_DIR="${BASE_DIR}/sdks"
+OUTPUT_DIR="${BASE_DIR}/${SDK}"
 
 if [[ -z "${SOURCE_DIR-}" ]] || [[ ! -d "${BASE_DIR}" ]]; then
   echo "Must provide source directory"
@@ -40,8 +40,8 @@ if [[ -f "${CONFIG_FILE}" ]]; then
   CONFIG_PARAM="-c /local/config-${SDK}.yaml"
 fi
 
-if [[ ! -d "${OUTPUT_DIR}/${SDK}" ]]; then
-  mkdir -p "${OUTPUT_DIR}/${SDK}"
+if [[ ! -d "${OUTPUT_DIR}" ]]; then
+  mkdir -p "${OUTPUT_DIR}/sdk"
 fi
 
 docker run --rm \
@@ -50,9 +50,5 @@ docker run --rm \
   openapitools/openapi-generator-cli:v7.11.0 generate \
     ${CONFIG_PARAM} \
     -i "/local/${OAS_FILE}" \
-    -o "/local/sdks/${SDK}" \
+    -o "/local/${SDK}/sdk" \
     --skip-validate-spec
-
-if [[ "${SDK}" = "java" ]]; then
-  chmod +x "${OUTPUT_DIR}/${SDK}/gradlew"
-fi

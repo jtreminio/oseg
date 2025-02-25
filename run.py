@@ -8,27 +8,27 @@ from oseg import Generator, generator as g
 """
 Example:
 python3 run.py generate \
-    -i examples/petstore/openapi.yaml \
-    -o examples/petstore/generated/python/src \
-    --config-file examples/petstore/config-python.yaml \
-    --example-data-file examples/petstore/example_data.json
+    -i openapi.yaml \
+    -o generated/python/src \
+    --config-file config-python.yaml \
+    --example-data-file example_data.json
 
 or:
 
 python3 run.py generate \
-    -i examples/petstore/openapi.yaml \
-    -o examples/petstore/generated/python/src \
+    -i openapi.yaml \
+    -o generated/python/src \
     --generator-name python \
     --config '{
       "packageName": "openapi_client",
       "oseg.propertyNamingConvention": "camel_case",
       "oseg.ignoreOptionalUnset": false
     }' \
-    --example-data-file examples/petstore/example_data.json
+    --example-data-file example_data.json
     
 or:
 
-python3 run.py config-help -g csharp
+python3 run.py config-help -g python
 """
 
 
@@ -160,6 +160,18 @@ def config_help(generator_name: str):
 
     for name, sub in result["optional"].items():
         data.append([name, sub["description"], "No", sub["default"]])
+
+    print(
+        "\n"
+        + inspect.cleandoc(
+            """
+            Note: Any config name not prepended with "oseg" refers to the source
+            SDK. These names come directly from openapi-generator. See
+            https://openapi-generator.tech/docs/generators/ for more information.
+            """
+        )
+        + "\n"
+    )
 
     print(
         tabulate(data, headers="firstrow", tablefmt="simple", maxcolwidths=[None, 40])

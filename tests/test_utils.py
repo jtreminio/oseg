@@ -4,7 +4,6 @@ from oseg import parser
 
 class TestUtils:
     _BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-    PETSTORE: str = f"{_BASE_DIR}/../data/petstore/openapi.yaml"
     cached_oa_parsers: dict[str, parser.OaParser] = {}
 
     @classmethod

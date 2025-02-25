@@ -3,11 +3,18 @@ from .base_generator import (
     BaseConfigDef,
     BaseGenerator,
     GeneratorFactory,
+    ProjectSetup,
     PropsOptionalT,
+    ProjectSetupTemplateFilesDef,
+    GENERATOR_CONFIG_TYPE,
 )
-from .csharp_generator import CSharpConfig, CSharpGenerator
-from .java_generator import JavaConfig, JavaGenerator
-from .php_generator import PhpConfig, PhpGenerator
-from .python_generator import PythonConfig, PythonGenerator
-from .ruby_generator import RubyConfig, RubyGenerator
-from .typescript_node_generator import TypescriptNodeConfig, TypescriptNodeGenerator
+from .csharp_generator import CSharpConfig, CSharpGenerator, CSharpProject
+from .java_generator import JavaConfig, JavaGenerator, JavaProject
+from .php_generator import PhpConfig, PhpGenerator, PhpProject
+from .python_generator import PythonConfig, PythonGenerator, PythonProject
+from .ruby_generator import RubyConfig, RubyGenerator, RubyProject
+from .typescript_node_generator import (
+    TypescriptNodeConfig,
+    TypescriptNodeGenerator,
+    TypescriptNodeProject,
+)

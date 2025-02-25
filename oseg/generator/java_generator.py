@@ -10,6 +10,7 @@ JavaConfigDef = TypedDict(
         "invokerPackage": str,
         "apiPackage": str,
         "modelPackage": str,
+        "artifactId": str | None,
         "oseg.package": str | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
@@ -48,6 +49,14 @@ class JavaConfig(generator.BaseConfig):
     }
 
     PROPS_OPTIONAL: dict[str, generator.PropsOptionalT] = {
+        "artifactId": {
+            "description": inspect.cleandoc(
+                """
+                artifactId of the source package. (Default: openapi-java-client)
+                """
+            ),
+            "default": "openapi-java-client",
+        },
         "oseg.package": {
             "description": inspect.cleandoc(
                 """
@@ -93,6 +102,11 @@ class JavaConfig(generator.BaseConfig):
         assert isinstance(self.invoker_package, str)
         assert isinstance(self.api_package, str)
         assert isinstance(self.model_package, str)
+
+        self.artifact_id = config.get(
+            "artifactId",
+            self.PROPS_OPTIONAL["artifactId"].get("default"),
+        )
 
         self.oseg_package = config.get(
             "oseg.package",
@@ -330,3 +344,23 @@ class JavaGenerator(generator.BaseGenerator):
             return f"{value}L"
 
         return value
+
+
+class JavaProject(generator.ProjectSetup):
+    config: JavaConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        template_files = [
+            generator.ProjectSetupTemplateFilesDef(
+                source="build.gradle",
+                target="build.gradle",
+                values={
+                    "{{ artifactId }}": self.config.artifact_id,
+                    "{{ oseg_package }}": self.config.oseg_package,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
