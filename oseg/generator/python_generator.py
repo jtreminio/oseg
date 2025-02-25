@@ -216,3 +216,10 @@ class PythonGenerator(generator.BaseGenerator):
             return f'date.fromisoformat("{value}")'
 
         return self._to_json(value)
+
+
+class PythonProject(generator.ProjectSetup):
+    config: PythonConfig
+
+    def setup(self) -> None:
+        pass

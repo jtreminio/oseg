@@ -51,3 +51,14 @@ class Generator:
                     f.write(rendered)
 
         return 0
+
+    def setup_project(
+        self,
+        config: generator.BaseConfigDef | str,
+        base_dir: str,
+        output_dir: str,
+    ) -> int:
+        project_setup = generator.ProjectSetup.factory(config, base_dir, output_dir)
+        project_setup.setup()
+
+        return 0

@@ -208,3 +208,22 @@ class RubyGenerator(generator.BaseGenerator):
             return f'Date.parse("{value}").to_date'
 
         return self._to_json(value)
+
+
+class RubyProject(generator.ProjectSetup):
+    config: RubyConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        template_files = [
+            {
+                "source": "Gemfile",
+                "target": "Gemfile",
+                "values": {
+                    "{{ gemName }}": self.config.gem_name,
+                },
+            },
+        ]
+
+        self._template_files(template_files)

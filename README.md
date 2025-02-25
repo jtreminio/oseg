@@ -50,7 +50,7 @@ using Org.OpenAPITools.Api;
 using Org.OpenAPITools.Client;
 using Org.OpenAPITools.Model;
 
-namespace OSEG.PetStore.Examples;
+namespace OSEG.PetStoreExamples;
 
 public class AddPetExample
 {
@@ -113,7 +113,7 @@ public class AddPetExample
 ### [java](https://openapi-generator.tech/docs/generators/java/)
 
 ```java
-package oseg.petstore.examples;
+package oseg.petstore_examples;
 
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
@@ -186,7 +186,7 @@ public class AddPetExample
 ```php
 <?php
 
-namespace OSEG\PetStore\Examples;
+namespace OSEG\PetStoreExamples;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -288,6 +288,7 @@ with ApiClient(configuration) as api_client:
         pprint(response)
     except ApiException as e:
         print("Exception when calling Pet#add_pet: %s\n" % e)
+
 ```
 
 ### [ruby](https://openapi-generator.tech/docs/generators/ruby/)
@@ -296,7 +297,7 @@ with ApiClient(configuration) as api_client:
 require "openapi_client"
 
 OpenApiClient.configure do |config|
-    config.access_token = "YOUR_ACCESS_TOKEN";
+    config.access_token = "YOUR_ACCESS_TOKEN"
 end
 
 category = OpenApiClient::Category.new
@@ -361,15 +362,15 @@ tags2.id = 98765;
 tags2.name = "tag_2";
 
 const tags = [
-    tags1,
-    tags2,
+  tags1,
+  tags2,
 ];
 
 const pet = new models.Pet();
 pet.name = "My pet name";
 pet.photoUrls = [
-    "https://example.com/picture_1.jpg",
-    "https://example.com/picture_2.jpg",
+  "https://example.com/picture_1.jpg",
+  "https://example.com/picture_2.jpg",
 ];
 pet.id = 12345;
 pet.status = models.Pet.StatusEnum.Available;
@@ -377,7 +378,7 @@ pet.category = category;
 pet.tags = tags;
 
 apiCaller.addPet(
-    pet,
+  pet,
 ).then(response => {
   console.log(response.body);
 }).catch(error => {
@@ -390,14 +391,14 @@ apiCaller.addPet(
 
 Example data used to generate the code snippets can come from a number of places:
 
-* [example or examples values](https://github.com/jtreminio/oseg/blob/9f720fc462ba5d1a8b8f90fa349a675dbd76c610/examples/petstore/openapi.yaml#L705) in schema
-* [default values](https://github.com/jtreminio/oseg/blob/9f720fc462ba5d1a8b8f90fa349a675dbd76c610/examples/petstore/openapi.yaml#L100) in schema
+* [example or examples values](https://github.com/jtreminio/oseg-examples/blob/main/petstore/openapi.yaml#L705) in schema
+* [default values](https://github.com/jtreminio/oseg-examples/blob/main/petstore/openapi.yaml#L100) in schema
 * [Externally referenced JSON files](https://github.com/jtreminio/oseg/blob/51e26de23b812f22887d0ccc867b09dff825fbf9/tests/fixtures/example_data_parser-external_example.yaml#L78-L82) defined in schema
-* You can also create a [JSON file with examples for all the endpoints you want](https://github.com/jtreminio/oseg/blob/90ec8364fdfd202557543a00caaa49ddb47ed249/examples/petstore/example_data.json)
+* You can also create a [JSON file with examples for all the endpoints you want](https://github.com/jtreminio/oseg-examples/blob/main/petstore/example_data.json)
 
 OSEG currently generates one code snippet file per `requestBody` definition, but only a single example per `parameters` definition.
 
-In other words, you can generate multiple examples of the same operation/endpoint by having multiple `requestBody` definitions. Each generate example will have different data embedded within it. However, since [parameters](https://github.com/jtreminio/oseg/blob/main/examples/petstore/openapi.yaml#L84-L100) is tied to a single operation, the same data will apply to any and all `requestBody` definitions.
+In other words, you can generate multiple examples of the same operation/endpoint by having multiple `requestBody` definitions. Each generate example will have different data embedded within it. However, since [parameters](https://github.com/jtreminio/oseg-examples/blob/main/petstore/openapi.yaml#L84-L100) is tied to a single operation, the same data will apply to any and all `requestBody` definitions.
 
 If you use a custom JSON file with examples you can define as many examples per endpoint as you want, since you can define each data source separately (`query`, `path`, `header`, `cookie`, and `body`) per endpoint.
 

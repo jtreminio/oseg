@@ -221,3 +221,29 @@ class PhpGenerator(generator.BaseGenerator):
             return NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
         return NormalizeStr.underscore(f"{name}_{value}").upper()
+
+
+class PhpProject(generator.ProjectSetup):
+    config: PhpConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        namespace = self.config.oseg_namespace.split("\\")
+        namespace = list(filter(None, namespace))
+        namespace = "\\\\".join(namespace)
+        namespace = namespace.rstrip("\\\\")
+
+        template_files = [
+            {
+                "source": "composer.json",
+                "target": "composer.json",
+                "values": {
+                    "{{ composerPackageName }}": self.config.composer_package_name,
+                    "{{ oseg_composerPackageName }}": self.config.oseg_composer_package_name,
+                    "{{ oseg_namespace }}": namespace,
+                },
+            },
+        ]
+
+        self._template_files(template_files)

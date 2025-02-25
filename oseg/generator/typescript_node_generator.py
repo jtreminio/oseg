@@ -296,3 +296,23 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
             return None
 
         return NormalizeStr.pascal_case(value)
+
+
+class TypescriptNodeProject(generator.ProjectSetup):
+    config: TypescriptNodeConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore", "tsconfig.json"])
+
+        template_files = [
+            {
+                "source": "package.json",
+                "target": "package.json",
+                "values": {
+                    "{{ npm_name }}": self.config.npm_name,
+                    "{{ oseg_npm_name }}": self.config.oseg_npm_name,
+                },
+            },
+        ]
+
+        self._template_files(template_files)

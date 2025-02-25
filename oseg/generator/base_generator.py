@@ -1,5 +1,8 @@
 from __future__ import annotations
 import json
+import os
+import shutil
+
 import openapi_pydantic as oa
 from abc import abstractmethod
 from typing import Protocol, TypedDict, Any, Union
@@ -305,3 +308,83 @@ class GeneratorFactory:
             generator.RubyGenerator.NAME,
             generator.TypescriptNodeGenerator.NAME,
         ]
+
+
+class ProjectSetupTemplateFilesDef(TypedDict):
+    source: str
+    target: str
+    values: dict[str, str]
+
+
+class ProjectSetup:
+    config: GENERATOR_CONFIG_TYPE
+
+    def __init__(self, config: GENERATOR_CONFIG_TYPE, base_dir: str, output_dir: str):
+        __DIR = os.path.dirname(os.path.abspath(__file__))
+        self.config = config
+        self.additional_files_dir: str = (
+            f"{__DIR}/../../static/additional_files/{config.GENERATOR_NAME}"
+        )
+        self.base_dir: str = base_dir
+        self.output_dir: str = output_dir
+
+        if not os.path.isdir(base_dir):
+            os.makedirs(base_dir)
+
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+
+    @staticmethod
+    def factory(
+        config: BaseConfigDef | str,
+        base_dir: str,
+        output_dir: str,
+    ) -> ProjectSetup:
+        config = generator.BaseConfig.factory(config)
+
+        if isinstance(config, generator.CSharpConfig):
+            return generator.CSharpProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.JavaConfig):
+            return generator.JavaProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.PhpConfig):
+            return generator.PhpProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.PythonConfig):
+            return generator.PythonProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.RubyConfig):
+            return generator.RubyProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.TypescriptNodeConfig):
+            return generator.TypescriptNodeProject(config, base_dir, output_dir)
+
+        raise NotImplementedError
+
+    @abstractmethod
+    def setup(self) -> None:
+        raise NotImplementedError
+
+    def _copy_files(self, filenames: list[str]) -> None:
+        for filename in filenames:
+            shutil.copyfile(
+                f"{self.additional_files_dir}/{filename}",
+                f"{self.base_dir}/{filename}",
+            )
+
+    def _template_files(self, files: list[ProjectSetupTemplateFilesDef]) -> None:
+        for file in files:
+            with open(
+                f"{self.additional_files_dir}/{file["source"]}", "r", encoding="utf-8"
+            ) as s:
+                source = s.read()
+
+                for old, new in file["values"].items():
+                    if new is None:
+                        new = ""
+
+                    source = source.replace(old, new)
+
+                with open(file["target"], "w", encoding="utf-8") as t:
+                    t.write(source)

@@ -344,3 +344,23 @@ class JavaGenerator(generator.BaseGenerator):
             return f"{value}L"
 
         return value
+
+
+class JavaProject(generator.ProjectSetup):
+    config: JavaConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        template_files = [
+            {
+                "source": "build.gradle",
+                "target": "build.gradle",
+                "values": {
+                    "{{ artifactId }}": self.config.artifact_id,
+                    "{{ oseg_package }}": self.config.oseg_package,
+                },
+            },
+        ]
+
+        self._template_files(template_files)
