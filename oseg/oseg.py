@@ -9,8 +9,12 @@ class Generator:
         operation_id: str | None = None,
         example_data: model.EXAMPLE_DATA_BY_OPERATION | str | None = None,
     ):
-        if isinstance(example_data, str) and os.path.isfile(example_data):
-            example_data = parser.FileLoader.get_file_contents(example_data)
+        if isinstance(example_data, str):
+            example_data = (
+                parser.FileLoader.get_file_contents(example_data)
+                if os.path.isfile(example_data)
+                else None
+            )
 
         self._oa_parser = parser.OaParser(
             oas_file,
