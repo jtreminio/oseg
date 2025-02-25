@@ -439,25 +439,25 @@ Run with a local config file:
 
 ```bash
 python3 run.py generate \
-    -i examples/petstore/openapi.yaml \
-    -o examples/petstore/generated/python/src \
-    --config-file examples/petstore/config-python.yaml \
-    --example-data-file examples/petstore/example_data.json
+    -i openapi.yaml \
+    -o generated/python/src \
+    --config-file config-python.yaml \
+    --example-data-file example_data.json
 ```
 
 Run with inline config values. These config values can be seen by running `python3 run.py config-help -g {generator}`:
 
 ```bash
 python3 run.py generate \
-    -i examples/petstore/openapi.yaml \
-    -o examples/petstore/generated/python/src \
+    -i openapi.yaml \
+    -o generated/python/src \
     --generator-name python \
     --config '{
       "packageName": "openapi_client",
       "oseg.propertyNamingConvention": "camel_case",
       "oseg.ignoreOptionalUnset": false
     }' \
-    --example-data-file examples/petstore/example_data.json
+    --example-data-file example_data.json
 ```
 
 ## Tests
