@@ -203,7 +203,7 @@ class CSharpGenerator(generator.BaseGenerator):
         return name.lower() in self.RESERVED_KEYWORDS
 
     def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if secondary and not self.is_reserved_keyword(name, secondary):
+        if not self.is_reserved_keyword(name, secondary):
             return name
 
         return NormalizeStr.camel_case(f"{self.RESERVED_KEYWORD_PREPEND}_{name}")
