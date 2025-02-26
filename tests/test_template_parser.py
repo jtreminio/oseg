@@ -166,6 +166,8 @@ class TestTemplateParser(unittest.TestCase):
             "var_try": body_data["try"],
             "var_while": body_data["while"],
             "var_with": body_data["with"],
+            "var_configuration": body_data["configuration"],
+            "var_version": body_data["version"],
         }
 
         self.assertDictEqual(expected, root_properties)
@@ -198,6 +200,8 @@ class TestTemplateParser(unittest.TestCase):
             "var_try": body_data["try"],
             "var_while": body_data["while"],
             "var_with": body_data["with"],
+            "var_configuration": body_data["configuration"],
+            "var_version": body_data["version"],
         }
 
         data_provider = {
@@ -210,6 +214,8 @@ class TestTemplateParser(unittest.TestCase):
                 "var_try": default_expected["var_try"],
                 "var_while": default_expected["var_while"],
                 "var_with": default_expected["var_with"],
+                "var_configuration": default_expected["var_configuration"],
+                "var_version": default_expected["var_version"],
             },
             "status": {
                 "name": default_expected["name"],
@@ -220,6 +226,8 @@ class TestTemplateParser(unittest.TestCase):
                 "var_try": default_expected["var_try"],
                 "var_while": default_expected["var_while"],
                 "var_with": default_expected["var_with"],
+                "var_configuration": default_expected["var_configuration"],
+                "var_version": default_expected["var_version"],
             },
         }
 
@@ -262,6 +270,8 @@ class TestTemplateParser(unittest.TestCase):
             "var_try": body_data["try"],
             "var_while": body_data["while"],
             "var_with": body_data["with"],
+            "var_configuration": body_data["configuration"],
+            "var_version": body_data["version"],
         }
 
         example_name = self.example_name
@@ -300,6 +310,8 @@ class TestTemplateParser(unittest.TestCase):
             "var_try": body_data["try"],
             "var_while": body_data["while"],
             "var_with": body_data["with"],
+            "var_configuration": body_data["configuration"],
+            "var_version": body_data["version"],
         }
 
         example_name = self.example_name
@@ -585,6 +597,8 @@ class TestTemplateParser(unittest.TestCase):
             "var_try2": body_data["try"],
             "var_while2": body_data["while"],
             "var_with2": body_data["with"],
+            "configuration": body_data["configuration"],
+            "version": body_data["version"],
         }
 
         self.assertDictEqual(expected, api_call_properties)
@@ -803,6 +817,8 @@ class TestTemplateParser(unittest.TestCase):
                     "try": "body_try_value",
                     "while": "body_while_value",
                     "with": "body_with_value",
+                    "configuration": "configuration_value",
+                    "version": "version_value",
                 },
             }
         }

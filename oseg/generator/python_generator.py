@@ -145,10 +145,10 @@ class PythonGenerator(generator.BaseGenerator):
 
     config: PythonConfig
 
-    def is_reserved_keyword(self, name: str) -> bool:
+    def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str) -> str:
+    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
         if not self.is_reserved_keyword(name):
             return name
 

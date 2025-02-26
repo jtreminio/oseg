@@ -210,10 +210,10 @@ class JavaGenerator(generator.BaseGenerator):
 
     config: JavaConfig
 
-    def is_reserved_keyword(self, name: str) -> bool:
+    def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str) -> str:
+    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
         if not self.is_reserved_keyword(name):
             return name
 

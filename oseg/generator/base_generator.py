@@ -154,11 +154,19 @@ class BaseGenerator(Protocol):
         self.template_parser = parser.TemplateParser(self)
 
     @abstractmethod
-    def is_reserved_keyword(self, name: str) -> bool:
+    def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def unreserve_keyword(self, name: str) -> str:
+    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
+        """Changes a variable name to not be in conflict with
+        generator's reserved keywords.
+
+        Some generators like csharp have an additional set of reserved
+        keywords that are only enforced in Model classes. This set is
+        triggered with secondary=True.
+        """
+
         raise NotImplementedError
 
     @abstractmethod

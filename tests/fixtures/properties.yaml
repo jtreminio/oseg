@@ -651,6 +651,10 @@ components:
           type: string
         with:
           type: string
+        configuration:
+          type: string
+        version:
+          type: string
     MultipleDogs:
       type: object
       properties:

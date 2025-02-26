@@ -96,6 +96,7 @@ class TemplateParser:
                 continue
 
             prop_name = self._resolve_keyword(prop.name, prop.original_name)
+            prop_name = self._resolve_keyword(prop_name, prop.original_name, True)
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
@@ -271,6 +272,8 @@ class TemplateParser:
                 continue
 
             prop_name = self._resolve_keyword(property_name, sub_obj.original_name)
+            prop_name = self._resolve_keyword(prop_name, sub_obj.original_name, True)
+
             printable = model.PrintableObject()
             result[prop_name] = printable
 
@@ -285,6 +288,8 @@ class TemplateParser:
                 continue
 
             prop_name = self._resolve_keyword(property_name, array_obj.original_name)
+            prop_name = self._resolve_keyword(prop_name, array_obj.original_name, True)
+
             printable = model.PrintableObject()
             result[prop_name] = printable
 
@@ -310,7 +315,7 @@ class TemplateParser:
 
         return property_values
 
-    def _resolve_keyword(self, name: str, original_name: str):
+    def _resolve_keyword(self, name: str, original_name: str, secondary: bool = False):
         """When two properties have identical names and will be listed
         at the same level (parameters + root-level body properties) we
         automatically append an increasing integer to the name to avoid
@@ -339,7 +344,10 @@ class TemplateParser:
         if the name is a reserved keyword.
         """
 
-        if self._generator.is_reserved_keyword(original_name):
-            return self._generator.unreserve_keyword(name)
+        if self._generator.is_reserved_keyword(original_name, secondary):
+            return self._generator.unreserve_keyword(name, secondary)
+
+        if self._generator.is_reserved_keyword(name, secondary):
+            return self._generator.unreserve_keyword(name, secondary)
 
         return name

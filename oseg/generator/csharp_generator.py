@@ -189,14 +189,21 @@ class CSharpGenerator(generator.BaseGenerator):
         "volatile",
         "while",
     ]
+    RESERVED_KEYWORDS_SECONDARY = [
+        "configuration",
+        "version",
+    ]
 
     config: CSharpConfig
 
-    def is_reserved_keyword(self, name: str) -> bool:
+    def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
+        if secondary:
+            return name.lower() in self.RESERVED_KEYWORDS_SECONDARY
+
         return name.lower() in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str) -> str:
-        if not self.is_reserved_keyword(name):
+    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
+        if secondary and not self.is_reserved_keyword(name, secondary):
             return name
 
         return NormalizeStr.camel_case(f"{self.RESERVED_KEYWORD_PREPEND}_{name}")

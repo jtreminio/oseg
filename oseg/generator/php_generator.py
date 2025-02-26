@@ -126,10 +126,10 @@ class PhpGenerator(generator.BaseGenerator):
 
     config: PhpConfig
 
-    def is_reserved_keyword(self, name: str) -> bool:
+    def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return False
 
-    def unreserve_keyword(self, name: str) -> str:
+    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
         return name
 
     def print_classname(self, name: str) -> str:

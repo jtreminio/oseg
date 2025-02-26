@@ -535,6 +535,8 @@ class TestPropertyParser(unittest.TestCase):
             "try2",
             "while2",
             "with2",
+            "configuration",
+            "version",
         ]
 
         self.assertListEqual(expected_properties_1, list(example_data.properties()))
