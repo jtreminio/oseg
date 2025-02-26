@@ -211,29 +211,8 @@ class BaseGenerator(Protocol):
 
     def print_free_form(self, item: model.PropertyFreeForm) -> model.PrintableFreeForm:
         printable = model.PrintableFreeForm()
-        printable.value = None
-
-        if item.is_array:
-            printable.is_array = True
-
-            if item.value is None:
-                return printable
-
-            printable.value = []
-
-            for obj in item.value:
-                for k, v in obj.items():
-                    printable.value.append({k: self._to_json(v)})
-
-            return printable
-
-        if item.value is None:
-            return printable
-
-        printable.value = {}
-
-        for k, v in item.value.items():
-            printable.value[k] = self._to_json(v)
+        printable.value = item.value
+        printable.is_array = item.is_array
 
         return printable
 

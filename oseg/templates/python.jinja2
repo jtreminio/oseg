@@ -30,25 +30,17 @@ open("{{ printable.value }}", "rb").read()
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-{
-        {% for k, v in printable.value.items() %}
-    "{{ k }}": {{ v }},
-        {% endfor %}
-}
+json.loads("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""")
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-[
-        {% for obj in printable.values %}
-    {
-            {% for k, v in obj.items() %}
-        "{{ k }}": {{ v }},
-            {% endfor %}
-    },
-        {% endfor %}
-]
+json.loads("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""")
     {%- endif %}
 {%- endmacro -%}
 
@@ -74,6 +66,7 @@ open("{{ printable.value }}", "rb").read()
 
 {%- import "_macros.jinja2" as m with context -%}
 
+import json
 from datetime import date, datetime
 from pprint import pprint
 

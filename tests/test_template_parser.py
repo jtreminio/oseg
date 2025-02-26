@@ -596,7 +596,7 @@ class TestTemplateParser(unittest.TestCase):
             "root_level_free_form": {
                 "name": "request_body",
                 "value": {"bam": "baz"},
-                "expected": {"request_body": "{'bam': '\"baz\"'}"},
+                "expected": {"request_body": "{'bam': 'baz'}"},
             },
             "root_level_string": {
                 "name": "body",

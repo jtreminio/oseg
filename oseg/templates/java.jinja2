@@ -34,29 +34,19 @@ List.of {% if not printable.value %}(){% else %}
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-Map.of {% if not printable.value %}(){% else %}
-(
-        {% for k, v in printable.value.items() %}
-    "{{ k }}", {{ v }}{% if not loop.last %},{% endif %}
-
-        {% endfor %}
-)
+{% if not printable.value %}Map.of (){% else %}
+JSON.deserialize("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""", Map.class)
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-List.of {% if not printable.value %}(){% else %}
-(
-        {% for obj in printable.value %}
-    Map.of {% if not obj.value %}(){% if not loop.last %},{% endif %}{% else %}(
-            {% for k, v in obj.items() %}
-        "{{ k }}": {{ v }},
-            {% endfor %}
-    ){% if not loop.last %},{% endif %}{% endif %}
-
-        {% endfor %}
-)
+{% if not printable.value %}List.of (){% else %}
+JSON.deserialize("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""", List.class)
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
@@ -96,6 +86,7 @@ import {{ config.invokerPackage }}.ApiException;
 import {{ config.invokerPackage }}.Configuration;
 import {{ config.apiPackage }}.*;
 import {{ config.invokerPackage }}.auth.*;
+import {{ config.invokerPackage }}.JSON;
 import {{ config.modelPackage }}.*;
 
 import java.io.File;

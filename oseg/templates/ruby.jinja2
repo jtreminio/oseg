@@ -30,25 +30,19 @@ File.new("{{ printable.value }}", "r")
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-{
-        {% for k, v in printable.value.items() %}
-    "{{ k }}": {{ v }},
-        {% endfor %}
-}
+JSON.parse(<<-EOD
+    {{ printable.value|tojson(4)|indent(4) }}
+    EOD
+)
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}{{ print_null() }}{% else %}
-[
-        {% for obj in printable.value %}
-    {
-            {% for k, v in obj.items() %}
-        "{{ k }}": {{ v }},
-            {% endfor %}
-    },
-        {% endfor %}
-]
+  {% if printable.value == None %}{{ print_null() }}{% else %}
+JSON.parse(<<-EOD
+    {{ printable.value|tojson(4)|indent(4) }}
+    EOD
+)
     {%- endif %}
 {%- endmacro -%}
 
@@ -80,6 +74,7 @@ File.new("{{ printable.value }}", "r")
 
 {%- import "_macros.jinja2" as m with context -%}
 
+require "json"
 require "{{ config.gemName }}"
 
 {{ config.moduleName }}.configure do |config|

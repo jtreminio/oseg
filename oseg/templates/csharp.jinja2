@@ -38,30 +38,19 @@ new List<Stream>{% if not printable.value %}(){% else %}
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-new Dictionary<string, object>{% if not printable.value %}(){% else %}
-
-{
-        {% for k, v in printable.value.items() %}
-    ["{{ k }}"] = {{ v }},
-        {% endfor %}
-}
+{% if not printable.value %}new Dictionary<string, object>(){% else %}
+JsonSerializer.Deserialize<Dictionary<string, object>>("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""")
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-new List<Dictionary<string, object>>{% if not printable.value %}(){% else %}
-
-{
-        {% for obj in printable.value %}
-    new Dictionary<string, object>
-    {
-            {% for k, v in obj.items() %}
-        ["{{ k }}"] = {{ v }},
-            {% endfor %}
-    },
-        {% endfor %}
-}
+{% if not printable.value %}new List<Dictionary<string, object>>(){% else %}
+JsonSerializer.Deserialize<List<Dictionary<string, object>>>("""
+    {{ printable.value|tojson(4)|indent(4) }}
+""")
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
@@ -94,6 +83,7 @@ new List<{{ printable.target_type|print_classname }}>{% if not printable.value %
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 using {{ config.packageName }}.Api;
 using {{ config.packageName }}.Client;

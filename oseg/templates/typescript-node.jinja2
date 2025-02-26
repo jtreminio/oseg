@@ -32,25 +32,13 @@ fs.createReadStream("{{ printable.value }}")
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-{
-        {% for k, v in printable.value.items() %}
-  "{{ k }}": {{ v }},
-        {% endfor %}
-}
+  {{ printable.value|tojson(2) }}
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
-[
-        {% for obj in printable.value %}
-  {
-            {% for k, v in obj.items() %}
-    "{{ k }}": {{ v }},
-            {% endfor %}
-  },
-        {% endfor %}
-]
+  {{ printable.value|tojson(2) }}
     {%- endif %}
 {%- endmacro -%}
 
