@@ -170,6 +170,10 @@ class BaseGenerator(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    def print_apiname(self, name: str) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
     def print_classname(self, name: str) -> str:
         raise NotImplementedError
 

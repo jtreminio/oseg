@@ -115,7 +115,7 @@ try {
     {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(8) %}
     {% if operation.response and operation.response.body  %}$response = {% endif -%}
-    (new {{ config.invokerPackage }}\Api\{{ operation.api_name|print_classname }}Api(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
+    (new {{ config.invokerPackage }}\Api\{{ operation.api_name|print_apiname }}(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
@@ -132,6 +132,6 @@ try {
     copy($response->getRealPath(), __DIR__ . '/file_response');
 {% endif %}
 } catch ({{ config.invokerPackage }}\ApiException $e) {
-    echo "Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: {$e->getMessage()}";
+    echo "Exception when calling {{ operation.api_name|print_apiname }}#{{ operation.operation_id|print_methodname }}: {$e->getMessage()}";
 }
 {{ "" }}

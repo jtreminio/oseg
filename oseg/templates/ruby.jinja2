@@ -111,7 +111,7 @@ begin
 {% call(properties) m.parse_api_call_properties_macro(8, True) %}
     {% call(opt_properties) m.parse_api_call_properties_macro(8, False) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-    {{ config.moduleName }}::{{ (operation.api_name ~ "Api")|print_classname }}.new.{{ operation.operation_id|print_methodname }}{%- if not properties and not opt_properties %}
+    {{ config.moduleName }}::{{ operation.api_name|print_apiname }}.new.{{ operation.operation_id|print_methodname }}{%- if not properties and not opt_properties %}
 
         {% else %}(
             {% for name, value in properties.items() %}
@@ -136,6 +136,6 @@ begin
     FileUtils.cp(response.path, "./file_response")
 {% endif %}
 rescue {{ config.moduleName }}::ApiError => e
-    puts "Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: #{e}"
+    puts "Exception when calling {{ operation.api_name|print_apiname }}#{{ operation.operation_id|print_methodname }}: #{e}"
 end
 {{ "" }}

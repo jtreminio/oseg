@@ -208,6 +208,9 @@ class CSharpGenerator(generator.BaseGenerator):
 
         return NormalizeStr.camel_case(f"{self.RESERVED_KEYWORD_PREPEND}_{name}")
 
+    def print_apiname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(f"{name}Api")
+
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)
 

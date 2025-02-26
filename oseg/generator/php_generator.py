@@ -132,6 +132,9 @@ class PhpGenerator(generator.BaseGenerator):
     def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
         return name
 
+    def print_apiname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(f"{name}Api")
+
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)
 

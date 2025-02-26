@@ -132,7 +132,7 @@ public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(16) %}
             {% if operation.response and operation.response.body  %}var response = {% endif -%}
-            new {{ (operation.api_name ~ "Api")|print_classname }}(config).{{ operation.operation_id|print_methodname }}({%- if not properties %});
+            new {{ operation.api_name|print_apiname }}(config).{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
     {% for name, value in properties.items() %}
@@ -154,7 +154,7 @@ public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
         }
         catch (ApiException e)
         {
-            Console.WriteLine("Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: " + e.Message);
+            Console.WriteLine("Exception when calling {{ operation.api_name|print_apiname }}#{{ operation.operation_id|print_methodname }}: " + e.Message);
             Console.WriteLine("Status Code: " + e.ErrorCode);
             Console.WriteLine(e.StackTrace);
         }

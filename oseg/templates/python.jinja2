@@ -109,7 +109,7 @@ with ApiClient(configuration) as api_client:
         {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(12) %}
         {% if operation.response and operation.response.body  %}response = {% endif -%}
-        api.{{ (operation.api_name ~ "Api")|print_classname }}(api_client).{{ operation.operation_id|print_methodname }}({%- if not properties %})
+        api.{{ operation.api_name|print_apiname }}(api_client).{{ operation.operation_id|print_methodname }}({%- if not properties %})
 {% else %}
 
     {% for name, value in properties.items() %}
@@ -130,5 +130,5 @@ with ApiClient(configuration) as api_client:
         open("./file_response", "wb").write(response.read())
     {% endif %}
     except ApiException as e:
-        print("Exception when calling {{ operation.api_name|print_classname }}#{{ operation.operation_id|print_methodname }}: %s\n" % e)
+        print("Exception when calling {{ operation.api_name|print_apiname }}#{{ operation.operation_id|print_methodname }}: %s\n" % e)
 {{ "" }}

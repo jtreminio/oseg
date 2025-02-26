@@ -48,6 +48,9 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["split"]: Callable[[str, str], str] = (
             lambda value, separator: value.split(separator)
         )
+        environment.filters["print_apiname"]: Callable[[str], str] = (
+            lambda name: self._sdk_generator.print_apiname(name)
+        )
         environment.filters["print_classname"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.print_classname(name)
         )

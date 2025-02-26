@@ -25,6 +25,16 @@ class NormalizeStr:
         return result
 
     @classmethod
+    def pascalize(cls, value: str) -> str:
+        """Slightly different pascal behavior.
+        See TestNormalizeStr::test_pascalize.
+
+        Currently only used by java generator for API classnames.
+        """
+
+        return cls.pascal_case(cls.snake_case(value))
+
+    @classmethod
     def snake_case(cls, value: str) -> str:
         if value in cls._snake_cache:
             return cls._snake_cache[value]

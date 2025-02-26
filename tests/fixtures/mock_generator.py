@@ -97,6 +97,9 @@ class MockGenerator(generator.BaseGenerator):
 
         return name
 
+    def print_apiname(self, name: str) -> str:
+        return parser.NormalizeStr.pascal_case(f"{name}Api")
+
     def print_classname(self, name: str) -> str:
         return parser.NormalizeStr.pascal_case(name)
 

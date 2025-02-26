@@ -180,6 +180,9 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
+    def print_apiname(self, name: str) -> str:
+        return NormalizeStr.pascal_case(f"{name}Api")
+
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)
 
