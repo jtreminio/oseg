@@ -57,7 +57,7 @@ class PhpConfig(generator.BaseConfig):
             "description": inspect.cleandoc(
                 """
                 Namespace for your example snippets.
-                Ex: OSEG\PetStoreExamples
+                Ex: OSEG\\PetStoreExamples
                 """
             ),
             "default": None,
