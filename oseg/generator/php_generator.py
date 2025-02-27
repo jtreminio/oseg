@@ -196,9 +196,8 @@ class PhpGenerator(generator.BaseGenerator):
         if item.type == "string" and item.format in ["date-time", "date"]:
             return f'new \\DateTime("{value}")'
 
-        # If the value contains $ rather than try to escape it, print it as NOWDOC
-        if isinstance(value, str) and "$" in value:
-            return f"<<<'EOD'\n    {value}\n    EOD"
+        if isinstance(value, str):
+            return self._escape_dollar(value)
 
         return self._to_json(value)
 
@@ -222,6 +221,19 @@ class PhpGenerator(generator.BaseGenerator):
             return NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
         return NormalizeStr.underscore(f"{name}_{value}").upper()
+
+    def _escape_dollar(self, value: str) -> str:
+        """If the value contains $ try to escape it"""
+
+        if "$" not in value:
+            return self._to_json(value)
+
+        if "'" not in value:
+            result = self._to_json(value)
+            result = result.strip('"')
+            return f"'{result}'"
+
+        return self._to_json(value).replace("$", "\\$")
 
 
 class PhpProject(generator.ProjectSetup):
