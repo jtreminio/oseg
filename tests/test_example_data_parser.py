@@ -686,26 +686,61 @@ class TestExampleDataParser(unittest.TestCase):
                 "type": oa.DataType.OBJECT,
                 "name": "request_body",
                 "value": {"foo": "bar", "bam": "baz"},
+                "is_array": False,
+            },
+            "root_level_free_form_array": {
+                "type": oa.DataType.OBJECT,
+                "name": "request_body",
+                "value": [{"foo": "bar", "bam": "baz"}],
+                "is_array": True,
             },
             "root_level_string": {
                 "type": oa.DataType.STRING,
                 "name": "body",
                 "value": "some string value",
+                "is_array": False,
+            },
+            "root_level_string_array": {
+                "type": oa.DataType.STRING,
+                "name": "request_body",
+                "value": ["some string value"],
+                "is_array": True,
             },
             "root_level_int": {
                 "type": oa.DataType.INTEGER,
                 "name": "body",
                 "value": 12345,
+                "is_array": False,
+            },
+            "root_level_int_array": {
+                "type": oa.DataType.INTEGER,
+                "name": "request_body",
+                "value": [12345],
+                "is_array": True,
             },
             "root_level_file": {
                 "type": oa.DataType.STRING,
                 "name": "body",
                 "value": "/some/file/path.pdf",
+                "is_array": False,
+            },
+            "root_level_file_array": {
+                "type": oa.DataType.STRING,
+                "name": "request_body",
+                "value": ["/some/file/path.pdf"],
+                "is_array": True,
             },
             "root_level_bool": {
                 "type": oa.DataType.BOOLEAN,
                 "name": "body",
                 "value": True,
+                "is_array": False,
+            },
+            "root_level_bool_array": {
+                "type": oa.DataType.BOOLEAN,
+                "name": "request_body",
+                "value": [True],
+                "is_array": True,
             },
         }
 
@@ -716,10 +751,16 @@ class TestExampleDataParser(unittest.TestCase):
                 operation = oa_parser.operations[operation_id]
                 container = operation.request.example_data["example"]
 
-                self.assertEqual(
-                    expected["type"],
-                    operation.request.body.type,
-                )
+                if expected["is_array"]:
+                    self.assertEqual(
+                        expected["type"],
+                        operation.request.body.items.type,
+                    )
+                else:
+                    self.assertEqual(
+                        expected["type"],
+                        operation.request.body.type,
+                    )
 
                 self.assertEqual(
                     expected["name"],

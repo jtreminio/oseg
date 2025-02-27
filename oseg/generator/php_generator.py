@@ -196,6 +196,10 @@ class PhpGenerator(generator.BaseGenerator):
         if item.type == "string" and item.format in ["date-time", "date"]:
             return f'new \\DateTime("{value}")'
 
+        # If the value contains $ rather than try to escape it, print it as NOWDOC
+        if isinstance(value, str) and "$" in value:
+            return f"<<<'EOD'\n    {value}\n    EOD"
+
         return self._to_json(value)
 
     def _get_enum_name(

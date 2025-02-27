@@ -205,10 +205,15 @@ class TestPropertyContainer(unittest.TestCase):
     def test_flatten_nonobjects_ignored(self):
         data_provider = [
             "root_level_free_form",
+            "root_level_free_form_array",
             "root_level_string",
+            "root_level_string_array",
             "root_level_int",
+            "root_level_int_array",
             "root_level_file",
+            "root_level_file_array",
             "root_level_bool",
+            "root_level_bool_array",
         ]
 
         oa_parser = TestUtils.oa_parser("root_level_non_objects")
@@ -227,21 +232,41 @@ class TestPropertyContainer(unittest.TestCase):
                 "name": "request_body",
                 "value": {"foo": "bar", "bam": "baz"},
             },
+            "root_level_free_form_array": {
+                "name": "request_body",
+                "value": [{"foo": "bar", "bam": "baz"}],
+            },
             "root_level_string": {
                 "name": "body",
                 "value": "some string value",
+            },
+            "root_level_string_array": {
+                "name": "request_body",
+                "value": ["some string value"],
             },
             "root_level_int": {
                 "name": "body",
                 "value": 12345,
             },
+            "root_level_int_array": {
+                "name": "request_body",
+                "value": [12345],
+            },
             "root_level_file": {
                 "name": "body",
                 "value": "/some/file/path.pdf",
             },
+            "root_level_file_array": {
+                "name": "request_body",
+                "value": ["/some/file/path.pdf"],
+            },
             "root_level_bool": {
                 "name": "body",
                 "value": True,
+            },
+            "root_level_bool_array": {
+                "name": "request_body",
+                "value": [True],
             },
         }
 

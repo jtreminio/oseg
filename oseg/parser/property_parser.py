@@ -12,12 +12,15 @@ class PropertyParser:
     def parse(
         self,
         schema: oa.Schema,
-        data: dict[str, any] | list[dict[str, any]],
+        data: dict[str, any] | list[dict[str, any] | any],
     ) -> model.PROPERTY_TYPES:
         if parser.TypeChecker.is_array(schema):
             assert isinstance(
                 data, list
             ), "Body schema is list, example data should also be a list"
+
+            if self._is_root_level_non_object(schema.items):
+                return self._create_non_object_container(schema, data)
 
             container: model.PropertyObjectArray | None = None
 
@@ -45,11 +48,7 @@ class PropertyParser:
 
             return container
 
-        if (
-            self._is_resolvable_of(schema, parser.TypeChecker.is_file)
-            or self._is_resolvable_of(schema, parser.TypeChecker.is_free_form)
-            or self._is_resolvable_of(schema, parser.TypeChecker.is_scalar)
-        ):
+        if self._is_root_level_non_object(schema):
             return self._create_non_object_container(schema, data)
 
         return self._create_property_object_container(
@@ -151,11 +150,14 @@ class PropertyParser:
     ) -> model.PROPERTY_NON_OBJECT_TYPE:
         """Handles root-level non-object properties"""
 
+        is_array = parser.TypeChecker.is_array(schema)
+
+        name = "body" if not is_array else "request_body"
         result = self._handle_file(
             container=None,
             schema=schema,
-            name="body",
-            data={"body": data},
+            name=name,
+            data={name: data},
         )
 
         if result:
@@ -171,11 +173,12 @@ class PropertyParser:
         if result:
             return result
 
+        name = "body" if not is_array else "request_body"
         result = self._handle_scalar(
             container=None,
             schema=schema,
-            name="body",
-            data={"body": data},
+            name=name,
+            data={name: data},
         )
 
         if result:
@@ -392,4 +395,11 @@ class PropertyParser:
     def _is_resolvable_of(self, schema: oa.Schema, callback: Callable) -> bool:
         return callback(schema) or (
             parser.TypeChecker.is_array(schema) and callback(schema.items)
+        )
+
+    def _is_root_level_non_object(self, schema: oa.Schema) -> bool:
+        return bool(
+            self._is_resolvable_of(schema, parser.TypeChecker.is_file)
+            or self._is_resolvable_of(schema, parser.TypeChecker.is_free_form)
+            or self._is_resolvable_of(schema, parser.TypeChecker.is_scalar)
         )

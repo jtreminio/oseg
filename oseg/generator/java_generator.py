@@ -229,7 +229,13 @@ class JavaGenerator(generator.BaseGenerator):
         return NormalizeStr.pascal_case(name)
 
     def print_methodname(self, name: str) -> str:
-        return NormalizeStr.camel_case(name)
+        result = NormalizeStr.camel_case(name)
+
+        # if the original method name starts with _, keep it
+        if name.startswith("_"):
+            return f"_{result}"
+
+        return result
 
     def print_propname(self, name: str) -> str:
         # not currently used by template
@@ -298,9 +304,7 @@ class JavaGenerator(generator.BaseGenerator):
         if value is None:
             return None
 
-        value: str
-
-        return value.upper()
+        return NormalizeStr.underscore(value).upper()
 
     def _handle_value(
         self,

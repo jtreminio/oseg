@@ -547,21 +547,41 @@ class TestPropertyParser(unittest.TestCase):
                 "type": model.PropertyFreeForm,
                 "value": {"some_key": "some_value"},
             },
+            "FreeFormSchemaArray": {
+                "type": model.PropertyFreeForm,
+                "value": [{"some_key": "some_value"}],
+            },
             "StringSchema": {
                 "type": model.PropertyScalar,
                 "value": "foo bar",
+            },
+            "StringSchemaArray": {
+                "type": model.PropertyScalar,
+                "value": ["foo bar"],
             },
             "IntSchema": {
                 "type": model.PropertyScalar,
                 "value": 654321,
             },
+            "IntSchemaArray": {
+                "type": model.PropertyScalar,
+                "value": [654321],
+            },
             "FileSchema": {
                 "type": model.PropertyFile,
                 "value": "/path.pdf",
             },
+            "FileSchemaArray": {
+                "type": model.PropertyFile,
+                "value": ["/path.pdf"],
+            },
             "BoolSchema": {
                 "type": model.PropertyScalar,
                 "value": False,
+            },
+            "BoolSchemaArray": {
+                "type": model.PropertyScalar,
+                "value": [False],
             },
         }
 

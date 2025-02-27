@@ -18,6 +18,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FreeFormSchema'
+  /root_level_free_form_array:
+    post:
+      tags:
+        - pet
+      operationId: root_level_free_form_array
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FreeFormSchemaArray'
   /root_level_string:
     post:
       tags:
@@ -31,6 +44,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StringSchema'
+  /root_level_string_array:
+    post:
+      tags:
+        - pet
+      operationId: root_level_string_array
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StringSchemaArray'
   /root_level_int:
     post:
       tags:
@@ -44,6 +70,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IntSchema'
+  /root_level_int_array:
+    post:
+      tags:
+        - pet
+      operationId: root_level_int_array
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntSchemaArray'
   /root_level_file:
     post:
       tags:
@@ -57,6 +96,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FileSchema'
+  /root_level_file_array:
+    post:
+      tags:
+        - pet
+      operationId: root_level_file_array
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileSchemaArray'
   /root_level_bool:
     post:
       tags:
@@ -70,6 +122,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BoolSchema'
+  /root_level_bool_array:
+    post:
+      tags:
+        - pet
+      operationId: root_level_bool_array
+      responses:
+        '200':
+          description: Successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoolSchemaArray'
 components:
   schemas:
     FreeFormSchema:
@@ -78,16 +143,36 @@ components:
       example:
         foo: bar
         bam: baz
+    FreeFormSchemaArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/FreeFormSchema'
     StringSchema:
       type: string
       example: "some string value"
+    StringSchemaArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/StringSchema'
     IntSchema:
       type: integer
       example: 12345
+    IntSchemaArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/IntSchema'
     FileSchema:
       type: string
       format: binary
       example: "/some/file/path.pdf"
+    FileSchemaArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileSchema'
     BoolSchema:
       type: boolean
       example: true
+    BoolSchemaArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/BoolSchema'

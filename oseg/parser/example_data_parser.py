@@ -209,10 +209,9 @@ class ExampleDataParser:
             return {}
 
         # only a single example from content schema
-        if (
-            content.example
-            and isinstance(content.example, dict)
-            and len(content.example.keys())
+        if content.example and (
+            (isinstance(content.example, dict) and len(content.example.keys()))
+            or (isinstance(content.example, list) and len(content.example))
         ):
             return {self.DEFAULT_EXAMPLE_NAME: content.example}
 
