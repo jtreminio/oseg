@@ -267,15 +267,14 @@ class JavaGenerator(generator.BaseGenerator):
 
             printable.value = []
 
-            if item.type == oa.DataType.STRING:
-                if item.is_enum:
-                    enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+            if item.type == oa.DataType.STRING and item.is_enum:
+                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-                    if not parent:
-                        printable.target_type = enum_type
-                    else:
-                        parent_type = NormalizeStr.pascal_case(parent.type)
-                        printable.target_type = f"{parent_type}.{enum_type}"
+                if not parent:
+                    printable.target_type = enum_type
+                else:
+                    parent_type = NormalizeStr.pascal_case(parent.type)
+                    printable.target_type = f"{parent_type}.{enum_type}"
 
             for i in item.value:
                 printable.value.append(self._handle_value(item, i, parent))

@@ -236,15 +236,14 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         parent: model.PropertyObject | None,
     ) -> str | None:
-        if item.type == oa.DataType.STRING:
-            if item.is_enum:
-                if parent is None:
-                    return None
+        if item.type == oa.DataType.STRING and item.is_enum:
+            if parent is None:
+                return None
 
-                parent_type = NormalizeStr.pascal_case(parent.type)
-                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+            parent_type = NormalizeStr.pascal_case(parent.type)
+            enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
-                return f"{parent_type}.{enum_type}"
+            return f"{parent_type}.{enum_type}"
 
         return None
 
@@ -254,7 +253,10 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         value: any,
         parent: model.PropertyObject | None,
     ) -> any:
-        if item.type == oa.DataType.STRING and item.is_enum:
+        if item.type != oa.DataType.STRING:
+            return self._to_json(value)
+
+        if item.is_enum:
             enum_name = self._get_enum_name(item, value)
 
             if enum_name is None:
@@ -275,16 +277,10 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
             return final
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATETIME.value
-        ):
+        if item.format == model.DataFormat.DATETIME.value:
             return f'new Date("{value}")'
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATE.value
-        ):
+        if item.format == model.DataFormat.DATE.value:
             return self._to_json(value)
 
         return self._to_json(value)

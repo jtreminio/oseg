@@ -213,17 +213,12 @@ class RubyGenerator(generator.BaseGenerator):
         if value is None:
             return self.print_null()
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATETIME.value
-        ):
-            return f'Date.parse("{value}").to_time'
+        if item.type == oa.DataType.STRING:
+            if item.format == model.DataFormat.DATETIME.value:
+                return f'Date.parse("{value}").to_time'
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATE.value
-        ):
-            return f'Date.parse("{value}").to_date'
+            if item.format == model.DataFormat.DATE.value:
+                return f'Date.parse("{value}").to_date'
 
         return self._to_json(value)
 

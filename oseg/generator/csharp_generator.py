@@ -322,17 +322,12 @@ class CSharpGenerator(generator.BaseGenerator):
 
             return f"{parent_type}.{enum_type}.{enum_name}"
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATETIME.value
-        ):
-            return f'DateTime.Parse("{value}")'
+        if item.type == oa.DataType.STRING:
+            if item.format == model.DataFormat.DATETIME.value:
+                return f'DateTime.Parse("{value}")'
 
-        if (
-            item.type == oa.DataType.STRING
-            and item.format == model.DataFormat.DATE.value
-        ):
-            return f'DateOnly.Parse("{value}")'
+            if item.format == model.DataFormat.DATE.value:
+                return f'DateOnly.Parse("{value}")'
 
         return self._to_json(value)
 

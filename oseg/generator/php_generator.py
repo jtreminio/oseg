@@ -191,19 +191,20 @@ class PhpGenerator(generator.BaseGenerator):
         if item.value is None:
             return self._to_json(value)
 
-        # if enum but no parent, use the literal value
-        if item.type == oa.DataType.STRING and item.is_enum and parent is not None:
-            namespace = self.config.invokerPackage
-            enum_name = self._get_enum_name(item, item.name, value)
-            parent_type = NormalizeStr.pascal_case(parent.type)
+        if item.type == oa.DataType.STRING:
+            # if enum but no parent, use the literal value
+            if item.is_enum and parent is not None:
+                namespace = self.config.invokerPackage
+                enum_name = self._get_enum_name(item, item.name, value)
+                parent_type = NormalizeStr.pascal_case(parent.type)
 
-            return f"{namespace}\\Model\\{parent_type}::{enum_name}"
+                return f"{namespace}\\Model\\{parent_type}::{enum_name}"
 
-        if item.type == oa.DataType.STRING and item.format in [
-            model.DataFormat.DATETIME.value,
-            model.DataFormat.DATE.value,
-        ]:
-            return f'new \\DateTime("{value}")'
+            if item.format in [
+                model.DataFormat.DATETIME.value,
+                model.DataFormat.DATE.value,
+            ]:
+                return f'new \\DateTime("{value}")'
 
         if isinstance(value, str):
             return self._escape_dollar(value)
