@@ -1,9 +1,8 @@
-import unittest
 from oseg import parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestSchemaJoiner(unittest.TestCase):
+class TestSchemaJoiner(TestCase):
     def test_no_all_of_no_discriminator(self):
         data = {
             "id": 123,

@@ -1,10 +1,9 @@
-import unittest
 from random import randrange
 from oseg import model, parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestPropertyContainer(unittest.TestCase):
+class TestPropertyContainer(TestCase):
     def test_unique_names_all_required(self):
         operation_id = "unique_names_all_required"
         example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME

@@ -213,8 +213,13 @@ class JavaGenerator(generator.BaseGenerator):
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if not self.is_reserved_keyword(name):
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
+        if not force and not self.is_reserved_keyword(name, secondary):
             return name
 
         if name == "_":
@@ -283,17 +288,46 @@ class JavaGenerator(generator.BaseGenerator):
     def print_null(self) -> str:
         return "null"
 
+    def _handle_value(
+        self,
+        item: model.PropertyScalar,
+        value: any,
+        parent: model.PropertyObject | None,
+    ) -> any:
+        if item.type == "string":
+            if item.is_enum:
+                enum_name = self._get_enum_name(item, value)
+
+                if enum_name is None:
+                    return self.print_null()
+
+                if parent is None:
+                    return self._to_json(value)
+
+                parent_type = NormalizeStr.pascal_case(parent.type)
+                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+
+                return f"{parent_type}.{enum_type}.{enum_name}"
+
+            if item.format == "date-time":
+                return f'OffsetDateTime.parse("{value}")'
+
+            if item.format == "date":
+                return f'LocalDate.parse("{value}")'
+
+        int_fixed = self._fix_ints(item, value)
+
+        return int_fixed if int_fixed is not None else self._to_json(value)
+
     def _get_enum_name(
         self,
         item: model.PropertyScalar,
         value: any,
     ) -> str | None:
-        enum_varname = self._get_enum_varname_override(item.schema, value)
+        if value is None:
+            return None
 
-        if enum_varname is not None:
-            return enum_varname
-
-        enum_varname = self._get_enum_varname(item.schema, value)
+        enum_varname, is_override = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname
@@ -301,40 +335,7 @@ class JavaGenerator(generator.BaseGenerator):
         if value == "" and "" in item.schema.enum:
             return "Empty"
 
-        if value is None:
-            return None
-
         return NormalizeStr.underscore(value).upper()
-
-    def _handle_value(
-        self,
-        item: model.PropertyScalar,
-        value: any,
-        parent: model.PropertyObject | None,
-    ) -> any:
-        if item.type == "string" and item.is_enum:
-            enum_name = self._get_enum_name(item, value)
-
-            if enum_name is None:
-                return self.print_null()
-
-            if parent is None:
-                return self._to_json(value)
-
-            parent_type = NormalizeStr.pascal_case(parent.type)
-            enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
-
-            return f"{parent_type}.{enum_type}.{enum_name}"
-
-        if item.type == "string" and item.format == "date-time":
-            return f'OffsetDateTime.parse("{value}")'
-
-        if item.type == "string" and item.format == "date":
-            return f'LocalDate.parse("{value}")'
-
-        int_fixed = self._fix_ints(item, value)
-
-        return int_fixed if int_fixed is not None else self._to_json(value)
 
     def _fix_ints(self, item: model.PropertyScalar, value: any) -> any:
         if item.type not in ["integer", "number"] or value is None:

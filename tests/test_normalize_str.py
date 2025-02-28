@@ -1,8 +1,8 @@
-import unittest
 from oseg import parser
+from test_utils import TestCase
 
 
-class TestNormalizeStr(unittest.TestCase):
+class TestNormalizeStr(TestCase):
     def test_underscore(self):
         data = {
             "A": "A",

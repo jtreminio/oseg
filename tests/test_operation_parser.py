@@ -1,9 +1,8 @@
-import unittest
 from oseg import parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestOperationParser(unittest.TestCase):
+class TestOperationParser(TestCase):
     def test_has_form_data(self):
         data = [
             "request_x_www_form_urlencoded",
@@ -112,7 +111,3 @@ class TestOperationParser(unittest.TestCase):
         expected = "security-advisories/list-global-advisories/some_value"
 
         self.assertEqual(expected, operation.operation_id)
-
-
-if __name__ == "__main__":
-    unittest.main()

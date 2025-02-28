@@ -1,11 +1,10 @@
-import unittest
 import uuid
 import openapi_pydantic as oa
 from oseg import model, parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestExampleDataParser(unittest.TestCase):
+class TestExampleDataParser(TestCase):
     def test_common_path_query_param_scenarios(self):
         data_provider = {
             # Always use example value if set
@@ -847,7 +846,3 @@ class TestExampleDataParser(unittest.TestCase):
         self.assertTrue(dog_1.is_set)
         self.assertTrue(pet_2.is_set)
         self.assertIsNone(dog_2)
-
-
-if __name__ == "__main__":
-    unittest.main()

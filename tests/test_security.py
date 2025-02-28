@@ -1,9 +1,8 @@
-import unittest
-from oseg import model, parser
-from test_utils import TestUtils
+from oseg import model
+from test_utils import TestUtils, TestCase
 
 
-class TestSecurity(unittest.TestCase):
+class TestSecurity(TestCase):
     def test_security_all(self):
         oa_parser = TestUtils.oa_parser("security_schemes")
         operation = oa_parser.operations.get("security_all")

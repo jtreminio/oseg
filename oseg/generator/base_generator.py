@@ -117,7 +117,6 @@ class BaseConfig(Protocol):
             case _:
                 raise NotImplementedError("Generator not found for config_help")
 
-    # todo test
     def _parse_security(self) -> dict[str, any]:
         security = {}
 
@@ -158,7 +157,12 @@ class BaseGenerator(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
         """Changes a variable name to not be in conflict with
         generator's reserved keywords.
 
@@ -235,37 +239,39 @@ class BaseGenerator(Protocol):
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 
-    def _get_enum_varname(self, schema: oa.Schema, value: any) -> str | None:
+    def _get_enum_varname(
+        self,
+        schema: oa.Schema,
+        value: any,
+    ) -> tuple[str | None, bool]:
+        if value is None:
+            return None, False
+
+        target = (
+            schema.items.enum
+            if parser.TypeChecker.is_array(schema) and schema.items
+            else schema.enum
+        )
+
+        if not target or value not in target:
+            return None, False
+
+        index = target.index(value)
+
+        overrides = schema.model_extra.get(self.X_ENUM_VARNAMES_OVERRIDE)
+
+        if overrides:
+            enum_varnames: list[str] = overrides.get(self.NAME)
+
+            if enum_varnames and len(enum_varnames) - 1 >= index:
+                return enum_varnames[index], True
+
         enum_varnames = schema.model_extra.get(self.X_ENUM_VARNAMES)
 
-        if not enum_varnames:
-            return None
+        if enum_varnames and len(enum_varnames) - 1 >= index:
+            return enum_varnames[index], False
 
-        # todo unit test
-        if value is None:
-            return None
-
-        if schema.type == oa.DataType.ARRAY and schema.items:
-            return enum_varnames[schema.items.enum.index(value)]
-
-        return enum_varnames[schema.enum.index(value)]
-
-    def _get_enum_varname_override(self, schema: oa.Schema, value: any) -> str | None:
-        # todo unit test
-        enum_varnames_override = schema.model_extra.get(self.X_ENUM_VARNAMES_OVERRIDE)
-
-        if not enum_varnames_override:
-            return None
-
-        enum_varnames = enum_varnames_override.get(self.NAME)
-
-        if not enum_varnames:
-            return None
-
-        if schema.type == oa.DataType.ARRAY and schema.items:
-            return enum_varnames[schema.items.enum.index(value)]
-
-        return enum_varnames[schema.enum.index(value)]
+        return None, False
 
 
 class GeneratorFactory:

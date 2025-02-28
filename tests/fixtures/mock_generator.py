@@ -11,6 +11,7 @@ MockConfigDef = TypedDict(
     {
         "packageName": str,
         "oseg.ignoreOptionalUnset": bool | None,
+        "oseg.security": dict[str, any] | None,
     },
 )
 
@@ -47,6 +48,14 @@ class MockConfig(generator.BaseConfig):
                 """
             ),
             "default": True,
+        },
+        "oseg.security": {
+            "description": inspect.cleandoc(
+                """
+                Security scheme definitions
+                """
+            ),
+            "default": {},
         },
     }
 
@@ -88,8 +97,13 @@ class MockGenerator(generator.BaseGenerator):
 
         return parsed in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if secondary and not self.is_reserved_keyword(name, secondary):
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
+        if not force and not self.is_reserved_keyword(name, secondary):
             return name
 
         if not name.startswith(self.RESERVED_KEYWORD_PREPEND):
@@ -139,16 +153,32 @@ class MockGenerator(generator.BaseGenerator):
             printable.value = []
 
             for i in item.value:
-                printable.value.append(self._to_json(i))
+                printable.value.append(self._handle_value(item, i))
 
             return printable
 
-        printable.value = item.value
+        printable.value = self._handle_value(item, item.value)
 
         return printable
 
     def print_null(self) -> str:
         return "None"
+
+    def _handle_value(
+        self,
+        item: model.PropertyScalar,
+        value: any,
+    ) -> any:
+        if item.is_enum:
+            enum_varname, is_override = self._get_enum_varname(item.schema, value)
+
+            if enum_varname is not None:
+                return enum_varname
+
+        if isinstance(value, str):
+            return value
+
+        return self._to_json(value)
 
 
 def scalar_macro_callback(printable: model.PrintableScalar) -> str | None:

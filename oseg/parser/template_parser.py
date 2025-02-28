@@ -345,9 +345,17 @@ class TemplateParser:
         """
 
         if self._generator.is_reserved_keyword(original_name, secondary):
-            return self._generator.unreserve_keyword(name, secondary)
+            return self._generator.unreserve_keyword(
+                name=name,
+                force=True,
+                secondary=secondary,
+            )
 
         if self._generator.is_reserved_keyword(name, secondary):
-            return self._generator.unreserve_keyword(name, secondary)
+            return self._generator.unreserve_keyword(
+                name=name,
+                force=True,
+                secondary=secondary,
+            )
 
         return name

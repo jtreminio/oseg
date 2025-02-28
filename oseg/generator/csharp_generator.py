@@ -202,8 +202,13 @@ class CSharpGenerator(generator.BaseGenerator):
 
         return name.lower() in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if not self.is_reserved_keyword(name, secondary):
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
+        if not force and not self.is_reserved_keyword(name, secondary):
             return name
 
         return NormalizeStr.camel_case(f"{self.RESERVED_KEYWORD_PREPEND}_{name}")
@@ -250,28 +255,8 @@ class CSharpGenerator(generator.BaseGenerator):
 
         return printable
 
-    def _get_enum_name(
-        self,
-        item: model.PropertyScalar,
-        value: any,
-    ) -> str | None:
-        enum_varname = self._get_enum_varname_override(item.schema, value)
-
-        if enum_varname is not None:
-            return enum_varname
-
-        enum_varname = self._get_enum_varname(item.schema, value)
-
-        if enum_varname is not None:
-            return enum_varname
-
-        if value == "" and "" in item.schema.enum:
-            return "Empty"
-
-        if value is None:
-            return None
-
-        return NormalizeStr.pascal_case(value)
+    def print_null(self) -> str:
+        return "null"
 
     def _get_target_type(
         self,
@@ -313,9 +298,6 @@ class CSharpGenerator(generator.BaseGenerator):
 
         return ""
 
-    def print_null(self) -> str:
-        return "null"
-
     def _handle_value(
         self,
         item: model.PropertyScalar,
@@ -343,6 +325,24 @@ class CSharpGenerator(generator.BaseGenerator):
             return f'DateOnly.Parse("{value}")'
 
         return self._to_json(value)
+
+    def _get_enum_name(
+        self,
+        item: model.PropertyScalar,
+        value: any,
+    ) -> str | None:
+        if value is None:
+            return None
+
+        enum_varname, is_override = self._get_enum_varname(item.schema, value)
+
+        if enum_varname is not None:
+            return enum_varname
+
+        if value == "" and "" in item.schema.enum:
+            return "Empty"
+
+        return NormalizeStr.pascal_case(value)
 
 
 class CSharpProject(generator.ProjectSetup):

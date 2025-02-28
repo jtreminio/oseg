@@ -129,7 +129,12 @@ class PhpGenerator(generator.BaseGenerator):
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return False
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
         return name
 
     def print_apiname(self, name: str) -> str:
@@ -207,14 +212,12 @@ class PhpGenerator(generator.BaseGenerator):
         name: str,
         value: any,
     ) -> str:
-        enum_varname = self._get_enum_varname_override(item.schema, value)
+        enum_varname, is_override = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
-            return enum_varname
+            if is_override:
+                return enum_varname
 
-        enum_varname = self._get_enum_varname(item.schema, value)
-
-        if enum_varname is not None:
             return NormalizeStr.underscore(f"{name}_{enum_varname}").upper()
 
         if value == "" or value is None:

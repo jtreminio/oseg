@@ -1,4 +1,5 @@
 import os
+import unittest
 from oseg import parser
 
 
@@ -19,3 +20,10 @@ class TestUtils:
         cls.cached_oa_parsers[filename] = parser.OaParser(filepath)
 
         return cls.cached_oa_parsers[filename]
+
+
+class TestCase(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.maxDiff = None

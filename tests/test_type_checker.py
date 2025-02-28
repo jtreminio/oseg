@@ -1,9 +1,8 @@
-import unittest
 from oseg import parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestTypeChecker(unittest.TestCase):
+class TestTypeChecker(TestCase):
     def test_is_array(self):
         oa_parser = TestUtils.oa_parser("type_checker")
         together = oa_parser.components.schemas.get("Together")

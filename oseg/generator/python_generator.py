@@ -148,8 +148,13 @@ class PythonGenerator(generator.BaseGenerator):
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if not self.is_reserved_keyword(name):
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
+        if not force and not self.is_reserved_keyword(name, secondary):
             return name
 
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
@@ -215,11 +220,12 @@ class PythonGenerator(generator.BaseGenerator):
         if item.type == "boolean" or value is None:
             return value
 
-        if item.type == "string" and item.format == "date-time":
-            return f'datetime.fromisoformat("{value}")'
+        if item.type == "string":
+            if item.format == "date-time":
+                return f"datetime.fromisoformat({self._to_json(value)})"
 
-        if item.type == "string" and item.format == "date":
-            return f'date.fromisoformat("{value}")'
+            if item.format == "date":
+                return f"date.fromisoformat({self._to_json(value)})"
 
         return self._to_json(value)
 

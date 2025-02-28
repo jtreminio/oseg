@@ -174,8 +174,13 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
 
-    def unreserve_keyword(self, name: str, secondary: bool = False) -> str:
-        if not self.is_reserved_keyword(name):
+    def unreserve_keyword(
+        self,
+        name: str,
+        force: bool = False,
+        secondary: bool = False,
+    ) -> str:
+        if not force and not self.is_reserved_keyword(name, secondary):
             return name
 
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
@@ -282,12 +287,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         value: any,
     ) -> str | None:
-        enum_varname = self._get_enum_varname_override(item.schema, value)
-
-        if enum_varname is not None:
-            return enum_varname
-
-        enum_varname = self._get_enum_varname(item.schema, value)
+        enum_varname, is_override = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
             return enum_varname

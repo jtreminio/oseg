@@ -1,10 +1,8 @@
-import unittest
-import openapi_pydantic as oa
 from oseg import model, parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestPropertyParser(unittest.TestCase):
+class TestPropertyParser(TestCase):
     def test_discriminator(self):
         oa_parser = TestUtils.oa_parser("discriminator")
         property_parser = parser.PropertyParser(oa_parser)
@@ -595,7 +593,3 @@ class TestPropertyParser(unittest.TestCase):
 
                 self.assertEqual(expected["value"], parsed.value)
                 self.assertIsInstance(parsed, expected["type"])
-
-
-if __name__ == "__main__":
-    unittest.main()

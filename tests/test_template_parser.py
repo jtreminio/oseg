@@ -1,10 +1,9 @@
-import unittest
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 from fixtures.mock_generator import MockConfig, MockGenerator, JINJA_MACROS
 from oseg import model, parser
 
 
-class TestTemplateParser(unittest.TestCase):
+class TestTemplateParser(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.jinja_macros = model.JinjaMacros(JINJA_MACROS)
@@ -158,7 +157,7 @@ class TestTemplateParser(unittest.TestCase):
 
         expected = {
             "name": body_data["name"],
-            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -192,7 +191,7 @@ class TestTemplateParser(unittest.TestCase):
 
         default_expected = {
             "name": body_data["name"],
-            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -261,8 +260,8 @@ class TestTemplateParser(unittest.TestCase):
         body_data = self._example_data()[self.example_name]["body"]
 
         expected = {
-            "name": None,
-            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "name": "null",
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
             "id": str(body_data["id"]),
             "status": body_data["status"],
             "category": "category",
@@ -302,8 +301,8 @@ class TestTemplateParser(unittest.TestCase):
 
         expected = {
             "name": body_data["name"],
-            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
-            "id": None,
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
+            "id": "null",
             "status": body_data["status"],
             "category": "category",
             "tags": "tags",
@@ -585,7 +584,7 @@ class TestTemplateParser(unittest.TestCase):
         expected = {
             "petId": str(path_data["petId"]),
             "name": body_data["name"],
-            "photoUrls": f'["{body_data["photoUrls"][0]}","{body_data["photoUrls"][1]}"]',
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
             "queryParam": str(query_data["queryParam"]),
             "var_try": query_data["try"],
             "var_while": query_data["while"],
@@ -601,7 +600,7 @@ class TestTemplateParser(unittest.TestCase):
             "version": body_data["version"],
         }
 
-        self.assertDictEqual(expected, api_call_properties)
+        self.assertEqual(expected, api_call_properties)
 
         operation.request.example_data = None
 
@@ -630,7 +629,7 @@ class TestTemplateParser(unittest.TestCase):
             "root_level_bool": {
                 "name": "body",
                 "value": True,
-                "expected": {"body": "True"},
+                "expected": {"body": "true"},
             },
         }
 
@@ -689,9 +688,9 @@ class TestTemplateParser(unittest.TestCase):
         )
 
         expected = {
-            "param_2": None,
-            "param_1": None,
-            "param_3": None,
+            "param_2": "null",
+            "param_1": "null",
+            "param_3": "null",
         }
 
         self.assertDictEqual(expected, api_call_properties)

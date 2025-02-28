@@ -1,10 +1,9 @@
-import unittest
 import openapi_pydantic as oa
 from oseg import parser
-from test_utils import TestUtils
+from test_utils import TestUtils, TestCase
 
 
-class TestComponentResolver(unittest.TestCase):
+class TestComponentResolver(TestCase):
     def test_parameters(self):
         oa_parser = TestUtils.oa_parser("properties")
         operation = oa_parser.operations["default"]
@@ -586,7 +585,3 @@ class TestComponentResolver(unittest.TestCase):
                     result[parameter.name] = parameter.param_schema.type.value
 
                 self.assertEqual(expected_parameters, result)
-
-
-if __name__ == "__main__":
-    unittest.main()
