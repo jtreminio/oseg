@@ -199,7 +199,10 @@ class PhpGenerator(generator.BaseGenerator):
 
             return f"{namespace}\\Model\\{parent_type}::{enum_name}"
 
-        if item.type == oa.DataType.STRING and item.format in ["date-time", "date"]:
+        if item.type == oa.DataType.STRING and item.format in [
+            model.DataFormat.DATETIME.value,
+            model.DataFormat.DATE.value,
+        ]:
             return f'new \\DateTime("{value}")'
 
         if isinstance(value, str):

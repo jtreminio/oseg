@@ -310,10 +310,10 @@ class JavaGenerator(generator.BaseGenerator):
 
                 return f"{parent_type}.{enum_type}.{enum_name}"
 
-            if item.format == "date-time":
+            if item.format == model.DataFormat.DATETIME.value:
                 return f'OffsetDateTime.parse("{value}")'
 
-            if item.format == "date":
+            if item.format == model.DataFormat.DATE.value:
                 return f'LocalDate.parse("{value}")'
 
         int_fixed = self._fix_ints(item, value)
@@ -342,11 +342,11 @@ class JavaGenerator(generator.BaseGenerator):
         if item.type not in [oa.DataType.INTEGER, oa.DataType.NUMBER] or value is None:
             return None
 
-        if item.format == "float":
+        if item.format == model.DataFormat.FLOAT.value:
             return f"{value}F"
-        elif item.format == "double":
+        elif item.format == model.DataFormat.DOUBLE.value:
             return f"{value}D"
-        elif item.format == "int64":
+        elif item.format == model.DataFormat.INT64.value:
             return f"{value}L"
 
         return value

@@ -277,10 +277,10 @@ class CSharpGenerator(generator.BaseGenerator):
 
                 return f"{parent_type}.{enum_type}"
 
-            if item.format == "date-time":
+            if item.format == model.DataFormat.DATETIME.value:
                 return "DateTime"
 
-            if item.format == "date":
+            if item.format == model.DataFormat.DATE.value:
                 return "DateOnly"
 
             return "string"
@@ -289,10 +289,13 @@ class CSharpGenerator(generator.BaseGenerator):
             return "int"
 
         if item.type == oa.DataType.NUMBER:
-            if item.format in ["float", "double"]:
+            if item.format in [
+                model.DataFormat.FLOAT.value,
+                model.DataFormat.DOUBLE.value,
+            ]:
                 return item.format
 
-            if item.format == "int64":
+            if item.format == model.DataFormat.INT64.value:
                 return "long"
 
             return "int"
@@ -319,10 +322,16 @@ class CSharpGenerator(generator.BaseGenerator):
 
             return f"{parent_type}.{enum_type}.{enum_name}"
 
-        if item.type == oa.DataType.STRING and item.format == "date-time":
+        if (
+            item.type == oa.DataType.STRING
+            and item.format == model.DataFormat.DATETIME.value
+        ):
             return f'DateTime.Parse("{value}")'
 
-        if item.type == oa.DataType.STRING and item.format == "date":
+        if (
+            item.type == oa.DataType.STRING
+            and item.format == model.DataFormat.DATE.value
+        ):
             return f'DateOnly.Parse("{value}")'
 
         return self._to_json(value)

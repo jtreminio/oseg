@@ -222,10 +222,10 @@ class PythonGenerator(generator.BaseGenerator):
             return value
 
         if item.type == oa.DataType.STRING:
-            if item.format == "date-time":
+            if item.format == model.DataFormat.DATETIME.value:
                 return f"datetime.fromisoformat({self._to_json(value)})"
 
-            if item.format == "date":
+            if item.format == model.DataFormat.DATE.value:
                 return f"date.fromisoformat({self._to_json(value)})"
 
         return self._to_json(value)

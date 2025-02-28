@@ -2,19 +2,12 @@ from __future__ import annotations
 import openapi_pydantic as oa
 from typing import Union
 from pydantic import BaseModel
-from oseg import model
+from oseg import model, parser
 
 
 class TypeChecker:
     SCHEMA_UNION = Union[BaseModel, oa.Schema]
     REF_UNION = Union[BaseModel, oa.Reference]
-
-    _SCALAR_TYPES = [
-        oa.DataType.BOOLEAN,
-        oa.DataType.INTEGER,
-        oa.DataType.NUMBER,
-        oa.DataType.STRING,
-    ]
 
     # Exclude "base64" because that will be considered a string in SDKs
     _FILE_FORMATS = [
@@ -151,9 +144,9 @@ class TypeChecker:
     def _is_of_scalar_type(cls, propery_type: oa.DataType | list[oa.DataType]) -> bool:
         if isinstance(propery_type, list):
             for t in propery_type:
-                if t in cls._SCALAR_TYPES:
+                if t in model.SCALAR_TYPES:
                     return True
 
             return False
 
-        return propery_type in cls._SCALAR_TYPES
+        return propery_type in model.SCALAR_TYPES

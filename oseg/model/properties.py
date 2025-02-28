@@ -1,7 +1,26 @@
 from __future__ import annotations
+
+from enum import Enum
+
 import openapi_pydantic as oa
 from typing import Union, TypeVar, Generic, Protocol
 from oseg import parser
+
+
+SCALAR_TYPES = [
+    oa.DataType.BOOLEAN,
+    oa.DataType.INTEGER,
+    oa.DataType.NUMBER,
+    oa.DataType.STRING,
+]
+
+
+class DataFormat(str, Enum):
+    DATETIME = "date-time"
+    DATE = "date"
+    FLOAT = "float"
+    DOUBLE = "double"
+    INT64 = "int64"
 
 
 class PropertyInterface(Protocol):

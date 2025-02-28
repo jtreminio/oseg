@@ -1,4 +1,5 @@
 from .properties import (
+    DataFormat,
     PropertyFile,
     PropertyFreeForm,
     PropertyScalar,
@@ -7,6 +8,7 @@ from .properties import (
     PROPERTY_NON_OBJECT_TYPE,
     PROPERTY_OBJECT_TYPE,
     PROPERTY_TYPES,
+    SCALAR_TYPES,
 )
 from .property_container import PropertyContainer
 

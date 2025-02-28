@@ -275,10 +275,16 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
             return final
 
-        if item.type == oa.DataType.STRING and item.format == "date-time":
+        if (
+            item.type == oa.DataType.STRING
+            and item.format == model.DataFormat.DATETIME.value
+        ):
             return f'new Date("{value}")'
 
-        if item.type == oa.DataType.STRING and item.format == "date":
+        if (
+            item.type == oa.DataType.STRING
+            and item.format == model.DataFormat.DATE.value
+        ):
             return self._to_json(value)
 
         return self._to_json(value)
