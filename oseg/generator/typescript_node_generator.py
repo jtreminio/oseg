@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
@@ -235,7 +236,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         parent: model.PropertyObject | None,
     ) -> str | None:
-        if item.type == "string":
+        if item.type == oa.DataType.STRING:
             if item.is_enum:
                 if parent is None:
                     return None
@@ -253,7 +254,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         value: any,
         parent: model.PropertyObject | None,
     ) -> any:
-        if item.type == "string" and item.is_enum:
+        if item.type == oa.DataType.STRING and item.is_enum:
             enum_name = self._get_enum_name(item, value)
 
             if enum_name is None:
@@ -274,10 +275,10 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
             return final
 
-        if item.type == "string" and item.format == "date-time":
+        if item.type == oa.DataType.STRING and item.format == "date-time":
             return f'new Date("{value}")'
 
-        if item.type == "string" and item.format == "date":
+        if item.type == oa.DataType.STRING and item.format == "date":
             return self._to_json(value)
 
         return self._to_json(value)

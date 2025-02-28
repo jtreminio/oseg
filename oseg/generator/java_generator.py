@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 
@@ -266,7 +267,7 @@ class JavaGenerator(generator.BaseGenerator):
 
             printable.value = []
 
-            if item.type == "string":
+            if item.type == oa.DataType.STRING:
                 if item.is_enum:
                     enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
 
@@ -294,7 +295,7 @@ class JavaGenerator(generator.BaseGenerator):
         value: any,
         parent: model.PropertyObject | None,
     ) -> any:
-        if item.type == "string":
+        if item.type == oa.DataType.STRING:
             if item.is_enum:
                 enum_name = self._get_enum_name(item, value)
 
@@ -338,7 +339,7 @@ class JavaGenerator(generator.BaseGenerator):
         return NormalizeStr.underscore(value).upper()
 
     def _fix_ints(self, item: model.PropertyScalar, value: any) -> any:
-        if item.type not in ["integer", "number"] or value is None:
+        if item.type not in [oa.DataType.INTEGER, oa.DataType.NUMBER] or value is None:
             return None
 
         if item.format == "float":

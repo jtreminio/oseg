@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
@@ -212,10 +213,10 @@ class RubyGenerator(generator.BaseGenerator):
         if value is None:
             return self.print_null()
 
-        if item.type == "string" and item.format == "date-time":
+        if item.type == oa.DataType.STRING and item.format == "date-time":
             return f'Date.parse("{value}").to_time'
 
-        if item.type == "string" and item.format == "date":
+        if item.type == oa.DataType.STRING and item.format == "date":
             return f'Date.parse("{value}").to_date'
 
         return self._to_json(value)

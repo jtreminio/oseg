@@ -24,34 +24,24 @@ class PropertyInterface(Protocol):
         self.is_required: bool = is_required
         self.is_nullable: bool = parser.TypeChecker.is_nullable(self.schema)
         self.is_set: bool = is_set
-        self.type: str = self._get_type()
+        self.type: oa.DataType = self._get_type()
 
     # todo currently only support single type, not list of types
-    def _get_type(self) -> str:
+    def _get_type(self) -> oa.DataType:
         if self.is_array:
             # todo figure out why this happens
             if self.schema.items is None:
-                return ""
+                raise NotImplementedError("Array items == None")
 
             if isinstance(self.schema.items.type, list):
-                type_value = self.schema.items.type[0].value
-            else:
-                type_value = self.schema.items.type.value
+                return self.schema.items.type[0]
 
-            assert isinstance(
-                type_value, str
-            ), f"'{self.schema}' has invalid array items type"
-
-            return type_value
+            return self.schema.items.type
 
         if isinstance(self.schema.type, list):
-            type_value = self.schema.type[0].value
-        else:
-            type_value = self.schema.type.value
+            return self.schema.type[0]
 
-        assert isinstance(type_value, str), f"'{self.schema}' has invalid item type"
-
-        return type_value
+        return self.schema.type
 
 
 class PropertyFile(PropertyInterface):
@@ -116,9 +106,9 @@ class PropertyScalar(PropertyInterface):
             result = []
 
             for i in self.value:
-                if self.type == oa.DataType.STRING.value:
+                if self.type == oa.DataType.STRING:
                     result.append(str(i))
-                elif self.type == oa.DataType.BOOLEAN.value:
+                elif self.type == oa.DataType.BOOLEAN:
                     result.append(bool(i))
                 else:
                     i: int
@@ -128,9 +118,9 @@ class PropertyScalar(PropertyInterface):
 
             return
 
-        if self.type == oa.DataType.STRING.value:
+        if self.type == oa.DataType.STRING:
             self.value = str(self.value)
-        elif self.type == oa.DataType.BOOLEAN.value:
+        elif self.type == oa.DataType.BOOLEAN:
             self.value = bool(self.value)
 
     def _set_string_format(self) -> str | None:

@@ -10,10 +10,10 @@ class TypeChecker:
     REF_UNION = Union[BaseModel, oa.Reference]
 
     _SCALAR_TYPES = [
-        "boolean",
-        "integer",
-        "number",
-        "string",
+        oa.DataType.BOOLEAN,
+        oa.DataType.INTEGER,
+        oa.DataType.NUMBER,
+        oa.DataType.STRING,
     ]
 
     # Exclude "base64" because that will be considered a string in SDKs
@@ -151,7 +151,7 @@ class TypeChecker:
     def _is_of_scalar_type(cls, propery_type: oa.DataType | list[oa.DataType]) -> bool:
         if isinstance(propery_type, list):
             for t in propery_type:
-                if t.value in cls._SCALAR_TYPES:
+                if t in cls._SCALAR_TYPES:
                     return True
 
             return False

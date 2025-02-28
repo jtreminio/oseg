@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
@@ -263,10 +264,10 @@ class CSharpGenerator(generator.BaseGenerator):
         item: model.PropertyScalar,
         parent: model.PropertyObject | None,
     ) -> str:
-        if item.type == "boolean":
+        if item.type == oa.DataType.BOOLEAN:
             return "bool"
 
-        if item.type == "string":
+        if item.type == oa.DataType.STRING:
             if item.is_enum:
                 if parent is None:
                     return "string"
@@ -284,10 +285,10 @@ class CSharpGenerator(generator.BaseGenerator):
 
             return "string"
 
-        if item.type == "integer":
+        if item.type == oa.DataType.INTEGER:
             return "int"
 
-        if item.type == "number":
+        if item.type == oa.DataType.NUMBER:
             if item.format in ["float", "double"]:
                 return item.format
 
@@ -318,10 +319,10 @@ class CSharpGenerator(generator.BaseGenerator):
 
             return f"{parent_type}.{enum_type}.{enum_name}"
 
-        if item.type == "string" and item.format == "date-time":
+        if item.type == oa.DataType.STRING and item.format == "date-time":
             return f'DateTime.Parse("{value}")'
 
-        if item.type == "string" and item.format == "date":
+        if item.type == oa.DataType.STRING and item.format == "date":
             return f'DateOnly.Parse("{value}")'
 
         return self._to_json(value)

@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
@@ -191,14 +192,14 @@ class PhpGenerator(generator.BaseGenerator):
             return self._to_json(value)
 
         # if enum but no parent, use the literal value
-        if item.type == "string" and item.is_enum and parent is not None:
+        if item.type == oa.DataType.STRING and item.is_enum and parent is not None:
             namespace = self.config.invokerPackage
             enum_name = self._get_enum_name(item, item.name, value)
             parent_type = NormalizeStr.pascal_case(parent.type)
 
             return f"{namespace}\\Model\\{parent_type}::{enum_name}"
 
-        if item.type == "string" and item.format in ["date-time", "date"]:
+        if item.type == oa.DataType.STRING and item.format in ["date-time", "date"]:
             return f'new \\DateTime("{value}")'
 
         if isinstance(value, str):

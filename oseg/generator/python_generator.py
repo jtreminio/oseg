@@ -1,4 +1,5 @@
 import inspect
+import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
@@ -217,10 +218,10 @@ class PythonGenerator(generator.BaseGenerator):
         return "None"
 
     def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
-        if item.type == "boolean" or value is None:
+        if item.type == oa.DataType.BOOLEAN or value is None:
             return value
 
-        if item.type == "string":
+        if item.type == oa.DataType.STRING:
             if item.format == "date-time":
                 return f"datetime.fromisoformat({self._to_json(value)})"
 
