@@ -4,6 +4,8 @@ Create (almost) ready to use SDK snippets for SDKs generated using [openapi-gene
 
 ## Examples
 
+Several more examples can be found at [jtreminio/oseg-examples](https://github.com/jtreminio/oseg-examples).
+
 Using the [OpenAPITools/openapi-generator petstore.yaml](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml) definition, we can generate SDK examples from the [addPet endpoint](https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/test/resources/2_0/petstore.yaml#L22-L47).
 
 OpenAPI spec:
