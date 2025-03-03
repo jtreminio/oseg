@@ -406,18 +406,18 @@ If you use a custom JSON file with examples you can define as many examples per 
 
 ## Adding more SDKs
 
-Examples are generated using (fairly) simple [Jinja templates](./oseg/templates/). Adding a new SDK requires a few steps:
+Examples are generated using (fairly) simple [Jinja templates](https://github.com/jtreminio/oseg/tree/main/oseg/templates). Adding a new SDK requires a few steps:
 
 1) Create the Generator
    * handles language-specific parameter and method naming
    * contains a config class with required and optional parameters for the chosen SDK. We follow the naming convention outlined in [openapi-generator page for each generator](https://openapi-generator.tech/docs/generators/python).
    * and some other things
-   * ([Python example](./oseg/generator/python_generator.py))
-2) Create the Jinja template ([Python example](./oseg/templates/python.jinja2))
+   * [Python example](https://github.com/jtreminio/oseg/blob/main/oseg/generator/python_generator.py)
+2) Create the Jinja template ([Python example](https://github.com/jtreminio/oseg/blob/main/oseg/generator/python_generator.py))
 
 ## How to run
 
-The entrypoint to this project is [run.py](./run.py). It currently supports two commands:
+The entrypoint to this project is [run.py](https://github.com/jtreminio/oseg/blob/main/run.py). It currently supports two commands:
 
 ### config-help
 
@@ -425,10 +425,18 @@ Prints all config options available to a given generator.
 
 Run `python3 run.py config-help --help` for more details.
 
+Or, with Docker: `docker container run --rm jtreminio/oseg:latest config-help --help`
+
 Show config options for the `python` generator:
 
 ```bash
 python3 run.py config-help -g python
+```
+
+Or, with Docker: 
+
+```bash
+docker container run --rm jtreminio/oseg:latest config-help -g python
 ```
 
 ### generate
@@ -442,7 +450,17 @@ Run with a local config file:
 ```bash
 python3 run.py generate \
     -i openapi.yaml \
-    -o generated/python/src \
+    -o python/src \
+    --config-file config-python.yaml \
+    --example-data-file example_data.json
+```
+
+Or, with Docker:
+
+```bash
+docker container run --rm -v $PWD:/app jtreminio/oseg:latest generate \
+    -i openapi.yaml \
+    -o python/src \
     --config-file config-python.yaml \
     --example-data-file example_data.json
 ```
@@ -452,19 +470,36 @@ Run with inline config values. These config values can be seen by running `pytho
 ```bash
 python3 run.py generate \
     -i openapi.yaml \
-    -o generated/python/src \
+    -o python/src \
     --generator-name python \
     --config '{
       "packageName": "openapi_client",
       "oseg.propertyNamingConvention": "camel_case",
-      "oseg.ignoreOptionalUnset": false
+      "oseg.security.api_key.api_key": "YOUR_API_KEY",
+      "oseg.security.petstore_auth.access_token": "YOUR_ACCESS_TOKEN"
+    }' \
+    --example-data-file example_data.json
+```
+
+Or, with Docker:
+
+```bash
+docker container run --rm -v $PWD:/app jtreminio/oseg:latest generate \
+    -i openapi.yaml \
+    -o python/src \
+    --generator-name python \
+    --config '{
+      "packageName": "openapi_client",
+      "oseg.propertyNamingConvention": "camel_case",
+      "oseg.security.api_key.api_key": "YOUR_API_KEY",
+      "oseg.security.petstore_auth.access_token": "YOUR_ACCESS_TOKEN"
     }' \
     --example-data-file example_data.json
 ```
 
 ## Tests
 
-See [tests directory](./tests).
+See [tests directory](https://github.com/jtreminio/oseg/tree/main/tests).
 
 ## Feature support
 
