@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+## example: ./bin/package-typescript petstore
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+PROJECT=$1
+SDK="typescript-fetch"
+WORKING_DIR="/app/openapi"
+PROJECT_DIR="${DIR}/../../oseg-examples/${PROJECT}"
+SDK_DIR="${PROJECT_DIR}/${SDK}/sdk"
+TARGET_DIR="${PROJECT_DIR}/${SDK}"
+ARTIFACTS_DIR="${PROJECT_DIR}/${SDK}/artifacts"
+
+if [[ -z "${PROJECT-}" ]] || [[ ! -d "${PROJECT_DIR}" ]]; then
+  echo "Must provide project"
+  exit 1
+fi
+
+rm -rf "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACTS_DIR}"
+rm -f "${TARGET_DIR}/package-lock.json"
+rm -rf "${TARGET_DIR}/node_modules"
+
+docker run -it --rm \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-npm-cache:/root/.npm" \
+  -w "${WORKING_DIR}" \
+  node:22 npm install
+
+docker run -it --rm \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-npm-cache:/root/.npm" \
+  -w "${WORKING_DIR}" \
+  node:22 npm run build
+
+docker run -it --rm \
+  -v "${SDK_DIR}:${WORKING_DIR}" \
+  -v "${ARTIFACTS_DIR}:/artifacts" \
+  -v "oseg-npm-cache:/root/.npm" \
+  -w "${WORKING_DIR}" \
+  node:22 npm pack --pack-destination /artifacts
+
+mv "${ARTIFACTS_DIR}/"*.tgz "${ARTIFACTS_DIR}/packaged.tgz"

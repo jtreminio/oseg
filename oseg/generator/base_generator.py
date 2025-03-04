@@ -15,6 +15,7 @@ GENERATOR_CONFIG_TYPE = Union[
     "generator.PhpConfig",
     "generator.PythonConfig",
     "generator.RubyConfig",
+    "generator.TypescriptFetchConfig",
     "generator.TypescriptNodeConfig",
 ]
 
@@ -24,6 +25,7 @@ GENERATOR_TYPE = Union[
     "generator.PhpGenerator",
     "generator.PythonGenerator",
     "generator.RubyGenerator",
+    "generator.TypescriptFetchGenerator",
     "generator.TypescriptNodeGenerator",
 ]
 
@@ -76,6 +78,8 @@ class BaseConfig(Protocol):
                 return generator.PythonConfig(additional_properties)
             case generator.RubyConfig.GENERATOR_NAME:
                 return generator.RubyConfig(additional_properties)
+            case generator.TypescriptFetchConfig.GENERATOR_NAME:
+                return generator.TypescriptFetchConfig(additional_properties)
             case generator.TypescriptNodeConfig.GENERATOR_NAME:
                 return generator.TypescriptNodeConfig(additional_properties)
             case _:
@@ -108,6 +112,11 @@ class BaseConfig(Protocol):
                 return {
                     "required": generator.RubyConfig.PROPS_REQUIRED,
                     "optional": generator.RubyConfig.PROPS_OPTIONAL,
+                }
+            case generator.TypescriptFetchConfig.GENERATOR_NAME:
+                return {
+                    "required": generator.TypescriptFetchConfig.PROPS_REQUIRED,
+                    "optional": generator.TypescriptFetchConfig.PROPS_OPTIONAL,
                 }
             case generator.TypescriptNodeConfig.GENERATOR_NAME:
                 return {
@@ -296,6 +305,13 @@ class GeneratorFactory:
         if isinstance(config, generator.RubyConfig):
             return generator.RubyGenerator(config, operation, property_container)
 
+        if isinstance(config, generator.TypescriptFetchConfig):
+            return generator.TypescriptFetchGenerator(
+                config,
+                operation,
+                property_container,
+            )
+
         if isinstance(config, generator.TypescriptNodeConfig):
             return generator.TypescriptNodeGenerator(
                 config,
@@ -313,6 +329,7 @@ class GeneratorFactory:
             generator.PhpGenerator.NAME,
             generator.PythonGenerator.NAME,
             generator.RubyGenerator.NAME,
+            generator.TypescriptFetchGenerator.NAME,
             generator.TypescriptNodeGenerator.NAME,
         ]
 
@@ -358,6 +375,9 @@ class ProjectSetup:
 
         if isinstance(config, generator.RubyConfig):
             return generator.RubyProject(config, base_dir, output_dir)
+
+        if isinstance(config, generator.TypescriptFetchConfig):
+            return generator.TypescriptFetchProject(config, base_dir, output_dir)
 
         if isinstance(config, generator.TypescriptNodeConfig):
             return generator.TypescriptNodeProject(config, base_dir, output_dir)

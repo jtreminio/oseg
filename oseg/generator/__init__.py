@@ -14,6 +14,11 @@ from .java_generator import JavaConfig, JavaGenerator, JavaProject
 from .php_generator import PhpConfig, PhpGenerator, PhpProject
 from .python_generator import PythonConfig, PythonGenerator, PythonProject
 from .ruby_generator import RubyConfig, RubyGenerator, RubyProject
+from .typescript_fetch_generator import (
+    TypescriptFetchConfig,
+    TypescriptFetchGenerator,
+    TypescriptFetchProject,
+)
 from .typescript_node_generator import (
     TypescriptNodeConfig,
     TypescriptNodeGenerator,
