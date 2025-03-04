@@ -2,7 +2,7 @@ from __future__ import annotations
 import openapi_pydantic as oa
 from typing import Union
 from pydantic import BaseModel
-from oseg import model, parser
+from oseg import model
 
 
 class TypeChecker:
