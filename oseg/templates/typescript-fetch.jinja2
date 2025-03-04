@@ -1,0 +1,131 @@
+{%- macro print_scalar(printable) -%}
+{% if printable.value == "null" %}{{ print_null() }}{% else %}
+{{ printable.value }}
+{%- endif %}
+{%- endmacro -%}
+
+{%- macro print_scalar_array(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+[
+        {% for i in printable.value %}
+  {{ i }},
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+new Blob([fs.readFileSync("{{ printable.value }}")])
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_file_array(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+[
+        {% for i in printable.value %}
+  new Blob([fs.readFileSync("{{ i }}")]),
+        {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_free_form(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+  {{ printable.value|tojson(2) }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_free_form_array(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+  {{ printable.value|tojson(2) }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+{{ printable.value|print_variablename }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_object_array(printable) -%}
+    {% if printable.value == None %}{{ print_null() }}{% else %}
+[
+    {% for i in printable.value %}
+  {{ i|print_variablename }},
+    {% endfor %}
+]
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro print_security(printable) -%}
+    {% set comment = "" %}
+    {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
+
+    {%- if printable.method == "api_key" %}
+{{ comment }}{{ printable.name|print_variablename }}: "{{ printable.value }}",
+    {%- else %}{{ comment }}{{ printable.method|print_variablename }}: "{{ printable.value }}",
+    {%- endif %}
+{%-endmacro -%}
+
+{%- macro print_variable_name_as_comment(name, value) -%}
+    {% if config.oseg.printApiCallProperty %}
+        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
+    {% endif %}
+{%-endmacro -%}
+
+{%- import "_macros.jinja2" as m with context -%}
+
+import * as fs from 'fs';
+import api from "{{ config.npmName }}"
+import models from "{{ config.npmName }}"
+
+const config = new api.Configuration({
+{% if operation.security.is_optional %}
+// Authentication is optional for this API endpoint
+{% endif %}
+{% call(security_schemes) m.parse_security_macro(0) %}
+    {% for _, security in security_schemes.items() %}
+  {{ security }}
+    {% endfor %}
+{% endcall %}
+})
+
+const apiCaller = new api.{{ operation.api_name|print_apiname }}(config);
+
+{% call(objects) m.parse_objects_macro() %}
+    {% for obj_name, obj in objects.items() %}
+        {% if not obj.is_array %}
+const {{ obj_name|print_variablename }}: models.{{ obj.type|print_classname }} = {
+        {% call(properties) m.parse_object_properties_macro(obj, 2) %}
+            {% for name, value in properties.items() %}
+  {{ name|print_propname }}: {{ value }},
+            {% endfor %}
+        {% endcall %}
+};
+        {% else %}
+const {{ obj_name|print_variablename }} = {{ "" }}
+            {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
+  {{- value }};
+            {% endcall %}
+        {% endif %}
+
+    {% endfor %}
+{% endcall %}
+{% call(properties) m.parse_api_call_properties_macro(2) %}
+apiCaller.{{ operation.operation_id|print_methodname }}({% if not properties %})
+{%- else %}{
+    {% for name, value in properties.items() %}
+  {{ name|print_variablename }}: {{ value }},
+    {% endfor %}
+}){% endif %}{% endcall %}{%- if operation.response and operation.response.body  %}.then(response => {
+{% if not operation.response.is_binary %}
+  console.log(response);
+{% elif operation.response.is_binary %}
+  fs.createWriteStream('./file_response').write(response);
+{% endif -%}
+}){% endif %}.catch(error => {
+  console.log("Exception when calling {{ operation.api_name|print_apiname }}#{{ operation.operation_id|print_methodname }}:");
+  console.log(error.response);
+});
+{{ "" }}
