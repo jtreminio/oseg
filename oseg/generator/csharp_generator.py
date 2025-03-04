@@ -5,8 +5,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-CSharpConfigDef = TypedDict(
-    "CSharpConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "packageName": str,
         "packageGuid": str | None,
@@ -18,20 +18,16 @@ CSharpConfigDef = TypedDict(
 )
 
 
-class CSharpConfigComplete(TypedDict):
-    generatorName: str
-    additionalProperties: CSharpConfigDef
-
-
 @dataclass
-class CSharpConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     namespace: str | None
     packageGuid: str
 
 
 class CSharpConfig(generator.BaseConfig):
     GENERATOR_NAME = "csharp"
-    oseg: CSharpConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -89,15 +85,15 @@ class CSharpConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: CSharpConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.packageName = config.get("packageName")
         assert isinstance(self.packageName, str)
 
         self.packageGuid = self._get_value("packageGuid")
 
-        self.oseg = CSharpConfigOseg(
+        self.oseg = ConfigOseg(
             namespace=self._get_value("oseg.namespace"),
             packageGuid=self._get_value("oseg.packageGuid"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
@@ -105,7 +101,45 @@ class CSharpConfig(generator.BaseConfig):
         )
 
 
+class Project(generator.Project):
+    config: CSharpConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore", "global.json", "NuGet.Config"])
+
+        template_files = [
+            generator.ProjectTemplateFilesDef(
+                source="Entry.cs",
+                target=f"{self.output_dir}/Entry.cs",
+                values={
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
+                },
+            ),
+            generator.ProjectTemplateFilesDef(
+                source="SLN.sln",
+                target=f"{self.config.oseg.namespace}.sln",
+                values={
+                    "{{ packageGuid }}": self.config.packageGuid,
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
+                    "{{ oseg.packageGuid }}": self.config.oseg.packageGuid,
+                },
+            ),
+            generator.ProjectTemplateFilesDef(
+                source="CSPROJ.csproj",
+                target=f"{self.output_dir}/{self.config.oseg.namespace}.csproj",
+                values={
+                    "{{ packageName }}": self.config.packageName,
+                    "{{ oseg.namespace }}": self.config.oseg.namespace,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
+
+
 class CSharpGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = CSharpConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "cs"
     NAME = "csharp"
     TEMPLATE = f"{NAME}.jinja2"
@@ -195,7 +229,7 @@ class CSharpGenerator(generator.BaseGenerator):
         "version",
     ]
 
-    config: CSharpConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         if secondary:
@@ -350,37 +384,4 @@ class CSharpGenerator(generator.BaseGenerator):
         return NormalizeStr.pascal_case(value)
 
 
-class CSharpProject(generator.ProjectSetup):
-    config: CSharpConfig
-
-    def setup(self) -> None:
-        self._copy_files([".gitignore", "global.json", "NuGet.Config"])
-
-        template_files = [
-            generator.ProjectSetupTemplateFilesDef(
-                source="Entry.cs",
-                target=f"{self.output_dir}/Entry.cs",
-                values={
-                    "{{ oseg.namespace }}": self.config.oseg.namespace,
-                },
-            ),
-            generator.ProjectSetupTemplateFilesDef(
-                source="SLN.sln",
-                target=f"{self.config.oseg.namespace}.sln",
-                values={
-                    "{{ packageGuid }}": self.config.packageGuid,
-                    "{{ oseg.namespace }}": self.config.oseg.namespace,
-                    "{{ oseg.packageGuid }}": self.config.oseg.packageGuid,
-                },
-            ),
-            generator.ProjectSetupTemplateFilesDef(
-                source="CSPROJ.csproj",
-                target=f"{self.output_dir}/{self.config.oseg.namespace}.csproj",
-                values={
-                    "{{ packageName }}": self.config.packageName,
-                    "{{ oseg.namespace }}": self.config.oseg.namespace,
-                },
-            ),
-        ]
-
-        self._template_files(template_files)
+generator.GeneratorFactory.register(CSharpGenerator)

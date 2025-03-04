@@ -5,8 +5,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-TypescriptNodeConfigDef = TypedDict(
-    "TypescriptNodeConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "npmName": str,
         "oseg.npmName": str | None,
@@ -17,20 +17,16 @@ TypescriptNodeConfigDef = TypedDict(
 )
 
 
-class TypescriptNodeConfigComplete(TypedDict):
-    npmName: str
-    additionalProperties: TypescriptNodeConfigDef
-
-
 @dataclass
-class TypescriptNodeConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     npmName: str | None
     printApiCallProperty: bool | None
 
 
 class TypescriptNodeConfig(generator.BaseConfig):
     GENERATOR_NAME = "typescript-node"
-    oseg: TypescriptNodeConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "npmName": inspect.cleandoc(
@@ -79,13 +75,13 @@ class TypescriptNodeConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: TypescriptNodeConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.npmName = config.get("npmName")
         assert isinstance(self.npmName, str)
 
-        self.oseg = TypescriptNodeConfigOseg(
+        self.oseg = ConfigOseg(
             npmName=self._get_value("oseg.npmName"),
             printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
@@ -93,7 +89,29 @@ class TypescriptNodeConfig(generator.BaseConfig):
         )
 
 
+class Project(generator.Project):
+    config: TypescriptNodeConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore", "tsconfig.json"])
+
+        template_files = [
+            generator.ProjectTemplateFilesDef(
+                source="package.json",
+                target="package.json",
+                values={
+                    "{{ npmName }}": self.config.npmName,
+                    "{{ oseg.npmName }}": self.config.oseg.npmName,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
+
+
 class TypescriptNodeGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = TypescriptNodeConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "ts"
     NAME = "typescript-node"
     TEMPLATE = f"{NAME}.jinja2"
@@ -170,7 +188,7 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    config: TypescriptNodeConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
@@ -304,21 +322,4 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
         return NormalizeStr.pascal_case(value)
 
 
-class TypescriptNodeProject(generator.ProjectSetup):
-    config: TypescriptNodeConfig
-
-    def setup(self) -> None:
-        self._copy_files([".gitignore", "tsconfig.json"])
-
-        template_files = [
-            generator.ProjectSetupTemplateFilesDef(
-                source="package.json",
-                target="package.json",
-                values={
-                    "{{ npmName }}": self.config.npmName,
-                    "{{ oseg.npmName }}": self.config.oseg.npmName,
-                },
-            ),
-        ]
-
-        self._template_files(template_files)
+generator.GeneratorFactory.register(TypescriptNodeGenerator)

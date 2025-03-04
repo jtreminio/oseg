@@ -2,30 +2,11 @@ from __future__ import annotations
 import json
 import os
 import shutil
-from dataclasses import dataclass
-
 import openapi_pydantic as oa
 from abc import abstractmethod
-from typing import Protocol, TypedDict, Any, Union
-from oseg import generator, model, parser, __ROOT_DIR__
-
-GENERATOR_CONFIG_TYPE = Union[
-    "generator.CSharpConfig",
-    "generator.JavaConfig",
-    "generator.PhpConfig",
-    "generator.PythonConfig",
-    "generator.RubyConfig",
-    "generator.TypescriptNodeConfig",
-]
-
-GENERATOR_TYPE = Union[
-    "generator.CSharpGenerator",
-    "generator.JavaGenerator",
-    "generator.PhpGenerator",
-    "generator.PythonGenerator",
-    "generator.RubyGenerator",
-    "generator.TypescriptNodeGenerator",
-]
+from dataclasses import dataclass
+from typing import Protocol, TypedDict, Any, Type
+from oseg import model, parser, __ROOT_DIR__
 
 
 class PropsOptionalT(TypedDict):
@@ -53,69 +34,15 @@ class BaseConfig(Protocol):
     _config: dict[str, any]
     oseg: BaseConfigOseg
 
-    @staticmethod
-    def factory(config: BaseConfigDef | str) -> GENERATOR_CONFIG_TYPE:
-        if isinstance(config, str):
-            data = parser.FileLoader.get_file_contents(config)
+    def __init__(self, config: dict[str, any]):
+        self._config = config
 
-            if not len(data):
-                raise NotImplementedError(f"{config} contains invalid data")
-
-            config = data
-
-        additional_properties = config.get("additionalProperties", {})
-
-        match config.get("generatorName"):
-            case generator.CSharpConfig.GENERATOR_NAME:
-                return generator.CSharpConfig(additional_properties)
-            case generator.JavaConfig.GENERATOR_NAME:
-                return generator.JavaConfig(additional_properties)
-            case generator.PhpConfig.GENERATOR_NAME:
-                return generator.PhpConfig(additional_properties)
-            case generator.PythonConfig.GENERATOR_NAME:
-                return generator.PythonConfig(additional_properties)
-            case generator.RubyConfig.GENERATOR_NAME:
-                return generator.RubyConfig(additional_properties)
-            case generator.TypescriptNodeConfig.GENERATOR_NAME:
-                return generator.TypescriptNodeConfig(additional_properties)
-            case _:
-                raise NotImplementedError("Generator not found for config")
-
-    @staticmethod
-    def config_help(generator_name: str):
-        match generator_name:
-            case generator.CSharpConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.CSharpConfig.PROPS_REQUIRED,
-                    "optional": generator.CSharpConfig.PROPS_OPTIONAL,
-                }
-            case generator.JavaConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.JavaConfig.PROPS_REQUIRED,
-                    "optional": generator.JavaConfig.PROPS_OPTIONAL,
-                }
-            case generator.PhpConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.PhpConfig.PROPS_REQUIRED,
-                    "optional": generator.PhpConfig.PROPS_OPTIONAL,
-                }
-            case generator.PythonConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.PythonConfig.PROPS_REQUIRED,
-                    "optional": generator.PythonConfig.PROPS_OPTIONAL,
-                }
-            case generator.RubyConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.RubyConfig.PROPS_REQUIRED,
-                    "optional": generator.RubyConfig.PROPS_OPTIONAL,
-                }
-            case generator.TypescriptNodeConfig.GENERATOR_NAME:
-                return {
-                    "required": generator.TypescriptNodeConfig.PROPS_REQUIRED,
-                    "optional": generator.TypescriptNodeConfig.PROPS_OPTIONAL,
-                }
-            case _:
-                raise NotImplementedError("Generator not found for config_help")
+    @classmethod
+    def config_help(cls):
+        return {
+            "required": cls.PROPS_REQUIRED,
+            "optional": cls.PROPS_OPTIONAL,
+        }
 
     def _parse_security(self) -> dict[str, any]:
         security = {}
@@ -134,7 +61,58 @@ class BaseConfig(Protocol):
         return self._config.get(name, self.PROPS_OPTIONAL[name].get("default"))
 
 
+@dataclass
+class ProjectTemplateFilesDef:
+    source: str
+    target: str
+    values: dict[str, str]
+
+
+class Project:
+    config: BaseConfig
+
+    def __init__(self, config: BaseConfig, base_dir: str, output_dir: str):
+        self.config = config
+        self.additional_files_dir: str = (
+            f"{__ROOT_DIR__}/static/additional_files/{config.GENERATOR_NAME}"
+        )
+        self.base_dir: str = base_dir
+        self.output_dir: str = output_dir
+
+        if not os.path.isdir(f"{base_dir}/{output_dir}"):
+            os.makedirs(f"{base_dir}/{output_dir}")
+
+    @abstractmethod
+    def setup(self) -> None:
+        raise NotImplementedError
+
+    def _copy_files(self, filenames: list[str]) -> None:
+        for filename in filenames:
+            shutil.copyfile(
+                f"{self.additional_files_dir}/{filename}",
+                f"{self.base_dir}/{filename}",
+            )
+
+    def _template_files(self, files: list[ProjectTemplateFilesDef]) -> None:
+        for file in files:
+            source_file = f"{self.additional_files_dir}/{file.source}"
+            with open(source_file, "r", encoding="utf-8") as s:
+                source = s.read()
+
+                for old, new in file.values.items():
+                    if new is None:
+                        new = ""
+
+                    source = source.replace(old, new)
+
+                target_file = f"{self.base_dir}/{file.target}"
+                with open(target_file, "w", encoding="utf-8") as t:
+                    t.write(source)
+
+
 class BaseGenerator(Protocol):
+    CONFIG_CLASS = BaseConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION: str
     NAME: str
     TEMPLATE: str
@@ -275,118 +253,66 @@ class BaseGenerator(Protocol):
 
 
 class GeneratorFactory:
-    @staticmethod
-    def factory(
-        config: generator.GENERATOR_CONFIG_TYPE,
-        operation: model.Operation,
-        property_container: model.PropertyContainer,
-    ) -> GENERATOR_TYPE:
-        if isinstance(config, generator.CSharpConfig):
-            return generator.CSharpGenerator(config, operation, property_container)
+    generators: dict[str, Type[BaseGenerator]] = {}
 
-        if isinstance(config, generator.JavaConfig):
-            return generator.JavaGenerator(config, operation, property_container)
+    @classmethod
+    def register(cls, gen: Type[BaseGenerator]) -> None:
+        cls.generators[gen.NAME] = gen
 
-        if isinstance(config, generator.PhpConfig):
-            return generator.PhpGenerator(config, operation, property_container)
+    @classmethod
+    def config_class(cls, name: str) -> Type[BaseConfig]:
+        return cls.generator_class(name).CONFIG_CLASS
 
-        if isinstance(config, generator.PythonConfig):
-            return generator.PythonGenerator(config, operation, property_container)
+    @classmethod
+    def config_factory(cls, config: dict | str) -> BaseConfig:
+        if isinstance(config, str):
+            data = parser.FileLoader.get_file_contents(config)
 
-        if isinstance(config, generator.RubyConfig):
-            return generator.RubyGenerator(config, operation, property_container)
+            if not len(data):
+                raise NotImplementedError(f"{config} contains invalid data")
 
-        if isinstance(config, generator.TypescriptNodeConfig):
-            return generator.TypescriptNodeGenerator(
-                config,
-                operation,
-                property_container,
-            )
+            config = data
 
-        raise NotImplementedError
+        additional_properties = config.get("additionalProperties", {})
 
-    @staticmethod
-    def default_generator_names() -> list[str]:
-        return [
-            generator.CSharpGenerator.NAME,
-            generator.JavaGenerator.NAME,
-            generator.PhpGenerator.NAME,
-            generator.PythonGenerator.NAME,
-            generator.RubyGenerator.NAME,
-            generator.TypescriptNodeGenerator.NAME,
-        ]
+        return cls.config_class(config.get("generatorName"))(additional_properties)
 
-
-@dataclass
-class ProjectSetupTemplateFilesDef:
-    source: str
-    target: str
-    values: dict[str, str]
-
-
-class ProjectSetup:
-    config: GENERATOR_CONFIG_TYPE
-
-    def __init__(self, config: GENERATOR_CONFIG_TYPE, base_dir: str, output_dir: str):
-        self.config = config
-        self.additional_files_dir: str = (
-            f"{__ROOT_DIR__}/static/additional_files/{config.GENERATOR_NAME}"
-        )
-        self.base_dir: str = base_dir
-        self.output_dir: str = output_dir
-
-        if not os.path.isdir(f"{base_dir}/{output_dir}"):
-            os.makedirs(f"{base_dir}/{output_dir}")
-
-    @staticmethod
-    def factory(
-        config: GENERATOR_CONFIG_TYPE,
+    @classmethod
+    def project_factory(
+        cls,
+        config: BaseConfig,
         base_dir: str,
         output_dir: str,
-    ) -> ProjectSetup:
-        if isinstance(config, generator.CSharpConfig):
-            return generator.CSharpProject(config, base_dir, output_dir)
+    ) -> Project:
+        return cls.generator_class(config.GENERATOR_NAME).PROJECT_CLASS(
+            config,
+            base_dir,
+            output_dir,
+        )
 
-        if isinstance(config, generator.JavaConfig):
-            return generator.JavaProject(config, base_dir, output_dir)
+    @classmethod
+    def generator_class(cls, name: str) -> Type[BaseGenerator]:
+        if name not in cls.generators:
+            raise NotImplementedError(f"Generator '{name}' not found")
 
-        if isinstance(config, generator.PhpConfig):
-            return generator.PhpProject(config, base_dir, output_dir)
+        return cls.generators[name]
 
-        if isinstance(config, generator.PythonConfig):
-            return generator.PythonProject(config, base_dir, output_dir)
+    @classmethod
+    def generator_factory(
+        cls,
+        config: BaseConfig,
+        operation: model.Operation,
+        property_container: model.PropertyContainer,
+    ) -> BaseGenerator:
+        return cls.generator_class(config.GENERATOR_NAME)(
+            config,
+            operation,
+            property_container,
+        )
 
-        if isinstance(config, generator.RubyConfig):
-            return generator.RubyProject(config, base_dir, output_dir)
+    @classmethod
+    def default_generator_names(cls) -> list[str]:
+        result = list(cls.generators.keys())
+        result.sort()
 
-        if isinstance(config, generator.TypescriptNodeConfig):
-            return generator.TypescriptNodeProject(config, base_dir, output_dir)
-
-        raise NotImplementedError
-
-    @abstractmethod
-    def setup(self) -> None:
-        raise NotImplementedError
-
-    def _copy_files(self, filenames: list[str]) -> None:
-        for filename in filenames:
-            shutil.copyfile(
-                f"{self.additional_files_dir}/{filename}",
-                f"{self.base_dir}/{filename}",
-            )
-
-    def _template_files(self, files: list[ProjectSetupTemplateFilesDef]) -> None:
-        for file in files:
-            source_file = f"{self.additional_files_dir}/{file.source}"
-            with open(source_file, "r", encoding="utf-8") as s:
-                source = s.read()
-
-                for old, new in file.values.items():
-                    if new is None:
-                        new = ""
-
-                    source = source.replace(old, new)
-
-                target_file = f"{self.base_dir}/{file.target}"
-                with open(target_file, "w", encoding="utf-8") as t:
-                    t.write(source)
+        return result

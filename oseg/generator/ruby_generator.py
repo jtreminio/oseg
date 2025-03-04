@@ -5,8 +5,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-RubyConfigDef = TypedDict(
-    "RubyConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "gemName": str,
         "moduleName": str,
@@ -17,20 +17,15 @@ RubyConfigDef = TypedDict(
 )
 
 
-class RubyConfigComplete(TypedDict):
-    generatorName: str
-    moduleName: str
-    additionalProperties: RubyConfigDef
-
-
 @dataclass
-class RubyConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     printApiCallProperty: bool | None
 
 
 class RubyConfig(generator.BaseConfig):
     GENERATOR_NAME = "ruby"
-    oseg: RubyConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "gemName": inspect.cleandoc(
@@ -76,8 +71,8 @@ class RubyConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: RubyConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.gemName = config.get("gemName")
         self.moduleName = config.get("moduleName")
@@ -85,14 +80,35 @@ class RubyConfig(generator.BaseConfig):
         assert isinstance(self.gemName, str)
         assert isinstance(self.moduleName, str)
 
-        self.oseg = RubyConfigOseg(
+        self.oseg = ConfigOseg(
             printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
             security=self._parse_security(),
         )
 
 
+class Project(generator.Project):
+    config: RubyConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        template_files = [
+            generator.ProjectTemplateFilesDef(
+                source="Gemfile",
+                target="Gemfile",
+                values={
+                    "{{ gemName }}": self.config.gemName,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
+
+
 class RubyGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = RubyConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "rb"
     NAME = "ruby"
     TEMPLATE = f"{NAME}.jinja2"
@@ -149,7 +165,7 @@ class RubyGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    config: RubyConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
@@ -223,20 +239,4 @@ class RubyGenerator(generator.BaseGenerator):
         return self._to_json(value)
 
 
-class RubyProject(generator.ProjectSetup):
-    config: RubyConfig
-
-    def setup(self) -> None:
-        self._copy_files([".gitignore"])
-
-        template_files = [
-            generator.ProjectSetupTemplateFilesDef(
-                source="Gemfile",
-                target="Gemfile",
-                values={
-                    "{{ gemName }}": self.config.gemName,
-                },
-            ),
-        ]
-
-        self._template_files(template_files)
+generator.GeneratorFactory.register(RubyGenerator)

@@ -5,8 +5,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-PythonConfigDef = TypedDict(
-    "PythonConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "packageName": str,
         "oseg.propertyNamingConvention": str | None,
@@ -16,19 +16,15 @@ PythonConfigDef = TypedDict(
 )
 
 
-class PythonConfigComplete(TypedDict):
-    generatorName: str
-    additionalProperties: PythonConfigDef
-
-
 @dataclass
-class PythonConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     propertyNamingConvention: str | None
 
 
 class PythonConfig(generator.BaseConfig):
     GENERATOR_NAME = "python"
-    oseg: PythonConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -68,20 +64,29 @@ class PythonConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: PythonConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.packageName = config.get("packageName")
         assert isinstance(self.packageName, str)
 
-        self.oseg = PythonConfigOseg(
+        self.oseg = ConfigOseg(
             propertyNamingConvention=self._get_value("oseg.propertyNamingConvention"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
             security=self._parse_security(),
         )
 
 
+class Project(generator.Project):
+    config: PythonConfig
+
+    def setup(self) -> None:
+        pass
+
+
 class PythonGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = PythonConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "py"
     NAME = "python"
     TEMPLATE = f"{NAME}.jinja2"
@@ -144,7 +149,7 @@ class PythonGenerator(generator.BaseGenerator):
         "yield",
     ]
 
-    config: PythonConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return NormalizeStr.snake_case(name) in self.RESERVED_KEYWORDS
@@ -231,8 +236,4 @@ class PythonGenerator(generator.BaseGenerator):
         return self._to_json(value)
 
 
-class PythonProject(generator.ProjectSetup):
-    config: PythonConfig
-
-    def setup(self) -> None:
-        pass
+generator.GeneratorFactory.register(PythonGenerator)

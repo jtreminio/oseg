@@ -6,8 +6,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-JavaConfigDef = TypedDict(
-    "JavaConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "invokerPackage": str,
         "apiPackage": str,
@@ -21,20 +21,16 @@ JavaConfigDef = TypedDict(
 )
 
 
-class JavaConfigComplete(TypedDict):
-    generatorName: str
-    additionalProperties: JavaConfigDef
-
-
 @dataclass
-class JavaConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     package: str | None
     printApiCallProperty: bool
 
 
 class JavaConfig(generator.BaseConfig):
     GENERATOR_NAME = "java"
-    oseg: JavaConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "invokerPackage": inspect.cleandoc(
@@ -103,8 +99,8 @@ class JavaConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: JavaConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.invokerPackage = config.get("invokerPackage")
         self.apiPackage = config.get("apiPackage")
@@ -116,7 +112,7 @@ class JavaConfig(generator.BaseConfig):
 
         self.artifactId = self._get_value("artifactId")
 
-        self.oseg = JavaConfigOseg(
+        self.oseg = ConfigOseg(
             package=self._get_value("oseg.package"),
             printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
@@ -124,7 +120,29 @@ class JavaConfig(generator.BaseConfig):
         )
 
 
+class Project(generator.Project):
+    config: JavaConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        template_files = [
+            generator.ProjectTemplateFilesDef(
+                source="build.gradle",
+                target="build.gradle",
+                values={
+                    "{{ artifactId }}": self.config.artifactId,
+                    "{{ oseg.package }}": self.config.oseg.package,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
+
+
 class JavaGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = JavaConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "java"
     NAME = "java"
     TEMPLATE = f"{NAME}.jinja2"
@@ -209,7 +227,7 @@ class JavaGenerator(generator.BaseGenerator):
         "while",
     ]
 
-    config: JavaConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return name.lower() in self.RESERVED_KEYWORDS
@@ -351,21 +369,4 @@ class JavaGenerator(generator.BaseGenerator):
         return value
 
 
-class JavaProject(generator.ProjectSetup):
-    config: JavaConfig
-
-    def setup(self) -> None:
-        self._copy_files([".gitignore"])
-
-        template_files = [
-            generator.ProjectSetupTemplateFilesDef(
-                source="build.gradle",
-                target="build.gradle",
-                values={
-                    "{{ artifactId }}": self.config.artifactId,
-                    "{{ oseg.package }}": self.config.oseg.package,
-                },
-            ),
-        ]
-
-        self._template_files(template_files)
+generator.GeneratorFactory.register(JavaGenerator)

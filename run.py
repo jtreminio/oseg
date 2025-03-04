@@ -149,7 +149,7 @@ def generate(
     ),
 )
 def config_help(generator_name: str):
-    result = g.BaseConfig.config_help(generator_name)
+    result = g.GeneratorFactory.config_class(generator_name).config_help()
 
     data = [
         ["Name", "", "Required", "Default"],
@@ -184,7 +184,7 @@ def get_config(
     config_file: str | None,
     generator_name: str | None,
     config: str | None,
-) -> str | g.BaseConfigDef:
+) -> str | g.BaseConfig:
     if config_file:
         assert (
             generator_name is None
@@ -192,7 +192,7 @@ def get_config(
 
         assert config is None, "--config cannot be used with --config-file"
 
-        return config_file
+        return g.GeneratorFactory.config_factory(config_file)
 
     assert isinstance(generator_name, str) and (
         generator_name in generator_names
@@ -200,12 +200,12 @@ def get_config(
 
     assert isinstance(config, str), f"--config required when --config-file is not used"
 
-    result: g.BaseConfigDef = {
-        "generatorName": generator_name,
-        "additionalProperties": json.loads(config),
-    }
-
-    return result
+    return g.GeneratorFactory.config_factory(
+        {
+            "generatorName": generator_name,
+            "additionalProperties": json.loads(config),
+        }
+    )
 
 
 cli.add_command(generate)

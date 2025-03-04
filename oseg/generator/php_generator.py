@@ -5,8 +5,8 @@ from typing import TypedDict
 from oseg import generator, model
 from oseg.parser import NormalizeStr
 
-PhpConfigDef = TypedDict(
-    "PhpConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "invokerPackage": str,
         "composerPackageName": str | None,
@@ -19,13 +19,8 @@ PhpConfigDef = TypedDict(
 )
 
 
-class PhpConfigComplete(TypedDict):
-    generatorName: str
-    additionalProperties: PhpConfigDef
-
-
 @dataclass
-class PhpConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     namespace: str | None
     composerPackageName: str | None
     autoloadLocation: str | None
@@ -33,7 +28,8 @@ class PhpConfigOseg(generator.BaseConfigOseg):
 
 class PhpConfig(generator.BaseConfig):
     GENERATOR_NAME = "php"
-    oseg: PhpConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "invokerPackage": inspect.cleandoc(
@@ -100,15 +96,15 @@ class PhpConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: PhpConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
         self.invokerPackage = config.get("invokerPackage")
         assert isinstance(self.invokerPackage, str)
 
         self.composerPackageName = self._get_value("composerPackageName")
 
-        self.oseg = PhpConfigOseg(
+        self.oseg = ConfigOseg(
             namespace=self._get_value("oseg.namespace"),
             composerPackageName=self._get_value("oseg.composerPackageName"),
             autoloadLocation=self._get_value("oseg.autoloadLocation"),
@@ -117,7 +113,35 @@ class PhpConfig(generator.BaseConfig):
         )
 
 
+class Project(generator.Project):
+    config: PhpConfig
+
+    def setup(self) -> None:
+        self._copy_files([".gitignore"])
+
+        namespace = self.config.oseg.namespace.split("\\")
+        namespace = list(filter(None, namespace))
+        namespace = "\\\\".join(namespace)
+        namespace = namespace.rstrip("\\\\")
+
+        template_files = [
+            generator.ProjectTemplateFilesDef(
+                source="composer.json",
+                target="composer.json",
+                values={
+                    "{{ composerPackageName }}": self.config.composerPackageName,
+                    "{{ oseg.composerPackageName }}": self.config.oseg.composerPackageName,
+                    "{{ oseg.namespace }}": namespace,
+                },
+            ),
+        ]
+
+        self._template_files(template_files)
+
+
 class PhpGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = PhpConfig
+    PROJECT_CLASS = Project
     FILE_EXTENSION = "php"
     NAME = "php"
     TEMPLATE = f"{NAME}.jinja2"
@@ -125,7 +149,7 @@ class PhpGenerator(generator.BaseGenerator):
     RESERVED_KEYWORD_PREPEND = ""
     RESERVED_KEYWORDS = []
 
-    config: PhpConfig
+    config: CONFIG_CLASS
 
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
         return False
@@ -244,27 +268,4 @@ class PhpGenerator(generator.BaseGenerator):
         return self._to_json(value).replace("$", "\\$")
 
 
-class PhpProject(generator.ProjectSetup):
-    config: PhpConfig
-
-    def setup(self) -> None:
-        self._copy_files([".gitignore"])
-
-        namespace = self.config.oseg.namespace.split("\\")
-        namespace = list(filter(None, namespace))
-        namespace = "\\\\".join(namespace)
-        namespace = namespace.rstrip("\\\\")
-
-        template_files = [
-            generator.ProjectSetupTemplateFilesDef(
-                source="composer.json",
-                target="composer.json",
-                values={
-                    "{{ composerPackageName }}": self.config.composerPackageName,
-                    "{{ oseg.composerPackageName }}": self.config.oseg.composerPackageName,
-                    "{{ oseg.namespace }}": namespace,
-                },
-            ),
-        ]
-
-        self._template_files(template_files)
+generator.GeneratorFactory.register(PhpGenerator)

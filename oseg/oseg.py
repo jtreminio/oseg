@@ -24,10 +24,9 @@ class Generator:
 
     def generate(
         self,
-        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
+        config: generator.BaseConfig,
         output_dir: str,
     ) -> int:
-        config = self.read_config_file(config)
         jinja = jinja_extension.JinjaExt.factory()
 
         if not os.path.isdir(output_dir):
@@ -35,7 +34,7 @@ class Generator:
 
         for _, operation in self._oa_parser.operations.items():
             for name, property_container in operation.request.example_data.items():
-                sdk_generator = generator.GeneratorFactory.factory(
+                sdk_generator = generator.GeneratorFactory.generator_factory(
                     config,
                     operation,
                     property_container,
@@ -46,7 +45,7 @@ class Generator:
                 file_extension = sdk_generator.FILE_EXTENSION
                 target_file = f"{output_dir}/{filename}.{file_extension}"
 
-                print(f"Begin parsing for {config.GENERATOR_NAME} {filename}")
+                print(f"Begin parsing for {sdk_generator.NAME} {filename}")
 
                 rendered = jinja.template(sdk_generator).render(
                     operation=operation,
@@ -61,21 +60,20 @@ class Generator:
 
     def setup_project(
         self,
-        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
+        config: generator.BaseConfig,
         base_dir: str,
         output_dir: str,
     ) -> int:
-        config = self.read_config_file(config)
-        project_setup = generator.ProjectSetup.factory(config, base_dir, output_dir)
-        project_setup.setup()
+        generator.GeneratorFactory.project_factory(
+            config,
+            base_dir,
+            output_dir,
+        ).setup()
 
         return 0
 
     def read_config_file(
         self,
-        config: generator.GENERATOR_CONFIG_TYPE | generator.BaseConfigDef | str,
-    ) -> generator.GENERATOR_CONFIG_TYPE:
-        if isinstance(config, dict) or isinstance(config, str):
-            return generator.BaseConfig.factory(config)
-
-        return config
+        config: generator.BaseConfigDef | str,
+    ) -> generator.BaseConfig:
+        return generator.GeneratorFactory.config_factory(config)
