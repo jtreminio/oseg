@@ -2,9 +2,8 @@ import inspect
 import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
-
 from oseg import generator, model
-from oseg.parser import NormalizeStr, PascalCaseOption
+from oseg.parser import NormalizeStr, PascalCaseOption, CamelCaseOption
 
 ConfigDef = TypedDict(
     "ConfigDef",
@@ -265,11 +264,20 @@ class JavaGenerator(generator.BaseGenerator):
         return result
 
     def print_propname(self, name: str) -> str:
-        # not currently used by template
-        raise NotImplementedError
+        return self.unreserve_keyword(
+            NormalizeStr.camel_case(
+                name,
+                CamelCaseOption.LOWERCASE_FIRST_SECTION,
+            )
+        )
 
     def print_variablename(self, name: str) -> str:
-        return self.unreserve_keyword(NormalizeStr.camel_case(name))
+        return self.unreserve_keyword(
+            NormalizeStr.camel_case(
+                name,
+                CamelCaseOption.LOWERCASE_FIRST_SECTION,
+            )
+        )
 
     def print_scalar(
         self,

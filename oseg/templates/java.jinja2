@@ -74,7 +74,7 @@ new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not pri
 
 {%- macro print_variable_name_as_comment(name, value) -%}
     {% if config.oseg.printApiCallProperty %}
-        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
+        {% if name|print_propname != value %} // {{ name|print_propname }}{% endif %}
     {% endif %}
 {%-endmacro -%}
 
