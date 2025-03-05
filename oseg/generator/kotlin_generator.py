@@ -1,20 +1,19 @@
 import inspect
+
 import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 
 from oseg import generator, model
-from oseg.parser import NormalizeStr, PascalCaseOption
+from oseg.parser import NormalizeStr, CamelCaseOption
 
 ConfigDef = TypedDict(
     "ConfigDef",
     {
-        "invokerPackage": str,
-        "apiPackage": str,
-        "modelPackage": str,
+        "groupId": str,
+        "packageName": str,
         "artifactId": str | None,
         "oseg.package": str | None,
-        "oseg.printApiCallProperty": bool | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
     },
@@ -24,31 +23,24 @@ ConfigDef = TypedDict(
 @dataclass
 class ConfigOseg(generator.BaseConfigOseg):
     package: str | None
-    printApiCallProperty: bool
 
 
-class JavaConfig(generator.BaseConfig):
-    GENERATOR_NAME = "java"
+class KotlinConfig(generator.BaseConfig):
+    GENERATOR_NAME = "kotlin"
     oseg: ConfigOseg
     _config: ConfigDef
 
     PROPS_REQUIRED = {
-        "invokerPackage": inspect.cleandoc(
+        "groupId": inspect.cleandoc(
             """
-            The root namespace of the source package. This is the SDK package
-            you are generating example snippets for. Ex: org.openapitools.client
-            """
-        ),
-        "apiPackage": inspect.cleandoc(
-            """
-            The API namespace of the source package.
-            Ex: org.openapitools.client.api
+            Generated artifact package's organization. This is the SDK package
+            you are generating example snippets for. Ex: org.openapitools
             """
         ),
-        "modelPackage": inspect.cleandoc(
+        "packageName": inspect.cleandoc(
             """
-            The Model namespace of the source package.
-            Ex: org.openapitools.client.model
+            Generated artifact package name.
+            Ex: org.openapitools.client
             """
         ),
     }
@@ -57,10 +49,10 @@ class JavaConfig(generator.BaseConfig):
         "artifactId": {
             "description": inspect.cleandoc(
                 """
-                artifactId of the source package. (Default: openapi-java-client)
+                artifactId of the source package. (Default: openapi-kotlin-client)
                 """
             ),
-            "default": "openapi-java-client",
+            "default": "openapi-kotlin-client",
         },
         "oseg.package": {
             "description": inspect.cleandoc(
@@ -70,15 +62,6 @@ class JavaConfig(generator.BaseConfig):
                 """
             ),
             "default": None,
-        },
-        "oseg.printApiCallProperty": {
-            "description": inspect.cleandoc(
-                """
-                Add property name as comment for non-variable values passed to
-                the API call method. (Default: true)
-                """
-            ),
-            "default": True,
         },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
@@ -102,26 +85,23 @@ class JavaConfig(generator.BaseConfig):
     def __init__(self, config: ConfigDef):
         super().__init__(config)
 
-        self.invokerPackage = config.get("invokerPackage")
-        self.apiPackage = config.get("apiPackage")
-        self.modelPackage = config.get("modelPackage")
+        self.groupId = config.get("groupId")
+        self.packageName = config.get("packageName")
 
-        assert isinstance(self.invokerPackage, str)
-        assert isinstance(self.apiPackage, str)
-        assert isinstance(self.modelPackage, str)
+        assert isinstance(self.groupId, str)
+        assert isinstance(self.packageName, str)
 
         self.artifactId = self._get_value("artifactId")
 
         self.oseg = ConfigOseg(
             package=self._get_value("oseg.package"),
-            printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
             security=self._parse_security(),
         )
 
 
 class Project(generator.Project):
-    config: JavaConfig
+    config: KotlinConfig
 
     def setup(self) -> None:
         self._copy_files([".gitignore"])
@@ -140,90 +120,87 @@ class Project(generator.Project):
         self._template_files(template_files)
 
 
-class JavaGenerator(generator.BaseGenerator):
-    CONFIG_CLASS = JavaConfig
+class KotlinGenerator(generator.BaseGenerator):
+    CONFIG_CLASS = KotlinConfig
     PROJECT_CLASS = Project
-    FILE_EXTENSION = "java"
-    NAME = "java"
+    FILE_EXTENSION = "kt"
+    NAME = "kotlin"
     TEMPLATE = f"{NAME}.jinja2"
 
     RESERVED_KEYWORD_PREPEND = "_"
     RESERVED_KEYWORDS = [
         "_",
+        "ApiResponse",
         "abstract",
-        "apiclient",
-        "apiexception",
-        "apiresponse",
-        "assert",
-        "boolean",
+        "actual",
+        "annotation",
+        "as",
         "break",
-        "byte",
-        "case",
-        "catch",
-        "char",
         "class",
-        "configuration",
+        "companion",
         "const",
+        "constructor",
         "continue",
-        "default",
+        "contract",
+        "crossinline",
+        "data",
+        "delegate",
         "do",
-        "double",
+        "dynamic",
         "else",
         "enum",
-        "extends",
-        "file",
+        "expect",
+        "external",
+        "false",
+        "field",
         "final",
         "finally",
-        "float",
         "for",
-        "goto",
+        "fun",
         "if",
-        "implements",
         "import",
-        "instanceof",
-        "int",
+        "in",
+        "infix",
+        "init",
+        "inline",
+        "inner",
         "interface",
-        "list",
-        "localdate",
-        "localreturntype",
-        "localtime",
-        "localvaraccept",
-        "localvaraccepts",
-        "localvarauthnames",
-        "localvarcollectionqueryparams",
-        "localvarcontenttype",
-        "localvarcontenttypes",
-        "localvarcookieparams",
-        "localvarformparams",
-        "localvarheaderparams",
-        "localvarpath",
-        "localvarpostbody",
-        "localvarqueryparams",
-        "long",
-        "native",
-        "new",
+        "internal",
+        "is",
+        "it",
+        "lateinit",
+        "noinline",
         "null",
         "object",
-        "offsetdatetime",
+        "open",
+        "operator",
+        "out",
+        "override",
         "package",
+        "param",
         "private",
+        "property",
         "protected",
         "public",
+        "receiver",
+        "reified",
         "return",
-        "short",
-        "static",
-        "strictfp",
-        "stringutil",
+        "sealed",
+        "setparam",
         "super",
-        "switch",
-        "synchronized",
+        "suspend",
+        "tailrec",
         "this",
         "throw",
-        "throws",
-        "transient",
+        "true",
         "try",
-        "void",
-        "volatile",
+        "typealias",
+        "typeof",
+        "val",
+        "var",
+        "vararg",
+        "when",
+        "where",
         "while",
     ]
 
@@ -247,10 +224,7 @@ class JavaGenerator(generator.BaseGenerator):
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
     def print_apiname(self, name: str) -> str:
-        return NormalizeStr.pascal_case(
-            f"{name}Api",
-            option=PascalCaseOption.LOWERCASE_CONTIGUOUS,
-        )
+        return NormalizeStr.pascal_case(f"{name}Api")
 
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)
@@ -265,11 +239,20 @@ class JavaGenerator(generator.BaseGenerator):
         return result
 
     def print_propname(self, name: str) -> str:
-        # not currently used by template
-        raise NotImplementedError
+        return self.unreserve_keyword(
+            NormalizeStr.camel_case(
+                name,
+                CamelCaseOption.LOWERCASE_FIRST_SECTION,
+            )
+        )
 
     def print_variablename(self, name: str) -> str:
-        return self.unreserve_keyword(NormalizeStr.camel_case(name))
+        return self.unreserve_keyword(
+            NormalizeStr.camel_case(
+                name,
+                CamelCaseOption.LOWERCASE_FIRST_SECTION,
+            )
+        )
 
     def print_scalar(
         self,
@@ -289,13 +272,27 @@ class JavaGenerator(generator.BaseGenerator):
             printable.value = []
 
             if item.type == oa.DataType.STRING and item.is_enum:
-                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+                enum_type = NormalizeStr.pascal_case(f"{item.name}")
 
                 if not parent:
-                    printable.target_type = enum_type
+                    parent_type = NormalizeStr.pascal_case(
+                        f"{self.operation.api_name}Api"
+                    )
+                    operation_id = NormalizeStr.pascal_case(self.operation.operation_id)
+                    printable.target_type = f"{parent_type}.{enum_type}{operation_id}"
+
+                    for i in item.value:
+                        final_value = self._handle_value(item, i, parent)
+
+                        printable.value.append(f"{printable.target_type}.{final_value}")
                 else:
                     parent_type = NormalizeStr.pascal_case(parent.type)
                     printable.target_type = f"{parent_type}.{enum_type}"
+
+                    for i in item.value:
+                        printable.value.append(self._handle_value(item, i, parent))
+
+                return printable
 
             for i in item.value:
                 printable.value.append(self._handle_value(item, i, parent))
@@ -323,10 +320,10 @@ class JavaGenerator(generator.BaseGenerator):
                     return self.print_null()
 
                 if parent is None:
-                    return self._to_json(value)
+                    return NormalizeStr.camel_case(value)
 
                 parent_type = NormalizeStr.pascal_case(parent.type)
-                enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+                enum_type = NormalizeStr.pascal_case(f"{item.name}")
 
                 return f"{parent_type}.{enum_type}.{enum_name}"
 
@@ -336,9 +333,10 @@ class JavaGenerator(generator.BaseGenerator):
             if item.format == model.DataFormat.DATE.value:
                 return f'LocalDate.parse("{value}")'
 
-        int_fixed = self._fix_ints(item, value)
+        if isinstance(value, str):
+            return self._escape_dollar(value)
 
-        return int_fixed if int_fixed is not None else self._to_json(value)
+        return self._to_json(value)
 
     def _get_enum_name(
         self,
@@ -348,6 +346,8 @@ class JavaGenerator(generator.BaseGenerator):
         if value is None:
             return None
 
+        value: str
+
         enum_varname, is_override = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
@@ -356,20 +356,7 @@ class JavaGenerator(generator.BaseGenerator):
         if value == "" and "" in item.schema.enum:
             return "Empty"
 
-        return NormalizeStr.underscore(value).upper()
-
-    def _fix_ints(self, item: model.PropertyScalar, value: any) -> any:
-        if item.type not in [oa.DataType.INTEGER, oa.DataType.NUMBER] or value is None:
-            return None
-
-        if item.format == model.DataFormat.FLOAT.value:
-            return f"{value}F"
-        elif item.format == model.DataFormat.DOUBLE.value:
-            return f"{value}D"
-        elif item.format == model.DataFormat.INT64.value:
-            return f"{value}L"
-
-        return value
+        return NormalizeStr.camel_case(value.replace("-", "_minus_"))
 
 
-generator.GeneratorFactory.register(JavaGenerator)
+generator.GeneratorFactory.register(KotlinGenerator)

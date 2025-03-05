@@ -114,7 +114,7 @@ ${{ obj_name|print_variablename }} = {{ "" }}
 try {
     {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(8) %}
-    {% if operation.response and operation.response.body  %}$response = {% endif -%}
+    {% if operation.response and operation.response.body %}$response = {% endif -%}
     (new {{ config.invokerPackage }}\Api\{{ operation.api_name|print_apiname }}(config: $config))->{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 

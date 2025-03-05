@@ -21,6 +21,10 @@ def main():
             "base_dir": f"{project_dir}/java",
             "output_dir": "src/main/java/oseg/launchdarkly_examples",
         },
+        "kotlin": {
+            "base_dir": f"{project_dir}/kotlin",
+            "output_dir": "src/main/kotlin/oseg/launchdarkly_examples",
+        },
         "php": {
             "base_dir": f"{project_dir}/php",
             "output_dir": "src",

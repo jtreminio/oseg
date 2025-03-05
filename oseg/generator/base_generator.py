@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import os
+import re
 import shutil
 import openapi_pydantic as oa
 from abc import abstractmethod
@@ -250,6 +251,16 @@ class BaseGenerator(Protocol):
             return enum_varnames[index], False
 
         return None, False
+
+    def _escape_dollar(self, value: str) -> str:
+        """If the value contains $ try to escape it"""
+
+        value = self._to_json(value)
+
+        if "$" not in value:
+            return value
+
+        return re.sub(r"(?<!\\)\$", r"\\$", value)
 
 
 class GeneratorFactory:

@@ -108,7 +108,7 @@ with ApiClient(configuration) as api_client:
     try:
         {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(12) %}
-        {% if operation.response and operation.response.body  %}response = {% endif -%}
+        {% if operation.response and operation.response.body %}response = {% endif -%}
         api.{{ operation.api_name|print_apiname }}(api_client).{{ operation.operation_id|print_methodname }}({%- if not properties %})
 {% else %}
 

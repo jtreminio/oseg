@@ -3,7 +3,12 @@ from .oa_parser import OaParser
 
 from .example_data_parser import ExampleDataParser
 from .component_resolver import ComponentResolver, OA_RESOLVABLE
-from .normalize_str import NormalizeStr
+from .normalize_str import (
+    NormalizeStr,
+    CamelCaseOption,
+    PascalCaseOption,
+    UnderscoreOption,
+)
 from .operation_parser import OperationParser
 from .property_flattener import PropertyFlattener
 from .property_parser import PropertyParser
