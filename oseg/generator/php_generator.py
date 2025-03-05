@@ -254,18 +254,5 @@ class PhpGenerator(generator.BaseGenerator):
 
         return NormalizeStr.underscore(f"{name}_{value}").upper()
 
-    def _escape_dollar(self, value: str) -> str:
-        """If the value contains $ try to escape it"""
-
-        if "$" not in value:
-            return self._to_json(value)
-
-        if "'" not in value:
-            result = self._to_json(value)
-            result = result.strip('"')
-            return f"'{result}'"
-
-        return self._to_json(value).replace("$", "\\$")
-
 
 generator.GeneratorFactory.register(PhpGenerator)

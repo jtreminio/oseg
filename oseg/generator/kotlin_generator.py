@@ -1,4 +1,5 @@
 import inspect
+
 import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
@@ -208,7 +209,6 @@ class KotlinGenerator(generator.BaseGenerator):
         "typealias",
         "typeof",
         "val",
-        "value",
         "var",
         "vararg",
         "when",
@@ -236,7 +236,7 @@ class KotlinGenerator(generator.BaseGenerator):
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
     def print_apiname(self, name: str) -> str:
-        return NormalizeStr.pascalize(f"{name}Api")
+        return NormalizeStr.pascal_case(f"{name}Api")
 
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)
@@ -251,8 +251,7 @@ class KotlinGenerator(generator.BaseGenerator):
         return result
 
     def print_propname(self, name: str) -> str:
-        # not currently used by template
-        raise NotImplementedError
+        return self.unreserve_keyword(NormalizeStr.camel_case(name))
 
     def print_variablename(self, name: str) -> str:
         return self.unreserve_keyword(NormalizeStr.camel_case(name))
@@ -323,7 +322,7 @@ class KotlinGenerator(generator.BaseGenerator):
                     return self.print_null()
 
                 if parent is None:
-                    return NormalizeStr.underscore(value)
+                    return NormalizeStr.camel_case(value)
 
                 parent_type = NormalizeStr.pascal_case(parent.type)
                 enum_type = NormalizeStr.pascal_case(f"{item.name}")
@@ -336,6 +335,9 @@ class KotlinGenerator(generator.BaseGenerator):
             if item.format == model.DataFormat.DATE.value:
                 return f'LocalDate.parse("{value}")'
 
+        if isinstance(value, str):
+            return self._escape_dollar(value)
+
         return self._to_json(value)
 
     def _get_enum_name(
@@ -346,6 +348,8 @@ class KotlinGenerator(generator.BaseGenerator):
         if value is None:
             return None
 
+        value: str
+
         enum_varname, is_override = self._get_enum_varname(item.schema, value)
 
         if enum_varname is not None:
@@ -354,7 +358,7 @@ class KotlinGenerator(generator.BaseGenerator):
         if value == "" and "" in item.schema.enum:
             return "Empty"
 
-        return NormalizeStr.underscore(value)
+        return NormalizeStr.camel_case(value.replace("-", "_minus_"))
 
 
 generator.GeneratorFactory.register(KotlinGenerator)

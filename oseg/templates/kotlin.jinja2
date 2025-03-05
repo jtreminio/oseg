@@ -33,18 +33,18 @@ listOf {% if not printable.value %}(){% else %}
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
 {% if not printable.value %}Map.of (){% else %}
-JSON.deserialize("""
+Serializer.moshi.adapter<Map<String, Any>>().fromJson("""
     {{ printable.value|tojson(4)|indent(4) }}
-""", Map.class)
+""")!!
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}{% else %}
 {% if not printable.value %}listOf (){% else %}
-JSON.deserialize("""
+Serializer.moshi.adapter<List<Map<String, Any>>>().fromJson("""
     {{ printable.value|tojson(4)|indent(4) }}
-""", List.class)
+""")!!
     {%- endif %}{%- endif %}
 {%- endmacro -%}
 
@@ -91,7 +91,9 @@ import java.time.OffsetDateTime
 import kotlin.collections.ArrayList
 import kotlin.collections.List
 import kotlin.collections.Map
+import com.squareup.moshi.adapter
 
+@ExperimentalStdlibApi
 class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
 {
     fun {{ operation.operation_id|print_methodname }}()
@@ -113,7 +115,7 @@ class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
             {% else %}
 
                 {% for name, value in properties.items() %}
-            {{ name|print_variablename }} = {{ value }},
+            {{ name|print_propname }} = {{ value }},
                 {% endfor %}
             {% endif %}
         )
@@ -136,7 +138,7 @@ class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
 {% else %}
 
     {% for name, value in properties.items() %}
-                {{ name|print_variablename }} = {{ value }},
+                {{ name|print_propname }} = {{ value }},
     {% endfor %}
             )
 {% endif %}
