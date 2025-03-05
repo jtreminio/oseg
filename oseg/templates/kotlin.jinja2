@@ -71,12 +71,6 @@ arrayListOf<{{ printable.target_type|print_classname }}>({% if not printable.val
     {%- else %} = "{{ printable.value }}"{%- endif %}
 {%-endmacro -%}
 
-{%- macro print_variable_name_as_comment(name, value) -%}
-    {% if config.oseg.printApiCallProperty %}
-        {% if name|print_variablename != value %} // {{ name|print_variablename }}{% endif %}
-    {% endif %}
-{%-endmacro -%}
-
 {%- import "_macros.jinja2" as m with context -%}
 
 package {{ config.oseg.package }}

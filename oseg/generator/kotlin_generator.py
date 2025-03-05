@@ -14,7 +14,6 @@ ConfigDef = TypedDict(
         "packageName": str,
         "artifactId": str | None,
         "oseg.package": str | None,
-        "oseg.printApiCallProperty": bool | None,
         "oseg.ignoreOptionalUnset": bool | None,
         "oseg.security": dict[str, any] | None,
     },
@@ -24,7 +23,6 @@ ConfigDef = TypedDict(
 @dataclass
 class ConfigOseg(generator.BaseConfigOseg):
     package: str | None
-    printApiCallProperty: bool
 
 
 class KotlinConfig(generator.BaseConfig):
@@ -65,15 +63,6 @@ class KotlinConfig(generator.BaseConfig):
             ),
             "default": None,
         },
-        "oseg.printApiCallProperty": {
-            "description": inspect.cleandoc(
-                """
-                Add property name as comment for non-variable values passed to
-                the API call method. (Default: true)
-                """
-            ),
-            "default": True,
-        },
         "oseg.ignoreOptionalUnset": {
             "description": inspect.cleandoc(
                 """
@@ -106,7 +95,6 @@ class KotlinConfig(generator.BaseConfig):
 
         self.oseg = ConfigOseg(
             package=self._get_value("oseg.package"),
-            printApiCallProperty=self._get_value("oseg.printApiCallProperty"),
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
             security=self._parse_security(),
         )
