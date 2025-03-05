@@ -110,7 +110,7 @@ begin
     {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(8, True) %}
     {% call(opt_properties) m.parse_api_call_properties_macro(8, False) %}
-        {% if operation.response and operation.response.body  %}response = {% endif -%}
+        {% if operation.response and operation.response.body %}response = {% endif -%}
     {{ config.moduleName }}::{{ operation.api_name|print_apiname }}.new.{{ operation.operation_id|print_methodname }}{%- if not properties and not opt_properties %}
 
         {% else %}(

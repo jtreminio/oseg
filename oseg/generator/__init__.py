@@ -8,9 +8,10 @@ from .base_generator import (
     ProjectTemplateFilesDef,
     PropsOptionalT,
 )
-from .csharp_generator import CSharpConfig, CSharpGenerator
-from .java_generator import JavaConfig, JavaGenerator
-from .php_generator import PhpConfig, PhpGenerator
-from .python_generator import PythonConfig, PythonGenerator
-from .ruby_generator import RubyConfig, RubyGenerator
-from .typescript_node_generator import TypescriptNodeConfig, TypescriptNodeGenerator
+from .csharp_generator import CSharpGenerator
+from .java_generator import JavaGenerator
+from .kotlin_generator import KotlinGenerator
+from .php_generator import PhpGenerator
+from .python_generator import PythonGenerator
+from .ruby_generator import RubyGenerator
+from .typescript_node_generator import TypescriptNodeGenerator

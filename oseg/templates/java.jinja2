@@ -132,7 +132,7 @@ public class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
         {
             {{ "" -}}
 {% call(properties) m.parse_api_call_properties_macro(16) %}
-            {% if operation.response and operation.response.body  %}var response = {% endif -%}
+            {% if operation.response and operation.response.body %}var response = {% endif -%}
             new {{ operation.api_name|print_apiname }}(config).{{ operation.operation_id|print_methodname }}({%- if not properties %});
 {% else %}
 
