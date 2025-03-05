@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from oseg import generator, model
-from oseg.parser import NormalizeStr
+from oseg.parser import NormalizeStr, PascalCaseOption
 
 ConfigDef = TypedDict(
     "ConfigDef",
@@ -247,7 +247,10 @@ class JavaGenerator(generator.BaseGenerator):
         return f"{self.RESERVED_KEYWORD_PREPEND}{name}"
 
     def print_apiname(self, name: str) -> str:
-        return NormalizeStr.pascal_case(f"{name}Api", keep_uc=False)
+        return NormalizeStr.pascal_case(
+            f"{name}Api",
+            option=PascalCaseOption.LOWERCASE_CONTIGUOUS,
+        )
 
     def print_classname(self, name: str) -> str:
         return NormalizeStr.pascal_case(name)

@@ -265,11 +265,18 @@ class TestNormalizeStr(TestCase):
                 "v1": "some_value",
                 "v2": "some_value",
             },
+            "LD-API-Version": {
+                "v1": "LD_API_Version",
+                "v2": "L_D_API_Version",
+            },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                v1 = parser.NormalizeStr.underscore(provided, separate_first_char=False)
+                v1 = parser.NormalizeStr.underscore(
+                    provided,
+                    option=parser.UnderscoreOption.FIRST_CHAR_JOIN,
+                )
 
                 self.assertEqual(
                     first=expected["v1"],
@@ -277,7 +284,10 @@ class TestNormalizeStr(TestCase):
                     msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
                 )
 
-                v2 = parser.NormalizeStr.underscore(provided, separate_first_char=True)
+                v2 = parser.NormalizeStr.underscore(
+                    provided,
+                    option=parser.UnderscoreOption.FIRST_CHAR_SEPARATE,
+                )
 
                 self.assertEqual(
                     first=expected["v2"],
@@ -290,268 +300,341 @@ class TestNormalizeStr(TestCase):
             "A": {
                 "v1": "a",
                 "v2": "a",
+                "v3": "a",
             },
             "a": {
                 "v1": "a",
                 "v2": "a",
+                "v3": "a",
             },
             "Ab": {
                 "v1": "ab",
                 "v2": "ab",
+                "v3": "ab",
             },
             "AB": {
                 "v1": "aB",
                 "v2": "ab",
+                "v3": "ab",
             },
             "aB": {
                 "v1": "aB",
                 "v2": "aB",
+                "v3": "aB",
             },
             "ABC": {
                 "v1": "aBC",
                 "v2": "abc",
+                "v3": "abc",
             },
             "OAuthName": {
                 "v1": "oAuthName",
                 "v2": "oAuthName",
+                "v3": "oAuthName",
             },
             "abcdefg123hij456": {
                 "v1": "abcdefg123hij456",
                 "v2": "abcdefg123hij456",
+                "v3": "abcdefg123hij456",
             },
             "Abcdefg123hij456": {
                 "v1": "abcdefg123hij456",
                 "v2": "abcdefg123hij456",
+                "v3": "abcdefg123hij456",
             },
             "ABcdefg123hij456": {
                 "v1": "aBcdefg123hij456",
                 "v2": "aBcdefg123hij456",
+                "v3": "aBcdefg123hij456",
             },
             "ABCdefg123hij456": {
                 "v1": "aBCdefg123hij456",
                 "v2": "abCdefg123hij456",
+                "v3": "abCdefg123hij456",
             },
             "ABCDefg123hij456": {
                 "v1": "aBCDefg123hij456",
                 "v2": "abcDefg123hij456",
+                "v3": "abcDefg123hij456",
             },
             "ABCDEfg123hij456": {
                 "v1": "aBCDEfg123hij456",
                 "v2": "abcdEfg123hij456",
+                "v3": "abcdEfg123hij456",
             },
             "ABCDEFg123hij456": {
                 "v1": "aBCDEFg123hij456",
                 "v2": "abcdefg123hij456",
+                "v3": "abcdefg123hij456",
             },
             "ABCDEFG123hij456": {
                 "v1": "aBCDEFG123hij456",
                 "v2": "abcdefg123hij456",
+                "v3": "abcdefg123hij456",
             },
             "ABCDEFG123Hij456": {
                 "v1": "aBCDEFG123Hij456",
                 "v2": "abcdefg123Hij456",
+                "v3": "abcdefg123Hij456",
             },
             "ABCDEFG123HIj456": {
                 "v1": "aBCDEFG123HIj456",
                 "v2": "abcdefg123Hij456",
+                "v3": "abcdefg123HIj456",
             },
             "ABCDEFG123HIJ456": {
                 "v1": "aBCDEFG123HIJ456",
                 "v2": "abcdefg123Hij456",
+                "v3": "abcdefg123HIJ456",
             },
             "ABCDEFG123HiJ456": {
                 "v1": "aBCDEFG123HiJ456",
                 "v2": "abcdefg123HiJ456",
+                "v3": "abcdefg123HiJ456",
             },
             "ABCDEFG123hiJ456": {
                 "v1": "aBCDEFG123hiJ456",
                 "v2": "abcdefg123hiJ456",
+                "v3": "abcdefg123hiJ456",
             },
             "ABCDEFG123hIJ456": {
                 "v1": "aBCDEFG123hIJ456",
                 "v2": "abcdefg123hIj456",
+                "v3": "abcdefg123hIJ456",
             },
             "aBcdefg123hij456": {
                 "v1": "aBcdefg123hij456",
                 "v2": "aBcdefg123hij456",
+                "v3": "aBcdefg123hij456",
             },
             "aBCdefg123hij456": {
                 "v1": "aBCdefg123hij456",
                 "v2": "aBCdefg123hij456",
+                "v3": "aBCdefg123hij456",
             },
             "aBCDefg123hij456": {
                 "v1": "aBCDefg123hij456",
                 "v2": "aBcDefg123hij456",
+                "v3": "aBCDefg123hij456",
             },
             "aBCDEfg123hij456": {
                 "v1": "aBCDEfg123hij456",
                 "v2": "aBcdEfg123hij456",
+                "v3": "aBCDEfg123hij456",
             },
             "aBCDEFg123hij456": {
                 "v1": "aBCDEFg123hij456",
                 "v2": "aBcdefg123hij456",
+                "v3": "aBCDEFg123hij456",
             },
             "aBCDEFG123hij456": {
                 "v1": "aBCDEFG123hij456",
                 "v2": "aBcdefg123hij456",
+                "v3": "aBCDEFG123hij456",
             },
             "aBcDeFg123hIj456": {
                 "v1": "aBcDeFg123hIj456",
                 "v2": "aBcDeFg123hIj456",
+                "v3": "aBcDeFg123hIj456",
             },
             "HelloWorld!123": {
                 "v1": "helloWorld123",
                 "v2": "helloWorld123",
+                "v3": "helloWorld123",
             },
             "MixEDCase$#42": {
                 "v1": "mixEDCase42",
                 "v2": "mixEdCase42",
+                "v3": "mixEDCase42",
             },
             "Snake_Case-Test": {
                 "v1": "snakeCaseTest",
                 "v2": "snakeCaseTest",
+                "v3": "snakeCaseTest",
             },
             "CamelCase99!": {
                 "v1": "camelCase99",
                 "v2": "camelCase99",
+                "v3": "camelCase99",
             },
             "Python@Rocks2024": {
                 "v1": "pythonRocks2024",
                 "v2": "pythonRocks2024",
+                "v3": "pythonRocks2024",
             },
             "myVariable&*()": {
                 "v1": "myVariable",
                 "v2": "myVariable",
+                "v3": "myVariable",
             },
             "Some-Thing#Here": {
                 "v1": "someThingHere",
                 "v2": "someThingHere",
+                "v3": "someThingHere",
             },
             "No$SpacesAllowed99": {
                 "v1": "noSpacesAllowed99",
                 "v2": "noSpacesAllowed99",
+                "v3": "noSpacesAllowed99",
             },
             "justA_TestString!": {
                 "v1": "justATestString",
                 "v2": "justATestString",
+                "v3": "justATestString",
             },
             "What?Ever*YouSay": {
                 "v1": "whatEverYouSay",
                 "v2": "whatEverYouSay",
+                "v3": "whatEverYouSay",
             },
             "UserID_789": {
                 "v1": "userID789",
                 "v2": "userId789",
+                "v3": "userID789",
             },
             "Go4It-Now!": {
                 "v1": "go4ItNow",
                 "v2": "go4ItNow",
+                "v3": "go4ItNow",
             },
             "Check_ME@THIS": {
                 "v1": "checkMETHIS",
                 "v2": "checkMeThis",
+                "v3": "checkMETHIS",
             },
             "JavaScript$Rules!": {
                 "v1": "javaScriptRules",
                 "v2": "javaScriptRules",
+                "v3": "javaScriptRules",
             },
             "Best_Choice_2025*": {
                 "v1": "bestChoice2025",
                 "v2": "bestChoice2025",
+                "v3": "bestChoice2025",
             },
             "Happy_Days": {
                 "v1": "happyDays",
                 "v2": "happyDays",
+                "v3": "happyDays",
             },
             "Let's-Try_This-One!": {
                 "v1": "letSTryThisOne",
                 "v2": "letSTryThisOne",
+                "v3": "letSTryThisOne",
             },
             "Make$It$Count24": {
                 "v1": "makeItCount24",
                 "v2": "makeItCount24",
+                "v3": "makeItCount24",
             },
             "Code-Lover@Heart": {
                 "v1": "codeLoverHeart",
                 "v2": "codeLoverHeart",
+                "v3": "codeLoverHeart",
             },
             "Dev&Ops-24/7": {
                 "v1": "devOps247",
                 "v2": "devOps247",
+                "v3": "devOps247",
             },
             "Super#Cool_Project": {
                 "v1": "superCoolProject",
                 "v2": "superCoolProject",
+                "v3": "superCoolProject",
             },
             "WhatIs_This?": {
                 "v1": "whatIsThis",
                 "v2": "whatIsThis",
+                "v3": "whatIsThis",
             },
             "42AnswerToEverything!": {
                 "v1": "42AnswerToEverything",
                 "v2": "42AnswerToEverything",
+                "v3": "42AnswerToEverything",
             },
             "API@Version_3.0": {
                 "v1": "aPIVersion30",
                 "v2": "apiVersion30",
+                "v3": "apiVersion30",
             },
             "Let'sDo_This-Again!": {
                 "v1": "letSDoThisAgain",
                 "v2": "letSDoThisAgain",
+                "v3": "letSDoThisAgain",
             },
             "AI configs (beta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AI Configs (beta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AIconfigs (beta) Api": {
                 "v1": "aIconfigsBetaApi",
                 "v2": "aIconfigsBetaApi",
+                "v3": "aIconfigsBetaApi",
             },
             "AIConfigs (beta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AIConfigs(beta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AIConfigs(Beta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AIConfigsBeta) Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AI Configs Beta Api": {
                 "v1": "aIConfigsBetaApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBetaApi",
             },
             "AI configs (BETA) Api": {
                 "v1": "aIConfigsBETAApi",
                 "v2": "aiConfigsBetaApi",
+                "v3": "aiConfigsBETAApi",
             },
             "abcd": {
                 "v1": "abcd",
                 "v2": "abcd",
+                "v3": "abcd",
             },
             "some-value": {
                 "v1": "someValue",
                 "v2": "someValue",
+                "v3": "someValue",
             },
             "some_value": {
                 "v1": "someValue",
                 "v2": "someValue",
+                "v3": "someValue",
+            },
+            "LD-API-Version": {
+                "v1": "lDAPIVersion",
+                "v2": "ldApiVersion",
+                "v3": "ldAPIVersion",
             },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                v1 = parser.NormalizeStr.camel_case(provided, keep_uc=True)
+                v1 = parser.NormalizeStr.camel_case(
+                    provided,
+                    option=parser.CamelCaseOption.UPPERCASE_KEEP,
+                )
 
                 self.assertEqual(
                     first=expected["v1"],
@@ -559,12 +642,26 @@ class TestNormalizeStr(TestCase):
                     msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
                 )
 
-                v2 = parser.NormalizeStr.camel_case(provided, keep_uc=False)
+                v2 = parser.NormalizeStr.camel_case(
+                    provided,
+                    option=parser.CamelCaseOption.LOWERCASE_CONTIGUOUS,
+                )
 
                 self.assertEqual(
                     first=expected["v2"],
                     second=v2,
                     msg=f"v2 - Provided: {provided}, Expected: {expected["v2"]}, Result: {v2}",
+                )
+
+                v3 = parser.NormalizeStr.camel_case(
+                    provided,
+                    option=parser.CamelCaseOption.LOWERCASE_FIRST_SECTION,
+                )
+
+                self.assertEqual(
+                    first=expected["v3"],
+                    second=v3,
+                    msg=f"v3 - Provided: {provided}, Expected: {expected["v3"]}, Result: {v3}",
                 )
 
     def test_pascal_case(self):
@@ -829,11 +926,18 @@ class TestNormalizeStr(TestCase):
                 "v1": "SomeValue",
                 "v2": "SomeValue",
             },
+            "LD-API-Version": {
+                "v1": "LDAPIVersion",
+                "v2": "LdApiVersion",
+            },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                v1 = parser.NormalizeStr.pascal_case(provided, keep_uc=True)
+                v1 = parser.NormalizeStr.pascal_case(
+                    provided,
+                    option=parser.PascalCaseOption.UPPERCASE_KEEP,
+                )
 
                 self.assertEqual(
                     first=expected["v1"],
@@ -841,7 +945,10 @@ class TestNormalizeStr(TestCase):
                     msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
                 )
 
-                v2 = parser.NormalizeStr.pascal_case(provided, keep_uc=False)
+                v2 = parser.NormalizeStr.pascal_case(
+                    provided,
+                    option=parser.PascalCaseOption.LOWERCASE_CONTIGUOUS,
+                )
 
                 self.assertEqual(
                     first=expected["v2"],
@@ -916,6 +1023,7 @@ class TestNormalizeStr(TestCase):
             "abcd": "abcd",
             "some-value": "some_value",
             "some_value": "some_value",
+            "LD-API-Version": "ld_api_version",
         }
 
         for provided, expected in data.items():
@@ -995,6 +1103,7 @@ class TestNormalizeStr(TestCase):
             "abcd": "Abcd",
             "some-value": "Some-value",
             "some_value": "Some_value",
+            "LD-API-Version": "LD-API-Version",
         }
 
         for provided, expected in data.items():

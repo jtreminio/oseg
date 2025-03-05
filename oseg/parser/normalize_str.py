@@ -1,5 +1,22 @@
 import re
+from enum import Enum
 from typing import Callable
+
+
+class CamelCaseOption(Enum):
+    UPPERCASE_KEEP = 1
+    LOWERCASE_CONTIGUOUS = 2
+    LOWERCASE_FIRST_SECTION = 3
+
+
+class PascalCaseOption(Enum):
+    UPPERCASE_KEEP = 1
+    LOWERCASE_CONTIGUOUS = 2
+
+
+class UnderscoreOption(Enum):
+    FIRST_CHAR_JOIN = 1
+    FIRST_CHAR_SEPARATE = 2
 
 
 class NormalizeStr:
@@ -8,37 +25,51 @@ class NormalizeStr:
     _underscore_cache: dict[str, str] = {}
 
     @classmethod
-    def camel_case(cls, value: str, keep_uc: bool = True) -> str:
+    def camel_case(
+        cls,
+        value: str,
+        option: CamelCaseOption = CamelCaseOption.UPPERCASE_KEEP,
+    ) -> str:
         """camelCase a string
 
-        keep_uc: bool
+        option: CamelCaseOption
             Keep uppercase characters as-is. Otherwise you won't see
             contiguous uppercase characters.
 
-            For "UserID_789":
-            ON: userID789
-            OFF: userId789
+            For "LD-API-Version":
+            UPPERCASE_KEEP: lDAPIVersion
+            LOWERCASE_CONTIGUOUS: ldApiVersion
+            LOWERCASE_FIRST_SECTION: ldAPIVersion
         """
 
-        if not keep_uc:
+        if option == CamelCaseOption.LOWERCASE_CONTIGUOUS:
             value = cls.snake_case(value)
+
+        if option == CamelCaseOption.LOWERCASE_FIRST_SECTION:
+            values = cls.underscore(value).split("_")
+            values[0] = values[0].lower()
+            value = "_".join(values)
 
         return cls.lc_first(cls._camelize(value))
 
     @classmethod
-    def pascal_case(cls, value: str, keep_uc: bool = True) -> str:
+    def pascal_case(
+        cls,
+        value: str,
+        option: PascalCaseOption = PascalCaseOption.UPPERCASE_KEEP,
+    ) -> str:
         """PascalCase a string
 
-        keep_uc: bool
+        option: PascalCaseOption
             Keep uppercase characters as-is. Otherwise you won't see
             contiguous uppercase characters.
 
             For "UserID_789":
-            ON:  UserID789
-            OFF: UserId789
+            UPPERCASE_KEEP:  UserID789
+            LOWERCASE_CONTIGUOUS: UserId789
         """
 
-        if not keep_uc:
+        if option == PascalCaseOption.LOWERCASE_CONTIGUOUS:
             value = cls.snake_case(value)
 
         return cls.uc_first(cls._camelize(value))
@@ -50,25 +81,29 @@ class NormalizeStr:
         return cls.underscore(value).lower()
 
     @classmethod
-    def underscore(cls, value: str, separate_first_char: bool = False) -> str:
+    def underscore(
+        cls,
+        value: str,
+        option: UnderscoreOption = UnderscoreOption.FIRST_CHAR_JOIN,
+    ) -> str:
         """Underscore the given word.
 
         Character case is left as-is.
 
-        separate_first_char: bool
+        separate_first_char: UnderscoreOption
             When a string is two characters long and both characters
             are uppercase, separate them with an underscore:
 
             For "AB":
-            ON: A_B
-            OFF: AB
+            FIRST_CHAR_JOIN: AB
+            FIRST_CHAR_SEPARATE: A_B
 
             When a string is three characters or longer and the first two
             characters are uppercase, always separate them with an underscore:
 
             For "ABC":
-            ON: ABC
-            OFF: A_BC
+            FIRST_CHAR_JOIN: ABC
+            FIRST_CHAR_SEPARATE: A_BC
 
         Copied from openapi-generator
         https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/main/java/org/openapitools/codegen/utils/StringUtils.java
@@ -77,7 +112,7 @@ class NormalizeStr:
         if value is None:
             return ""
 
-        cache_key = f"{value}_v1" if not separate_first_char else f"{value}_v2"
+        cache_key = f"{value}_{option.value}"
 
         if cache_key in cls._underscore_cache:
             return cls._underscore_cache[cache_key]
@@ -115,7 +150,7 @@ class NormalizeStr:
         # the first char is special, it will always be separate from rest
         # when caps and next character is caps
         if (
-            separate_first_char
+            option == UnderscoreOption.FIRST_CHAR_SEPARATE
             and len(result) >= 2
             and result[0].isupper()
             and result[1].isupper()
