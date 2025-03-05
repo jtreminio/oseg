@@ -3,7 +3,7 @@ import jinja2
 from jinja2 import ext, pass_context
 from jinja2.runtime import Context, Undefined
 from typing import Callable
-from oseg import generator, model, parser
+from oseg import generator, model
 
 
 class JinjaExt(jinja2.ext.Extension):
@@ -27,24 +27,6 @@ class JinjaExt(jinja2.ext.Extension):
     def __init__(self, environment: jinja2.Environment):
         super().__init__(environment)
 
-        environment.filters["camel_case"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.camel_case(value)
-        )
-        environment.filters["pascal_case"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.pascal_case(value)
-        )
-        environment.filters["snake_case"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.snake_case(value)
-        )
-        environment.filters["uc_first"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.uc_first(value)
-        )
-        environment.filters["underscore"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.underscore(value)
-        )
-        environment.filters["underscore_e"]: Callable[[str], str] = (
-            lambda value: parser.NormalizeStr.underscore_e(value)
-        )
         environment.filters["split"]: Callable[[str, str], str] = (
             lambda value, separator: value.split(separator)
         )
@@ -63,6 +45,7 @@ class JinjaExt(jinja2.ext.Extension):
         environment.filters["print_variablename"]: Callable[[str], str] = (
             lambda name: self._sdk_generator.print_variablename(name)
         )
+
         environment.globals.update(parse_security=self._parse_security)
         environment.globals.update(parse_objects=self._parse_objects)
         environment.globals.update(

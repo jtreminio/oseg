@@ -5,266 +5,848 @@ from test_utils import TestCase
 class TestNormalizeStr(TestCase):
     def test_underscore(self):
         data = {
-            "A": "A",
-            "a": "a",
-            "Ab": "Ab",
-            "AB": "AB",
-            "aB": "a_B",
-            "OAuthName": "O_Auth_Name",
-            "abcdefg123hij456": "abcdefg123hij456",
-            "Abcdefg123hij456": "Abcdefg123hij456",
-            "ABcdefg123hij456": "A_Bcdefg123hij456",
-            "ABCdefg123hij456": "AB_Cdefg123hij456",
-            "ABCDefg123hij456": "ABC_Defg123hij456",
-            "ABCDEfg123hij456": "ABCD_Efg123hij456",
-            "ABCDEFg123hij456": "ABCDEFg123hij456",
-            "ABCDEFG123hij456": "ABCDEFG123hij456",
-            "ABCDEFG123Hij456": "ABCDEFG123_Hij456",
-            "ABCDEFG123HIj456": "ABCDEFG123_HIj456",
-            "ABCDEFG123HIJ456": "ABCDEFG123_HIJ456",
-            "ABCDEFG123HiJ456": "ABCDEFG123_Hi_J456",
-            "ABCDEFG123hiJ456": "ABCDEFG123hi_J456",
-            "ABCDEFG123hIJ456": "ABCDEFG123h_IJ456",
-            "aBcdefg123hij456": "a_Bcdefg123hij456",
-            "aBCdefg123hij456": "a_B_Cdefg123hij456",
-            "aBCDefg123hij456": "a_BC_Defg123hij456",
-            "aBCDEfg123hij456": "a_BCD_Efg123hij456",
-            "aBCDEFg123hij456": "a_BCDEFg123hij456",
-            "aBCDEFG123hij456": "a_BCDEFG123hij456",
-            "aBcDeFg123hIj456": "a_Bc_De_Fg123h_Ij456",
-            "HelloWorld!123": "Hello_World_123",
-            "MixEDCase$#42": "Mix_ED_Case__42",
-            "Snake_Case-Test": "Snake_Case_Test",
-            "CamelCase99!": "Camel_Case99",
-            "Python@Rocks2024": "Python_Rocks2024",
-            "myVariable&*()": "my_Variable",
-            "Some-Thing#Here": "Some_Thing_Here",
-            "No$SpacesAllowed99": "No_Spaces_Allowed99",
-            "justA_TestString!": "just_A_Test_String",
-            "What?Ever*YouSay": "What_Ever_You_Say",
-            "UserID_789": "User_ID_789",
-            "Go4It-Now!": "Go4_It_Now",
-            "Check_ME@THIS": "Check_ME_THIS",
-            "JavaScript$Rules!": "Java_Script_Rules",
-            "Best_Choice_2025*": "Best_Choice_2025",
-            "Happy_Days": "Happy_Days",
-            "Let's-Try_This-One!": "Let_s_Try_This_One",
-            "Make$It$Count24": "Make_It_Count24",
-            "Code-Lover@Heart": "Code_Lover_Heart",
-            "Dev&Ops-24/7": "Dev_Ops_24_7",
-            "Super#Cool_Project": "Super_Cool_Project",
-            "WhatIs_This?": "What_Is_This",
-            "42AnswerToEverything!": "42_Answer_To_Everything",
-            "API@Version_3.0": "API_Version_3_0",
-            "Let'sDo_This-Again!": "Let_s_Do_This_Again",
+            "A": {
+                "v1": "A",
+                "v2": "A",
+            },
+            "a": {
+                "v1": "a",
+                "v2": "a",
+            },
+            "Ab": {
+                "v1": "Ab",
+                "v2": "Ab",
+            },
+            "AB": {
+                "v1": "AB",
+                "v2": "A_B",
+            },
+            "aB": {
+                "v1": "a_B",
+                "v2": "a_B",
+            },
+            "ABC": {
+                "v1": "ABC",
+                "v2": "A_BC",
+            },
+            "OAuthName": {
+                "v1": "O_Auth_Name",
+                "v2": "O_Auth_Name",
+            },
+            "abcdefg123hij456": {
+                "v1": "abcdefg123hij456",
+                "v2": "abcdefg123hij456",
+            },
+            "Abcdefg123hij456": {
+                "v1": "Abcdefg123hij456",
+                "v2": "Abcdefg123hij456",
+            },
+            "ABcdefg123hij456": {
+                "v1": "A_Bcdefg123hij456",
+                "v2": "A_Bcdefg123hij456",
+            },
+            "ABCdefg123hij456": {
+                "v1": "AB_Cdefg123hij456",
+                "v2": "A_B_Cdefg123hij456",
+            },
+            "ABCDefg123hij456": {
+                "v1": "ABC_Defg123hij456",
+                "v2": "A_BC_Defg123hij456",
+            },
+            "ABCDEfg123hij456": {
+                "v1": "ABCD_Efg123hij456",
+                "v2": "A_BCD_Efg123hij456",
+            },
+            "ABCDEFg123hij456": {
+                "v1": "ABCDEFg123hij456",
+                "v2": "A_BCDEFg123hij456",
+            },
+            "ABCDEFG123hij456": {
+                "v1": "ABCDEFG123hij456",
+                "v2": "A_BCDEFG123hij456",
+            },
+            "ABCDEFG123Hij456": {
+                "v1": "ABCDEFG123_Hij456",
+                "v2": "A_BCDEFG123_Hij456",
+            },
+            "ABCDEFG123HIj456": {
+                "v1": "ABCDEFG123_HIj456",
+                "v2": "A_BCDEFG123_HIj456",
+            },
+            "ABCDEFG123HIJ456": {
+                "v1": "ABCDEFG123_HIJ456",
+                "v2": "A_BCDEFG123_HIJ456",
+            },
+            "ABCDEFG123HiJ456": {
+                "v1": "ABCDEFG123_Hi_J456",
+                "v2": "A_BCDEFG123_Hi_J456",
+            },
+            "ABCDEFG123hiJ456": {
+                "v1": "ABCDEFG123hi_J456",
+                "v2": "A_BCDEFG123hi_J456",
+            },
+            "ABCDEFG123hIJ456": {
+                "v1": "ABCDEFG123h_IJ456",
+                "v2": "A_BCDEFG123h_IJ456",
+            },
+            "aBcdefg123hij456": {
+                "v1": "a_Bcdefg123hij456",
+                "v2": "a_Bcdefg123hij456",
+            },
+            "aBCdefg123hij456": {
+                "v1": "a_B_Cdefg123hij456",
+                "v2": "a_B_Cdefg123hij456",
+            },
+            "aBCDefg123hij456": {
+                "v1": "a_BC_Defg123hij456",
+                "v2": "a_BC_Defg123hij456",
+            },
+            "aBCDEfg123hij456": {
+                "v1": "a_BCD_Efg123hij456",
+                "v2": "a_BCD_Efg123hij456",
+            },
+            "aBCDEFg123hij456": {
+                "v1": "a_BCDEFg123hij456",
+                "v2": "a_BCDEFg123hij456",
+            },
+            "aBCDEFG123hij456": {
+                "v1": "a_BCDEFG123hij456",
+                "v2": "a_BCDEFG123hij456",
+            },
+            "aBcDeFg123hIj456": {
+                "v1": "a_Bc_De_Fg123h_Ij456",
+                "v2": "a_Bc_De_Fg123h_Ij456",
+            },
+            "HelloWorld!123": {
+                "v1": "Hello_World_123",
+                "v2": "Hello_World_123",
+            },
+            "MixEDCase$#42": {
+                "v1": "Mix_ED_Case__42",
+                "v2": "Mix_ED_Case__42",
+            },
+            "Snake_Case-Test": {
+                "v1": "Snake_Case_Test",
+                "v2": "Snake_Case_Test",
+            },
+            "CamelCase99!": {
+                "v1": "Camel_Case99",
+                "v2": "Camel_Case99",
+            },
+            "Python@Rocks2024": {
+                "v1": "Python_Rocks2024",
+                "v2": "Python_Rocks2024",
+            },
+            "myVariable&*()": {
+                "v1": "my_Variable",
+                "v2": "my_Variable",
+            },
+            "Some-Thing#Here": {
+                "v1": "Some_Thing_Here",
+                "v2": "Some_Thing_Here",
+            },
+            "No$SpacesAllowed99": {
+                "v1": "No_Spaces_Allowed99",
+                "v2": "No_Spaces_Allowed99",
+            },
+            "justA_TestString!": {
+                "v1": "just_A_Test_String",
+                "v2": "just_A_Test_String",
+            },
+            "What?Ever*YouSay": {
+                "v1": "What_Ever_You_Say",
+                "v2": "What_Ever_You_Say",
+            },
+            "UserID_789": {
+                "v1": "User_ID_789",
+                "v2": "User_ID_789",
+            },
+            "Go4It-Now!": {
+                "v1": "Go4_It_Now",
+                "v2": "Go4_It_Now",
+            },
+            "Check_ME@THIS": {
+                "v1": "Check_ME_THIS",
+                "v2": "Check_ME_THIS",
+            },
+            "JavaScript$Rules!": {
+                "v1": "Java_Script_Rules",
+                "v2": "Java_Script_Rules",
+            },
+            "Best_Choice_2025*": {
+                "v1": "Best_Choice_2025",
+                "v2": "Best_Choice_2025",
+            },
+            "Happy_Days": {
+                "v1": "Happy_Days",
+                "v2": "Happy_Days",
+            },
+            "Let's-Try_This-One!": {
+                "v1": "Let_s_Try_This_One",
+                "v2": "Let_s_Try_This_One",
+            },
+            "Make$It$Count24": {
+                "v1": "Make_It_Count24",
+                "v2": "Make_It_Count24",
+            },
+            "Code-Lover@Heart": {
+                "v1": "Code_Lover_Heart",
+                "v2": "Code_Lover_Heart",
+            },
+            "Dev&Ops-24/7": {
+                "v1": "Dev_Ops_24_7",
+                "v2": "Dev_Ops_24_7",
+            },
+            "Super#Cool_Project": {
+                "v1": "Super_Cool_Project",
+                "v2": "Super_Cool_Project",
+            },
+            "WhatIs_This?": {
+                "v1": "What_Is_This",
+                "v2": "What_Is_This",
+            },
+            "42AnswerToEverything!": {
+                "v1": "42_Answer_To_Everything",
+                "v2": "42_Answer_To_Everything",
+            },
+            "API@Version_3.0": {
+                "v1": "API_Version_3_0",
+                "v2": "A_PI_Version_3_0",
+            },
+            "Let'sDo_This-Again!": {
+                "v1": "Let_s_Do_This_Again",
+                "v2": "Let_s_Do_This_Again",
+            },
+            "AI configs (beta) Api": {
+                "v1": "AI_configs_beta_Api",
+                "v2": "A_I_configs_beta_Api",
+            },
+            "AI Configs (beta) Api": {
+                "v1": "AI_Configs_beta_Api",
+                "v2": "A_I_Configs_beta_Api",
+            },
+            "AIconfigs (beta) Api": {
+                "v1": "A_Iconfigs_beta_Api",
+                "v2": "A_Iconfigs_beta_Api",
+            },
+            "AIConfigs (beta) Api": {
+                "v1": "AI_Configs_beta_Api",
+                "v2": "A_I_Configs_beta_Api",
+            },
+            "AIConfigs(beta) Api": {
+                "v1": "AI_Configs_beta_Api",
+                "v2": "A_I_Configs_beta_Api",
+            },
+            "AIConfigs(Beta) Api": {
+                "v1": "AI_Configs_Beta_Api",
+                "v2": "A_I_Configs_Beta_Api",
+            },
+            "AIConfigsBeta) Api": {
+                "v1": "AI_Configs_Beta_Api",
+                "v2": "A_I_Configs_Beta_Api",
+            },
+            "AI Configs Beta Api": {
+                "v1": "AI_Configs_Beta_Api",
+                "v2": "A_I_Configs_Beta_Api",
+            },
+            "AI configs (BETA) Api": {
+                "v1": "AI_configs_BETA_Api",
+                "v2": "A_I_configs_BETA_Api",
+            },
+            "abcd": {
+                "v1": "abcd",
+                "v2": "abcd",
+            },
+            "some-value": {
+                "v1": "some_value",
+                "v2": "some_value",
+            },
+            "some_value": {
+                "v1": "some_value",
+                "v2": "some_value",
+            },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                result = parser.NormalizeStr.underscore(provided)
+                v1 = parser.NormalizeStr.underscore(provided, separate_first_char=False)
 
                 self.assertEqual(
-                    first=expected,
-                    second=result,
-                    msg=f"Provided: {provided}, Expected: {expected}, Result: {result}",
+                    first=expected["v1"],
+                    second=v1,
+                    msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
                 )
 
-    def test_underscore_e(self):
-        data = {
-            "A": "A",
-            "a": "a",
-            "Ab": "Ab",
-            "AB": "A_B",
-            "aB": "a_B",
-            "OAuthName": "O_Auth_Name",
-            "abcdefg123hij456": "abcdefg123hij456",
-            "Abcdefg123hij456": "Abcdefg123hij456",
-            "ABcdefg123hij456": "A_Bcdefg123hij456",
-            "ABCdefg123hij456": "A_B_Cdefg123hij456",
-            "ABCDefg123hij456": "A_BC_Defg123hij456",
-            "ABCDEfg123hij456": "A_BCD_Efg123hij456",
-            "ABCDEFg123hij456": "A_BCDEFg123hij456",
-            "ABCDEFG123hij456": "A_BCDEFG123hij456",
-            "ABCDEFG123Hij456": "A_BCDEFG123_Hij456",
-            "ABCDEFG123HIj456": "A_BCDEFG123_HIj456",
-            "ABCDEFG123HIJ456": "A_BCDEFG123_HIJ456",
-            "ABCDEFG123HiJ456": "A_BCDEFG123_Hi_J456",
-            "ABCDEFG123hiJ456": "A_BCDEFG123hi_J456",
-            "ABCDEFG123hIJ456": "A_BCDEFG123h_IJ456",
-            "aBcdefg123hij456": "a_Bcdefg123hij456",
-            "aBCdefg123hij456": "a_B_Cdefg123hij456",
-            "aBCDefg123hij456": "a_BC_Defg123hij456",
-            "aBCDEfg123hij456": "a_BCD_Efg123hij456",
-            "aBCDEFg123hij456": "a_BCDEFg123hij456",
-            "aBCDEFG123hij456": "a_BCDEFG123hij456",
-            "aBcDeFg123hIj456": "a_Bc_De_Fg123h_Ij456",
-            "HelloWorld!123": "Hello_World_123",
-            "MixEDCase$#42": "Mix_ED_Case__42",
-            "Snake_Case-Test": "Snake_Case_Test",
-            "CamelCase99!": "Camel_Case99",
-            "Python@Rocks2024": "Python_Rocks2024",
-            "myVariable&*()": "my_Variable",
-            "Some-Thing#Here": "Some_Thing_Here",
-            "No$SpacesAllowed99": "No_Spaces_Allowed99",
-            "justA_TestString!": "just_A_Test_String",
-            "What?Ever*YouSay": "What_Ever_You_Say",
-            "UserID_789": "User_ID_789",
-            "Go4It-Now!": "Go4_It_Now",
-            "Check_ME@THIS": "Check_ME_THIS",
-            "JavaScript$Rules!": "Java_Script_Rules",
-            "Best_Choice_2025*": "Best_Choice_2025",
-            "Happy_Days": "Happy_Days",
-            "Let's-Try_This-One!": "Let_s_Try_This_One",
-            "Make$It$Count24": "Make_It_Count24",
-            "Code-Lover@Heart": "Code_Lover_Heart",
-            "Dev&Ops-24/7": "Dev_Ops_24_7",
-            "Super#Cool_Project": "Super_Cool_Project",
-            "WhatIs_This?": "What_Is_This",
-            "42AnswerToEverything!": "42_Answer_To_Everything",
-            "API@Version_3.0": "A_PI_Version_3_0",
-            "Let'sDo_This-Again!": "Let_s_Do_This_Again",
-        }
-
-        for provided, expected in data.items():
-            with self.subTest(provided):
-                result = parser.NormalizeStr.underscore_e(provided)
+                v2 = parser.NormalizeStr.underscore(provided, separate_first_char=True)
 
                 self.assertEqual(
-                    first=expected,
-                    second=result,
-                    msg=f"Provided: {provided}, Expected: {expected}, Result: {result}",
+                    first=expected["v2"],
+                    second=v2,
+                    msg=f"v2 - Provided: {provided}, Expected: {expected["v2"]}, Result: {v2}",
                 )
 
     def test_camel_case(self):
         data = {
-            "A": "a",
-            "a": "a",
-            "Ab": "ab",
-            "AB": "aB",
-            "aB": "aB",
-            "OAuthName": "oAuthName",
-            "abcdefg123hij456": "abcdefg123hij456",
-            "Abcdefg123hij456": "abcdefg123hij456",
-            "ABcdefg123hij456": "aBcdefg123hij456",
-            "ABCdefg123hij456": "aBCdefg123hij456",
-            "ABCDefg123hij456": "aBCDefg123hij456",
-            "ABCDEfg123hij456": "aBCDEfg123hij456",
-            "ABCDEFg123hij456": "aBCDEFg123hij456",
-            "ABCDEFG123hij456": "aBCDEFG123hij456",
-            "ABCDEFG123Hij456": "aBCDEFG123Hij456",
-            "ABCDEFG123HIj456": "aBCDEFG123HIj456",
-            "ABCDEFG123HIJ456": "aBCDEFG123HIJ456",
-            "ABCDEFG123HiJ456": "aBCDEFG123HiJ456",
-            "ABCDEFG123hiJ456": "aBCDEFG123hiJ456",
-            "ABCDEFG123hIJ456": "aBCDEFG123hIJ456",
-            "aBcdefg123hij456": "aBcdefg123hij456",
-            "aBCdefg123hij456": "aBCdefg123hij456",
-            "aBCDefg123hij456": "aBCDefg123hij456",
-            "aBCDEfg123hij456": "aBCDEfg123hij456",
-            "aBCDEFg123hij456": "aBCDEFg123hij456",
-            "aBCDEFG123hij456": "aBCDEFG123hij456",
-            "aBcDeFg123hIj456": "aBcDeFg123hIj456",
-            "HelloWorld!123": "helloWorld123",
-            "MixEDCase$#42": "mixEDCase42",
-            "Snake_Case-Test": "snakeCaseTest",
-            "CamelCase99!": "camelCase99",
-            "Python@Rocks2024": "pythonRocks2024",
-            "myVariable&*()": "myVariable",
-            "Some-Thing#Here": "someThingHere",
-            "No$SpacesAllowed99": "noSpacesAllowed99",
-            "justA_TestString!": "justATestString",
-            "What?Ever*YouSay": "whatEverYouSay",
-            "UserID_789": "userID789",
-            "Go4It-Now!": "go4ItNow",
-            "Check_ME@THIS": "checkMETHIS",
-            "JavaScript$Rules!": "javaScriptRules",
-            "Best_Choice_2025*": "bestChoice2025",
-            "Happy_Days": "happyDays",
-            "Let's-Try_This-One!": "letSTryThisOne",
-            "Make$It$Count24": "makeItCount24",
-            "Code-Lover@Heart": "codeLoverHeart",
-            "Dev&Ops-24/7": "devOps247",
-            "Super#Cool_Project": "superCoolProject",
-            "WhatIs_This?": "whatIsThis",
-            "42AnswerToEverything!": "42AnswerToEverything",
-            "API@Version_3.0": "aPIVersion30",
-            "Let'sDo_This-Again!": "letSDoThisAgain",
+            "A": {
+                "v1": "a",
+                "v2": "a",
+            },
+            "a": {
+                "v1": "a",
+                "v2": "a",
+            },
+            "Ab": {
+                "v1": "ab",
+                "v2": "ab",
+            },
+            "AB": {
+                "v1": "aB",
+                "v2": "ab",
+            },
+            "aB": {
+                "v1": "aB",
+                "v2": "aB",
+            },
+            "ABC": {
+                "v1": "aBC",
+                "v2": "abc",
+            },
+            "OAuthName": {
+                "v1": "oAuthName",
+                "v2": "oAuthName",
+            },
+            "abcdefg123hij456": {
+                "v1": "abcdefg123hij456",
+                "v2": "abcdefg123hij456",
+            },
+            "Abcdefg123hij456": {
+                "v1": "abcdefg123hij456",
+                "v2": "abcdefg123hij456",
+            },
+            "ABcdefg123hij456": {
+                "v1": "aBcdefg123hij456",
+                "v2": "aBcdefg123hij456",
+            },
+            "ABCdefg123hij456": {
+                "v1": "aBCdefg123hij456",
+                "v2": "abCdefg123hij456",
+            },
+            "ABCDefg123hij456": {
+                "v1": "aBCDefg123hij456",
+                "v2": "abcDefg123hij456",
+            },
+            "ABCDEfg123hij456": {
+                "v1": "aBCDEfg123hij456",
+                "v2": "abcdEfg123hij456",
+            },
+            "ABCDEFg123hij456": {
+                "v1": "aBCDEFg123hij456",
+                "v2": "abcdefg123hij456",
+            },
+            "ABCDEFG123hij456": {
+                "v1": "aBCDEFG123hij456",
+                "v2": "abcdefg123hij456",
+            },
+            "ABCDEFG123Hij456": {
+                "v1": "aBCDEFG123Hij456",
+                "v2": "abcdefg123Hij456",
+            },
+            "ABCDEFG123HIj456": {
+                "v1": "aBCDEFG123HIj456",
+                "v2": "abcdefg123Hij456",
+            },
+            "ABCDEFG123HIJ456": {
+                "v1": "aBCDEFG123HIJ456",
+                "v2": "abcdefg123Hij456",
+            },
+            "ABCDEFG123HiJ456": {
+                "v1": "aBCDEFG123HiJ456",
+                "v2": "abcdefg123HiJ456",
+            },
+            "ABCDEFG123hiJ456": {
+                "v1": "aBCDEFG123hiJ456",
+                "v2": "abcdefg123hiJ456",
+            },
+            "ABCDEFG123hIJ456": {
+                "v1": "aBCDEFG123hIJ456",
+                "v2": "abcdefg123hIj456",
+            },
+            "aBcdefg123hij456": {
+                "v1": "aBcdefg123hij456",
+                "v2": "aBcdefg123hij456",
+            },
+            "aBCdefg123hij456": {
+                "v1": "aBCdefg123hij456",
+                "v2": "aBCdefg123hij456",
+            },
+            "aBCDefg123hij456": {
+                "v1": "aBCDefg123hij456",
+                "v2": "aBcDefg123hij456",
+            },
+            "aBCDEfg123hij456": {
+                "v1": "aBCDEfg123hij456",
+                "v2": "aBcdEfg123hij456",
+            },
+            "aBCDEFg123hij456": {
+                "v1": "aBCDEFg123hij456",
+                "v2": "aBcdefg123hij456",
+            },
+            "aBCDEFG123hij456": {
+                "v1": "aBCDEFG123hij456",
+                "v2": "aBcdefg123hij456",
+            },
+            "aBcDeFg123hIj456": {
+                "v1": "aBcDeFg123hIj456",
+                "v2": "aBcDeFg123hIj456",
+            },
+            "HelloWorld!123": {
+                "v1": "helloWorld123",
+                "v2": "helloWorld123",
+            },
+            "MixEDCase$#42": {
+                "v1": "mixEDCase42",
+                "v2": "mixEdCase42",
+            },
+            "Snake_Case-Test": {
+                "v1": "snakeCaseTest",
+                "v2": "snakeCaseTest",
+            },
+            "CamelCase99!": {
+                "v1": "camelCase99",
+                "v2": "camelCase99",
+            },
+            "Python@Rocks2024": {
+                "v1": "pythonRocks2024",
+                "v2": "pythonRocks2024",
+            },
+            "myVariable&*()": {
+                "v1": "myVariable",
+                "v2": "myVariable",
+            },
+            "Some-Thing#Here": {
+                "v1": "someThingHere",
+                "v2": "someThingHere",
+            },
+            "No$SpacesAllowed99": {
+                "v1": "noSpacesAllowed99",
+                "v2": "noSpacesAllowed99",
+            },
+            "justA_TestString!": {
+                "v1": "justATestString",
+                "v2": "justATestString",
+            },
+            "What?Ever*YouSay": {
+                "v1": "whatEverYouSay",
+                "v2": "whatEverYouSay",
+            },
+            "UserID_789": {
+                "v1": "userID789",
+                "v2": "userId789",
+            },
+            "Go4It-Now!": {
+                "v1": "go4ItNow",
+                "v2": "go4ItNow",
+            },
+            "Check_ME@THIS": {
+                "v1": "checkMETHIS",
+                "v2": "checkMeThis",
+            },
+            "JavaScript$Rules!": {
+                "v1": "javaScriptRules",
+                "v2": "javaScriptRules",
+            },
+            "Best_Choice_2025*": {
+                "v1": "bestChoice2025",
+                "v2": "bestChoice2025",
+            },
+            "Happy_Days": {
+                "v1": "happyDays",
+                "v2": "happyDays",
+            },
+            "Let's-Try_This-One!": {
+                "v1": "letSTryThisOne",
+                "v2": "letSTryThisOne",
+            },
+            "Make$It$Count24": {
+                "v1": "makeItCount24",
+                "v2": "makeItCount24",
+            },
+            "Code-Lover@Heart": {
+                "v1": "codeLoverHeart",
+                "v2": "codeLoverHeart",
+            },
+            "Dev&Ops-24/7": {
+                "v1": "devOps247",
+                "v2": "devOps247",
+            },
+            "Super#Cool_Project": {
+                "v1": "superCoolProject",
+                "v2": "superCoolProject",
+            },
+            "WhatIs_This?": {
+                "v1": "whatIsThis",
+                "v2": "whatIsThis",
+            },
+            "42AnswerToEverything!": {
+                "v1": "42AnswerToEverything",
+                "v2": "42AnswerToEverything",
+            },
+            "API@Version_3.0": {
+                "v1": "aPIVersion30",
+                "v2": "apiVersion30",
+            },
+            "Let'sDo_This-Again!": {
+                "v1": "letSDoThisAgain",
+                "v2": "letSDoThisAgain",
+            },
+            "AI configs (beta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AI Configs (beta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AIconfigs (beta) Api": {
+                "v1": "aIconfigsBetaApi",
+                "v2": "aIconfigsBetaApi",
+            },
+            "AIConfigs (beta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AIConfigs(beta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AIConfigs(Beta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AIConfigsBeta) Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AI Configs Beta Api": {
+                "v1": "aIConfigsBetaApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "AI configs (BETA) Api": {
+                "v1": "aIConfigsBETAApi",
+                "v2": "aiConfigsBetaApi",
+            },
+            "abcd": {
+                "v1": "abcd",
+                "v2": "abcd",
+            },
+            "some-value": {
+                "v1": "someValue",
+                "v2": "someValue",
+            },
+            "some_value": {
+                "v1": "someValue",
+                "v2": "someValue",
+            },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                result = parser.NormalizeStr.camel_case(provided)
+                v1 = parser.NormalizeStr.camel_case(provided, keep_uc=True)
 
                 self.assertEqual(
-                    first=expected,
-                    second=result,
-                    msg=f"Provided: {provided}, Expected: {expected}, Result: {result}",
+                    first=expected["v1"],
+                    second=v1,
+                    msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
+                )
+
+                v2 = parser.NormalizeStr.camel_case(provided, keep_uc=False)
+
+                self.assertEqual(
+                    first=expected["v2"],
+                    second=v2,
+                    msg=f"v2 - Provided: {provided}, Expected: {expected["v2"]}, Result: {v2}",
                 )
 
     def test_pascal_case(self):
         data = {
-            "A": "A",
-            "a": "A",
-            "Ab": "Ab",
-            "AB": "AB",
-            "aB": "AB",
-            "OAuthName": "OAuthName",
-            "abcdefg123hij456": "Abcdefg123hij456",
-            "Abcdefg123hij456": "Abcdefg123hij456",
-            "ABcdefg123hij456": "ABcdefg123hij456",
-            "ABCdefg123hij456": "ABCdefg123hij456",
-            "ABCDefg123hij456": "ABCDefg123hij456",
-            "ABCDEfg123hij456": "ABCDEfg123hij456",
-            "ABCDEFg123hij456": "ABCDEFg123hij456",
-            "ABCDEFG123hij456": "ABCDEFG123hij456",
-            "ABCDEFG123Hij456": "ABCDEFG123Hij456",
-            "ABCDEFG123HIj456": "ABCDEFG123HIj456",
-            "ABCDEFG123HIJ456": "ABCDEFG123HIJ456",
-            "ABCDEFG123HiJ456": "ABCDEFG123HiJ456",
-            "ABCDEFG123hiJ456": "ABCDEFG123hiJ456",
-            "ABCDEFG123hIJ456": "ABCDEFG123hIJ456",
-            "aBcdefg123hij456": "ABcdefg123hij456",
-            "aBCdefg123hij456": "ABCdefg123hij456",
-            "aBCDefg123hij456": "ABCDefg123hij456",
-            "aBCDEfg123hij456": "ABCDEfg123hij456",
-            "aBCDEFg123hij456": "ABCDEFg123hij456",
-            "aBCDEFG123hij456": "ABCDEFG123hij456",
-            "aBcDeFg123hIj456": "ABcDeFg123hIj456",
-            "HelloWorld!123": "HelloWorld123",
-            "MixEDCase$#42": "MixEDCase42",
-            "Snake_Case-Test": "SnakeCaseTest",
-            "CamelCase99!": "CamelCase99",
-            "Python@Rocks2024": "PythonRocks2024",
-            "myVariable&*()": "MyVariable",
-            "Some-Thing#Here": "SomeThingHere",
-            "No$SpacesAllowed99": "NoSpacesAllowed99",
-            "justA_TestString!": "JustATestString",
-            "What?Ever*YouSay": "WhatEverYouSay",
-            "UserID_789": "UserID789",
-            "Go4It-Now!": "Go4ItNow",
-            "Check_ME@THIS": "CheckMETHIS",
-            "JavaScript$Rules!": "JavaScriptRules",
-            "Best_Choice_2025*": "BestChoice2025",
-            "Happy_Days": "HappyDays",
-            "Let's-Try_This-One!": "LetSTryThisOne",
-            "Make$It$Count24": "MakeItCount24",
-            "Code-Lover@Heart": "CodeLoverHeart",
-            "Dev&Ops-24/7": "DevOps247",
-            "Super#Cool_Project": "SuperCoolProject",
-            "WhatIs_This?": "WhatIsThis",
-            "42AnswerToEverything!": "42AnswerToEverything",
-            "API@Version_3.0": "APIVersion30",
-            "Let'sDo_This-Again!": "LetSDoThisAgain",
+            "A": {
+                "v1": "A",
+                "v2": "A",
+            },
+            "a": {
+                "v1": "A",
+                "v2": "A",
+            },
+            "Ab": {
+                "v1": "Ab",
+                "v2": "Ab",
+            },
+            "AB": {
+                "v1": "AB",
+                "v2": "Ab",
+            },
+            "aB": {
+                "v1": "AB",
+                "v2": "AB",
+            },
+            "ABC": {
+                "v1": "ABC",
+                "v2": "Abc",
+            },
+            "OAuthName": {
+                "v1": "OAuthName",
+                "v2": "OAuthName",
+            },
+            "abcdefg123hij456": {
+                "v1": "Abcdefg123hij456",
+                "v2": "Abcdefg123hij456",
+            },
+            "Abcdefg123hij456": {
+                "v1": "Abcdefg123hij456",
+                "v2": "Abcdefg123hij456",
+            },
+            "ABcdefg123hij456": {
+                "v1": "ABcdefg123hij456",
+                "v2": "ABcdefg123hij456",
+            },
+            "ABCdefg123hij456": {
+                "v1": "ABCdefg123hij456",
+                "v2": "AbCdefg123hij456",
+            },
+            "ABCDefg123hij456": {
+                "v1": "ABCDefg123hij456",
+                "v2": "AbcDefg123hij456",
+            },
+            "ABCDEfg123hij456": {
+                "v1": "ABCDEfg123hij456",
+                "v2": "AbcdEfg123hij456",
+            },
+            "ABCDEFg123hij456": {
+                "v1": "ABCDEFg123hij456",
+                "v2": "Abcdefg123hij456",
+            },
+            "ABCDEFG123hij456": {
+                "v1": "ABCDEFG123hij456",
+                "v2": "Abcdefg123hij456",
+            },
+            "ABCDEFG123Hij456": {
+                "v1": "ABCDEFG123Hij456",
+                "v2": "Abcdefg123Hij456",
+            },
+            "ABCDEFG123HIj456": {
+                "v1": "ABCDEFG123HIj456",
+                "v2": "Abcdefg123Hij456",
+            },
+            "ABCDEFG123HIJ456": {
+                "v1": "ABCDEFG123HIJ456",
+                "v2": "Abcdefg123Hij456",
+            },
+            "ABCDEFG123HiJ456": {
+                "v1": "ABCDEFG123HiJ456",
+                "v2": "Abcdefg123HiJ456",
+            },
+            "ABCDEFG123hiJ456": {
+                "v1": "ABCDEFG123hiJ456",
+                "v2": "Abcdefg123hiJ456",
+            },
+            "ABCDEFG123hIJ456": {
+                "v1": "ABCDEFG123hIJ456",
+                "v2": "Abcdefg123hIj456",
+            },
+            "aBcdefg123hij456": {
+                "v1": "ABcdefg123hij456",
+                "v2": "ABcdefg123hij456",
+            },
+            "aBCdefg123hij456": {
+                "v1": "ABCdefg123hij456",
+                "v2": "ABCdefg123hij456",
+            },
+            "aBCDefg123hij456": {
+                "v1": "ABCDefg123hij456",
+                "v2": "ABcDefg123hij456",
+            },
+            "aBCDEfg123hij456": {
+                "v1": "ABCDEfg123hij456",
+                "v2": "ABcdEfg123hij456",
+            },
+            "aBCDEFg123hij456": {
+                "v1": "ABCDEFg123hij456",
+                "v2": "ABcdefg123hij456",
+            },
+            "aBCDEFG123hij456": {
+                "v1": "ABCDEFG123hij456",
+                "v2": "ABcdefg123hij456",
+            },
+            "aBcDeFg123hIj456": {
+                "v1": "ABcDeFg123hIj456",
+                "v2": "ABcDeFg123hIj456",
+            },
+            "HelloWorld!123": {
+                "v1": "HelloWorld123",
+                "v2": "HelloWorld123",
+            },
+            "MixEDCase$#42": {
+                "v1": "MixEDCase42",
+                "v2": "MixEdCase42",
+            },
+            "Snake_Case-Test": {
+                "v1": "SnakeCaseTest",
+                "v2": "SnakeCaseTest",
+            },
+            "CamelCase99!": {
+                "v1": "CamelCase99",
+                "v2": "CamelCase99",
+            },
+            "Python@Rocks2024": {
+                "v1": "PythonRocks2024",
+                "v2": "PythonRocks2024",
+            },
+            "myVariable&*()": {
+                "v1": "MyVariable",
+                "v2": "MyVariable",
+            },
+            "Some-Thing#Here": {
+                "v1": "SomeThingHere",
+                "v2": "SomeThingHere",
+            },
+            "No$SpacesAllowed99": {
+                "v1": "NoSpacesAllowed99",
+                "v2": "NoSpacesAllowed99",
+            },
+            "justA_TestString!": {
+                "v1": "JustATestString",
+                "v2": "JustATestString",
+            },
+            "What?Ever*YouSay": {
+                "v1": "WhatEverYouSay",
+                "v2": "WhatEverYouSay",
+            },
+            "UserID_789": {
+                "v1": "UserID789",
+                "v2": "UserId789",
+            },
+            "Go4It-Now!": {
+                "v1": "Go4ItNow",
+                "v2": "Go4ItNow",
+            },
+            "Check_ME@THIS": {
+                "v1": "CheckMETHIS",
+                "v2": "CheckMeThis",
+            },
+            "JavaScript$Rules!": {
+                "v1": "JavaScriptRules",
+                "v2": "JavaScriptRules",
+            },
+            "Best_Choice_2025*": {
+                "v1": "BestChoice2025",
+                "v2": "BestChoice2025",
+            },
+            "Happy_Days": {
+                "v1": "HappyDays",
+                "v2": "HappyDays",
+            },
+            "Let's-Try_This-One!": {
+                "v1": "LetSTryThisOne",
+                "v2": "LetSTryThisOne",
+            },
+            "Make$It$Count24": {
+                "v1": "MakeItCount24",
+                "v2": "MakeItCount24",
+            },
+            "Code-Lover@Heart": {
+                "v1": "CodeLoverHeart",
+                "v2": "CodeLoverHeart",
+            },
+            "Dev&Ops-24/7": {
+                "v1": "DevOps247",
+                "v2": "DevOps247",
+            },
+            "Super#Cool_Project": {
+                "v1": "SuperCoolProject",
+                "v2": "SuperCoolProject",
+            },
+            "WhatIs_This?": {
+                "v1": "WhatIsThis",
+                "v2": "WhatIsThis",
+            },
+            "42AnswerToEverything!": {
+                "v1": "42AnswerToEverything",
+                "v2": "42AnswerToEverything",
+            },
+            "API@Version_3.0": {
+                "v1": "APIVersion30",
+                "v2": "ApiVersion30",
+            },
+            "Let'sDo_This-Again!": {
+                "v1": "LetSDoThisAgain",
+                "v2": "LetSDoThisAgain",
+            },
+            "AI configs (beta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AI Configs (beta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AIconfigs (beta) Api": {
+                "v1": "AIconfigsBetaApi",
+                "v2": "AIconfigsBetaApi",
+            },
+            "AIConfigs (beta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AIConfigs(beta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AIConfigs(Beta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AIConfigsBeta) Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AI Configs Beta Api": {
+                "v1": "AIConfigsBetaApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "AI configs (BETA) Api": {
+                "v1": "AIConfigsBETAApi",
+                "v2": "AiConfigsBetaApi",
+            },
+            "abcd": {
+                "v1": "Abcd",
+                "v2": "Abcd",
+            },
+            "some-value": {
+                "v1": "SomeValue",
+                "v2": "SomeValue",
+            },
+            "some_value": {
+                "v1": "SomeValue",
+                "v2": "SomeValue",
+            },
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
-                result = parser.NormalizeStr.pascal_case(provided)
+                v1 = parser.NormalizeStr.pascal_case(provided, keep_uc=True)
 
                 self.assertEqual(
-                    first=expected,
-                    second=result,
-                    msg=f"Provided: {provided}, Expected: {expected}, Result: {result}",
+                    first=expected["v1"],
+                    second=v1,
+                    msg=f"v1 - Provided: {provided}, Expected: {expected["v1"]}, Result: {v1}",
+                )
+
+                v2 = parser.NormalizeStr.pascal_case(provided, keep_uc=False)
+
+                self.assertEqual(
+                    first=expected["v2"],
+                    second=v2,
+                    msg=f"v2 - Provided: {provided}, Expected: {expected["v2"]}, Result: {v2}",
                 )
 
     def test_snake_case(self):
@@ -274,6 +856,7 @@ class TestNormalizeStr(TestCase):
             "Ab": "ab",
             "AB": "ab",
             "aB": "a_b",
+            "ABC": "abc",
             "OAuthName": "o_auth_name",
             "abcdefg123hij456": "abcdefg123hij456",
             "Abcdefg123hij456": "abcdefg123hij456",
@@ -321,6 +904,18 @@ class TestNormalizeStr(TestCase):
             "42AnswerToEverything!": "42_answer_to_everything",
             "API@Version_3.0": "api_version_3_0",
             "Let'sDo_This-Again!": "let_s_do_this_again",
+            "AI configs (beta) Api": "ai_configs_beta_api",
+            "AI Configs (beta) Api": "ai_configs_beta_api",
+            "AIconfigs (beta) Api": "a_iconfigs_beta_api",
+            "AIConfigs (beta) Api": "ai_configs_beta_api",
+            "AIConfigs(beta) Api": "ai_configs_beta_api",
+            "AIConfigs(Beta) Api": "ai_configs_beta_api",
+            "AIConfigsBeta) Api": "ai_configs_beta_api",
+            "AI Configs Beta Api": "ai_configs_beta_api",
+            "AI configs (BETA) Api": "ai_configs_beta_api",
+            "abcd": "abcd",
+            "some-value": "some_value",
+            "some_value": "some_value",
         }
 
         for provided, expected in data.items():
@@ -340,6 +935,7 @@ class TestNormalizeStr(TestCase):
             "Ab": "Ab",
             "AB": "AB",
             "aB": "AB",
+            "ABC": "ABC",
             "OAuthName": "OAuthName",
             "abcdefg123hij456": "Abcdefg123hij456",
             "Abcdefg123hij456": "Abcdefg123hij456",
@@ -387,89 +983,23 @@ class TestNormalizeStr(TestCase):
             "42AnswerToEverything!": "42AnswerToEverything!",
             "API@Version_3.0": "API@Version_3.0",
             "Let'sDo_This-Again!": "Let'sDo_This-Again!",
+            "AI configs (beta) Api": "AI configs (beta) Api",
+            "AI Configs (beta) Api": "AI Configs (beta) Api",
+            "AIconfigs (beta) Api": "AIconfigs (beta) Api",
+            "AIConfigs (beta) Api": "AIConfigs (beta) Api",
+            "AIConfigs(beta) Api": "AIConfigs(beta) Api",
+            "AIConfigs(Beta) Api": "AIConfigs(Beta) Api",
+            "AIConfigsBeta) Api": "AIConfigsBeta) Api",
+            "AI Configs Beta Api": "AI Configs Beta Api",
+            "AI configs (BETA) Api": "AI configs (BETA) Api",
+            "abcd": "Abcd",
+            "some-value": "Some-value",
+            "some_value": "Some_value",
         }
 
         for provided, expected in data.items():
             with self.subTest(provided):
                 result = parser.NormalizeStr.uc_first(provided)
-
-                self.assertEqual(
-                    first=expected,
-                    second=result,
-                    msg=f"Provided: {provided}, Expected: {expected}, Result: {result}",
-                )
-
-    def test_pascalize(self):
-        data = {
-            "A": "A",
-            "a": "A",
-            "Ab": "Ab",
-            "AB": "Ab",
-            "aB": "AB",
-            "OAuthName": "OAuthName",
-            "abcdefg123hij456": "Abcdefg123hij456",
-            "Abcdefg123hij456": "Abcdefg123hij456",
-            "ABcdefg123hij456": "ABcdefg123hij456",
-            "ABCdefg123hij456": "AbCdefg123hij456",
-            "ABCDefg123hij456": "AbcDefg123hij456",
-            "ABCDEfg123hij456": "AbcdEfg123hij456",
-            "ABCDEFg123hij456": "Abcdefg123hij456",
-            "ABCDEFG123hij456": "Abcdefg123hij456",
-            "ABCDEFG123Hij456": "Abcdefg123Hij456",
-            "ABCDEFG123HIj456": "Abcdefg123Hij456",
-            "ABCDEFG123HIJ456": "Abcdefg123Hij456",
-            "ABCDEFG123HiJ456": "Abcdefg123HiJ456",
-            "ABCDEFG123hiJ456": "Abcdefg123hiJ456",
-            "ABCDEFG123hIJ456": "Abcdefg123hIj456",
-            "aBcdefg123hij456": "ABcdefg123hij456",
-            "aBCdefg123hij456": "ABCdefg123hij456",
-            "aBCDefg123hij456": "ABcDefg123hij456",
-            "aBCDEfg123hij456": "ABcdEfg123hij456",
-            "aBCDEFg123hij456": "ABcdefg123hij456",
-            "aBCDEFG123hij456": "ABcdefg123hij456",
-            "aBcDeFg123hIj456": "ABcDeFg123hIj456",
-            "HelloWorld!123": "HelloWorld123",
-            "MixEDCase$#42": "MixEdCase42",
-            "Snake_Case-Test": "SnakeCaseTest",
-            "CamelCase99!": "CamelCase99",
-            "Python@Rocks2024": "PythonRocks2024",
-            "myVariable&*()": "MyVariable",
-            "Some-Thing#Here": "SomeThingHere",
-            "No$SpacesAllowed99": "NoSpacesAllowed99",
-            "justA_TestString!": "JustATestString",
-            "What?Ever*YouSay": "WhatEverYouSay",
-            "UserID_789": "UserId789",
-            "Go4It-Now!": "Go4ItNow",
-            "Check_ME@THIS": "CheckMeThis",
-            "JavaScript$Rules!": "JavaScriptRules",
-            "Best_Choice_2025*": "BestChoice2025",
-            "Happy_Days": "HappyDays",
-            "Let's-Try_This-One!": "LetSTryThisOne",
-            "Make$It$Count24": "MakeItCount24",
-            "Code-Lover@Heart": "CodeLoverHeart",
-            "Dev&Ops-24/7": "DevOps247",
-            "Super#Cool_Project": "SuperCoolProject",
-            "WhatIs_This?": "WhatIsThis",
-            "42AnswerToEverything!": "42AnswerToEverything",
-            "API@Version_3.0": "ApiVersion30",
-            "Let'sDo_This-Again!": "LetSDoThisAgain",
-            "AI configs (beta) Api": "AiConfigsBetaApi",
-            "AI Configs (beta) Api": "AiConfigsBetaApi",
-            "AIconfigs (beta) Api": "AIconfigsBetaApi",
-            "AIConfigs (beta) Api": "AiConfigsBetaApi",
-            "AIConfigs(beta) Api": "AiConfigsBetaApi",
-            "AIConfigs(Beta) Api": "AiConfigsBetaApi",
-            "AIConfigsBeta) Api": "AiConfigsBetaApi",
-            "AI Configs Beta Api": "AiConfigsBetaApi",
-            "AI configs (BETA) Api": "AiConfigsBetaApi",
-            "abcd": "Abcd",
-            "some-value": "SomeValue",
-            "some_value": "SomeValue",
-        }
-
-        for provided, expected in data.items():
-            with self.subTest(provided):
-                result = parser.NormalizeStr.pascalize(provided)
 
                 self.assertEqual(
                     first=expected,
