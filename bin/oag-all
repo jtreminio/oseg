@@ -9,6 +9,7 @@ SOURCE_DIR=$1
 
 bash "${DIR}/oag-run" "${SOURCE_DIR}" csharp
 bash "${DIR}/oag-run" "${SOURCE_DIR}" java
+bash "${DIR}/oag-run" "${SOURCE_DIR}" kotlin
 bash "${DIR}/oag-run" "${SOURCE_DIR}" php
 bash "${DIR}/oag-run" "${SOURCE_DIR}" python
 bash "${DIR}/oag-run" "${SOURCE_DIR}" ruby

@@ -47,7 +47,7 @@ fi
 docker run --rm \
   -v "${BASE_DIR}/:/local" \
   -e _JAVA_OPTIONS=-DmaxYamlCodePoints=99999999 \
-  openapitools/openapi-generator-cli:v7.11.0 generate \
+  openapitools/openapi-generator-cli:v7.12.0 generate \
     ${CONFIG_PARAM} \
     -i "/local/${OAS_FILE}" \
     -o "/local/${SDK}/sdk" \
