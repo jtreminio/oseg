@@ -3,7 +3,7 @@ from oseg import Generator, __ROOT_DIR__
 
 def main():
     operation_id = None
-    target_sdk = "python"
+    target_sdk = None
 
     project = "chatwoot"
     project_dir = f"{__ROOT_DIR__}/../oseg-examples/{project}"
