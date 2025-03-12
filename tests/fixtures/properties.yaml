@@ -471,6 +471,90 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/requestBodies/PropRefNestedObject'
+  /codegen_request_body_name_json:
+    post:
+      tags:
+        - pet
+      operationId: codegen_request_body_name_json
+      responses:
+        '200':
+          description: Successful operation
+      parameters:
+        - name: petId
+          in: path
+          description: ID of pet to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: queryParam
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: try
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: while
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: with
+          in: query
+          schema:
+            type: string
+            default: "foo"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dog'
+      x-codegen-request-body-name: some_new_name
+  /codegen_request_body_name_formdata:
+    post:
+      tags:
+        - pet
+      operationId: codegen_request_body_name_formdata
+      responses:
+        '200':
+          description: Successful operation
+      parameters:
+        - name: petId
+          in: path
+          description: ID of pet to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: queryParam
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: try
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: while
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: with
+          in: query
+          schema:
+            type: string
+            default: "foo"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Dog'
+      x-codegen-request-body-name: some_new_name
 components:
   schemas:
     Pet:

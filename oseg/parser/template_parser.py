@@ -177,9 +177,17 @@ class TemplateParser:
         has_data = False
 
         for _, prop in property_container.properties(required_flag).items():
-            prop_name = self._resolve_keyword(prop.name, prop.original_name)
-
             if property_container.body and prop == property_container.body:
+                operation = self._generator.operation
+                override_request_body_name = operation.request_body_name()
+
+                request_body_name = (
+                    override_request_body_name
+                    if override_request_body_name
+                    else prop.name
+                )
+
+                prop_name = self._resolve_keyword(request_body_name, prop.original_name)
                 has_data = True
 
                 if parser.TypeChecker.is_property_objectish(prop):
@@ -197,6 +205,8 @@ class TemplateParser:
                 )
 
                 continue
+
+            prop_name = self._resolve_keyword(prop.name, prop.original_name)
 
             if isinstance(prop, model.PropertyObject) or isinstance(
                 prop, model.PropertyObjectArray

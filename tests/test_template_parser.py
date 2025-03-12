@@ -919,3 +919,72 @@ class TestTemplateParser(TestCase):
                 ]
             }
         }
+
+    def test_codegen_request_body_name(self):
+        operation_id = "codegen_request_body_name_json"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        operation.request.example_data = self._example_data()
+        container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
+
+        path_data = self._example_data()[self.example_name]["path"]
+        query_data = self._example_data()[self.example_name]["query"]
+
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            indent_count=0,
+        )
+
+        expected = {
+            "petId": str(path_data["petId"]),
+            "queryParam": str(query_data["queryParam"]),
+            "var_try": query_data["try"],
+            "var_while": query_data["while"],
+            "var_with": query_data["with"],
+            "some_new_name": "dog",
+        }
+
+        self.assertDictEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
+
+    def test_codegen_request_body_name_formdata(self):
+        operation_id = "codegen_request_body_name_formdata"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        operation.request.example_data = self._example_data()
+        container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
+
+        body_data = self._example_data()[self.example_name]["body"]
+        path_data = self._example_data()[self.example_name]["path"]
+        query_data = self._example_data()[self.example_name]["query"]
+
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            indent_count=0,
+        )
+
+        expected = {
+            "petId": str(path_data["petId"]),
+            "name": body_data["name"],
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
+            "queryParam": str(query_data["queryParam"]),
+            "var_try": query_data["try"],
+            "var_while": query_data["while"],
+            "var_with": query_data["with"],
+            "id": str(body_data["id"]),
+            "category": "category",
+            "tags": "tags",
+            "status": body_data["status"],
+            "var_try2": body_data["try"],
+            "var_while2": body_data["while"],
+            "var_with2": body_data["with"],
+            "configuration": body_data["configuration"],
+            "version": body_data["version"],
+        }
+
+        self.assertEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
