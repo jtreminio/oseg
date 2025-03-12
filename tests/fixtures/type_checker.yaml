@@ -87,6 +87,20 @@ components:
           items:
             type: object
             additionalProperties: {}
+        prop_free_form_no_additional_properties:
+          type: object
+        prop_free_form_no_additional_properties_array:
+          type: array
+          items:
+            type: object
+        prop_free_form_additional_properties_true:
+          type: object
+          additionalProperties: true
+        prop_free_form_additional_properties_true_array:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
         prop_scalar_bool:
           type: boolean
         prop_scalar_integer:

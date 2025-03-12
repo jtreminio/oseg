@@ -16,6 +16,8 @@ class TestTypeChecker(TestCase):
             "prop_file_contentMediaType_array",
             "prop_file_contentEncoding_array",
             "prop_free_form_array",
+            "prop_free_form_no_additional_properties_array",
+            "prop_free_form_additional_properties_true_array",
             "prop_scalar_bool_array",
             "prop_scalar_integer_array",
             "prop_scalar_number_array",
@@ -61,8 +63,16 @@ class TestTypeChecker(TestCase):
         func_single = parser.TypeChecker.is_free_form
         func_array = parser.TypeChecker.is_free_form_array
 
-        expected_true_single = ["prop_free_form"]
-        expected_true_array = ["prop_free_form_array"]
+        expected_true_single = [
+            "prop_free_form",
+            "prop_free_form_no_additional_properties",
+            "prop_free_form_additional_properties_true",
+        ]
+        expected_true_array = [
+            "prop_free_form_array",
+            "prop_free_form_no_additional_properties_array",
+            "prop_free_form_additional_properties_true_array",
+        ]
 
         for name, prop in together.properties.items():
             with self.subTest(name):

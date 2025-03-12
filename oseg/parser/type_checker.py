@@ -60,8 +60,9 @@ class TypeChecker:
     @classmethod
     def is_free_form(cls, schema: SCHEMA_UNION) -> bool:
         return bool(
-            cls._is_of_type(schema, oa.DataType.OBJECT)
-            and schema.additionalProperties is not None
+            not cls.is_object(schema)
+            and cls._is_of_type(schema, oa.DataType.OBJECT)
+            and schema.properties is None
         )
 
     @classmethod

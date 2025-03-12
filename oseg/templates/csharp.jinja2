@@ -37,21 +37,21 @@ new List<Stream>{% if not printable.value %}(){% else %}
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}{{ print_null() }}{% else %}
-{% if not printable.value %}new Dictionary<string, object>(){% else %}
+    {% if printable.value == None %}{{ print_null() }}
+    {%- elif not printable.value %}new Dictionary<string, object>(){%- else %}
 JsonSerializer.Deserialize<Dictionary<string, object>>("""
     {{ printable.value|tojson(4)|indent(4) }}
 """)
-    {%- endif %}{%- endif %}
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}{{ print_null() }}{% else %}
-{% if not printable.value %}new List<Dictionary<string, object>>(){% else %}
+    {% if printable.value == None %}{{ print_null() }}
+    {%- elif not printable.value %}new List<Dictionary<string, object>>(){%- else %}
 JsonSerializer.Deserialize<List<Dictionary<string, object>>>("""
     {{ printable.value|tojson(4)|indent(4) }}
 """)
-    {%- endif %}{%- endif %}
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro print_object(printable) -%}

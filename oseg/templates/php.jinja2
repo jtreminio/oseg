@@ -29,7 +29,8 @@ new SplFileObject("{{ printable.value }}")
 {%- endmacro -%}
 
 {%- macro print_free_form(printable) -%}
-    {% if printable.value == None %}{{ print_null() }}{% else %}
+    {% if printable.value == None %}{{ print_null() }}
+    {%- elif not printable.value %}[]{%- else %}
 json_decode(<<<'EOD'
     {{ printable.value|tojson(4)|indent(4) }}
 EOD, true)
@@ -37,7 +38,8 @@ EOD, true)
 {%- endmacro -%}
 
 {%- macro print_free_form_array(printable) -%}
-    {% if printable.value == None %}{{ print_null() }}{% else %}
+    {% if printable.value == None %}{{ print_null() }}
+    {%- elif not printable.value %}[]{%- else %}
 json_decode(<<<'EOD'
     {{ printable.value|tojson(4)|indent(4) }}
 EOD, true)

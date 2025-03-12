@@ -347,10 +347,14 @@ class PropertyParser:
         if not self._is_resolvable_of(schema, parser.TypeChecker.is_free_form):
             return None
 
+        value = data.get(name)
+        if value == "{}":
+            value = {}
+
         result = model.PropertyFreeForm(
             schema=schema,
             name=name,
-            value=data.get(name),
+            value=value,
             is_required=(
                 self._is_required(container.schema, name) if container else False
             ),

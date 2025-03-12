@@ -555,6 +555,19 @@ paths:
             schema:
               $ref: '#/components/schemas/Dog'
       x-codegen-request-body-name: some_new_name
+  /free_form_string_object_value:
+    post:
+      tags:
+        - pet
+      operationId: free_form_string_object_value
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FreeFormWithStringObjectValue"
+      responses:
+        '200':
+          description: Successful operation
 components:
   schemas:
     Pet:
@@ -804,6 +817,12 @@ components:
           type: string
         with:
           type: string
+    FreeFormWithStringObjectValue:
+      type: object
+      properties:
+        prop_object:
+          type: object
+          example: "{}"
   parameters:
     ParamString:
       name: paramString

@@ -593,3 +593,14 @@ class TestPropertyParser(TestCase):
 
                 self.assertEqual(expected["value"], parsed.value)
                 self.assertIsInstance(parsed, expected["type"])
+
+    def test_free_form_string_object_value(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations["free_form_string_object_value"]
+        example_data = operation.request.example_data[example_name]
+
+        result = example_data.body.free_forms.get("prop_object").value
+        expected = {}
+
+        self.assertEqual(expected, result)
