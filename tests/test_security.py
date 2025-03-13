@@ -35,7 +35,7 @@ class TestSecurity(TestCase):
         )
 
         self.assertEqual(
-            model.SecurityMethod.USERNAME,
+            model.SecurityMethod.BASIC,
             operation.security.schemes[1]["http_basic_scheme"].method,
         )
 

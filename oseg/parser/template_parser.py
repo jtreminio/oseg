@@ -18,34 +18,27 @@ class TemplateParser:
         is_primary = True
 
         for schemes in self._generator.operation.security.schemes:
-            for name, scheme in schemes.items():
-                if scheme.method == model.SecurityMethod.USERNAME:
-                    result[f"{scheme.name}_username"] = macros.print_security(
+            for key, scheme in schemes.items():
+                if scheme.method == model.SecurityMethod.BASIC:
+                    result[key] = macros.print_security(
                         printable=model.PrintableSecurity(
                             name=scheme.name,
+                            key=key,
                             method=scheme.method.value,
-                            value=security_config.get(f"{name}.username"),
+                            value=security_config.get(f"{key}.username", ""),
+                            value_2=security_config.get(f"{key}.password", ""),
                             is_primary=is_primary,
                         )
                     )
 
-                    if security_config.get(f"{name}.password"):
-                        result[f"{scheme.name}_password"] = macros.print_security(
-                            printable=model.PrintableSecurity(
-                                name=scheme.name,
-                                method="password",
-                                value=security_config.get(f"{name}.password"),
-                                is_primary=is_primary,
-                            )
-                        )
-
                     continue
 
-                result[scheme.name] = macros.print_security(
+                result[key] = macros.print_security(
                     printable=model.PrintableSecurity(
                         name=scheme.name,
+                        key=key,
                         method=scheme.method.value,
-                        value=security_config.get(f"{name}.{scheme.method.value}"),
+                        value=security_config.get(f"{key}.{scheme.method.value}", ""),
                         is_primary=is_primary,
                     )
                 )

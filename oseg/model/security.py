@@ -26,12 +26,14 @@ class SecurityMethod(str, Enum):
 
     ACCESS_TOKEN = "access_token"
     API_KEY = "api_key"
-    USERNAME = "username"
+    BASIC = "basic"
 
 
 @dataclass
 class SecurityScheme:
     name: str
+    # key is the key value in the securitySchemes definition, not the "name" property
+    key: str
     method: SecurityMethod
 
 
@@ -68,7 +70,8 @@ class Security:
                 self.schemes.append(
                     {
                         security: SecurityScheme(
-                            name=security,
+                            name=scheme.name if scheme.name else "",
+                            key=security,
                             method=self._resolve_scheme_method(scheme),
                         )
                     }
@@ -77,10 +80,11 @@ class Security:
                 continue
 
             joined = {}
-            for name in security:
-                scheme = oa_parser.components.securitySchemes[name]
-                joined[name] = SecurityScheme(
-                    name=name,
+            for key in security:
+                scheme = oa_parser.components.securitySchemes[key]
+                joined[key] = SecurityScheme(
+                    name=scheme.name if scheme.name else "",
+                    key=key,
                     method=self._resolve_scheme_method(scheme),
                 )
 
@@ -97,7 +101,7 @@ class Security:
             security_scheme.type == SecurityTypeEnum.HTTP
             and security_scheme.scheme == SecuritySchemeEnum.BASIC
         ):
-            return SecurityMethod.USERNAME
+            return SecurityMethod.BASIC
 
         if (
             security_scheme.type == SecurityTypeEnum.HTTP

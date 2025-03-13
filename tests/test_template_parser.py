@@ -729,16 +729,14 @@ class TestTemplateParser(TestCase):
 
         schemes = {
             "api_key_scheme": f"api_key: {security_config["api_key_scheme.api_key"]}",
-            "http_basic_scheme_username": f"username: {security_config["http_basic_scheme.username"]}",
-            "http_basic_scheme_password": f"password: {security_config["http_basic_scheme.password"]}",
+            "http_basic_scheme": f"basic: {security_config["http_basic_scheme.username"]}:{security_config["http_basic_scheme.password"]}",
             "http_bearer_scheme": f"access_token: {security_config["http_bearer_scheme.access_token"]}",
             "oauth2_scheme": f"access_token: {security_config["oauth2_scheme.access_token"]}",
         }
 
         schemes_commented = {
             "api_key_scheme": f"# api_key: {security_config["api_key_scheme.api_key"]}",
-            "http_basic_scheme_username": f"# username: {security_config["http_basic_scheme.username"]}",
-            "http_basic_scheme_password": f"# password: {security_config["http_basic_scheme.password"]}",
+            "http_basic_scheme": f"# basic: {security_config["http_basic_scheme.username"]}:{security_config["http_basic_scheme.password"]}",
             "http_bearer_scheme": f"# access_token: {security_config["http_bearer_scheme.access_token"]}",
             "oauth2_scheme": f"# access_token: {security_config["oauth2_scheme.access_token"]}",
         }
@@ -746,20 +744,14 @@ class TestTemplateParser(TestCase):
         data_provider = {
             "security_all": {
                 "api_key_scheme": schemes["api_key_scheme"],
-                "http_basic_scheme_username": schemes_commented[
-                    "http_basic_scheme_username"
-                ],
-                "http_basic_scheme_password": schemes_commented[
-                    "http_basic_scheme_password"
-                ],
+                "http_basic_scheme": schemes_commented["http_basic_scheme"],
                 "http_bearer_scheme": schemes_commented["http_bearer_scheme"],
                 "oauth2_scheme": schemes_commented["oauth2_scheme"],
             },
             "security_disabled": {},
             "security_and": {
                 "api_key_scheme": schemes["api_key_scheme"],
-                "http_basic_scheme_username": schemes["http_basic_scheme_username"],
-                "http_basic_scheme_password": schemes["http_basic_scheme_password"],
+                "http_basic_scheme": schemes["http_basic_scheme"],
             },
         }
 

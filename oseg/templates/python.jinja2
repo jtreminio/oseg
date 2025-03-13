@@ -61,9 +61,11 @@ json.loads("""
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
-{{ comment }}{{ printable.method|print_methodname }}=
-    {%- if printable.method == "api_key" %}{"{{ printable.name }}": "{{ printable.value }}"},
-    {%- else %}"{{ printable.value }}",{%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}api_key={"{{ printable.key }}": {{ printable.value|tojson }}},
+{%- elif printable.method == "access_token" %}{{ comment }}access_token={{ printable.value|tojson }},
+{%- else %}{{ comment }}username={{ printable.value|tojson }},
+{{ comment }}password={{ printable.value_2|tojson }},
+{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}

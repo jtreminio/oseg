@@ -69,7 +69,11 @@ new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not pri
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-{{ comment }}config.{{ ("set" ~ "_" ~ printable.method)|print_methodname }}("{{ printable.value }}");
+{%- if printable.method == "api_key" %}{{ comment }}((ApiKeyAuth) config.getAuthentication("{{ printable.key }}")).setApiKey({{ printable.value|tojson }});
+{%- elif printable.method == "access_token" %}{{ comment }}((HttpBearerAuth) config.getAuthentication("{{ printable.key }}")).setBearerToken({{ printable.value|tojson }});
+{%- else %}{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setUsername({{ printable.value|tojson }});
+{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setPassword({{ printable.value_2|tojson }});
+{%- endif %}
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}

@@ -26,7 +26,9 @@ class PrintableScalar:
 @dataclass
 class PrintableSecurity:
     name: str
-    method: Literal["access_token", "api_key", "username", "password"]
+    key: str
+    method: Literal["access_token", "api_key", "basic"]
     value: str = ""
+    value_2: str = ""
     # is the first security scheme(s) for Operation
     is_primary: bool = False

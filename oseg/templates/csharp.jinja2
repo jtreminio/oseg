@@ -73,9 +73,11 @@ new List<{{ printable.target_type|print_classname }}>{% if not printable.value %
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-{{ comment }}config.{{ printable.method|print_methodname }} =
-    {%- if printable.method == "api_key" %} new Dictionary<string, string> {["{{ printable.name }}"] = "{{ printable.value }}"};
-    {%- else %} "{{ printable.value }}";{%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}config.ApiKey.Add("{{ printable.name }}", {{ printable.value|tojson }});
+{%- elif printable.method == "access_token" %}{{ comment }}config.AccessToken = {{ printable.value|tojson }};
+{%- else %}{{ comment }}config.Username = {{ printable.value|tojson }};
+{{ comment }}config.Password = {{ printable.value_2|tojson }};
+{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}

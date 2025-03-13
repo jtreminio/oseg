@@ -65,9 +65,11 @@ ${{ printable.value|print_variablename }}
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-{{ comment }}$config->{{ ("set" ~ "_" ~ printable.method)|print_methodname }}
-    {%- if printable.method == "api_key" %}("{{ printable.name }}", "{{ printable.value }}");
-    {%- else %}("{{ printable.value }}");{%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}$config->setApiKey("{{ printable.name }}", {{ printable.value|tojson }});
+{%- elif printable.method == "access_token" %}{{ comment }}$config->setAccessToken({{ printable.value|tojson }});
+{%- else %}{{ comment }}$config->setUsername({{ printable.value|tojson }});
+{{ comment }}$config->setPassword({{ printable.value_2|tojson }});
+{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
