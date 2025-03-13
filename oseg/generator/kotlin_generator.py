@@ -275,16 +275,14 @@ class KotlinGenerator(generator.BaseGenerator):
                 enum_type = NormalizeStr.pascal_case(f"{item.name}")
 
                 if not parent:
-                    parent_type = NormalizeStr.pascal_case(
-                        f"{self.operation.api_name}Api"
-                    )
+                    parent_type = NormalizeStr.pascal_case(self.operation.api_name)
                     operation_id = NormalizeStr.pascal_case(self.operation.operation_id)
-                    printable.target_type = f"{parent_type}.{enum_type}{operation_id}"
+                    printable.target_type = (
+                        f"{parent_type}Api.{enum_type}{operation_id}"
+                    )
 
                     for i in item.value:
-                        final_value = self._handle_value(item, i, parent)
-
-                        printable.value.append(f"{printable.target_type}.{final_value}")
+                        printable.value.append(self._handle_value(item, i, parent))
                 else:
                     parent_type = NormalizeStr.pascal_case(parent.type)
                     printable.target_type = f"{parent_type}.{enum_type}"
