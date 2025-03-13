@@ -62,6 +62,15 @@ class PropertyInterface(Protocol):
 
         return self.schema.type
 
+    def _needs_default_value(self) -> bool:
+        if not self.value is None:
+            return False
+
+        if not self.is_required or self.is_nullable:
+            return False
+
+        return True
+
 
 class PropertyFile(PropertyInterface):
     _T = str | list[str] | None
@@ -80,6 +89,9 @@ class PropertyFile(PropertyInterface):
 
         self.is_bytes: bool = self.schema.schema_format == self._FORMAT_BYTES
 
+        if self._needs_default_value():
+            self.value = "some_file.pdf" if not self.is_array else []
+
 
 class PropertyFreeForm(PropertyInterface):
     _T = dict[str, any] | list[dict[str, any]] | None
@@ -94,6 +106,9 @@ class PropertyFreeForm(PropertyInterface):
         is_set: bool,
     ):
         super().__init__(schema, name, value, is_required, is_set)
+
+        if self._needs_default_value():
+            self.value = {} if not self.is_array else []
 
 
 class PropertyScalar(PropertyInterface):
@@ -112,19 +127,21 @@ class PropertyScalar(PropertyInterface):
     ):
         super().__init__(schema, name, value, is_required, is_set)
 
-        self._normalize_value()
         self.format: str | None = self._set_string_format()
         self.is_enum: bool = self._set_is_enum()
+        self._normalize_value()
 
     def _normalize_value(self) -> None:
-        if self.value is None:
-            return
+        needs_default_value = self._needs_default_value()
 
         if self.is_array:
             self.value: PropertyScalar._T_LIST
             result = []
 
-            for i in self.value:
+            if not needs_default_value and self.value is None:
+                return
+
+            for i in self.value if self.value is not None else []:
                 if self.type == oa.DataType.STRING:
                     result.append(str(i))
                 elif self.type == oa.DataType.BOOLEAN:
@@ -137,10 +154,19 @@ class PropertyScalar(PropertyInterface):
 
             return
 
+        if not needs_default_value and self.value is None:
+            return
+
         if self.type == oa.DataType.STRING:
-            self.value = str(self.value)
+            value = self.value
+
+            if needs_default_value:
+                value = self.schema.enum[0] if self.is_enum else f"{self.name}_string"
+
+            self.value = str(value)
         elif self.type == oa.DataType.BOOLEAN:
-            self.value = bool(self.value)
+            value = self.value if not needs_default_value else False
+            self.value = bool(value)
 
     def _set_string_format(self) -> str | None:
         if self.is_array:

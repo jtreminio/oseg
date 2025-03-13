@@ -277,10 +277,15 @@ class ExampleDataParser:
 
         if parser.TypeChecker.is_object(schema):
             for prop_name, prop_schema in schema.properties.items():
-                data[prop_name] = self._example_data_from_properties(
+                result = self._example_data_from_properties(
                     schema=prop_schema,
                     parents=parents[:],
                 )
+
+                if self._can_skip_null(schema, prop_schema, prop_name, result):
+                    continue
+
+                data[prop_name] = result
 
         """Once we have base object default data built see if we are dealing
         with a discriminator or allOf
@@ -289,10 +294,15 @@ class ExampleDataParser:
             merged = self._schema_joiner.merge_schemas_and_properties(schema, data)
 
             for prop_name, prop_schema in merged.properties.items():
-                data[prop_name] = self._example_data_from_properties(
+                result = self._example_data_from_properties(
                     schema=prop_schema,
                     parents=parents[:],
                 )
+
+                if self._can_skip_null(schema, prop_schema, prop_name, result):
+                    continue
+
+                data[prop_name] = result
 
         return data if len(data.keys()) else None
 
@@ -347,11 +357,13 @@ class ExampleDataParser:
         required = []
 
         for parameter in parameters:
-            if parameter.param_in.value == param_in.value:
-                properties[parameter.name] = parameter.param_schema
+            if parameter.param_in.value != param_in.value:
+                continue
 
-                if parameter.required:
-                    required.append(parameter.name)
+            properties[parameter.name] = parameter.param_schema
+
+            if parameter.required:
+                required.append(parameter.name)
 
         if not len(properties.keys()):
             return None
@@ -361,3 +373,24 @@ class ExampleDataParser:
         schema.required = required
 
         return schema
+
+    def _can_skip_null(
+        self,
+        parent: oa.Schema,
+        prop: oa.Schema,
+        prop_name: str,
+        value: any,
+    ) -> bool:
+        """If a property's value is None, and it is not required, and it is non-nullable,
+        do not add it to example data.
+        """
+
+        if value is not None:
+            return False
+
+        if parent.required and prop_name in parent.required:
+            return False
+        elif parser.TypeChecker.is_nullable(prop):
+            return False
+
+        return True

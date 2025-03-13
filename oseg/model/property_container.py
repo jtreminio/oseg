@@ -56,6 +56,14 @@ class PropertyContainer:
 
         return body.type
 
+    def is_parameter(self, prop: model.PROPERTY_TYPES) -> bool:
+        return (
+            (self.path and prop in self.path.properties.values())
+            or (self.query and prop in self.query.properties.values())
+            or (self.header and prop in self.header.properties.values())
+            or (self.cookie and prop in self.cookie.properties.values())
+        )
+
     def set_parameters(
         self,
         data: model.PropertyObject,
