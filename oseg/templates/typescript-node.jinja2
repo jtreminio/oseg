@@ -63,13 +63,12 @@ fs.createReadStream("{{ printable.value }}")
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-
-    {%- if printable.method == "api_key" %}
-{{ comment }}apiCaller.setApiKey(
-    {{- "" }}api.{{ (operation.api_name ~ "ApiApiKeys")|print_classname }}.{{ printable.name }},
-    {{- "" }} "{{ printable.value }}");
-    {%- else %}{{ comment }}apiCaller.{{ printable.method|print_methodname }} = "{{ printable.value }}";
-    {%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}apiCaller.setApiKey(
+    {{- "" }}api.{{ (operation.api_name ~ "ApiApiKeys")|print_classname }}.{{ printable.key }}, {{ printable.value|tojson }});
+{%- elif printable.method == "access_token" %}{{ comment }}apiCaller.accessToken = {{ printable.value|tojson }};
+{%- else %}{{ comment }}apiCaller.username = {{ printable.value|tojson }};
+{{ comment }}apiCaller.password = {{ printable.value_2|tojson }};
+{%- endif %}
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}

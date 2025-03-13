@@ -47,6 +47,7 @@ Generated SDK examples:
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 using Org.OpenAPITools.Api;
 using Org.OpenAPITools.Client;
@@ -104,7 +105,7 @@ public class AddPetExample
         }
         catch (ApiException e)
         {
-            Console.WriteLine("Exception when calling Pet#AddPet: " + e.Message);
+            Console.WriteLine("Exception when calling PetApi#AddPet: " + e.Message);
             Console.WriteLine("Status Code: " + e.ErrorCode);
             Console.WriteLine(e.StackTrace);
         }
@@ -121,6 +122,7 @@ import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
 import org.openapitools.client.api.*;
 import org.openapitools.client.auth.*;
+import org.openapitools.client.JSON;
 import org.openapitools.client.model.*;
 
 import java.io.File;
@@ -135,7 +137,7 @@ public class AddPetExample
     public static void main(String[] args)
     {
         var config = Configuration.getDefaultApiClient();
-        config.setAccessToken("YOUR_ACCESS_TOKEN");
+        ((HttpBearerAuth) config.getAuthentication("petstore_auth")).setBearerToken("YOUR_ACCESS_TOKEN");
 
         var category = new Category();
         category.id(12345L);
@@ -173,7 +175,7 @@ public class AddPetExample
 
             System.out.println(response);
         } catch (ApiException e) {
-            System.err.println("Exception when calling Pet#addPet");
+            System.err.println("Exception when calling PetApi#addPet");
             System.err.println("Status code: " + e.getCode());
             System.err.println("Reason: " + e.getResponseBody());
             System.err.println("Response headers: " + e.getResponseHeaders());
@@ -307,13 +309,14 @@ try {
 
     print_r($response);
 } catch (OpenAPI\Client\ApiException $e) {
-    echo "Exception when calling Pet#addPet: {$e->getMessage()}";
+    echo "Exception when calling PetApi#addPet: {$e->getMessage()}";
 }
 ```
 
 ### [python](https://openapi-generator.tech/docs/generators/python/)
 
 ```python
+import json
 from datetime import date, datetime
 from pprint import pprint
 
@@ -363,13 +366,13 @@ with ApiClient(configuration) as api_client:
 
         pprint(response)
     except ApiException as e:
-        print("Exception when calling Pet#add_pet: %s\n" % e)
-
+        print("Exception when calling PetApi#add_pet: %s\n" % e)
 ```
 
 ### [ruby](https://openapi-generator.tech/docs/generators/ruby/)
 
 ```ruby
+require "json"
 require "openapi_client"
 
 OpenApiClient.configure do |config|
@@ -411,7 +414,7 @@ begin
 
     p response
 rescue OpenApiClient::ApiError => e
-    puts "Exception when calling Pet#add_pet: #{e}"
+    puts "Exception when calling PetApi#add_pet: #{e}"
 end
 ```
 
@@ -458,7 +461,7 @@ apiCaller.addPet(
 ).then(response => {
   console.log(response.body);
 }).catch(error => {
-  console.log("Exception when calling Pet#addPet:");
+  console.log("Exception when calling PetApi#addPet:");
   console.log(error.body);
 });
 ```

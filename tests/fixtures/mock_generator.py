@@ -6,8 +6,8 @@ from mock import mock
 from typing import TypedDict
 from oseg import generator, model, parser
 
-MockConfigDef = TypedDict(
-    "MockConfigDef",
+ConfigDef = TypedDict(
+    "ConfigDef",
     {
         "packageName": str,
         "oseg.ignoreOptionalUnset": bool | None,
@@ -16,19 +16,15 @@ MockConfigDef = TypedDict(
 )
 
 
-class MockConfigComplete(TypedDict):
-    generatorName: str
-    additionalProperties: MockConfigDef
-
-
 @dataclass
-class MockConfigOseg(generator.BaseConfigOseg):
+class ConfigOseg(generator.BaseConfigOseg):
     pass
 
 
 class MockConfig(generator.BaseConfig):
     GENERATOR_NAME = "mock"
-    oseg: MockConfigOseg
+    oseg: ConfigOseg
+    _config: ConfigDef
 
     PROPS_REQUIRED = {
         "packageName": inspect.cleandoc(
@@ -59,13 +55,13 @@ class MockConfig(generator.BaseConfig):
         },
     }
 
-    def __init__(self, config: MockConfigDef):
-        self._config = config
+    def __init__(self, config: ConfigDef):
+        super().__init__(config)
 
-        self.package_name = config.get("packageName")
-        assert isinstance(self.package_name, str)
+        self.packageName = config.get("packageName")
+        assert isinstance(self.packageName, str)
 
-        self.oseg = MockConfigOseg(
+        self.oseg = ConfigOseg(
             ignoreOptionalUnset=self._get_value("oseg.ignoreOptionalUnset"),
             security=self._parse_security(),
         )
@@ -213,6 +209,9 @@ def object_macro_callback(printable: model.PrintableObject) -> str | None:
 
 def print_security_macro_callback(printable: model.PrintableSecurity) -> str:
     comment = "# " if not printable.is_primary else ""
+
+    if printable.method == "basic":
+        return f"{comment}{printable.method}: {printable.value}:{printable.value_2}"
 
     return f"{comment}{printable.method}: {printable.value}"
 

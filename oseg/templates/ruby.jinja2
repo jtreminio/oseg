@@ -63,9 +63,11 @@ JSON.parse(<<-EOD
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
-{{ comment }}config.{{ printable.method|print_methodname }}
-    {%- if printable.method == "api_key" %}["{{ printable.name }}"] = "{{ printable.value }}"
-    {%- else %} = "{{ printable.value }}"{%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}config.api_key["{{ printable.name }}"] = {{ printable.value|tojson }}
+{%- elif printable.method == "access_token" %}{{ comment }}config.access_token = {{ printable.value|tojson }}
+{%- else %}{{ comment }}config.username = {{ printable.value|tojson }}
+{{ comment }}config.password = {{ printable.value_2|tojson }}
+{%- endif %}
 {%-endmacro -%}
 
 {%- macro print_variable_name_as_comment(name, value) -%}

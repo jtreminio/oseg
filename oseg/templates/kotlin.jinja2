@@ -66,9 +66,11 @@ arrayListOf<{{ printable.target_type|print_classname }}>({% if not printable.val
 {%- macro print_security(printable) -%}
     {% set comment = "" %}
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
-{{ comment }}ApiClient.{{ printable.method|print_methodname }}
-    {%- if printable.method == "api_key" %}["{{ printable.name }}"] = "{{ printable.value }}"
-    {%- else %} = "{{ printable.value }}"{%- endif %}
+{%- if printable.method == "api_key" %}{{ comment }}ApiClient.apiKey["{{ printable.name }}"] = {{ printable.value|tojson }}
+{%- elif printable.method == "access_token" %}{{ comment }}ApiClient.accessToken = {{ printable.value|tojson }}
+{%- else %}{{ comment }}ApiClient.username = {{ printable.value|tojson }}
+{{ comment }}ApiClient.password = {{ printable.value_2|tojson }}
+{%- endif %}
 {%-endmacro -%}
 
 {%- import "_macros.jinja2" as m with context -%}
