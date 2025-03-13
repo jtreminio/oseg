@@ -215,6 +215,9 @@ class BaseGenerator(Protocol):
     def print_null(self) -> str:
         raise NotImplementedError
 
+    def force_print_parameters(self) -> bool:
+        return False
+
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 

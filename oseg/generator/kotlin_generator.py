@@ -312,6 +312,9 @@ class KotlinGenerator(generator.BaseGenerator):
         value: any,
         parent: model.PropertyObject | None,
     ) -> any:
+        if value is None:
+            return self._to_json(value)
+
         if item.type == oa.DataType.STRING:
             if item.is_enum:
                 enum_name = self._get_enum_name(item, value)
@@ -319,8 +322,17 @@ class KotlinGenerator(generator.BaseGenerator):
                 if enum_name is None:
                     return self.print_null()
 
-                if parent is None:
-                    return NormalizeStr.camel_case(value)
+                if parent is None or item not in parent.properties.values():
+                    parent_type = NormalizeStr.pascal_case(self.operation.api_name)
+                    operation_id = NormalizeStr.pascal_case(self.operation.operation_id)
+                    enum_type = NormalizeStr.uc_first(
+                        NormalizeStr.camel_case(
+                            value=item.name,
+                            option=CamelCaseOption.LOWERCASE_FIRST_SECTION,
+                        )
+                    )
+
+                    return f"{parent_type}Api.{enum_type}{operation_id}.{value}"
 
                 parent_type = NormalizeStr.pascal_case(parent.type)
                 enum_type = NormalizeStr.pascal_case(f"{item.name}")

@@ -32,7 +32,7 @@ listOf {% if not printable.value %}(){% else %}
 
 {%- macro print_free_form(printable) -%}
     {% if printable.value == None %}{{ print_null() }}
-    {%- elif not printable.value %}Map.of (){%- else %}
+    {%- elif not printable.value %}mapOf<String, Any> (){%- else %}
 Serializer.moshi.adapter<Map<String, Any>>().fromJson("""
     {{ printable.value|tojson(4)|indent(4) }}
 """)!!
@@ -113,8 +113,8 @@ class {{ (operation.operation_id ~ "_" ~ example_name)|print_classname }}
                 {% for name, value in properties.items() %}
             {{ name|print_propname }} = {{ value }},
                 {% endfor %}
-            {% endif %}
         )
+            {% endif %}
             {% endcall %}
         {% else %}
         val {{ obj_name|print_variablename }} = {{ "" }}

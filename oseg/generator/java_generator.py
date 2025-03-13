@@ -317,12 +317,18 @@ class JavaGenerator(generator.BaseGenerator):
     def print_null(self) -> str:
         return "null"
 
+    def force_print_parameters(self) -> bool:
+        return True
+
     def _handle_value(
         self,
         item: model.PropertyScalar,
         value: any,
         parent: model.PropertyObject | None,
     ) -> any:
+        if value is None:
+            return self._to_json(value)
+
         if item.type == oa.DataType.STRING:
             if item.is_enum:
                 enum_name = self._get_enum_name(item, value)
