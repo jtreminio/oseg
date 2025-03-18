@@ -17,8 +17,8 @@ class PropertyContainer:
 
         self._is_sorted: bool = False
         self._flattened_objects: dict[str, model.PropertyObject] = {}
-        self._sorter = parser.PropertySorter(self)
-        self._flattener = parser.PropertyFlattener(self)
+        self._sorter: parser.PropertySorter = parser.PropertySorter(self)
+        self._flattener: parser.PropertyFlattener = parser.PropertyFlattener(self)
 
     @property
     def has_data(self) -> bool:
@@ -55,6 +55,14 @@ class PropertyContainer:
             return body.properties[0].type
 
         return body.type
+
+    def is_parameter(self, prop: model.PROPERTY_TYPES) -> bool:
+        return (
+            (self.path and prop in self.path.properties.values())
+            or (self.query and prop in self.query.properties.values())
+            or (self.header and prop in self.header.properties.values())
+            or (self.cookie and prop in self.cookie.properties.values())
+        )
 
     def set_parameters(
         self,

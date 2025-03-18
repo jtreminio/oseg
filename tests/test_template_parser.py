@@ -260,7 +260,7 @@ class TestTemplateParser(TestCase):
         body_data = self._example_data()[self.example_name]["body"]
 
         expected = {
-            "name": "null",
+            "name": "name_string",
             "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
             "id": str(body_data["id"]),
             "status": body_data["status"],
@@ -688,7 +688,7 @@ class TestTemplateParser(TestCase):
         )
 
         expected = {
-            "param_2": "null",
+            "param_2": "param_2_string",
             "param_1": "null",
             "param_3": "null",
         }
@@ -767,6 +767,114 @@ class TestTemplateParser(TestCase):
                 )
 
                 self.assertEqual(expected, result)
+
+    def test_codegen_request_body_name(self):
+        operation_id = "codegen_request_body_name_json"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        operation.request.example_data = self._example_data()
+        container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
+
+        path_data = self._example_data()[self.example_name]["path"]
+        query_data = self._example_data()[self.example_name]["query"]
+
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            indent_count=0,
+        )
+
+        expected = {
+            "petId": str(path_data["petId"]),
+            "queryParam": str(query_data["queryParam"]),
+            "var_try": query_data["try"],
+            "var_while": query_data["while"],
+            "var_with": query_data["with"],
+            "some_new_name": "dog",
+        }
+
+        self.assertDictEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
+
+    def test_codegen_request_body_name_formdata(self):
+        operation_id = "codegen_request_body_name_formdata"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+        operation.request.example_data = self._example_data()
+        container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
+
+        body_data = self._example_data()[self.example_name]["body"]
+        path_data = self._example_data()[self.example_name]["path"]
+        query_data = self._example_data()[self.example_name]["query"]
+
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            indent_count=0,
+        )
+
+        expected = {
+            "petId": str(path_data["petId"]),
+            "name": body_data["name"],
+            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
+            "queryParam": str(query_data["queryParam"]),
+            "var_try": query_data["try"],
+            "var_while": query_data["while"],
+            "var_with": query_data["with"],
+            "id": str(body_data["id"]),
+            "category": "category",
+            "tags": "tags",
+            "status": body_data["status"],
+            "var_try2": body_data["try"],
+            "var_while2": body_data["while"],
+            "var_with2": body_data["with"],
+            "configuration": body_data["configuration"],
+            "version": body_data["version"],
+        }
+
+        self.assertEqual(expected, api_call_properties)
+
+        operation.request.example_data = None
+
+    def test_non_nullable_non_object_gets_default_value(self):
+        operation_id = "property_with_all_required_for_default_value"
+        oa_parser = TestUtils.oa_parser("properties")
+        operation = oa_parser.operations.get(operation_id)
+
+        container = operation.request.example_data[self.example_name]
+        sdk_generator = MockGenerator(self.config, operation, container)
+
+        expected_api_properties = {
+            "petId": "0",
+            "queryParam": "null",
+            "var_try": "foo",
+            "var_while": "foo",
+            "var_with": "foo",
+            "PropertyWithAllRequiredForDefaultValue": "property_with_all_required_for_default_value",
+        }
+
+        expected_object_properties = {
+            "id": "0",
+            "name": "name_string",
+            "is_available": "false",
+            "status": "available",
+            "photoUrls": "[]",
+        }
+
+        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
+            macros=self.jinja_macros,
+            indent_count=0,
+        )
+
+        object_properties = sdk_generator.template_parser.parse_object_properties(
+            macros=self.jinja_macros,
+            parent=container.body,
+            indent_count=0,
+        )
+
+        self.assertEqual(expected_api_properties, api_call_properties)
+        self.assertEqual(expected_object_properties, object_properties)
 
     # todo test print_file
 
@@ -911,72 +1019,3 @@ class TestTemplateParser(TestCase):
                 ]
             }
         }
-
-    def test_codegen_request_body_name(self):
-        operation_id = "codegen_request_body_name_json"
-        oa_parser = TestUtils.oa_parser("properties")
-        operation = oa_parser.operations.get(operation_id)
-        operation.request.example_data = self._example_data()
-        container = operation.request.example_data[self.example_name]
-        sdk_generator = MockGenerator(self.config, operation, container)
-
-        path_data = self._example_data()[self.example_name]["path"]
-        query_data = self._example_data()[self.example_name]["query"]
-
-        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
-            macros=self.jinja_macros,
-            indent_count=0,
-        )
-
-        expected = {
-            "petId": str(path_data["petId"]),
-            "queryParam": str(query_data["queryParam"]),
-            "var_try": query_data["try"],
-            "var_while": query_data["while"],
-            "var_with": query_data["with"],
-            "some_new_name": "dog",
-        }
-
-        self.assertDictEqual(expected, api_call_properties)
-
-        operation.request.example_data = None
-
-    def test_codegen_request_body_name_formdata(self):
-        operation_id = "codegen_request_body_name_formdata"
-        oa_parser = TestUtils.oa_parser("properties")
-        operation = oa_parser.operations.get(operation_id)
-        operation.request.example_data = self._example_data()
-        container = operation.request.example_data[self.example_name]
-        sdk_generator = MockGenerator(self.config, operation, container)
-
-        body_data = self._example_data()[self.example_name]["body"]
-        path_data = self._example_data()[self.example_name]["path"]
-        query_data = self._example_data()[self.example_name]["query"]
-
-        api_call_properties = sdk_generator.template_parser.parse_api_call_properties(
-            macros=self.jinja_macros,
-            indent_count=0,
-        )
-
-        expected = {
-            "petId": str(path_data["petId"]),
-            "name": body_data["name"],
-            "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
-            "queryParam": str(query_data["queryParam"]),
-            "var_try": query_data["try"],
-            "var_while": query_data["while"],
-            "var_with": query_data["with"],
-            "id": str(body_data["id"]),
-            "category": "category",
-            "tags": "tags",
-            "status": body_data["status"],
-            "var_try2": body_data["try"],
-            "var_while2": body_data["while"],
-            "var_with2": body_data["with"],
-            "configuration": body_data["configuration"],
-            "version": body_data["version"],
-        }
-
-        self.assertEqual(expected, api_call_properties)
-
-        operation.request.example_data = None

@@ -10,7 +10,7 @@ class OaParser:
         operation_id: str | None = None,
         example_data: model.EXAMPLE_DATA_BY_OPERATION | None = None,
     ):
-        self.file_loader = parser.FileLoader(oas_file)
+        self.file_loader: parser.FileLoader = parser.FileLoader(oas_file)
         self._openapi: oa.OpenAPI = oa.parse_obj(self.file_loader.oas)
         self._setup_oas()
 
@@ -18,9 +18,9 @@ class OaParser:
         self.security: list[dict[str, list[str]]] | None = self._openapi.security
         self.components: oa.Components = self._openapi.components
 
-        self._component_resolver = parser.ComponentResolver(self)
-        example_data_parser = parser.ExampleDataParser(self)
-        operation_parser = parser.OperationParser(self, example_data_parser)
+        self._component_resolver: parser.ComponentResolver = parser.ComponentResolver(self)
+        example_data_parser: parser.ExampleDataParser = parser.ExampleDataParser(self)
+        operation_parser: parser.OperationParser = parser.OperationParser(self, example_data_parser)
 
         self.operations: dict[str, model.Operation] = operation_parser.setup_operations(
             operation_id=operation_id,

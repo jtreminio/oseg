@@ -568,6 +568,44 @@ paths:
       responses:
         '200':
           description: Successful operation
+  /property_with_all_required_for_default_value:
+    post:
+      tags:
+        - pet
+      operationId: property_with_all_required_for_default_value
+      parameters:
+        - name: petId
+          in: path
+          description: ID of pet to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: queryParam
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: try
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: while
+          in: query
+          schema:
+            type: string
+            default: "foo"
+        - name: with
+          in: query
+          schema:
+            type: string
+            default: "foo"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyWithAllRequiredForDefaultValue'
 components:
   schemas:
     Pet:
@@ -817,6 +855,32 @@ components:
           type: string
         with:
           type: string
+    PropertyWithAllRequiredForDefaultValue:
+      type: object
+      required:
+        - id
+        - name
+        - is_available
+        - photoUrls
+        - status
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_available:
+          type: boolean
+        photoUrls:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          description: pet status in the store
+          enum:
+            - available
+            - pending
+            - sold
     FreeFormWithStringObjectValue:
       type: object
       properties:

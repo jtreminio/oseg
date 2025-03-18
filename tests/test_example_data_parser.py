@@ -28,7 +28,7 @@ class TestExampleDataParser(TestCase):
             # No example value and no default value and required
             "param_without_example_without_default_is_required": {
                 "name": "param_name_1",
-                "value": None,
+                "value": "param_name_1_string",
                 "required": True,
             },
             # No example value and no default value and not required
@@ -102,7 +102,7 @@ class TestExampleDataParser(TestCase):
             },
             {
                 "name": "param_without_example_without_default_is_required",
-                "value": None,
+                "value": "param_without_example_without_default_is_required_string",
                 "required": True,
             },
             {
@@ -843,6 +843,6 @@ class TestExampleDataParser(TestCase):
         dog_2 = pet_2.properties.get("dog")
 
         self.assertTrue(pet_1.is_set)
-        self.assertTrue(dog_1.is_set)
-        self.assertTrue(pet_2.is_set)
+        self.assertFalse(dog_1.is_set)
+        self.assertFalse(pet_2.is_set)
         self.assertIsNone(dog_2)

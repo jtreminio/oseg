@@ -129,7 +129,7 @@ class BaseGenerator(Protocol):
         self.config: BaseConfig = config
         self.operation: model.Operation = operation
         self.property_container: model.PropertyContainer = property_container
-        self.template_parser = parser.TemplateParser(self)
+        self.template_parser: parser.TemplateParser = parser.TemplateParser(self)
 
     @abstractmethod
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:
@@ -214,6 +214,9 @@ class BaseGenerator(Protocol):
     @abstractmethod
     def print_null(self) -> str:
         raise NotImplementedError
+
+    def force_print_parameters(self) -> bool:
+        return False
 
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)

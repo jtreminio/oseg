@@ -48,7 +48,7 @@ class ComponentResolver:
     """
 
     def __init__(self, oa_parser: parser.OaParser):
-        self._oa_parser = oa_parser
+        self._oa_parser: parser.OaParser = oa_parser
         self._names: dict[int, str] = {}
 
         self._component_examples()
