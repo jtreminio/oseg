@@ -129,7 +129,7 @@ class BaseGenerator(Protocol):
         self.config: BaseConfig = config
         self.operation: model.Operation = operation
         self.property_container: model.PropertyContainer = property_container
-        self.template_parser = parser.TemplateParser(self)
+        self.template_parser: parser.TemplateParser = parser.TemplateParser(self)
 
     @abstractmethod
     def is_reserved_keyword(self, name: str, secondary: bool = False) -> bool:

@@ -27,8 +27,8 @@ class OperationParser:
         oa_parser: parser.OaParser,
         example_data_parser: parser.ExampleDataParser,
     ):
-        self._oa_parser = oa_parser
-        self._example_data_parser = example_data_parser
+        self._oa_parser: parser.OaParser = oa_parser
+        self._example_data_parser: parser.ExampleDataParser = example_data_parser
 
     def setup_operations(
         self,

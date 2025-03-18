@@ -17,8 +17,8 @@ class PropertyContainer:
 
         self._is_sorted: bool = False
         self._flattened_objects: dict[str, model.PropertyObject] = {}
-        self._sorter = parser.PropertySorter(self)
-        self._flattener = parser.PropertyFlattener(self)
+        self._sorter: parser.PropertySorter = parser.PropertySorter(self)
+        self._flattener: parser.PropertyFlattener = parser.PropertyFlattener(self)
 
     @property
     def has_data(self) -> bool:

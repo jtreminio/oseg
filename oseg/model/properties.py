@@ -167,6 +167,9 @@ class PropertyScalar(PropertyInterface):
         elif self.type == oa.DataType.BOOLEAN:
             value = self.value if not needs_default_value else False
             self.value = bool(value)
+        else:
+            value = self.value if not needs_default_value else 0
+            self.value = value
 
     def _set_string_format(self) -> str | None:
         if self.is_array:

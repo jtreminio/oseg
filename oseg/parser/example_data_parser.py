@@ -8,8 +8,8 @@ class ExampleDataParser:
 
     def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser: parser.OaParser = oa_parser
-        self._property_parser = parser.PropertyParser(oa_parser)
-        self._schema_joiner = parser.SchemaJoiner(oa_parser)
+        self._property_parser: parser.PropertyParser = parser.PropertyParser(oa_parser)
+        self._schema_joiner: parser.SchemaJoiner = parser.SchemaJoiner(oa_parser)
 
     def from_oas_data(
         self,
