@@ -96,16 +96,16 @@ const apiCaller = new api.{{ operation.api_name|print_apiname }}();
 {% call(objects) m.parse_objects_macro() %}
     {% for obj_name, obj in objects.items() %}
         {% if not obj.is_array %}
-const {{ obj_name|print_variablename }} = new models.{{ obj.type|print_classname }}();
-        {% call(properties) m.parse_object_properties_macro(obj, 0) %}
-            {% for name, value in properties.items() %}
-{{ obj_name|print_variablename }}.{{ name|print_propname }} = {{ value }};
-            {% endfor %}
-        {% endcall %}
+            {% call(properties) m.parse_object_properties_macro(obj, 2) %}
+const {{ obj_name|print_variablename }}: models.{{ obj.type|print_classname }} = {
+                {% for name, value in properties.items() %}
+  {{ name|print_propname }}: {{ value }},
+                {% endfor %}
+            {% endcall %}
+};
         {% else %}
-const {{ obj_name|print_variablename }} = {{ "" }}
             {%- call(value) m.parse_object_list_properties_macro(obj, 0) %}
-  {{- value }};
+const {{ obj_name|print_variablename }} = {{ value }};
             {% endcall %}
         {% endif %}
 
