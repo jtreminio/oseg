@@ -62,7 +62,7 @@ class TypeChecker:
         return bool(
             not cls.is_object(schema)
             and cls._is_of_type(schema, oa.DataType.OBJECT)
-            and schema.properties is None
+            and (schema.properties is None or schema.properties == {})
         )
 
     @classmethod
