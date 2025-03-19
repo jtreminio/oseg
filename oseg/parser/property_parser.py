@@ -388,6 +388,9 @@ class PropertyParser:
             is_set=name in data,
         )
 
+        if not result.is_required and result.value is None and not result.is_nullable:
+            result.is_set = False
+
         if container:
             container.properties[name] = result
 

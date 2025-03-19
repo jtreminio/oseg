@@ -296,13 +296,12 @@ class TestTemplateParser(TestCase):
 
         operation.request.example_data = None
 
-    def test_parse_object_properties_does_not_skip_null_optional(self):
+    def test_parse_object_properties_skips_null_optional(self):
         body_data = self._example_data()[self.example_name]["body"]
 
         expected = {
             "name": body_data["name"],
             "photoUrls": f"[{body_data["photoUrls"][0]},{body_data["photoUrls"][1]}]",
-            "id": "null",
             "status": body_data["status"],
             "category": "category",
             "tags": "tags",
