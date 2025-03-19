@@ -203,6 +203,9 @@ class PhpGenerator(generator.BaseGenerator):
 
         return printable
 
+    def has_named_parameters(self) -> bool:
+        return True
+
     def print_null(self) -> str:
         return "null"
 

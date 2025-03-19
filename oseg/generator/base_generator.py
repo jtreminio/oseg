@@ -218,6 +218,10 @@ class BaseGenerator(Protocol):
     def force_print_parameters(self) -> bool:
         return False
 
+    def has_named_parameters(self) -> bool:
+        """Checks if this generator language support named parameters"""
+        return False
+
     def _to_json(self, value: any) -> str:
         return json.dumps(value, ensure_ascii=False)
 

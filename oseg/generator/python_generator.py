@@ -222,6 +222,9 @@ class PythonGenerator(generator.BaseGenerator):
     def print_null(self) -> str:
         return "None"
 
+    def has_named_parameters(self) -> bool:
+        return True
+
     def _handle_value(self, item: model.PropertyScalar, value: any) -> any:
         if item.type == oa.DataType.BOOLEAN or value is None:
             return value

@@ -293,6 +293,9 @@ class CSharpGenerator(generator.BaseGenerator):
     def print_null(self) -> str:
         return "null"
 
+    def has_named_parameters(self) -> bool:
+        return True
+
     def _get_target_type(
         self,
         item: model.PropertyScalar,

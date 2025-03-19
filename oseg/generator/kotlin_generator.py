@@ -304,6 +304,9 @@ class KotlinGenerator(generator.BaseGenerator):
     def print_null(self) -> str:
         return "null"
 
+    def has_named_parameters(self) -> bool:
+        return True
+
     def _handle_value(
         self,
         item: model.PropertyScalar,

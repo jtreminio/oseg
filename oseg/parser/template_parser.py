@@ -213,11 +213,25 @@ class TemplateParser:
                 # meaning they must list all properties in the order defined
                 # in the OAS
                 if not prop.is_required and not prop.is_set:
+                    # if generator language supports named parameters then
+                    # we can skip null values
+                    if self._generator.has_named_parameters():
+                        continue
+
                     result[prop_name] = self._generator.print_null()
                 else:
                     has_data = True
                     result[prop_name] = self._generator.print_variablename(prop_name)
 
+                continue
+
+            # if generator language supports named parameters then
+            # we can skip null values
+            if (
+                not prop.is_required
+                and not prop.is_set
+                and self._generator.has_named_parameters()
+            ):
                 continue
 
             result[prop_name] = self._parse_non_objects(
