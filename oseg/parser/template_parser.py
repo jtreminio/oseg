@@ -222,7 +222,7 @@ class TemplateParser:
 
             result[prop_name] = self._parse_non_objects(
                 macros=macros,
-                parent=property_container.body,
+                parent=None,
                 prop=prop,
             )
 
