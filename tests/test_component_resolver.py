@@ -585,3 +585,64 @@ class TestComponentResolver(TestCase):
                     result[parameter.name] = parameter.param_schema.type.value
 
                 self.assertEqual(expected_parameters, result)
+
+    def test_inline_schema_name_reuse(self):
+        example_name = parser.ExampleDataParser.DEFAULT_EXAMPLE_NAME
+        oa_parser = TestUtils.oa_parser("component_resolver")
+
+        operation_1 = {
+            "operation_id": "inline_nested_schema_root",
+            "data": {
+                "labels": ["label 1", "label 2"],
+            },
+            "expected_name": "inline_nested_schema_root_request",
+        }
+
+        operation_2 = {
+            "operation_id": "another_inline_nested_schema_root_2",
+            "data": {
+                "labels": ["label 1", "label 2"],
+            },
+            "expected_name": "inline_nested_schema_root_request",
+        }
+
+        operation_3 = {
+            "operation_id": "inline_nested_schema_nested",
+            "data": {
+                "nested_inline": {
+                    "labels": ["label 1", "label 2"],
+                }
+            },
+            "expected_name": "inline_nested_schema_root_request",
+        }
+
+        for data in [operation_1, operation_2]:
+            with self.subTest(data["operation_id"]):
+                operation = oa_parser.operations.get(data["operation_id"])
+                operation.request.example_data = {example_name: {"body": data["data"]}}
+                container = operation.request.example_data[example_name]
+
+                self.assertEqual(
+                    data["expected_name"],
+                    container.body_type,
+                )
+
+                self.assertEqual(
+                    data["expected_name"],
+                    oa_parser.get_component_name(container.body.schema),
+                )
+
+                operation.request.example_data = None
+
+        operation = oa_parser.operations.get(operation_3["operation_id"])
+        operation.request.example_data = {example_name: {"body": operation_3["data"]}}
+        container = operation.request.example_data[example_name]
+
+        self.assertEqual(
+            operation_3["expected_name"],
+            oa_parser.get_component_name(
+                container.body.properties.get("nested_inline").schema
+            ),
+        )
+
+        operation.request.example_data = None

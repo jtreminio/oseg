@@ -2,6 +2,70 @@ openapi: 3.1.0
 info:
   version: 1.0.0
   title: Fixture - Component Resolver Examples
+paths:
+  /inline_nested_schema_root:
+    post:
+      tags:
+        - pet
+      operationId: inline_nested_schema_root
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                labels:
+                  type: array
+                  description: Array of labels (comma-separated strings)
+                  items:
+                    type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /another_inline_nested_schema_root_2:
+    post:
+      tags:
+        - pet
+      operationId: another_inline_nested_schema_root_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                labels:
+                  type: array
+                  description: Array of labels (comma-separated strings)
+                  items:
+                    type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /inline_nested_schema_nested:
+    post:
+      tags:
+        - pet
+      operationId: inline_nested_schema_nested
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nested_inline:
+                  type: object
+                  properties:
+                    labels:
+                      type: array
+                      description: Array of labels (comma-separated strings)
+                      items:
+                        type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
 components:
   responses:
     SomeResponseRef:

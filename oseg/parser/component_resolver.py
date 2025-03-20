@@ -1,3 +1,4 @@
+import hashlib
 import openapi_pydantic as oa
 from typing import Union
 from oseg import parser
@@ -50,6 +51,7 @@ class ComponentResolver:
     def __init__(self, oa_parser: parser.OaParser):
         self._oa_parser: parser.OaParser = oa_parser
         self._names: dict[int, str] = {}
+        self._dynamic_names: dict[str, str] = {}
 
         self._component_examples()
         self._component_schemas()
@@ -201,6 +203,7 @@ class ComponentResolver:
         self,
         parent_schema: oa.Schema,
         parent_name: str,
+        from_request_body: bool = False,
     ) -> None:
         self._all_of(parent_schema)
 
@@ -218,6 +221,7 @@ class ComponentResolver:
                 schema=property_schema,
                 parent_name=parent_name,
                 name=property_name,
+                from_request_body=from_request_body,
             )
 
             if parser.TypeChecker.is_array(property_schema):
@@ -233,7 +237,18 @@ class ComponentResolver:
         schema: oa.Schema,
         parent_name: str,
         name: str,
+        from_request_body: bool,
     ) -> None:
+        """Generate a name for dynamic inline schemas.
+
+        If from_request_body == True, it will try to find a pre-existing name
+        from the _dynamic_names dict. This dict is solely for names generated
+        for inline schemes defined within a request body.
+
+        Otherwise, it generates a name using the parent schema name and property
+        name
+        """
+
         if not self._is_nameable(schema):
             return
 
@@ -244,13 +259,20 @@ class ComponentResolver:
             if schema.title is not None:
                 final_name = schema.title
             else:
-                final_name = f"{parent_name}_{name}"
+                schema_hash = self._generate_schema_hash(schema)
+
+                # check if an identical inline schema definition has already
+                # named, and use that name
+                if schema_hash in self._dynamic_names and from_request_body:
+                    final_name = self._dynamic_names[schema_hash]
+                else:
+                    final_name = f"{parent_name}_{name}"
 
             self._add(schema, final_name)
             self._oa_parser.components.schemas[final_name] = schema
 
             if parser.TypeChecker.is_object(schema):
-                self._schema_properties(schema, final_name)
+                self._schema_properties(schema, final_name, from_request_body)
 
             return
 
@@ -267,7 +289,7 @@ class ComponentResolver:
             return
 
         if parser.TypeChecker.is_object(schema.items) and not self.name(schema.items):
-            self._schema_properties(schema.items, items_name)
+            self._schema_properties(schema.items, items_name, from_request_body)
 
     def _request_body(
         self,
@@ -295,12 +317,20 @@ class ComponentResolver:
                 if schema.title is not None:
                     name = schema.title
                 else:
-                    name = f"{operation.operationId}_request"
+                    schema_hash = self._generate_schema_hash(schema)
+
+                    # check if an identical inline schema definition has already
+                    # named, and use that name
+                    if schema_hash in self._dynamic_names:
+                        name = self._dynamic_names[schema_hash]
+                    else:
+                        name = f"{operation.operationId}_request"
+                        self._dynamic_names[schema_hash] = name
 
                 self._add(schema, name)
                 self._oa_parser.components.schemas[name] = schema
 
-            self._schema_properties(schema, name)
+            self._schema_properties(schema, name, from_request_body=True)
             self._examples(media_type)
 
             # openapi-generator will only ever look at the first request
@@ -440,3 +470,6 @@ class ComponentResolver:
                 and self._is_nameable(schema.param_schema)
             )
         )
+
+    def _generate_schema_hash(self, schema: OA_RESOLVABLE) -> str:
+        return hashlib.sha256(str(schema).encode()).hexdigest()
