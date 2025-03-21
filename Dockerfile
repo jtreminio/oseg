@@ -1,18 +1,36 @@
-FROM python:3.12
+FROM ghcr.io/astral-sh/uv:python3.13-alpine
 LABEL maintainer="Juan Treminio <jtreminio@gmail.com>"
 
-COPY ./oseg /usr/app/oseg
-COPY ./static /usr/app/static
-COPY ./LICENSE /usr/app/LICENSE
-COPY ./pyproject.toml /usr/app/pyproject.toml
-COPY ./requirements.txt /usr/app/requirements.txt
-COPY ./run.py /usr/app/run.py
-COPY ./setup.py /usr/app/setup.py
-
-WORKDIR /usr/app
-
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Install the project into `/app`
 WORKDIR /app
 
-ENTRYPOINT ["python3", "/usr/app/run.py"]
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+ADD ./pyproject.toml /app/pyproject.toml
+ADD ./uv.lock /app/uv.lock
+ADD ./oseg /app/oseg
+ADD ./static /app/static
+ADD ./LICENSE /app/LICENSE
+ADD ./README.md /app/README.md
+ADD ./run.py /app/run.py
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Reset the entrypoint, don't invoke `uv`
+ENTRYPOINT ["python", "/app/run.py"]

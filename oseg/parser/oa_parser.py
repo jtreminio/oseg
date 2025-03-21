@@ -18,9 +18,14 @@ class OaParser:
         self.security: list[dict[str, list[str]]] | None = self._openapi.security
         self.components: oa.Components = self._openapi.components
 
-        self._component_resolver: parser.ComponentResolver = parser.ComponentResolver(self)
+        self._component_resolver: parser.ComponentResolver = parser.ComponentResolver(
+            self,
+        )
         example_data_parser: parser.ExampleDataParser = parser.ExampleDataParser(self)
-        operation_parser: parser.OperationParser = parser.OperationParser(self, example_data_parser)
+        operation_parser: parser.OperationParser = parser.OperationParser(
+            self,
+            example_data_parser,
+        )
 
         self.operations: dict[str, model.Operation] = operation_parser.setup_operations(
             operation_id=operation_id,

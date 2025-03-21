@@ -63,7 +63,7 @@ class PropertyInterface(Protocol):
         return self.schema.type
 
     def _needs_default_value(self) -> bool:
-        if not self.value is None:
+        if self.value is not None:
             return False
 
         if not self.is_required or self.is_nullable:

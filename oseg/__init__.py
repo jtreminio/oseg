@@ -6,7 +6,7 @@ import os
     oseg
 """
 
-__version__ = "0.2-dev"
+__version__ = "0.3-dev"
 __ROOT_DIR__ = os.path.dirname(os.path.abspath(__file__)) + "/.."
 
 from .jinja_extension import *
