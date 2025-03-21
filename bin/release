@@ -6,5 +6,5 @@ DIR=$(cd `dirname $0` && pwd)
 BASE_DIR="${DIR}/.."
 
 pushd "${BASE_DIR}"
-uv run twine upload dist/*
+uv publish
 popd
