@@ -646,3 +646,26 @@ class TestComponentResolver(TestCase):
         )
 
         operation.request.example_data = None
+
+    def test_request_body_inline_schema_name_used_for_inline_component_schema(self):
+        oa_parser = TestUtils.oa_parser("component_resolver")
+
+        schema_1 = oa_parser.components.schemas.get("SomeSchemaWithDupe1")
+        schema_2 = oa_parser.components.schemas.get("SomeSchemaWithDupe2")
+
+        prop_1 = schema_1.properties.get("prop_1")
+        prop_2 = schema_2.properties.get("prop_1").properties.get("prop_2")
+
+        expected_name = (
+            "inline_nested_schema_identical_name_1_request_some_property_name"
+        )
+
+        self.assertEqual(
+            expected_name,
+            oa_parser.get_component_name(prop_1),
+        )
+
+        self.assertEqual(
+            expected_name,
+            oa_parser.get_component_name(prop_2),
+        )

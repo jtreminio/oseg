@@ -66,6 +66,29 @@ paths:
       responses:
         '200':
           description: Successful operation
+  inline_nested_schema_identical_name_1:
+    post:
+      tags:
+        - pet
+      operationId: inline_nested_schema_identical_name_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                some_property_name:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Shared description for name property
+                  description: Shared description for this object
+      responses:
+        '200':
+          description: Success
 components:
   responses:
     SomeResponseRef:
@@ -85,6 +108,31 @@ components:
       properties:
         prop_1:
           type: string
+    # to match inline_nested_schema_identical_name_1.some_property_name
+    SomeSchemaWithDupe1:
+      type: object
+      properties:
+        prop_1:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Shared description for name property
+          description: Shared description for this object
+    SomeSchemaWithDupe2:
+      type: object
+      properties:
+        prop_1:
+          type: object
+          properties:
+            # to match inline_nested_schema_identical_name_1.some_property_name
+            prop_2:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Shared description for name property
+              description: Shared description for this object
   parameters:
     SomeParameterRef:
       $ref: '#/components/parameters/SomeParameter'

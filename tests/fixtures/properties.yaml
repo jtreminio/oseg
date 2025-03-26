@@ -66,6 +66,7 @@ paths:
                   properties:
                     key_1:
                       type: string
+                      description: some random description to make this object unique - 1
                 prop_ref_object:
                   $ref: '#/components/schemas/PropRefObject'
                 prop_array_ref_object:
@@ -75,10 +76,12 @@ paths:
                 # inline_request_body_properties_request_prop_nested_object
                 prop_nested_object:
                   type: object
+                  description: some random description to make this object unique - 2
                   properties:
                     # inline_request_body_properties_request_prop_nested_object_key_1
                     key_1:
                       type: object
+                      description: some random description to make this object unique - 3
                       properties:
                         key_2:
                           type: string
@@ -348,6 +351,7 @@ paths:
                 # MyCustomRequestBodyClass_prop_object
                 prop_object:
                   type: object
+                  description: some random description to make this object unique - 4
                   properties:
                     key_1:
                       type: string
@@ -375,6 +379,7 @@ paths:
                 # MyCustomRequestBodyClass_prop_object
                 prop_object:
                   type: object
+                  description: some random description to make this object unique - 5
                   properties:
                     key_1:
                       type: string
@@ -727,6 +732,7 @@ components:
       properties:
         key_1:
           type: object
+          description: some random description to make this object unique - 6
           properties:
             key_2:
               type: string
