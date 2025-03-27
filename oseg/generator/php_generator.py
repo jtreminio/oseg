@@ -146,8 +146,82 @@ class PhpGenerator(generator.BaseGenerator):
     NAME = "php"
     TEMPLATE = f"{NAME}.jinja2"
 
-    RESERVED_KEYWORD_PREPEND = ""
-    RESERVED_KEYWORDS = []
+    # reserved keyword functionality only applicable to enums
+    RESERVED_KEYWORD_PREPEND = "_"
+    RESERVED_KEYWORDS = [
+        "__halt_compiler",
+        "_header_accept",
+        "_tempbody",
+        "abstract",
+        "and",
+        "array",
+        "as",
+        "break",
+        "callable",
+        "case",
+        "catch",
+        "class",
+        "clone",
+        "const",
+        "continue",
+        "declare",
+        "default",
+        "die",
+        "do",
+        "echo",
+        "else",
+        "elseif",
+        "empty",
+        "enddeclare",
+        "endfor",
+        "endforeach",
+        "endif",
+        "endswitch",
+        "endwhile",
+        "eval",
+        "exit",
+        "extends",
+        "final",
+        "for",
+        "foreach",
+        "formparams",
+        "function",
+        "global",
+        "goto",
+        "headerparams",
+        "httpbody",
+        "if",
+        "implements",
+        "include",
+        "include_once",
+        "instanceof",
+        "insteadof",
+        "interface",
+        "isset",
+        "list",
+        "namespace",
+        "new",
+        "or",
+        "print",
+        "private",
+        "protected",
+        "public",
+        "queryparams",
+        "require",
+        "require_once",
+        "resourcepath",
+        "return",
+        "static",
+        "switch",
+        "throw",
+        "trait",
+        "try",
+        "unset",
+        "use",
+        "var",
+        "while",
+        "xor",
+    ]
 
     config: CONFIG_CLASS
 
@@ -260,7 +334,13 @@ class PhpGenerator(generator.BaseGenerator):
         if value == "" or value is None:
             return NormalizeStr.underscore(f"{name}_EMPTY").upper()
 
-        return NormalizeStr.underscore(f"{name}_{value}").upper()
+        name = NormalizeStr.underscore(name)
+        value = NormalizeStr.underscore(value)
+
+        if value.lower() in self.RESERVED_KEYWORDS:
+            value = f"{self.RESERVED_KEYWORD_PREPEND}{value}"
+
+        return f"{name}_{value}".upper()
 
 
 generator.GeneratorFactory.register(PhpGenerator)
