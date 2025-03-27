@@ -299,7 +299,7 @@ class ComponentResolver:
         schema.items = self._oa_parser.resolve_component(schema.items)
         items_name = self.name(schema.items)
 
-        if not items_name:
+        if not items_name and parser.TypeChecker.is_object_array(schema):
             schema_hash = self._generate_schema_hash(schema.items)
 
             if schema_hash in self._dynamic_names:

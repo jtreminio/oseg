@@ -669,3 +669,66 @@ class TestComponentResolver(TestCase):
             expected_name,
             oa_parser.get_component_name(prop_2),
         )
+
+    def test_schema_with_inner(self):
+        oa_parser = TestUtils.oa_parser("component_resolver")
+
+        schema_1 = oa_parser.components.schemas.get("SchemaWithInner")
+
+        prop_1 = schema_1.properties.get("prop_1")
+        prop_1_prop_2 = prop_1.properties.get("prop_2").items
+        prop_1_prop_2_prop_3 = prop_1_prop_2.properties.get("prop_3")
+
+        expected_name_1 = "SchemaWithInner_prop_1"
+        expected_name_2 = "SchemaWithInner_prop_1_prop_2_inner"
+        expected_name_3 = "SchemaWithInner_prop_1_prop_2_inner_prop_3"
+
+        self.assertEqual(
+            expected_name_1,
+            oa_parser.get_component_name(prop_1),
+        )
+
+        self.assertEqual(
+            expected_name_2,
+            oa_parser.get_component_name(prop_1_prop_2),
+        )
+
+        self.assertEqual(
+            expected_name_3,
+            oa_parser.get_component_name(prop_1_prop_2_prop_3),
+        )
+
+    def test_schema_with_inner_inner(self):
+        oa_parser = TestUtils.oa_parser("component_resolver")
+
+        schema_1 = oa_parser.components.schemas.get("SchemaWithInnerInner")
+
+        prop_1 = schema_1.properties.get("prop_1")
+        prop_1_prop_2 = prop_1.properties.get("prop_2").items
+        prop_1_prop_2_prop_3 = prop_1_prop_2.properties.get("prop_3").items
+        prop_1_prop_2_prop_3_prop_4 = prop_1_prop_2_prop_3.properties.get("prop_4")
+
+        expected_name_1 = "SchemaWithInnerInner_prop_1"
+        expected_name_2 = "SchemaWithInnerInner_prop_1_prop_2_inner"
+        expected_name_3 = "SchemaWithInnerInner_prop_1_prop_2_inner_prop_3_inner"
+        expected_name_4 = "SchemaWithInnerInner_prop_1_prop_2_inner_prop_3_inner_prop_4"
+
+        self.assertEqual(
+            expected_name_1,
+            oa_parser.get_component_name(prop_1),
+        )
+
+        self.assertEqual(
+            expected_name_2,
+            oa_parser.get_component_name(prop_1_prop_2),
+        )
+
+        self.assertEqual(
+            expected_name_3,
+            oa_parser.get_component_name(prop_1_prop_2_prop_3),
+        )
+
+        self.assertEqual(
+            expected_name_4,
+            oa_parser.get_component_name(prop_1_prop_2_prop_3_prop_4),
+        )
