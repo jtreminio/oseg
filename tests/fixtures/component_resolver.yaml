@@ -133,6 +133,52 @@ components:
                   type: string
                   description: Shared description for name property
               description: Shared description for this object
+    SchemaWithInner:
+      type: object
+      properties:
+        prop_1:
+          type: object
+          description: Some random description SchemaWithInner 1
+          properties:
+            prop_2:
+              type: array
+              description: Some random description SchemaWithInner 2
+              items:
+                type: object
+                properties:
+                  prop_3:
+                    type: object
+                    description: Some random description SchemaWithInner 3
+                    properties:
+                      name:
+                        type: string
+                        description: Some random description SchemaWithInner 4
+    SchemaWithInnerInner:
+      type: object
+      properties:
+        prop_1:
+          type: object
+          description: Some random description SchemaWithInnerInner 1
+          properties:
+            prop_2:
+              type: array
+              description: Some random description SchemaWithInnerInner 2
+              items:
+                type: object
+                properties:
+                  prop_3:
+                    type: array
+                    description: Some random description SchemaWithInnerInner 3
+                    items:
+                      type: object
+                      properties:
+                        prop_4:
+                          type: object
+                          description: Some random description SchemaWithInner 4
+                          properties:
+                            name:
+                              type: string
+                              description: Some random description SchemaWithInner 5
   parameters:
     SomeParameterRef:
       $ref: '#/components/parameters/SomeParameter'

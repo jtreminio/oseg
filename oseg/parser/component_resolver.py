@@ -299,17 +299,17 @@ class ComponentResolver:
         schema.items = self._oa_parser.resolve_component(schema.items)
         items_name = self.name(schema.items)
 
-        if not items_name:
-            """We do not want to get too crazy with unnamed nested arrays!
-            It gets complicated quite quickly.
-            Nested array of non-named Schema type=object is not supported.
-            Instead, create a named schema in #/components/schemas/ and use $ref
-            """
+        if not items_name and parser.TypeChecker.is_object_array(schema):
+            schema_hash = self._generate_schema_hash(schema.items)
 
-            return
+            if schema_hash in self._dynamic_names:
+                items_name = self._dynamic_names[schema_hash]
+            else:
+                items_name = f"{parent_name}_{name}_inner"
+                self._dynamic_names[schema_hash] = items_name
 
-        if parser.TypeChecker.is_object(schema.items) and not self.name(schema.items):
-            self._schema_properties(schema.items, items_name, from_request_body)
+        self._add(schema.items, items_name)
+        self._schema_properties(schema.items, items_name, from_request_body)
 
     def _request_body(
         self,
