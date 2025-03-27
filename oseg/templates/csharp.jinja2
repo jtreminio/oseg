@@ -75,8 +75,8 @@ new List<{{ printable.target_type|print_classname }}>{% if not printable.value %
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 {%- if printable.method == "api_key" %}{{ comment }}config.ApiKey.Add("{{ printable.name }}", {{ printable.value|tojson }});
 {%- elif printable.method == "access_token" %}{{ comment }}config.AccessToken = {{ printable.value|tojson }};
-{%- else %}{{ comment }}config.Username = {{ printable.value|tojson }};
-{{ comment }}config.Password = {{ printable.value_2|tojson }};
+{%- else %}{{ comment }}config.Username = {{ printable.value|tojson }};{% if printable.value_2 != None %}{{ "" }}
+{{ comment }}config.Password = {{ printable.value_2|tojson }};{% endif %}
 {%- endif %}
 {%-endmacro -%}
 

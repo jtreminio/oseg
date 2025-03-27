@@ -26,7 +26,7 @@ class TemplateParser:
                             key=key,
                             method=scheme.method.value,
                             value=security_config.get(f"{key}.username", ""),
-                            value_2=security_config.get(f"{key}.password", ""),
+                            value_2=security_config.get(f"{key}.password", None),
                             is_primary=is_primary,
                         )
                     )

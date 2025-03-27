@@ -67,8 +67,8 @@ EOD, true)
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 {%- if printable.method == "api_key" %}{{ comment }}$config->setApiKey("{{ printable.name }}", {{ printable.value|tojson }});
 {%- elif printable.method == "access_token" %}{{ comment }}$config->setAccessToken({{ printable.value|tojson }});
-{%- else %}{{ comment }}$config->setUsername({{ printable.value|tojson }});
-{{ comment }}$config->setPassword({{ printable.value_2|tojson }});
+{%- else %}{{ comment }}$config->setUsername({{ printable.value|tojson }});{% if printable.value_2 != None %}{{ "" }}
+{{ comment }}$config->setPassword({{ printable.value_2|tojson }});{% endif %}
 {%- endif %}
 {%-endmacro -%}
 

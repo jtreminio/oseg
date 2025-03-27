@@ -66,8 +66,8 @@ fs.createReadStream("{{ printable.value }}")
 {%- if printable.method == "api_key" %}{{ comment }}apiCaller.setApiKey(
     {{- "" }}api.{{ (operation.api_name ~ "ApiApiKeys")|print_classname }}.{{ printable.key }}, {{ printable.value|tojson }});
 {%- elif printable.method == "access_token" %}{{ comment }}apiCaller.accessToken = {{ printable.value|tojson }};
-{%- else %}{{ comment }}apiCaller.username = {{ printable.value|tojson }};
-{{ comment }}apiCaller.password = {{ printable.value_2|tojson }};
+{%- else %}{{ comment }}apiCaller.username = {{ printable.value|tojson }};{% if printable.value_2 != None %}{{ "" }}
+{{ comment }}apiCaller.password = {{ printable.value_2|tojson }};{% endif %}
 {%- endif %}
 {%-endmacro -%}
 

@@ -63,8 +63,8 @@ json.loads("""
     {% if not printable.is_primary %}{% set comment = "# " %}{% endif %}
 {%- if printable.method == "api_key" %}{{ comment }}api_key={"{{ printable.key }}": {{ printable.value|tojson }}},
 {%- elif printable.method == "access_token" %}{{ comment }}access_token={{ printable.value|tojson }},
-{%- else %}{{ comment }}username={{ printable.value|tojson }},
-{{ comment }}password={{ printable.value_2|tojson }},
+{%- else %}{{ comment }}username={{ printable.value|tojson }},{% if printable.value_2 != None %}{{ "" }}
+{{ comment }}password={{ printable.value_2|tojson }},{% endif %}
 {%- endif %}
 {%-endmacro -%}
 

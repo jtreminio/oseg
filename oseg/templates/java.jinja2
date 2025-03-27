@@ -71,8 +71,8 @@ new ArrayList<{{ printable.target_type|print_classname }}>(List.of {% if not pri
     {% if not printable.is_primary %}{% set comment = "// " %}{% endif %}
 {%- if printable.method == "api_key" %}{{ comment }}((ApiKeyAuth) config.getAuthentication("{{ printable.key }}")).setApiKey({{ printable.value|tojson }});
 {%- elif printable.method == "access_token" %}{{ comment }}((HttpBearerAuth) config.getAuthentication("{{ printable.key }}")).setBearerToken({{ printable.value|tojson }});
-{%- else %}{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setUsername({{ printable.value|tojson }});
-{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setPassword({{ printable.value_2|tojson }});
+{%- else %}{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setUsername({{ printable.value|tojson }});{% if printable.value_2 != None %}{{ "" }}
+{{ comment }}((HttpBasicAuth) config.getAuthentication("{{ printable.key }}")).setPassword({{ printable.value_2|tojson }});{% endif %}
 {%- endif %}
 {%-endmacro -%}
 
