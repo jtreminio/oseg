@@ -6,6 +6,7 @@ from typing import Literal
 class PrintableFreeForm:
     value: dict[str, any] | list[dict[str, any]] | None = None
     is_array: bool = False
+    has_properties: bool = False
 
 
 @dataclass

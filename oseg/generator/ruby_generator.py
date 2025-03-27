@@ -236,7 +236,18 @@ class RubyGenerator(generator.BaseGenerator):
             if item.format == model.DataFormat.DATE.value:
                 return f'Date.parse("{value}").to_date'
 
-        return self._to_json(value)
+        int_fixed = self._fix_ints(item, value)
+
+        return int_fixed if int_fixed is not None else self._to_json(value)
+
+    def _fix_ints(self, item: model.PropertyScalar, value: any) -> any:
+        if item.type not in [oa.DataType.INTEGER, oa.DataType.NUMBER] or value is None:
+            return None
+
+        if item.type == oa.DataType.NUMBER:
+            return f"({value}).to_f"
+
+        return value
 
 
 generator.GeneratorFactory.register(RubyGenerator)

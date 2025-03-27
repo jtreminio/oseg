@@ -383,6 +383,9 @@ class JavaGenerator(generator.BaseGenerator):
         elif item.format == model.DataFormat.INT64.value:
             return f"{value}L"
 
+        if item.type == oa.DataType.NUMBER:
+            return f"BigDecimal.valueOf({value})"
+
         return value
 
 
