@@ -96,6 +96,7 @@ class PropertyFile(PropertyInterface):
 class PropertyFreeForm(PropertyInterface):
     _T = dict[str, any] | list[dict[str, any]] | None
     value: _T
+    has_properties: bool
 
     def __init__(
         self,
@@ -109,6 +110,13 @@ class PropertyFreeForm(PropertyInterface):
 
         if self._needs_default_value():
             self.value = {} if not self.is_array else []
+
+        self.has_properties = False
+
+        if not self.is_array:
+            self.has_properties = bool(schema.properties == {})
+        else:
+            self.has_properties = bool(schema.items.properties == {})
 
 
 class PropertyScalar(PropertyInterface):

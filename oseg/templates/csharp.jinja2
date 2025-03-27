@@ -47,8 +47,8 @@ JsonSerializer.Deserialize<Dictionary<string, object>>("""
 
 {%- macro print_free_form_array(printable) -%}
     {% if printable.value == None %}{{ print_null() }}
-    {%- elif not printable.value %}new List<Dictionary<string, object>>(){%- else %}
-JsonSerializer.Deserialize<List<Dictionary<string, object>>>("""
+    {%- elif not printable.value %}new List<{% if printable.has_properties %}object{% else %}Dictionary<string, object>{% endif %}>(){%- else %}
+JsonSerializer.Deserialize<List<{% if printable.has_properties %}object{% else %}Dictionary<string, object>{% endif %}>>("""
     {{ printable.value|tojson(4)|indent(4) }}
 """)
     {%- endif %}

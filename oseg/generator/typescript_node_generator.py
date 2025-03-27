@@ -3,7 +3,7 @@ import openapi_pydantic as oa
 from dataclasses import dataclass
 from typing import TypedDict
 from oseg import generator, model
-from oseg.parser import NormalizeStr
+from oseg.parser import NormalizeStr, PascalCaseOption
 
 ConfigDef = TypedDict(
     "ConfigDef",
@@ -285,6 +285,10 @@ class TypescriptNodeGenerator(generator.BaseGenerator):
 
             parent_type = NormalizeStr.pascal_case(parent.type)
             enum_type = NormalizeStr.pascal_case(f"{item.name}Enum")
+            enum_name = NormalizeStr.pascal_case(
+                enum_name,
+                option=PascalCaseOption.LOWERCASE_CONTIGUOUS,
+            )
 
             final = f"models.{parent_type}.{enum_type}.{enum_name}"
 

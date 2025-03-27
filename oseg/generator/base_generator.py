@@ -208,6 +208,7 @@ class BaseGenerator(Protocol):
         printable = model.PrintableFreeForm()
         printable.value = item.value
         printable.is_array = item.is_array
+        printable.has_properties = item.has_properties
 
         return printable
 
