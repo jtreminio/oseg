@@ -175,7 +175,12 @@ class PhpGenerator(generator.BaseGenerator):
         return NormalizeStr.snake_case(name)
 
     def print_variablename(self, name: str) -> str:
-        return NormalizeStr.snake_case(name)
+        name = NormalizeStr.snake_case(name)
+
+        if not name.startswith("$"):
+            return "$" + name
+
+        return name
 
     def print_scalar(
         self,
