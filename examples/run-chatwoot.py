@@ -33,6 +33,10 @@ def main():
             "base_dir": f"{project_dir}/ruby",
             "output_dir": "src",
         },
+        "typescript-axios": {
+            "base_dir": f"{project_dir}/typescript-axios",
+            "output_dir": "src",
+        },
         "typescript-node": {
             "base_dir": f"{project_dir}/typescript-node",
             "output_dir": "src",
