@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR=$(cd `dirname $0` && pwd)
+
+uv run "${DIR}/run-chatwoot.py"
+uv run "${DIR}/run-launchdarkly.py"
+uv run "${DIR}/run-namsor.py"
+uv run "${DIR}/run-petstore.py"
